@@ -50,8 +50,17 @@ extern "C" {
     
     /* Constants defining flags for the send/recv calls. */
     enum {
-        MSG_OOB,        // Sends Out-of-band data.
-        MSG_DONTROUTE   // Don't use local routing.
+        MSG_OOB,        // Process Out-of-band data (send/recv).
+        MSG_DONTROUTE,  // Don't use local routing (send).
+        MSG_PEEK,       // Peeks at incoming data (recv).
+        MSG_WAITALL     // Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv).
+    };
+
+    /* Constants for the shutdown method. */
+    enum {
+        SHUT_RD,        // Disables further data receival on the socket.
+        SHUT_WR,        // Disables further data sending from the socket.
+        SHUT_RDWR       // Disables sending and receiving data on the socket.
     };
 
     /* Structure describing a generic socket address.
@@ -67,28 +76,42 @@ extern "C" {
 
     /* Method definitions */
 
-    /* Initializes the socket usage for the application on the platform */
+    /* Initializes the socket usage for the application on the platform. */
     int init_network();
 
-    /* Creates a new NETEMU_SOCKET */
+    /* Creates a new NETEMU_SOCKET. */
     NETEMU_SOCKET netemu_socket(int address_family, int socket_type);
 
-    /* Binds a given NETEMU_SOCKET to an address) */
-    int bind(NETEMU_SOCKET socket, const struct sockaddr* address, socklen_t address_len);
+    /* Binds a given NETEMU_SOCKET to an address. */
+    int bind(NETEMU_SOCKET socket, const struct sockaddr *address, socklen_t address_len);
 
-    /* Places a socket in a state where it listens for incoming connection attempts */
+    /* Places a socket in a state where it listens for incoming connection attempts. */
     int listen(NETEMU_SOCKET socket, int backlog);
 
     /* Accepts a connection attempt made on the listening socket. */
-    NETEMU_SOCKET accept(NETEMU_SOCKET socket, struct sockaddr* address, socklen_t* address_len);
+    NETEMU_SOCKET accept(NETEMU_SOCKET socket, struct sockaddr *address, socklen_t *address_len);
 
     /* Sends data through a connected socket. */
-    int send(NETEMU_SOCKET socket, const char* buffer, int len, int flags);
+    int send(NETEMU_SOCKET socket, const char *buffer, int len, int flags);
 
-    /* Sends data to a specific destination */
-    int sendto(NETEMU_SOCKET socket, const char* buffer, int len, int flags, const struct sockaddr* dest_address, socklen_t* address_len);
+    /* Sends data to a specific destination. */
+    int sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t *address_len);
 
+    /* Receives data on a connected socket. */
+    int recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
 
+    /* Received a datagram and stores the sender address */
+    int recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, struct sockaddr *address, socklen_t *address_len);
+
+    /* Disables send or receive on a socket. */
+    int shutdown(NETEMU_SOCKET socket, int how);
+
+    int free(NETEMU_SOCKET socket);
+
+    /* TODO: Look into error handling.
+     * In *nix, whenever a socket function returns -1, the system variable 'errno' is set with the appropriate error code.
+     * In windows, whenever a socket function returns -1, WSAGetLastError can be called to retrieve the error code for the last error that occured on the calling thread.
+     * How to abstract between the two? */
 
 #ifdef	__cplusplus
 }
