@@ -175,14 +175,8 @@ extern "C" {
     /* Frees the memory allocated for the socket */
     int free(NETEMU_SOCKET socket);
 
+    /* Returns the error code for the last error that occured */
     int GetLastError();
-
-
-
-    /* TODO: Look into error handling.
-     * In *nix, whenever a socket function returns -1, the system variable 'errno' is set with the appropriate error code.
-     * In windows, whenever a socket function returns -1, WSAGetLastError can be called to retrieve the error code for the last error that occured on the calling thread.
-     * How to abstract between the two? */
 
 #ifdef	__cplusplus
 }
