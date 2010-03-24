@@ -143,40 +143,40 @@ extern "C" {
     /* Method definitions */
 
     /* Initializes the socket usage for the application on the platform. */
-    int init_network();
+    int netemu_init_network();
 
     /* Creates a new NETEMU_SOCKET. */
     NETEMU_SOCKET netemu_socket(int address_family, int socket_type);
 
     /* Binds a given NETEMU_SOCKET to an address. */
-    int bind(NETEMU_SOCKET socket, const struct sockaddr *address, socklen_t address_len);
+    int netemu_bind(NETEMU_SOCKET socket, const struct sockaddr *address, socklen_t address_len);
 
     /* Places a socket in a state where it listens for incoming connection attempts. */
-    int listen(NETEMU_SOCKET socket, int backlog);
+    int netemu_listen(NETEMU_SOCKET socket, int backlog);
 
     /* Accepts a connection attempt made on the listening socket. */
-    NETEMU_SOCKET accept(NETEMU_SOCKET socket, struct sockaddr *address, socklen_t *address_len);
+    NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, struct sockaddr *address, socklen_t *address_len);
 
     /* Sends data through a connected socket. */
-    int send(NETEMU_SOCKET socket, const char *buffer, int len, int flags);
+    int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags);
 
     /* Sends data to a specific destination. */
-    int sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t *address_len);
+    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t *address_len);
 
     /* Receives data on a connected socket. */
-    int recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
+    int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
 
     /* Received a datagram and stores the sender address */
-    int recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, struct sockaddr *address, socklen_t *address_len);
+    int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, struct sockaddr *address, socklen_t *address_len);
 
     /* Disables send or receive on a socket. */
-    int shutdown(NETEMU_SOCKET socket, int how);
+    int netemu_shutdown(NETEMU_SOCKET socket, int how);
 
     /* Frees the memory allocated for the socket */
-    int free(NETEMU_SOCKET socket);
+    int netemu_free(NETEMU_SOCKET socket);
 
     /* Returns the error code for the last error that occured */
-    int GetLastError();
+    int netemu_get_last_error();
 
 #ifdef	__cplusplus
 }
