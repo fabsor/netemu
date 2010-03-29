@@ -145,9 +145,6 @@ extern "C" {
     /* Initializes the socket usage for the application on the platform. */
     int netemu_init_network();
 
-    /* Performs a cleanup when the application is finished using sockets */
-    int netemu_cleanup();
-
     /* Creates a new NETEMU_SOCKET. */
     NETEMU_SOCKET netemu_socket(int address_family, int socket_type);
 
@@ -164,7 +161,7 @@ extern "C" {
     int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags);
 
     /* Sends data to a specific destination. */
-    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t address_len);
+    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t *address_len);
 
     /* Receives data on a connected socket. */
     int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
@@ -175,12 +172,8 @@ extern "C" {
     /* Disables send or receive on a socket. */
     int netemu_shutdown(NETEMU_SOCKET socket, int how);
 
-    /* Closes an existing socket */
-    int netemu_closesocket(NETEMU_SOCKET socket);
-
     /* Frees the memory allocated for the socket */
-    // ONÖDIG?
-    // int netemu_free(NETEMU_SOCKET socket);
+    int netemu_free(NETEMU_SOCKET socket);
 
     /* Returns the error code for the last error that occured */
     int netemu_get_last_error();
