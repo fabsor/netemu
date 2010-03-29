@@ -13,20 +13,19 @@ extern "C" {
 #endif
     struct netemu_list{
         int size;
-        void* elements;
+        void** elements;
         int element_size;
         int count;
     };
 
-    struct netemu_list* netemu_list_new(int element_size);
 
     struct netemu_list* netemu_list_new(int element_size, int count);
 
-    void netemu_list_add(void* element);
+    void netemu_list_add(struct netemu_list* list, void* element);
 
-    int netemu_remove(void* element);
+    int netemu_remove(struct netemu_list* list, void* element);
 
-    int netemu_list_remove_at(int index);
+    int netemu_list_remove_at(struct netemu_list* list, int index);
 
     /**
      * Get a pointer to an element in the list.

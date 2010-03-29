@@ -7,12 +7,14 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <netdb.h>
 
 int initialized;
 /* Initializes the socket usage for the application on the platform. */
 int netemu_init_network() {
     initialized = 1;
     return 0;
+    
 }
 
 /* Creates a new NETEMU_SOCKET. */
@@ -71,4 +73,8 @@ int netemu_free(NETEMU_SOCKET socket) {
 /* Returns the error code for the last error that occured */
 int netemu_get_last_error() {
   return errno;
+}
+
+int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo* result) {
+    return getaddrinfo(nodename,servicetype,hints,&result);
 }

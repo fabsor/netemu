@@ -3,9 +3,7 @@
 
 #include "netemu_list.h"
 
-struct netemu_list* netemu_list_new(int element_size) {
-    return netemu_list_new(element_size,10);
-}
+void _netemu_enlarge_list(struct netemu_list* list, int size);
 
 struct netemu_list* netemu_list_new(int element_size,int count) {
   struct netemu_list list;
@@ -21,22 +19,20 @@ void netemu_list_add(struct netemu_list* list, void* element) {
 }
 
 void _netemu_enlarge_list(struct netemu_list* list, int size) {
+    int i;
     list->size += size;
-    void* elements = malloc(sizeof(list->element_size)*list->size);
-    for (int i  = 0; i < list->count; i++) {
+    void** elements = malloc(sizeof(list->element_size)*list->size);
+    for (i  = 0; i < list->count; i++) {
         elements[i] = list->elements[i];
     }
 }
 
 int netemu_list_remove(struct netemu_list* list, void* element){
-
-}
-
-void netemu_list_sort(void* func) {
     
 }
 
-int netemu_list_remove_at(int index);
+
+int netemu_list_remove_at(struct netemu_list* list,int index);
 
 /**
  * Get a pointer to an element in the list.
