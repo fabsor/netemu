@@ -134,10 +134,20 @@ extern "C" {
     /**
      * Structure describing a generic socket address.
      * Hopefully this is identical on both the unix and win32 platform, not yet verified though. */
+    /*
     struct netemu_sockaddr {
         unsigned short sa_family;   // THe address family of the socket.
         char sa_data[14];           // Address info.
     };
+    */
+    /* Lets do it this way instead, since this will be a direct mapping,
+     and no conversion will be needed. (hopefully it works across all platforms) */
+    typedef struct sockaddr netemu_sockaddr;
+
+    /* Let's typedef these structs directly. */
+    typedef struct sockaddr_in netemu_sockaddr_in;
+
+    typedef struct sockaddr_in6 netemu_sockaddr_in6;
 
     /*! Type defining size of socket info */
     typedef unsigned int socklen_t;
@@ -152,25 +162,25 @@ extern "C" {
     NETEMU_SOCKET netemu_socket(int address_family, int socket_type);
 
     /*! Binds a given NETEMU_SOCKET to an address. */
-    int netemu_bind(NETEMU_SOCKET socket, const struct netemu_sockaddr *address, socklen_t address_len);
+    int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len);
 
     /*! Places a socket in a state where it listens for incoming connection attempts. */
     int netemu_listen(NETEMU_SOCKET socket, int backlog);
 
     /* Accepts a connection attempt made on the listening socket. */
-    NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, struct netemu_sockaddr *address, socklen_t *address_len);
+    NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, socklen_t *address_len);
 
     /* Sends data through a connected socket. */
     int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags);
 
     /* Sends data to a specific destination. */
-    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct netemu_sockaddr *dest_address, socklen_t address_len);
+    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len);
 
     /* Receives data on a connected socket. */
     int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
 
     /* Received a datagram and stores the sender address */
-    int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, struct netemu_sockaddr *address, socklen_t *address_len);
+    int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len);
 
     /* Disables send or receive on a socket. */
     int netemu_shutdown(NETEMU_SOCKET socket, int how);
