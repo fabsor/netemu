@@ -14,14 +14,17 @@ extern "C" {
 
     /* Platform-specific socket typedefs.
      * Unix uses signed integers for the socket file descriptor,
-     * while windows uses an unsigned integer. */
+     * while windows uses an unsigned integer.
+     * TODO: Since there are no namespaces, we need to prefix all these with NETEMU_
+     * also, wouldn't it be better to define them to their constants instead?
+     */
     #ifdef _NIX
 
     typedef int NETEMU_SOCKET;
     #define INVALID_SOCKET  (NETEMU_SOCKET)(-1)
 
     /* Error code constants */
-    #define EINTR           4
+    #define NETEMU_EINTR    EINTR //Like this?
     #define EWOULDBLOCK     11
     #define EACCES          13
     #define EFAULT          14
@@ -95,79 +98,89 @@ extern "C" {
 
     /* Constants for the different address families that
      * can be specified when creating a new socket. */
-    enum {
-        NETEMU_AF_APPLETALK = 0,
-        NETEMU_AF_BLUETOOTH,
-        NETEMU_AF_INET,
-        NETEMU_AF_INET6,
-        NETEMU_AF_IPX,
-        NETEMU_AF_IRDA,
-        NETEMU_AF_UNSPEC
-    };
+
+    #define NETEMU_AF_APPLETALK AF_APPLETALK
+    #define NETEMU_AF_BLUETOOTH AF_BLUETOOTH
+    #define NETEMU_AF_INET  AF_INET
+    #define NETEMU_AF_INET6 AF_INET6
+    #define NETEMU_AF_IPX   AF_IPX
+    #define NETEMU_AF_IRDA  AF_IRDA
+    #define NETEMU_AF_UNSPEC    AF_UNSPEC
+
 
     /* Constans for the different socket types that
      * can be specified when creating a new socket. */
-    enum {
-        NETEMU_SOCK_DGRAM,
-        NETEMU_SOCK_RAW,
-        NETEMU_SOCK_RDM,
-        NETEMU_SOCK_STREAM
-    };
+    #define NETEMU_SOCK_DGRAM   SOCK_DGRAM
+    #define NETEMU_SOCK_RAW     SOCK_RAW
+    #define NETEMU_SOCK_RDM     SOCK_RDM
+    #define NETEMU_SOCK_STREAM  SOCK_STREAM
+    
     
     /* Constants defining flags for the send/recv calls. */
-    enum {
-        NETEMU_MSG_OOB,        // Process Out-of-band data (send/recv).
-        NETEMU_MSG_DONTROUTE,  // Don't use local routing (send).
-        NETEMU_MSG_PEEK,       // Peeks at incoming data (recv).
-        NETEMU_MSG_WAITALL     // Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv).
-    };
+
+    #define NETEMU_MSG_OOB          MSG_OOB        // Process Out-of-band data (send/recv).
+    #define NETEMU_MSG_DONTROUTE    MSG_DONTROUTE  // Don't use local routing (send).
+    #define NETEMU_MSG_PEEK         MSG_PEEK       // Peeks at incoming data (recv).
+    #define  NETEMU_MSG_WAITALL     MSG_WAITALL     // Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv).
+
 
     /* Constants for the shutdown method. */
-    enum {
-        NETEMU_SHUT_RD,        // Disables further data receival on the socket.
-        NETEMU_SHUT_WR,        // Disables further data sending from the socket.
-        NETEMU_SHUT_RDWR       // Disables sending and receiving data on the socket.
-    };
+    
+    #define NETEMU_SHUT_RD      SHUT_RD     // Disables further data receival on the socket.
+    #define NETEMU_SHUT_WR      SHUT_WR     // Disables further data sending from the socket.
+    #define NETEMU_SHUT_RDWR    SHUT_RDWR   // Disables sending and receiving data on the socket.
+    
 
-    /* Structure describing a generic socket address.
+    /**
+     * Structure describing a generic socket address.
      * Hopefully this is identical on both the unix and win32 platform, not yet verified though. */
-    struct sockaddr {
+    /*
+    struct netemu_sockaddr {
         unsigned short sa_family;   // THe address family of the socket.
         char sa_data[14];           // Address info.
     };
+    */
+    /* Lets do it this way instead, since this will be a direct mapping,
+     and no conversion will be needed. (hopefully it works across all platforms) */
+    typedef struct sockaddr netemu_sockaddr;
 
-    /* Type defining size of socket info */
+    /* Let's typedef these structs directly. */
+    typedef struct sockaddr_in netemu_sockaddr_in;
+
+    typedef struct sockaddr_in6 netemu_sockaddr_in6;
+
+    /*! Type defining size of socket info */
     typedef unsigned int socklen_t;
 
 
     /* Method definitions */
 
-    /* Initializes the socket usage for the application on the platform. */
+    /*! Initializes the socket usage for the application on the platform. */
     int netemu_init_network();
 
-    /* Creates a new NETEMU_SOCKET. */
+    /*! Creates a new NETEMU_SOCKET. */
     NETEMU_SOCKET netemu_socket(int address_family, int socket_type);
 
-    /* Binds a given NETEMU_SOCKET to an address. */
-    int netemu_bind(NETEMU_SOCKET socket, const struct sockaddr *address, socklen_t address_len);
+    /*! Binds a given NETEMU_SOCKET to an address. */
+    int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len);
 
-    /* Places a socket in a state where it listens for incoming connection attempts. */
+    /*! Places a socket in a state where it listens for incoming connection attempts. */
     int netemu_listen(NETEMU_SOCKET socket, int backlog);
 
     /* Accepts a connection attempt made on the listening socket. */
-    NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, struct sockaddr *address, socklen_t *address_len);
+    NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, socklen_t *address_len);
 
     /* Sends data through a connected socket. */
     int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags);
 
     /* Sends data to a specific destination. */
-    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t *address_len);
+    int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len);
 
     /* Receives data on a connected socket. */
     int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
 
     /* Received a datagram and stores the sender address */
-    int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, struct sockaddr *address, socklen_t *address_len);
+    int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len);
 
     /* Disables send or receive on a socket. */
     int netemu_shutdown(NETEMU_SOCKET socket, int how);
