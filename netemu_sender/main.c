@@ -36,17 +36,20 @@ int main()
 }
 
 void send_data(NETEMU_SOCKET socket) {
+	int error;
 	char c;
 	struct netemu_sockaddr_in addr;
 	int data_received;
 	int size = 22;
-
 	addr.addr = inet_addr("192.168.106.235");
 	addr.family = NETEMU_AF_INET;
 	addr.port = 27015;
 	
 	while(1) {
 		c = (char)getchar();
-		netemu_sendto(socket, &c, 1, 0, netemu_prepare_net_addr(&addr), sizeof(addr));
+		error = netemu_sendto(socket, &c, 1, 0, netemu_prepare_net_addr(&addr), sizeof(addr));
+		if(error != 0){
+			printf("Error: %s\n", netemu_get_last_error());
+		}
 	}
 }
