@@ -58,6 +58,9 @@ extern "C" {
 
     #else
 
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+
     typedef unsigned int NETEMU_SOCKET;
     #define INVALID_SOCKET  (NETEMU_SOCKET)(~0)
 
@@ -162,10 +165,6 @@ extern "C" {
     */
     typedef struct addrinfo netemu_addrinfo;
 
-    /*! Type defining size of socket info */
-    typedef unsigned int socklen_t;
-
-
     /* Method definitions */
 
     /*! Initializes the socket usage for the application on the platform. */
@@ -204,7 +203,7 @@ extern "C" {
     /* Returns the error code for the last error that occured */
     int netemu_get_last_error();
 
-    int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo* result);
+    int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo** result);
 
 #ifdef	__cplusplus
 }
