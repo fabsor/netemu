@@ -211,6 +211,7 @@ extern "C" {
 
     int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result);
 
+    netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr);
 #ifdef	__cplusplus
 }
 #endif
