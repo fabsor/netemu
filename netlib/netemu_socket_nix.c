@@ -24,7 +24,7 @@ NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
 
 /* Binds a given NETEMU_SOCKET to an address. */
 int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
-    return bind(socket,(struct sockaddr*)address,address_len);
+    return bind(socket,address,address_len);
 }
 
 /* Places a socket in a state where it listens for incoming connection attempts. */
@@ -75,6 +75,16 @@ int netemu_get_last_error() {
   return errno;
 }
 
-int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo* result) {
-    return getaddrinfo(nodename,servicetype,hints,&result);
+int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
+    return 0;
+}
+
+netemu_sockaddr* prepare_net_addr(struct netemu_sockaddr_in *netaddr){
+    struct sockaddr_in* in_addr;
+    in_addr = malloc(sizeof(struct sockaddr_in));
+    in_addr->sin_port = netaddr->port;
+    in_addr->sin_family = netaddr->family;
+    in_addr->sin_addr.s_addr = netaddr->addr;
+    
+    return (netemu_sockaddr*) in_addr;
 }
