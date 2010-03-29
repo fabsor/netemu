@@ -10,7 +10,9 @@ int main()
 	struct netemu_sockaddr_in addr;
 	addr.addr = htonl(INADDR_ANY);
 	addr.family = NETEMU_AF_INET;
-	addr.port = 0;
+	addr.port = 27015;
+
+	printf("RECEIVER\n");
 
 	error = netemu_init_network();
 	if(error != 0) {
@@ -40,9 +42,12 @@ void receive_data(NETEMU_SOCKET socket) {
 	
 	while(1) {
 		data_received = netemu_recv(socket, buffer, size, 0); 
-		if(data_received > 0)
+		if(data_received < 0){
+			printf("RECV: %i", netemu_get_last_error());
+		}
+		else if(data_received > 0)
 		{
-			printf(buffer);
+			printf("%c", buffer[0]);
 		}
 	}
 }

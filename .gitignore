@@ -8,3 +8,4 @@ Debug
 Debug/*
 Release
 Release/*
+*.ncb
