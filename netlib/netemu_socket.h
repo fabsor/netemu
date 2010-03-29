@@ -98,39 +98,38 @@ extern "C" {
 
     /* Constants for the different address families that
      * can be specified when creating a new socket. */
-    enum {
-        NETEMU_AF_APPLETALK = 0,
-        NETEMU_AF_BLUETOOTH,
-        NETEMU_AF_INET,
-        NETEMU_AF_INET6,
-        NETEMU_AF_IPX,
-        NETEMU_AF_IRDA,
-        NETEMU_AF_UNSPEC
-    };
+
+    #define NETEMU_AF_APPLETALK AF_APPLETALK
+    #define NETEMU_AF_BLUETOOTH AF_BLUETOOTH
+    #define NETEMU_AF_INET  AF_INET
+    #define NETEMU_AF_INET6 AF_INET6
+    #define NETEMU_AF_IPX   AF_IPX
+    #define NETEMU_AF_IRDA  AF_IRDA
+    #define NETEMU_AF_UNSPEC    AF_UNSPEC
+
 
     /* Constans for the different socket types that
      * can be specified when creating a new socket. */
-    enum {
-        NETEMU_SOCK_DGRAM,
-        NETEMU_SOCK_RAW,
-        NETEMU_SOCK_RDM,
-        NETEMU_SOCK_STREAM
-    };
+    #define NETEMU_SOCK_DGRAM   SOCK_DGRAM
+    #define NETEMU_SOCK_RAW     SOCK_RAW
+    #define NETEMU_SOCK_RDM     SOCK_RDM
+    #define NETEMU_SOCK_STREAM  SOCK_STREAM
+    
     
     /* Constants defining flags for the send/recv calls. */
-    enum {
-        NETEMU_MSG_OOB,        // Process Out-of-band data (send/recv).
-        NETEMU_MSG_DONTROUTE,  // Don't use local routing (send).
-        NETEMU_MSG_PEEK,       // Peeks at incoming data (recv).
-        NETEMU_MSG_WAITALL     // Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv).
-    };
+
+    #define NETEMU_MSG_OOB          MSG_OOB        // Process Out-of-band data (send/recv).
+    #define NETEMU_MSG_DONTROUTE    MSG_DONTROUTE  // Don't use local routing (send).
+    #define NETEMU_MSG_PEEK         MSG_PEEK       // Peeks at incoming data (recv).
+    #define  NETEMU_MSG_WAITALL     MSG_WAITALL     // Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv).
+
 
     /* Constants for the shutdown method. */
-    enum {
-        NETEMU_SHUT_RD,        // Disables further data receival on the socket.
-        NETEMU_SHUT_WR,        // Disables further data sending from the socket.
-        NETEMU_SHUT_RDWR       // Disables sending and receiving data on the socket.
-    };
+    
+    #define NETEMU_SHUT_RD      SHUT_RD     // Disables further data receival on the socket.
+    #define NETEMU_SHUT_WR      SHUT_WR     // Disables further data sending from the socket.
+    #define NETEMU_SHUT_RDWR    SHUT_RDWR   // Disables sending and receiving data on the socket.
+    
 
     /**
      * Structure describing a generic socket address.
