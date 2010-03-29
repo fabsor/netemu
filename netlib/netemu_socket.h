@@ -140,27 +140,33 @@ extern "C" {
         char sa_data[14];           // Address info.
     };
     */
-    /* Lets do it this way instead, since this will be a direct mapping,
-     and no conversion will be needed. (hopefully it works across all platforms) */
-    typedef struct sockaddr netemu_sockaddr;
+    typedef struct netemu_sockaddr{
+        unsigned short family;
+        char sa_data[14];
 
-    /* Let's typedef these structs directly. */
-    typedef struct sockaddr_in netemu_sockaddr_in;
+    };
+
+    typedef struct netemu_sockaddr_in {
+        unsigned short family;
+        char sa_data[14];
+        unsigned int addr;
+        short port;
+    };
 
     typedef struct sockaddr_in6 netemu_sockaddr_in6;
 
 
     /*! Winsock has a handy struct which contains address information of a specific host. This struct
-     * aims to replicate this. 
+     * aims to replicate this.*/
     struct netemu_addrinfo {
         int port;
         long address;
         char* hostname;
         netemu_sockaddr* addr;
-        struct netemu_addrinfo* next;
+        struct netemu_addrinfo** next;
     };
-    */
-    typedef struct addrinfo netemu_addrinfo;
+
+
 
     /*! Type defining size of socket info */
     typedef unsigned int socklen_t;
