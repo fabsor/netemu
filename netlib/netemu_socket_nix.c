@@ -6,6 +6,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <sys/un.h>
 #include <netdb.h>
 
@@ -45,13 +46,12 @@ int netmu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
 
 /* Sends data to a specific destination. */
 int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len){
-    return sendto(socket,buffer,len,flags,(struct sockaddr*)dest_address,address_len);
-    
+    return sendto(socket,buffer,len,flags,dest_address,address_len);
 }
 
 /* Receives data on a connected socket. */
 int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
-    return netemu_recv(socket,buffer,len,flags);
+    return recv(socket,buffer,len,flags);
 }
 
 /* Received a datagram and stores the sender address */
@@ -79,7 +79,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
     return 0;
 }
 
-netemu_sockaddr* prepare_net_addr(struct netemu_sockaddr_in *netaddr){
+netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
     struct sockaddr_in* in_addr;
     in_addr = malloc(sizeof(struct sockaddr_in));
     in_addr->sin_port = netaddr->port;
