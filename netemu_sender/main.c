@@ -1,6 +1,6 @@
-#include "..\netemu\netlib\netemu_socket.h"
+#include "netemu_socket.h"
 #include <stdio.h>
-
+#include <arpa/inet.h>
 void send_data(NETEMU_SOCKET);
 
 int main()
@@ -11,6 +11,7 @@ int main()
 	addr.addr = htonl(INADDR_ANY);
 	addr.family = NETEMU_AF_INET;
 	addr.port = 0;
+
 
 	printf("SENDER");
 
@@ -40,7 +41,7 @@ void send_data(NETEMU_SOCKET socket) {
 	int data_received;
 	int size = 22;
 
-	addr.addr = htonl(INADDR_LOOPBACK);
+	addr.addr = inet_addr("192.168.106.235");
 	addr.family = NETEMU_AF_INET;
 	addr.port = 27015;
 	

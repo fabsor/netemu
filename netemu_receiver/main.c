@@ -1,6 +1,6 @@
-#include "netlib\netemu_socket.h"
+#include "netemu_socket.h"
 #include <stdio.h>
-
+#include <stdlib.h>
 void receive_data(NETEMU_SOCKET);
 
 int main()
@@ -31,14 +31,15 @@ int main()
 	}
 
 	receive_data(socket);
+
 	return 0;
 }
 
 void receive_data(NETEMU_SOCKET socket) {
-	char* buffer;
+	char buffer[128];
 	int data_received;
 	int size = 128;
-	buffer = malloc(size);
+	//buffer = malloc(size*sizeof(char));
 	
 	while(1) {
 		data_received = netemu_recv(socket, buffer, size, 0); 
