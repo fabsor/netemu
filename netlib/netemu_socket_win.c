@@ -66,6 +66,16 @@ int netemu_get_last_error() {
     return WSAGetLastError();
 }
 
-int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo** result) {
-	return getaddrinfo(nodename, servicetype, hints, result);
+int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
+	/*return getaddrinfo(nodename, servicetype, hints, result);*/
+}
+
+netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr) {
+	struct sockaddr_in* in_addr;
+    in_addr = malloc(sizeof(struct sockaddr_in));
+    in_addr->sin_port = netaddr->port;
+    in_addr->sin_family = netaddr->family;
+    in_addr->sin_addr.s_addr = netaddr->addr;
+    
+    return (netemu_sockaddr*) in_addr;
 }
