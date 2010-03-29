@@ -149,8 +149,9 @@ extern "C" {
 
     typedef struct sockaddr_in6 netemu_sockaddr_in6;
 
+
     /*! Winsock has a handy struct which contains address information of a specific host. This struct
-     * aims to replicate this. */
+     * aims to replicate this. 
     struct netemu_addrinfo {
         int port;
         long address;
@@ -158,6 +159,8 @@ extern "C" {
         netemu_sockaddr* addr;
         struct netemu_addrinfo* next;
     };
+    */
+    typedef struct addrinfo netemu_addrinfo;
 
     /*! Type defining size of socket info */
     typedef unsigned int socklen_t;
@@ -201,7 +204,7 @@ extern "C" {
     /* Returns the error code for the last error that occured */
     int netemu_get_last_error();
 
-	int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo* result);
+    int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo* result);
 
 #ifdef	__cplusplus
 }
