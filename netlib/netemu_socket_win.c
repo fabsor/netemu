@@ -1,5 +1,4 @@
 #include "netemu_socket.h"
-#include <winsock2.h>
 
 int netemu_init_network() {
     int errcode;
@@ -65,4 +64,8 @@ int netemu_closesocket(NETEMU_SOCKET socket) {
 
 int netemu_get_last_error() {
     return WSAGetLastError();
+}
+
+int netemu_get_addr_info(char* nodename, char* servicetype, const netemu_addrinfo* hints, netemu_addrinfo** result) {
+	return getaddrinfo(nodename, servicetype, hints, result);
 }
