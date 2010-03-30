@@ -1,4 +1,4 @@
-#include "netemu_socket.h"
+#include "headers/netemu_socket.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <errno.h>
@@ -20,7 +20,8 @@ int netemu_init_network() {
 
 /* Creates a new NETEMU_SOCKET. */
 NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
-    NETEMU_SOCKET sock = socket(address_family,socket_type,0);
+    return socket(address_family,socket_type,0);
+
 }
 
 /* Binds a given NETEMU_SOCKET to an address. */
@@ -67,7 +68,7 @@ int netemu_shutdown(NETEMU_SOCKET socket, int how) {
 
 /* Frees the memory allocated for the socket */
 int netemu_free(NETEMU_SOCKET socket) {
-    
+    return 1;
 }
 
 /* Returns the error code for the last error that occured */

@@ -1,0 +1,3 @@
+#Tue Mar 30 08:22:50 CEST 2010
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.lib.debug.590138820=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\="\:" name\="PWD" operation\="replace" value\="/home/fabian/workspace/netemu/netlib/Debug"/>\n</environment>\n

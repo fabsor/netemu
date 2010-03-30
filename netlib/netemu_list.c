@@ -1,7 +1,7 @@
 #include <sys/socket.h>
 #include <stdlib.h>
 
-#include "netemu_list.h"
+#include "headers/netemu_list.h"
 
 void _netemu_enlarge_list(struct netemu_list* list, int size);
 
@@ -10,6 +10,7 @@ struct netemu_list* netemu_list_new(int element_size,int count) {
   list.size = count;
   list.element_size = element_size;
   list.elements = malloc(sizeof(element_size)*list.size);
+  return &list;
 }
 
 void netemu_list_add(struct netemu_list* list, void* element) {
@@ -21,18 +22,22 @@ void netemu_list_add(struct netemu_list* list, void* element) {
 void _netemu_enlarge_list(struct netemu_list* list, int size) {
     int i;
     list->size += size;
-    void** elements = malloc(sizeof(list->element_size)*list->size);
+    void** elements;
+
+    elements = malloc(sizeof(list->element_size)*list->size);
     for (i  = 0; i < list->count; i++) {
         elements[i] = list->elements[i];
     }
 }
 
 int netemu_list_remove(struct netemu_list* list, void* element){
-    
+  return 0;
 }
 
 
-int netemu_list_remove_at(struct netemu_list* list,int index);
+int netemu_list_remove_at(struct netemu_list* list,int index) {
+	return 0;
+}
 
 /**
  * Get a pointer to an element in the list.
