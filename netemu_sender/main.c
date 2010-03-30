@@ -32,6 +32,7 @@ int main()
 	}
 
 	send_data(socket);
+
 	return 0;
 }
 

@@ -80,6 +80,10 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
     return 0;
 }
 
+unsigned long netemu_inet_addr(char* addr) {
+	return inet_addr(addr);
+}
+
 netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
     struct sockaddr_in* in_addr;
     in_addr = malloc(sizeof(struct sockaddr_in));
