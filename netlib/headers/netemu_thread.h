@@ -12,12 +12,19 @@ typedef int netemu_thread;
 
 /* Since the windows threads are using the very microsofty WINAPI, we need to typedef a little =) */
 #ifdef _NIX
-typedef void NETEMU_API;
+
+#ifndef STDCALL 
+#define STDCALL __attribute__((stdcall)) 
+#endif 
+
+#define NETEMU_API		STDCALL
+
 #else
-typedef void WINAPI NETEMU_API;
+#include <Windows.h>
+#define NETEMU_API		WINAPI
 #endif
 
-int netemu_thread_new(netemu_thread* identifier, NETEMU_API *(*start_fn) (void *));
+int netemu_thread_new(netemu_thread* identifier, unsigned long (NETEMU_API *start_fn) (void *));
 
 int netemu_thread_stop(netemu_thread* identifier);
 

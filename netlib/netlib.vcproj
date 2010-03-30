@@ -154,6 +154,10 @@
 				RelativePath=".\netemu_socket_win.c"
 				>
 			</File>
+			<File
+				RelativePath=".\netemu_thread_win.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -162,6 +166,10 @@
 			>
 			<File
 				RelativePath=".\headers\netemu_socket.h"
+				>
+			</File>
+			<File
+				RelativePath=".\headers\netemu_thread.h"
 				>
 			</File>
 		</Filter>
