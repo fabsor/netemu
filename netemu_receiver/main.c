@@ -36,19 +36,27 @@ int main()
 }
 
 void receive_data(NETEMU_SOCKET socket) {
-	char buffer[128];
+	unsigned char buffer[4];
 	int data_received;
-	int size = 128;
-	//buffer = malloc(size*sizeof(char));
+	int size = 4;
+	unsigned long i = 0;
+	BOOL received[100000];
 	
-	while(1) {
+	while(i < 99999) {
 		data_received = netemu_recv(socket, buffer, size, 0); 
+		i = *((unsigned long*)buffer);
 		if(data_received < 0){
 			printf("RECV: %i", netemu_get_last_error());
 		}
 		else if(data_received > 0)
 		{
-			printf("%c", buffer[0]);
+			received[i] = TRUE;
 		}
 	}
+
+	for(i = 0; i < 100000; i++)
+		if(!received[i])
+		{
+			printf("OH NOES!");
+		}
 }
