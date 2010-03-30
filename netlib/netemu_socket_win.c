@@ -83,3 +83,11 @@ netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr) {
 unsigned long netemu_inet_addr(char* addr) {
 	return inet_addr(addr);
 }
+
+unsigned long netemu_htonl(unsigned long value) {
+	return htonl(value);
+}
+
+unsigned long netemu_ntohl(unsigned long value) {
+	return ntohl(value);
+}
