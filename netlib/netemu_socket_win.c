@@ -79,3 +79,7 @@ netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr) {
     
     return (netemu_sockaddr*) in_addr;
 }
+
+unsigned long netemu_inet_addr(char* addr) {
+	return inet_addr(addr);
+}
