@@ -41,7 +41,7 @@ void send_data(NETEMU_SOCKET socket) {
 	struct netemu_sockaddr_in addr;
 	int data_received;
 	int size = 22;
-	addr.addr = htonl(netemu_inet_addr("192.168.106.235"));
+	addr.addr = netemu_inet_addr("192.168.106.235");
 	addr.family = NETEMU_AF_INET;
 	addr.port = 27015;
 	
