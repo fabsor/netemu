@@ -216,6 +216,13 @@ extern "C" {
 
     /* Converts a string containing a dotted IPv4 address to a network order unsigned long. */
     unsigned long netemu_inet_addr(char* addr);
+
+	/* Converts an unsigned long from host order to network order. */
+	unsigned long netemu_htonl(unsigned long value);
+
+	/* Converts an unsigned long from network order to host order. */
+	unsigned long netemu_ntohl(unsigned long value);
+
 #ifdef	__cplusplus
 }
 #endif
