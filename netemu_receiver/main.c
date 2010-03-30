@@ -6,7 +6,6 @@ void receive_data(NETEMU_SOCKET);
 int main()
 {
 	int error;
-	unsigned int h;
 	NETEMU_SOCKET socket;
 	struct netemu_sockaddr_in addr;
 	addr.addr = htonl(INADDR_ANY);

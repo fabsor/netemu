@@ -309,6 +309,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cconfiguration>
 <cconfiguration id="cdt.managedbuild.config.gnu.lib.release.162130014">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.lib.release.162130014" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -606,6 +607,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cconfiguration>
 <cconfiguration id="cdt.managedbuild.config.gnu.lib.debug.590138820.1972585640">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.lib.debug.590138820.1972585640" moduleId="org.eclipse.cdt.core.settings" name="linux-x86-64">
@@ -914,6 +916,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cconfiguration>
 <cconfiguration id="cdt.managedbuild.config.gnu.lib.debug.590138820.1487655282">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.lib.debug.590138820.1487655282" moduleId="org.eclipse.cdt.core.settings" name="linux-x86-32">
@@ -1222,6 +1225,7 @@
 </profile>
 </scannerConfigBuildInfo>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cconfiguration>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">

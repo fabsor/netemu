@@ -31,13 +31,17 @@
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.1285646325" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="_NIX"/>
 </option>
+<option id="gnu.c.compiler.option.include.paths.1630769924" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/headers}&quot;"/>
+</option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1809247445" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1208196597" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
-<option id="gnu.c.link.option.paths.1783959046" superClass="gnu.c.link.option.paths" valueType="libPaths">
+<option id="gnu.c.link.option.paths.1783959046" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/linux-x86-64}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/Debug}&quot;"/>
 </option>
-<option id="gnu.c.link.option.libs.654577838" superClass="gnu.c.link.option.libs" valueType="libs">
+<option id="gnu.c.link.option.libs.654577838" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="netlib"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.10702291" superClass="cdt.managedbuild.tool.gnu.c.linker.input">

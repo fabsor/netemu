@@ -1,6 +1,5 @@
 #include "netemu_socket.h"
 #include <stdio.h>
-//#include <arpa/inet.h>
 void send_data(NETEMU_SOCKET);
 
 int main()
@@ -32,6 +31,7 @@ int main()
 	}
 
 	send_data(socket);
+
 	return 0;
 }
 
@@ -39,8 +39,13 @@ void send_data(NETEMU_SOCKET socket) {
 	int error;
 	unsigned long i = 0;
 	struct netemu_sockaddr_in addr;
+<<<<<<< HEAD
 	int data_received;
 	addr.addr = netemu_inet_addr("192.168.106.235");
+=======
+	//addr.addr = netemu_inet_addr("192.168.0.1");
+
+>>>>>>> fcc6b530efe5a0e4d1fb030039a988fe37a55152
 	addr.family = NETEMU_AF_INET;
 	addr.port = 27015;
 	
@@ -48,7 +53,7 @@ void send_data(NETEMU_SOCKET socket) {
 		error = netemu_sendto(socket, &i, 4, 0, netemu_prepare_net_addr(&addr), sizeof(addr));
 		i++;
 		if(error < 0) {
-			printf("Error: %s\n", netemu_get_last_error());
+			printf("Error: %d\n", netemu_get_last_error());
 		}
 	}
 }
