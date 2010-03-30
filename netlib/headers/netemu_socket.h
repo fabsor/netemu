@@ -198,7 +198,7 @@ extern "C" {
     /* Receives data on a connected socket. */
     int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags);
 
-    /* Received a datagram and stores the sender address */
+    /* Receives a data and stores the sender address */
     int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len);
 
     /* Disables send or receive on a socket. */
@@ -215,7 +215,7 @@ extern "C" {
     netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr);
 
     /* Converts a string containing a dotted IPv4 address to a network order unsigned long. */
-   unsigned long netemu_inet_addr(char* addr);
+    unsigned long netemu_inet_addr(char* addr);
 #ifdef	__cplusplus
 }
 #endif
