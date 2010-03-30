@@ -214,6 +214,8 @@ extern "C" {
 
     netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr);
 
+    /* Converts a string containing a dotted IPv4 address to a network order unsigned long. */
+   unsigned long netemu_inet_addr(char* addr);
 #ifdef	__cplusplus
 }
 #endif
