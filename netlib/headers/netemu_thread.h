@@ -10,7 +10,14 @@
 
 typedef int netemu_thread;
 
-int netemu_thread_new(netemu_thread* identifier, void *(*start_fn) (void *));
+/* Since the windows threads are using the very microsofty WINAPI, we need to typedef a little =) */
+#ifdef _NIX
+typedef void NETEMU_API;
+#else
+typedef void WINAPI NETEMU_API;
+#endif
+
+int netemu_thread_new(netemu_thread* identifier, NETEMU_API *(*start_fn) (void *));
 
 int netemu_thread_stop(netemu_thread* identifier);
 
