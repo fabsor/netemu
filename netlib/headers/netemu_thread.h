@@ -14,7 +14,7 @@ typedef int netemu_thread;
 
 typedef int NETEMU_MUTEX;
 
-int netemu_thread_new(netemu_thread* identifier, unsigned long (NETEMU_API *start_fn) (void *));
+int netemu_thread_new(netemu_thread* identifier, void (*start_fn) (void *));
 
 int netemu_thread_exit(netemu_thread* identifier);
 
