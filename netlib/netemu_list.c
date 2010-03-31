@@ -72,11 +72,11 @@ int netemu_list_remove(struct netemu_list* list, void* element){
 
 int netemu_list_remove_at(struct netemu_list* list,int index) {
 	int i;
-	list->count--;
 
 	for (i = index; i < list->count-1; i++) {
 		list->elements[i] = list->elements[i+1];
 	}
+	list->count--;
 }
 
 /**
