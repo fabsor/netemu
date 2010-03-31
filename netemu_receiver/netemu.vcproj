@@ -180,6 +180,10 @@
 				RelativePath=".\main.c"
 				>
 			</File>
+			<File
+				RelativePath=".\transport.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

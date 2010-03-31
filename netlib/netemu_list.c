@@ -1,4 +1,3 @@
-#include <sys/socket.h>
 #include <stdlib.h>
 #include "headers/netemu_list.h"
 
