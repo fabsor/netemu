@@ -81,7 +81,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 }
 
 unsigned long netemu_inet_addr(char* addr) {
-	return inet_addr(addr);
+	return htonl(inet_addr(addr));
 }
 
 netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
@@ -92,4 +92,15 @@ netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
     in_addr->sin_addr.s_addr = netaddr->addr;
     
     return (netemu_sockaddr*) in_addr;
+}
+
+
+/* Converts an unsigned long from host order to network order. */
+unsigned long netemu_htonl(unsigned long value) {
+	return htonl(value);
+}
+
+/* Converts an unsigned long from network order to host order. */
+unsigned long netemu_ntohl(unsigned long value) {
+	return ntohl(value);
 }
