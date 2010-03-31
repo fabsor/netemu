@@ -47,8 +47,9 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -151,6 +152,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\netemu_list.c"
+				>
+			</File>
+			<File
 				RelativePath=".\netemu_socket_win.c"
 				>
 			</File>
@@ -164,6 +169,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\netemu_list.h"
+				>
+			</File>
 			<File
 				RelativePath=".\headers\netemu_socket.h"
 				>

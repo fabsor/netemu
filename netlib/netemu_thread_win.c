@@ -5,5 +5,6 @@ int netemu_thread_new(netemu_thread* identifier, unsigned long (NETEMU_API *star
 }
 
 int netemu_thread_stop(netemu_thread* identifier) {
+	unsigned long long i;
 	return (int)TerminateThread(identifier, 0);
 }
