@@ -20,7 +20,7 @@ extern "C" {
 	typedef unsigned long int netemu_thread;
 #else
 #include <Windows.h>
-typedef HANDLE netemu_thread;
+	typedef HANDLE netemu_thread;
 #endif
 
 	/* TODO: make sure this is a good type to use. */
