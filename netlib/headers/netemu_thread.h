@@ -33,7 +33,7 @@ extern "C" {
 	* @param callback a function callback that will be called when the thread has started.
 	* @return 0 if the thread was created successfully, an error code otherwise.
 	*/
-	int netemu_thread_new(netemu_thread* identifier, void (*start_fn) (void *), void* arg);
+	int netemu_thread_new(netemu_thread identifier, void (*start_fn) (void *), void* arg);
 
 	/**
 	* Exit the current thread.
