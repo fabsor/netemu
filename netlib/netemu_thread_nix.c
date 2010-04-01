@@ -22,7 +22,6 @@ void *_netemu_thread_callback(void* arg);
 
 /*! This struct is used for passing arguments to the thread. */
 struct netemu_thread_args {
-	netemu_thread* identifier;
 	void (*start_fn) (void *);
 	void* arg;
 };
@@ -36,11 +35,9 @@ struct netemu_thread_args {
 int netemu_thread_new(netemu_thread* identifier, void (*start_fn) (void *), void* arg) {
 	struct netemu_thread_args* thread_args;
 	thread_args = malloc(sizeof(struct netemu_thread_args));
-	thread_args->identifier = malloc(sizeof(netemu_thread));
 	thread_args->start_fn = start_fn;
 	thread_args->arg = arg;
-	pthread_create(identifier, NULL, _netemu_thread_callback, arg);
-	return 0;
+	return pthread_create(identifier, NULL, _netemu_thread_callback, arg);
 }
 
 /**
