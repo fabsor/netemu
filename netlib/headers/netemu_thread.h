@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #ifdef _NIX
-	typedef unsigned long int netemu_thread;
+	typedef unsigned long int *netemu_thread;
 #else
 #include <Windows.h>
 	typedef HANDLE netemu_thread;
