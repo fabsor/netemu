@@ -11,16 +11,12 @@
  * @author Fabian Sörqvist <fabian.sorqvist@gmail.com>
  */
 #include <stdlib.h>
-#include "pthread.h"
 #include "headers/netemu_thread.h"
 #include "headers/netemu_list.h"
-
+#include <pthread.h>
 struct netemu_mutex{
 	pthread_mutex_t* mutex;
 };
-
-/* TODO: Tweak this value. We try a big one initially. */
-#define NETEMU_THREAD_MUTEX_LIST_INITIAL_SIZE 100;
 
 void *_netemu_thread_callback(void* arg);
 
@@ -38,7 +34,13 @@ struct netemu_thread_args {
  * @return 0 if the thread was created successfully, an error code otherwise.
  */
 int netemu_thread_new(netemu_thread* identifier, void (*start_fn) (void *), void* arg) {
-	return pthread_create(identifier, NULL, _netemu_thread_callback, arg);
+	struct netemu_thread_args* thread_args;
+	thread_args = malloc(sizeof(struct netemu_thread_args));
+	thread_args->identifier = malloc(sizeof(netemu_thread));
+	thread_args->start_fn = start_fn;
+	thread_args->arg = arg;
+	pthread_create(identifier, NULL, _netemu_thread_callback, arg);
+	return 0;
 }
 
 /**

@@ -15,11 +15,10 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-#include "pthread.h"
+
 /* TODO: Fix this for windows as well. */
 typedef unsigned long int netemu_thread;
 
-/* TODO: make sure this is a good type to use. */
 typedef struct netemu_mutex* netemu_mutex;
 
 
