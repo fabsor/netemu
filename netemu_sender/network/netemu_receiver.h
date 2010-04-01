@@ -34,6 +34,11 @@ struct netemu_receiver_fn{
  */
 struct netemu_receiver* netemu_receiver_new(char* host, int port, int buffer_size);
 
+/**
+ * This function creates a new thread and starts listening for incoming
+ * datagrams on the specified address and port.
+ */
+void netemu_receiver_start_listening(struct netemu_receiver* receiver);
 
 /**
  * Register a function that will act as a listener. The function will be called when data is received.

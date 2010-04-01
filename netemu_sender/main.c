@@ -1,9 +1,12 @@
 #include "netemu_socket.h"
+#include "network/netemu_receiver.h"
 #include <stdio.h>
 void send_data(NETEMU_SOCKET);
 
+void receive_data();
 int main()
 {
+	/*
 	int error;
 	NETEMU_SOCKET socket;
 	struct netemu_sockaddr_in addr;
@@ -33,8 +36,21 @@ int main()
 	send_data(socket);
 
 	return 0;
+	*/
+	receive_data();
 }
 
+void listener(char* data, size_t size, struct netemu_receiver* receiver) {
+	printf("%s",data);
+}
+
+void receive_data() {
+	struct netemu_receiver* receiver = netemu_receiver_new("localhost",20077,64);
+	netemu_receiver_register_recv_fn(receiver, listener);
+	netemu_receiver_start_listening(receiver);
+}
+
+/*
 void send_data(NETEMU_SOCKET socket) {
 	int error;
 	unsigned long i = 0;
@@ -52,3 +68,4 @@ void send_data(NETEMU_SOCKET socket) {
 		}
 	}
 }
+*/
