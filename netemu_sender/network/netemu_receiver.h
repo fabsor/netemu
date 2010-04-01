@@ -7,27 +7,38 @@
 
 #ifndef NETEMU_RECEIVER_H_
 #define NETEMU_RECEIVER_H_
+#include "netemu_socket.h"
+#include "netemu_thread.h"
+#include "netemu_list.h"
 
-#include "netemu_sender.h"
+#define NETEMU_RECEIVER_DEFAULT_BUFFER_SIZE	128
+
 /*! This struct describes a receiver. */
 struct netemu_receiver{
 	NETEMU_SOCKET socket;
 	netemu_sockaddr* addr;
+	netemu_mutex lock;
+	struct netemu_receiver_fn *receiver_fn;
+	int buffer_size;
+	int fn_count;
+};
+
+struct netemu_receiver_fn{
+	void (* listenerFn)(char*, size_t, struct netemu_receiver*);
+	struct netemu_receiver_fn *next;
 };
 
 /**
  * Create a new receiver. This will create a new socket and bind to the provided host and
  * port.
  */
-void netemu_receiver_new(char* host, int port);
+struct netemu_receiver* netemu_receiver_new(char* host, int port, int buffer_size);
 
-/*! Called to receive data. */
-void netemu_receiver_recv();
 
 /**
  * Register a function that will act as a listener. The function will be called when data is received.
  * The function must be thread safe.
  */
-void netemu_receiver_register_recv_fn(void (* listenerFn)(char*, size_t, struct netemu_sender));
+void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver*));
 
 #endif /* NETEMU_RECEIVER_H_ */

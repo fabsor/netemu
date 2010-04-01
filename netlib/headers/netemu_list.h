@@ -11,6 +11,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+
 	typedef struct _netemu_list_internal* netemu_list_internal;
 
 	struct netemu_list{

@@ -26,7 +26,6 @@ extern "C" {
 	/* TODO: make sure this is a good type to use. */
 	typedef struct netemu_mutex* netemu_mutex;
 
-
 	/**
 	* Start a new thread.
 	* @param netemu_thread* identifier an identifier that can be used to identify the thread.
@@ -53,13 +52,13 @@ extern "C" {
 	*/
 	void netemu_thread_mutex_lock(netemu_mutex mutex_identifier);
 
-	/**
+   /**
 	* Release a lock.
 	* @param NETEMU_MUTEX identifier the identifier for this lock.
 	*/
 	void netemu_thread_mutex_release(netemu_mutex mutex_identifier);
 
-	/**
+   /**
 	* Destroy a mutex lock.
 	* @param NETEMU_MUTEX the identifier of the lock.
 	*/

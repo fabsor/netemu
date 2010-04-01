@@ -39,7 +39,7 @@ void receive_data(NETEMU_SOCKET socket) {
 	int data_received;
 	int size = 4;
 	unsigned long i = 0;
-	BOOL received[100000];
+	int received[100000];
 	
 	while(i < 99999) {
 		data_received = netemu_recv(socket, buffer, size, 0); 
@@ -49,7 +49,7 @@ void receive_data(NETEMU_SOCKET socket) {
 		}
 		else if(data_received > 0)
 		{
-			received[i] = TRUE;
+			received[i] = 1;
 		}
 	}
 

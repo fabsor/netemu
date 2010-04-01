@@ -57,6 +57,7 @@ int _netemu_list_search_linear(struct netemu_list* list, void* element) {
 			return index;
 		}
 	}
+	return -1;
 }
 
 int netemu_list_remove(struct netemu_list* list, void* element){
@@ -71,11 +72,14 @@ int netemu_list_remove(struct netemu_list* list, void* element){
 
 int netemu_list_remove_at(struct netemu_list* list,int index) {
 	int i;
-
+	if (list->count < index) {
+		return -1;
+	}
 	for (i = index; i < list->count-1; i++) {
 		list->elements[i] = list->elements[i+1];
 	}
 	list->count--;
+	return 1;
 }
 
 /**
@@ -93,11 +97,11 @@ void netemu_list_register_sort_fn(struct netemu_list* list, int ( * comparator )
  * @return 1 if the sorting was successful, 0 if you haven't registered a sorting function.
  */
 int netemu_list_sort(struct netemu_list* list){
-	// If this list is sorted, then there's nothing to be done.
+	/* If this list is sorted, then there's nothing to be done. */
 	if(list->sorted)
 		return 1;
 
-	// We can't sort if we don't have a comparator.
+	/* We can't sort if we don't have a comparator. */
 	if(list->_intern->comparator != 0) {
 		qsort(list->elements[0],list->count,list->_intern->element_size,list->_intern->comparator);
 		list->sorted = 1;
