@@ -9,7 +9,7 @@
 #include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <pthread.h>
+//#include <pthread.h>
 /**
  * Create a new receiver. This will create a new socket and bind to the provided host and
  * port.
@@ -24,6 +24,7 @@ struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int addr_len,
 	receiver->addr = addr;
 	receiver->addr_len = addr_len;
 	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
+	receiver->receiver_fn = NULL;
 	if(receiver->socket == INVALID_SOCKET) {
 		receiver->error = netemu_get_last_error();
 	}
@@ -86,6 +87,7 @@ void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* 
 	struct netemu_receiver_fn *receiver_iter;
 	receiver_fn = malloc(sizeof(struct netemu_receiver_fn));
 	receiver_fn->listenerFn = listenerFn;
+	receiver_fn->next = NULL;
 
 	if (receiver->receiver_fn == NULL) {
 		receiver->receiver_fn = receiver_fn;
