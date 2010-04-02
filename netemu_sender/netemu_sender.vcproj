@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="C:\Users\Emil\Documents\NetBeansProjects\netemu\netlib\headers"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -174,12 +175,28 @@
 				RelativePath=".\main.c"
 				>
 			</File>
+			<File
+				RelativePath=".\network\netemu_receiver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_sender.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\network\netemu_receiver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_sender.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

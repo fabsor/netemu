@@ -66,7 +66,7 @@ extern "C" {
 #include <ws2tcpip.h>
 
 	typedef unsigned int NETEMU_SOCKET;
-#define INVALID_SOCKET  (NETEMU_SOCKET)(~0)
+#define NETEMU_INVALID_SOCKET  (NETEMU_SOCKET)(~0)
 
 #define NETEMU_ENOTINITIALIZED	WSANOTINITIALIZED
 #define NETEMU_EINTR			WSAEINTR
@@ -168,9 +168,8 @@ extern "C" {
 	/*! Winsock has a handy struct which contains address information of a specific host. This struct
 	* aims to replicate this.*/
 	struct netemu_addrinfo {
-		int port;
-		long address;
 		char* hostname;
+		size_t addrlen;
 		struct netemu_sockaddr* addr;
 		struct netemu_addrinfo** next;
 	};
