@@ -57,7 +57,7 @@ void receive_data() {
 	addr_in.port = 27015;
 
 	addr = netemu_prepare_net_addr(&addr_in);
-	receiver = netemu_receiver_new(addr,64);
+	receiver = netemu_receiver_new(addr,sizeof(addr_in),64);
 	netemu_receiver_register_recv_fn(receiver, listener);
 	netemu_receiver_start_listening(receiver);
 }
@@ -72,7 +72,7 @@ void send_data(){
 	addr_in.port = 27015;
 
 	addr = netemu_prepare_net_addr(&addr_in);
-	sender = netemu_sender_new(addr);
+	sender = netemu_sender_new(addr,sizeof(addr_in));
 	while (1) {
 		error = netemu_sender_send(sender,"Hello to you old friend.",64);
 		if(error < 0) {
