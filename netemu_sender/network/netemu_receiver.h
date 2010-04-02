@@ -21,6 +21,7 @@ struct netemu_receiver{
 	struct netemu_receiver_fn *receiver_fn;
 	int buffer_size;
 	int fn_count;
+	int error;
 };
 
 struct netemu_receiver_fn{
@@ -32,7 +33,7 @@ struct netemu_receiver_fn{
  * Create a new receiver. This will create a new socket and bind to the provided host and
  * port.
  */
-struct netemu_receiver* netemu_receiver_new(char* host, int port, int buffer_size);
+struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int buffer_size);
 
 /**
  * This function creates a new thread and starts listening for incoming

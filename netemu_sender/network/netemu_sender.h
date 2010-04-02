@@ -17,9 +17,10 @@ struct netemu_sender{
 };
 
 
+
 int netemu_sender_send(struct netemu_sender *sender, char *data);
 
-struct netemu_sender* netemu_sender_new(char* host, int port);
+struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr);
 
 void netemu_sender_free(struct netemu_sender* sender);
 

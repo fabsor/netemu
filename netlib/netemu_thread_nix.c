@@ -55,7 +55,7 @@ void *_netemu_thread_callback(void *arg) {
 	struct netemu_thread_args *arg_struct;
 	arg_struct = (struct netemu_thread_args*)arg;
 	/*Start the thread by calling the function passed by the user. */
-	arg_struct->start_fn(arg);
+	arg_struct->start_fn(arg_struct->arg);
 	return NULL;
 }
 /**

@@ -1,12 +1,12 @@
 #include "netemu_socket.h"
 #include "network/netemu_receiver.h"
 #include <stdio.h>
-void send_data(NETEMU_SOCKET);
+void send_data();
 
 void receive_data();
 int main()
 {
-	/*
+/*
 	int error;
 	NETEMU_SOCKET socket;
 	struct netemu_sockaddr_in addr;
@@ -36,12 +36,13 @@ int main()
 	send_data(socket);
 
 	return 0;
-	*/
+*/
+	netemu_init_network();
 	receive_data();
+	while (1);
+	//send_data();
 	/* Let's entertain the other thread with nothing ;) */
-	while (1) {
 
-	}
 }
 
 void listener(char* data, size_t size, struct netemu_receiver* receiver) {
@@ -49,9 +50,32 @@ void listener(char* data, size_t size, struct netemu_receiver* receiver) {
 }
 
 void receive_data() {
-	struct netemu_receiver* receiver = netemu_receiver_new("localhost",20077,64);
+	struct netemu_sockaddr_in addr_in;
+	netemu_sockaddr *addr;
+	struct netemu_receiver *receiver;
+	addr_in.addr = htonl(INADDR_ANY);
+	addr_in.family = NETEMU_AF_INET;
+	addr_in.port = 27015;
+
+	addr = netemu_prepare_net_addr(&addr_in);
+	receiver = netemu_receiver_new(addr,64);
 	netemu_receiver_register_recv_fn(receiver, listener);
 	netemu_receiver_start_listening(receiver);
+}
+
+void send_data(){
+	struct netemu_sockaddr_in addr_in;
+	struct netemu_sender* sender;
+	netemu_sockaddr *addr;
+
+	addr_in.addr = netemu_inet_addr("127.0.0.1");
+	addr_in.family = NETEMU_AF_INET;
+	addr_in.port = 20077;
+
+	addr = netemu_prepare_net_addr(&addr_in);
+	while(1) {
+		netemu_sender_send(sender,"Hello to you old friend.");
+	}
 }
 
 /*

@@ -16,16 +16,11 @@
  */
 void netemu_receiver_recv(void* params);
 
-struct netemu_receiver* netemu_receiver_new(char* host, int port, int buffer_size) {
-	struct netemu_sockaddr_in addr;
+struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int buffer_size) {
 	struct netemu_receiver* receiver;
 	receiver = malloc(sizeof(struct netemu_receiver));
-	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
-	addr.addr = netemu_inet_addr(host);
-	addr.port = netemu_htonl(port);
 	receiver->buffer_size = buffer_size;
-	receiver->addr = netemu_prepare_net_addr(&addr);
-	netemu_bind(receiver->socket,receiver->addr,sizeof(receiver->addr));
+	receiver->addr = addr;
 	return receiver;
 }
 
@@ -43,17 +38,35 @@ void netemu_receiver_start_listening(struct netemu_receiver* receiver){
 void netemu_receiver_recv(void* params) {
 	struct netemu_receiver* receiver;
 	char *buffer;
-
+	int error;
+	int bind_error;
 	receiver = (struct netemu_receiver*)params;
 	buffer = malloc(sizeof(char)*receiver->buffer_size);
+	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
+	if(receiver->socket == INVALID_SOCKET) {
+		receiver->error = netemu_get_last_error();
+		netemu_thread_exit();
+		return;
+	}
+
+	bind_error = netemu_bind(receiver->socket,receiver->addr,sizeof(*receiver->addr));
+	if(bind_error == -1) {
+		receiver->error = netemu_get_last_error();
+		netemu_thread_exit();
+		return;
+	}
 	receiver->lock = netemu_thread_mutex_create();
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock);
-		netemu_recv(receiver->socket, buffer, receiver->buffer_size, 0);
+		error = netemu_recv(receiver->socket, buffer, receiver->buffer_size, 0);
+		if (error) {
+			receiver->error = netemu_get_last_error();
+			break;
+		}
 		netemu_thread_mutex_release(receiver->lock);
 	}
-
+	netemu_thread_exit();
 }
 
 void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data) {
