@@ -27,6 +27,7 @@ struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr, int addr_len) {
 		sender->error = netemu_get_last_error();
 	}
 	sender->addr = addr;
+	sender->addr_len = addr_len;
 	sender->socket = socket;
 
 	return sender;
