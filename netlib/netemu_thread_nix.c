@@ -33,18 +33,19 @@ struct netemu_thread_args {
  * @param callback a function callback that will be called when the thread has started.
  * @return 0 if the thread was created successfully, an error code otherwise.
  */
-int netemu_thread_new(netemu_thread* identifier, void (*start_fn) (void *), void* arg) {
+netemu_thread netemu_thread_new(void (*start_fn) (void *), void* arg) {
 	struct netemu_thread_args* thread_args;
+	netemu_thread identifier;
 	int rc;
+	identifier = malloc(sizeof(pthread_t));
 	thread_args = malloc(sizeof(struct netemu_thread_args));
 	thread_args->start_fn = start_fn;
 	thread_args->arg = arg;
 	rc = pthread_create(identifier, NULL, _netemu_thread_callback, thread_args);
 	if(rc) {
-        printf("ERROR; return code from pthread_create() is %d\n", rc);
-        exit(-1);
+        return NULL;
 	}
-	return 0;
+	return identifier;
 }
 
 /**

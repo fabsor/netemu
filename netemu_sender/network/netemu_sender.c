@@ -8,8 +8,13 @@
 #include <stdlib.h>
 
 
-int netemu_sender_send(struct netemu_sender* sender, char* data) {
-	return netemu_sendto(sender->socket, data, 1, 0, sender->addr, sizeof(sender->addr));
+int netemu_sender_send(struct netemu_sender* sender, char* data, int size) {
+	int success;
+	success = netemu_sendto(sender->socket, data, size, 0, sender->addr, sizeof(&sender->addr));
+	if(success == -1){
+		sender->error = netemu_get_last_error();
+	}
+	return success;
 }
 
 struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr) {

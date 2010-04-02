@@ -15,12 +15,17 @@
  * port.
  */
 void netemu_receiver_recv(void* params);
+void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data);
 
 struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int buffer_size) {
 	struct netemu_receiver* receiver;
 	receiver = malloc(sizeof(struct netemu_receiver));
 	receiver->buffer_size = buffer_size;
 	receiver->addr = addr;
+	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
+	if(receiver->socket == INVALID_SOCKET) {
+		receiver->error = netemu_get_last_error();
+	}
 	return receiver;
 }
 
@@ -29,8 +34,7 @@ struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int buffer_si
  * datagrams on the specified address and port.
  */
 void netemu_receiver_start_listening(struct netemu_receiver* receiver){
-	netemu_thread identifier;
-	netemu_thread_new(&identifier, netemu_receiver_recv, (void*)receiver);
+	netemu_thread_new(netemu_receiver_recv, (void*)receiver);
 }
 
 
@@ -42,13 +46,6 @@ void netemu_receiver_recv(void* params) {
 	int bind_error;
 	receiver = (struct netemu_receiver*)params;
 	buffer = malloc(sizeof(char)*receiver->buffer_size);
-	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
-	if(receiver->socket == INVALID_SOCKET) {
-		receiver->error = netemu_get_last_error();
-		netemu_thread_exit();
-		return;
-	}
-
 	bind_error = netemu_bind(receiver->socket,receiver->addr,sizeof(*receiver->addr));
 	if(bind_error == -1) {
 		receiver->error = netemu_get_last_error();
@@ -64,6 +61,7 @@ void netemu_receiver_recv(void* params) {
 			receiver->error = netemu_get_last_error();
 			break;
 		}
+		_netemu_receiver_notify(receiver,buffer);
 		netemu_thread_mutex_release(receiver->lock);
 	}
 	netemu_thread_exit();
@@ -71,9 +69,15 @@ void netemu_receiver_recv(void* params) {
 
 void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data) {
 	struct netemu_receiver_fn* receiver_fn;
-	receiver_fn = receiver->receiver_fn;
-	receiver_fn->listenerFn(data,receiver->buffer_size, receiver);
-	receiver_fn = receiver_fn->next;
+	/* If there are no receivers, there's nothing to do here. */
+	if (receiver->receiver_fn == NULL) {
+		return;
+	}
+	do {
+		receiver_fn = receiver->receiver_fn;
+		receiver_fn->listenerFn(data,receiver->buffer_size, receiver);
+		receiver_fn = receiver_fn->next;
+	} while(receiver_fn->next != NULL);
 }
 
 /**

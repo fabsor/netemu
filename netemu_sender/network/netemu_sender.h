@@ -14,11 +14,12 @@
 struct netemu_sender{
 	NETEMU_SOCKET socket;
 	netemu_sockaddr* addr;
+	int error;
 };
 
 
 
-int netemu_sender_send(struct netemu_sender *sender, char *data);
+int netemu_sender_send(struct netemu_sender* sender, char* data, int size);
 
 struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr);
 

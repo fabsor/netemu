@@ -1,5 +1,6 @@
 #include "netemu_socket.h"
 #include "network/netemu_receiver.h"
+#include "network/netemu_sender.h"
 #include <stdio.h>
 void send_data();
 
@@ -39,10 +40,8 @@ int main()
 */
 	netemu_init_network();
 	receive_data();
-	while (1);
-	//send_data();
-	/* Let's entertain the other thread with nothing ;) */
-
+	send_data();
+	return 0;
 }
 
 void listener(char* data, size_t size, struct netemu_receiver* receiver) {
@@ -67,14 +66,18 @@ void send_data(){
 	struct netemu_sockaddr_in addr_in;
 	struct netemu_sender* sender;
 	netemu_sockaddr *addr;
-
-	addr_in.addr = netemu_inet_addr("127.0.0.1");
+	int error;
+	addr_in.addr = INADDR_LOOPBACK;
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = 20077;
+	addr_in.port = 27015;
 
 	addr = netemu_prepare_net_addr(&addr_in);
-	while(1) {
-		netemu_sender_send(sender,"Hello to you old friend.");
+	sender = netemu_sender_new(addr);
+	while (1) {
+		error = netemu_sender_send(sender,"Hello to you old friend.",64);
+		if(error < 0) {
+			printf("Error: %d\n", netemu_get_last_error());
+		}
 	}
 }
 
@@ -90,6 +93,7 @@ void send_data(NETEMU_SOCKET socket) {
 
 	while(i <= 100000) {
 		error = netemu_sendto(socket, &i, 4, 0, netemu_prepare_net_addr(&addr), sizeof(addr));
+
 		i++;
 		if(error < 0) {
 			printf("Error: %d\n", netemu_get_last_error());
