@@ -26,6 +26,7 @@ struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr, int addr_len) {
 	if (socket == INVALID_SOCKET) {
 		sender->error = netemu_get_last_error();
 	}
+	sender->addr_len = addr_len;
 	sender->addr = addr;
 	sender->socket = socket;
 

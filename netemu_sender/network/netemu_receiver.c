@@ -57,7 +57,7 @@ void netemu_receiver_recv(void* params) {
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock);
-		error = netemu_recv(receiver->socket, buffer, receiver->buffer_size, 0);
+		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error) {
 			receiver->error = netemu_get_last_error();
 			break;

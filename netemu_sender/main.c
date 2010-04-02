@@ -7,37 +7,6 @@ void send_data();
 void receive_data();
 int main()
 {
-/*
-	int error;
-	NETEMU_SOCKET socket;
-	struct netemu_sockaddr_in addr;
-	addr.addr = htonl(INADDR_ANY);
-	addr.family = NETEMU_AF_INET;
-	addr.port = 0;
-
-
-	printf("SENDER");
-
-	error = netemu_init_network();
-	if(error != 0) {
-		printf("INIT: %i", netemu_get_last_error());
-	}
-
-	socket = netemu_socket(NETEMU_AF_INET, NETEMU_SOCK_DGRAM);
-	if(socket == INVALID_SOCKET) {
-		printf("OH NOES!\n %i", netemu_get_last_error());
-	}
-
-	error = netemu_bind(socket, netemu_prepare_net_addr(&addr), sizeof(addr));
-
-	if(error != 0) {
-		printf("Error: %d", netemu_get_last_error());
-	}
-
-	send_data(socket);
-
-	return 0;
-*/
 	netemu_init_network();
 	receive_data();
 	send_data();
@@ -52,7 +21,7 @@ void receive_data() {
 	struct netemu_sockaddr_in addr_in;
 	netemu_sockaddr *addr;
 	struct netemu_receiver *receiver;
-	addr_in.addr = htonl(INADDR_ANY);
+	addr_in.addr = htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
 	addr_in.port = 27015;
 
