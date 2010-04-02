@@ -11,6 +11,7 @@
  * @author Fabian Sörqvist <fabian.sorqvist@gmail.com>
  */
 #include <stdlib.h>
+#include <stdio.h>
 #include "headers/netemu_thread.h"
 #include "headers/netemu_list.h"
 #include <pthread.h>
@@ -32,19 +33,25 @@ struct netemu_thread_args {
  * @param callback a function callback that will be called when the thread has started.
  * @return 0 if the thread was created successfully, an error code otherwise.
  */
-int netemu_thread_new(netemu_thread identifier, void (*start_fn) (void *), void* arg) {
+int netemu_thread_new(netemu_thread* identifier, void (*start_fn) (void *), void* arg) {
 	struct netemu_thread_args* thread_args;
+	int rc;
 	thread_args = malloc(sizeof(struct netemu_thread_args));
 	thread_args->start_fn = start_fn;
 	thread_args->arg = arg;
-	return pthread_create(identifier, NULL, _netemu_thread_callback, arg);
+	rc = pthread_create(identifier, NULL, _netemu_thread_callback, thread_args);
+	if(rc) {
+        printf("ERROR; return code from pthread_create() is %d\n", rc);
+        exit(-1);
+	}
+	return 0;
 }
 
 /**
  * Callback for the pthread_create() call.
  * @param arg this will always be a netemu_thread_struct.
  */
-void *_netemu_thread_callback(void* arg) {
+void *_netemu_thread_callback(void *arg) {
 	struct netemu_thread_args *arg_struct;
 	arg_struct = (struct netemu_thread_args*)arg;
 	/*Start the thread by calling the function passed by the user. */

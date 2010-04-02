@@ -45,7 +45,7 @@
 <listOptionValue builtIn="false" value="netlib"/>
 <listOptionValue builtIn="false" value="pthread"/>
 </option>
-<option id="gnu.c.link.option.noshared.1395597880" superClass="gnu.c.link.option.noshared" value="false" valueType="boolean"/>
+<option id="gnu.c.link.option.noshared.1395597880" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" value="false" valueType="boolean"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.301504247" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>

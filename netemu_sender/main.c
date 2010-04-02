@@ -38,6 +38,10 @@ int main()
 	return 0;
 	*/
 	receive_data();
+	/* Let's entertain the other thread with nothing ;) */
+	while (1) {
+
+	}
 }
 
 void listener(char* data, size_t size, struct netemu_receiver* receiver) {
@@ -59,7 +63,7 @@ void send_data(NETEMU_SOCKET socket) {
 	addr.addr = netemu_inet_addr("192.168.106.235");
 	addr.family = NETEMU_AF_INET;
 	addr.port = 27015;
-	
+
 	while(i <= 100000) {
 		error = netemu_sendto(socket, &i, 4, 0, netemu_prepare_net_addr(&addr), sizeof(addr));
 		i++;
