@@ -58,7 +58,7 @@ void netemu_receiver_recv(void* params) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock);
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
-		if (error) {
+		if (error == -1) {
 			receiver->error = netemu_get_last_error();
 			break;
 		}
@@ -70,15 +70,11 @@ void netemu_receiver_recv(void* params) {
 
 void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data) {
 	struct netemu_receiver_fn* receiver_fn;
-	/* If there are no receivers, there's nothing to do here. */
-	if (receiver->receiver_fn == NULL) {
-		return;
-	}
-	do {
-		receiver_fn = receiver->receiver_fn;
+	receiver_fn = receiver->receiver_fn;
+	while(receiver_fn != NULL) {
 		receiver_fn->listenerFn(data,receiver->buffer_size, receiver);
 		receiver_fn = receiver_fn->next;
-	} while(receiver_fn->next != NULL);
+	}
 }
 
 /**

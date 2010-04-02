@@ -21,9 +21,9 @@ void receive_data() {
 	struct netemu_sockaddr_in addr_in;
 	netemu_sockaddr *addr;
 	struct netemu_receiver *receiver;
-	addr_in.addr = htonl(INADDR_LOOPBACK);
+	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = 27015;
+	addr_in.port = htons(27015);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	receiver = netemu_receiver_new(addr,sizeof(addr_in),64);
@@ -36,9 +36,9 @@ void send_data(){
 	struct netemu_sender* sender;
 	netemu_sockaddr *addr;
 	int error;
-	addr_in.addr = INADDR_LOOPBACK;
+	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = 27015;
+	addr_in.port = htons(27015);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	sender = netemu_sender_new(addr,sizeof(addr_in));
