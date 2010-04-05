@@ -24,6 +24,8 @@ int netemu_sender_send(struct netemu_sender* sender, char* data, int size);
 
 struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr, int addr_len);
 
+struct netemu_sender* netemu_sender_new_on_socket(netemu_sockaddr* addr, NETEMU_SOCKET socket, int addr_len);
+
 void netemu_sender_free(struct netemu_sender* sender);
 
 #endif /* SENDER_H_ */

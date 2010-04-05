@@ -33,6 +33,19 @@ struct netemu_sender* netemu_sender_new(netemu_sockaddr* addr, int addr_len) {
 	return sender;
 }
 
+struct netemu_sender* netemu_sender_new_on_socket(netemu_sockaddr* addr, NETEMU_SOCKET socket, int addr_len) {
+	struct netemu_sender* sender;
+	sender = malloc(sizeof(struct netemu_sender));
+	if (socket == INVALID_SOCKET) {
+		sender->error = netemu_get_last_error();
+	}
+	sender->addr_len = addr_len;
+	sender->addr = addr;
+	sender->socket = socket;
+
+	return sender;
+}
+
 void netemu_sender_free(struct netemu_sender* sender) {
 	netemu_shutdown(sender->socket,0);
 	free(sender);

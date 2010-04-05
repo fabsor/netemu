@@ -9,7 +9,6 @@
 #include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
-//#include <pthread.h>
 /**
  * Create a new receiver. This will create a new socket and bind to the provided host and
  * port.
@@ -19,15 +18,24 @@ void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data);
 
 struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int addr_len, int buffer_size) {
 	struct netemu_receiver* receiver;
+	int bind_error;
 	receiver = malloc(sizeof(struct netemu_receiver));
 	receiver->buffer_size = buffer_size;
 	receiver->addr = addr;
 	receiver->addr_len = addr_len;
 	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
 	receiver->receiver_fn = NULL;
+
 	if(receiver->socket == INVALID_SOCKET) {
 		receiver->error = netemu_get_last_error();
+
 	}
+	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
+	if(bind_error == -1) {
+		receiver->error = netemu_get_last_error();
+	}
+
+
 	return receiver;
 }
 
@@ -48,12 +56,6 @@ void netemu_receiver_recv(void* params) {
 	int bind_error;
 	receiver = (struct netemu_receiver*)params;
 	buffer = malloc(sizeof(char)*receiver->buffer_size);
-	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
-	if(bind_error == -1) {
-		receiver->error = netemu_get_last_error();
-		netemu_thread_exit();
-		return;
-	}
 	receiver->lock = netemu_thread_mutex_create();
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
