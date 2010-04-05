@@ -36,7 +36,7 @@ char* netemu_communication_create_ping_message();
  * CONNECTION_REJECTED_TOO the connection was rejected because this server is full.
  * PING_RECEIVED The sent ping was received.
  */
-int netemu_communication_parse_server_communication_message(char* server_message);
+int netemu_communication_parse_server_message(char* server_message);
 
 /**
  * Parse the accept port out of a CONNECTION_ACCEPTED message.

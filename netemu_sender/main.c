@@ -17,14 +17,37 @@ void send_data(struct netemu_sender* sender, char* data);
 void test_server_communication();
 void test_sender_receiver();
 
+int ping_received = 0;
+int hello_received = 0;
+
 int main()
 {
 	netemu_init_network();
-	test_server_communication();
+	test_sender_receiver();
+	//test_server_communication();
+
+	while(!ping_received && !hello_received);
 	return 0;
 }
 
 void listener(char* data, size_t size, struct netemu_receiver* receiver) {
+	int msg;
+
+	if(strstr("PING",data) != NULL)
+		ping_received = 1;
+	if(strstr("HELLO",data) != NULL)
+		hello_received = 1;
+
+	msg = netemu_communication_parse_server_message(data);
+	switch(msg) {
+		case CONNECTION_REJECTED_VER: case CONNECTION_ACCEPTED: case CONNECTION_REJECTED_TOO:
+			hello_received = 1;
+			break;
+		case PING_RECEIVED:
+			ping_received = 1;
+
+	}
+
 	printf("%s",data);
 }
 
