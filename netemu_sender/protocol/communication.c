@@ -13,9 +13,14 @@
 
 
 char* netemu_communication_create_hello_message(float version) {
-	char str_version[3];
-	snprintf(str_version, 3, "%f", version);
-	return strcat("HELLO",str_version);
+	char str_version[5];
+	char* msg;
+	char* hello;
+	hello = "HELLO";
+	snprintf(str_version, 5, "%f", version);
+	msg = malloc(sizeof(hello)+sizeof(version));
+	strcpy(msg,hello);
+	return strcat(msg,str_version);
 }
 
 char* netemu_communication_create_ping_message() {

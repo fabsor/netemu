@@ -3,19 +3,22 @@
 #include "network/netemu_receiver.h"
 #include "network/netemu_sender.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-#define SERVER_PORT	27888
-#define CLIENT_PORT 35888
+#define INTERNAL_PORT	27999
+#define SERVER_PORT		27888
+#define CLIENT_PORT 	35888
 
-NETEMU_SOCKET receive_data();
-void send_data(NETEMU_SOCKET socket);
+struct netemu_receiver* prepare_receiver(int port);
+struct netemu_sender* prepare_sender(int port);
+void send_communication_data(struct netemu_sender* sender);
+void send_data(struct netemu_sender* sender, char* data);
+void test_sender_receiver();
 
 int main()
 {
-	NETEMU_SOCKET socket;
 	netemu_init_network();
-	socket = receive_data();
-	send_data(socket);
+	test_sender_receiver();
 	return 0;
 }
 
@@ -23,60 +26,70 @@ void listener(char* data, size_t size, struct netemu_receiver* receiver) {
 	printf("%s",data);
 }
 
-NETEMU_SOCKET receive_data() {
+void test_sender_receiver(){
+	struct netemu_receiver* receiver;
+	struct netemu_sender* sender;
+	receiver = prepare_receiver(INTERNAL_PORT);
+	sender = prepare_sender(INTERNAL_PORT);
+	send_communication_data(sender);
+}
+
+struct netemu_receiver* prepare_receiver(int port) {
 	struct netemu_sockaddr_in addr_in;
 	netemu_sockaddr *addr;
 	struct netemu_receiver *receiver;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(CLIENT_PORT);
+	addr_in.port = htons(port);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	receiver = netemu_receiver_new(addr,sizeof(addr_in),64);
 	netemu_receiver_register_recv_fn(receiver, listener);
 	netemu_receiver_start_listening(receiver);
-	return receiver->socket;
+	return receiver;
 }
 
-void send_data(NETEMU_SOCKET socket){
+struct netemu_sender* prepare_sender(int port) {
 	struct netemu_sockaddr_in addr_in;
 	struct netemu_sender* sender;
 	netemu_sockaddr *addr;
-	char* message;
-	int error;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(SERVER_PORT);
+	addr_in.port = htons(port);
 
 	addr = netemu_prepare_net_addr(&addr_in);
+	sender = netemu_sender_new(addr,sizeof(addr_in));
+
+	return sender;
+}
+
+struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
+	struct netemu_sockaddr_in addr_in;
+	struct netemu_sender* sender;
+	netemu_sockaddr *addr;
+	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
+	addr_in.family = NETEMU_AF_INET;
+	addr_in.port = htons(port);
+	addr = netemu_prepare_net_addr(&addr_in);
 	sender = netemu_sender_new_on_socket(addr,socket,sizeof(addr_in));
+
+	return sender;
+}
+
+
+void send_communication_data(struct netemu_sender* sender) {
+	char* message;
 	message = netemu_communication_create_ping_message();
+	send_data(sender, message);
+	message = netemu_communication_create_hello_message(0.83);
+	send_data(sender, message);
 
-	while (1) {
-		error = netemu_sender_send(sender,message,strlen(message)+1);
-		if(error < 0) {
-			printf("Error: %d\n", netemu_get_last_error());
-		}
-	}
 }
 
-/*
-void send_data(NETEMU_SOCKET socket) {
+void send_data(struct netemu_sender* sender, char* data) {
 	int error;
-	unsigned long i = 0;
-	struct netemu_sockaddr_in addr;
-	int data_received;
-	addr.addr = netemu_inet_addr("192.168.106.235");
-	addr.family = NETEMU_AF_INET;
-	addr.port = 27015;
-
-	while(i <= 100000) {
-		error = netemu_sendto(socket, &i, 4, 0, netemu_prepare_net_addr(&addr), sizeof(addr));
-
-		i++;
-		if(error < 0) {
-			printf("Error: %d\n", netemu_get_last_error());
-		}
+	error = netemu_sender_send(sender,data,strlen(data)+1);
+	if(error < 0) {
+		printf("Error: %d\n", netemu_get_last_error());
 	}
 }
-*/
