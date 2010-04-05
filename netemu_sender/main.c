@@ -76,7 +76,7 @@ struct netemu_receiver* prepare_receiver(int port) {
 	struct netemu_receiver *receiver;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(port);
+	addr_in.port = netemu_htons(port);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	receiver = netemu_receiver_new(addr,sizeof(addr_in),64);
@@ -91,7 +91,7 @@ struct netemu_sender* prepare_sender(int port) {
 	netemu_sockaddr *addr;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(port);
+	addr_in.port = netemu_htons(port);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	sender = netemu_sender_new(addr,sizeof(addr_in));
