@@ -11,19 +11,29 @@
 
 struct netemu_receiver* prepare_receiver(int port);
 struct netemu_sender* prepare_sender(int port);
+struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port);
 void send_communication_data(struct netemu_sender* sender);
 void send_data(struct netemu_sender* sender, char* data);
+void test_server_communication();
 void test_sender_receiver();
 
 int main()
 {
 	netemu_init_network();
-	test_sender_receiver();
+	test_server_communication();
 	return 0;
 }
 
 void listener(char* data, size_t size, struct netemu_receiver* receiver) {
 	printf("%s",data);
+}
+
+void test_server_communication() {
+	struct netemu_receiver* receiver;
+	struct netemu_sender* sender;
+	receiver = prepare_receiver(CLIENT_PORT);
+	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
+	send_communication_data(sender);
 }
 
 void test_sender_receiver(){
@@ -72,7 +82,6 @@ struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
 	addr_in.port = htons(port);
 	addr = netemu_prepare_net_addr(&addr_in);
 	sender = netemu_sender_new_on_socket(addr,socket,sizeof(addr_in));
-
 	return sender;
 }
 
@@ -83,7 +92,6 @@ void send_communication_data(struct netemu_sender* sender) {
 	send_data(sender, message);
 	message = netemu_communication_create_hello_message(0.83);
 	send_data(sender, message);
-
 }
 
 void send_data(struct netemu_sender* sender, char* data) {
