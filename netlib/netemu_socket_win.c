@@ -108,3 +108,8 @@ unsigned long netemu_htonl(unsigned long value) {
 unsigned long netemu_ntohl(unsigned long value) {
 	return ntohl(value);
 }
+
+/* Converts an unsigned long from network order to host order. */
+unsigned long netemu_htons(unsigned long value) {
+	return htons(value);
+}
