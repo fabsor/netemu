@@ -4,14 +4,14 @@
 #include "network/netemu_sender.h"
 #include <stdio.h>
 
-#define PORT	20;
+#define PORT	27888
 void send_data();
 
 void receive_data();
 int main()
 {
 	netemu_init_network();
-	receive_data();
+	//receive_data();
 	send_data();
 	return 0;
 }
@@ -26,7 +26,7 @@ void receive_data() {
 	struct netemu_receiver *receiver;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(27015);
+	addr_in.port = htons(PORT);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	receiver = netemu_receiver_new(addr,sizeof(addr_in),64);
@@ -38,15 +38,18 @@ void send_data(){
 	struct netemu_sockaddr_in addr_in;
 	struct netemu_sender* sender;
 	netemu_sockaddr *addr;
+	char* message;
 	int error;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(27015);
+	addr_in.port = htons(PORT);
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	sender = netemu_sender_new(addr,sizeof(addr_in));
+	message = netemu_communication_create_ping_message();
+
 	while (1) {
-		error = netemu_sender_send(sender,"Hello to you old friend.",64);
+		error = netemu_sender_send(sender,message,strlen(message)+1);
 		if(error < 0) {
 			printf("Error: %d\n", netemu_get_last_error());
 		}
