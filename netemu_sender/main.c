@@ -1,4 +1,5 @@
 #include "netemu_socket.h"
+#include "protocol/communication.h"
 #include "network/netemu_receiver.h"
 #include "network/netemu_sender.h"
 #include <stdio.h>
