@@ -3,6 +3,8 @@
 #include "network/netemu_receiver.h"
 #include "network/netemu_sender.h"
 #include <stdio.h>
+
+#define PORT	20;
 void send_data();
 
 void receive_data();
