@@ -24,9 +24,12 @@ int main()
 {
 	netemu_init_network();
 	test_sender_receiver();
-	//test_server_communication();
-
 	while(!ping_received && !hello_received);
+	ping_received = 0;
+	hello_received = 0;
+	test_server_communication();
+	while(!ping_received && !hello_received);
+
 	return 0;
 }
 
