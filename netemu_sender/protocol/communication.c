@@ -53,7 +53,7 @@ int netemu_communication_parse_server_accept_port(char* server_message) {
 
 	start = strlen("HELLOD00D")-1;
 	len = strlen(server_message)+1;
-	port = *(server_message+start);
+	port = (server_message+start);
 
 	return atoi(port);
 }

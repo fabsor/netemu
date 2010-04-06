@@ -8,14 +8,15 @@
 #include <string.h>
 #include "application.h"
 
-struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size) {
+struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction) {
 	struct protocol_message* message;
 	message = malloc(sizeof(struct protocol_message));
 	message->id = message_type;
-	message->total_size = instruction_size;
 	message->body = instruction;
 	return message;
 }
+
+
 
 void netemu_application_free_message(struct protocol_message* message) {
 	free(message->body);

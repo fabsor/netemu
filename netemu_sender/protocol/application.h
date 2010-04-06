@@ -142,7 +142,7 @@ struct chat {
 	char message[128];
 };
 
-struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size);
+struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction);
 struct login_request* netemu_application_create_login_request(char appName[128], int connection);
 
 
