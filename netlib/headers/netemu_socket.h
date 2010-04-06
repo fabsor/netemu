@@ -102,10 +102,6 @@ extern "C" {
 #define NETEMU_ESYSNOTREADY		WSASYSNOTREADY
 #define NETEMU_EVERNOTSUPPORTED	WSAVERNOTSUPPORTED
 #define NETEMU_EPROCLIM			WSAEPROCLIM
-
-
-
-
 #endif
 
 	/* Constants for the different address families that
@@ -211,6 +207,8 @@ extern "C" {
 	/* Frees the memory allocated for the socket */
 	int netemu_free(NETEMU_SOCKET socket);
 
+	/* Close socket*/
+	int netemu_closesocket(NETEMU_SOCKET socket);
 	/* Returns the error code for the last error that occured */
 	int netemu_get_last_error();
 

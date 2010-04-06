@@ -8,16 +8,20 @@
 #ifndef TRANSPORT_H_
 #define TRANSPORT_H_
 
-struct transport_packet {
-	int count;
-	struct instruction *instructions;
-};
+#include "netemu_util.h"
 
 struct transport_instruction {
 	/* ? */
-	int serial;
-	int length;
+	NETEMU_WORD serial;
+	NETEMU_WORD length;
 	void* instruction;
 };
+
+struct transport_packet {
+	char count;
+	struct transport_instruction **instructions;
+};
+
+
 
 #endif /* TRANSPORT_H_ */

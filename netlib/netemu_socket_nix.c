@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/un.h>
@@ -58,7 +59,6 @@ int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
 /* Received a datagram and stores the sender address */
 int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len) {
     return recvfrom(socket,buffer,len,flags,address,address_len);
-
 }
 
 /* Disables send or receive on a socket. */
@@ -69,6 +69,10 @@ int netemu_shutdown(NETEMU_SOCKET socket, int how) {
 /* Frees the memory allocated for the socket */
 int netemu_free(NETEMU_SOCKET socket) {
     return 1;
+}
+
+int netemu_closesocket(NETEMU_SOCKET socket) {
+	return close(socket);
 }
 
 /* Returns the error code for the last error that occured */

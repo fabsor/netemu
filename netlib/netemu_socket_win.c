@@ -62,6 +62,10 @@ int netemu_closesocket(NETEMU_SOCKET socket) {
     return closesocket(socket);
 }
 
+int netemu_free(NETEMU_SOCKET socket) {
+
+}
+
 int netemu_get_last_error() {
     return WSAGetLastError();
 }

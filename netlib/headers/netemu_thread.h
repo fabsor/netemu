@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 	/* TODO: make sure this is a good type to use. */
-	typedef struct netemu_mutex* netemu_mutex;
+	typedef struct netemu_mutex_internal* netemu_mutex;
 
 	/**
 	* Start a new thread.
@@ -51,19 +51,19 @@ extern "C" {
 	* Lock a mutex lock.
 	* @param NETEMU_MUTEX identifier the identifier of the mutex lock.
 	*/
-	void netemu_thread_mutex_lock(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_lock(netemu_mutex mutex_identifier);
 
    /**
 	* Release a lock.
 	* @param NETEMU_MUTEX identifier the identifier for this lock.
 	*/
-	void netemu_thread_mutex_release(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_release(netemu_mutex mutex_identifier);
 
    /**
 	* Destroy a mutex lock.
 	* @param NETEMU_MUTEX the identifier of the lock.
 	*/
-	void netemu_thread_mutex_destroy(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier);
 
 #ifdef	__cplusplus
 }

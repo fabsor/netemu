@@ -1,6 +1,6 @@
 #include "netemu_thread.h"
 
-struct netemu_mutex{
+struct netemu_mutex_internal {
 	HANDLE mutex;
 };
 
@@ -35,22 +35,24 @@ netemu_mutex netemu_thread_mutex_create() {
 	netemu_mutex mutex_struct;
 
 	/* TODO: ska mutex_struct verkligen vara en typdef för mutex_struct*? Namnkonflikt. */
-	mutex_struct = malloc(sizeof(struct netemu_mutex));
-	mutex_struct->mutex = CreateMutex(0, FALSE, "MUTEX");
+	mutex_struct = malloc(sizeof(struct netemu_mutex_internal));
+	mutex_struct->mutex = CreateMutex(0, FALSE, NULL);
 	return mutex_struct;
 }
 
-void netemu_thread_mutex_lock(netemu_mutex mutex_identifier) {
-	/* TODO: WaitForSingleObject returnerar värden som kan vara av värde! Kanske ska kolla lite på det? */
-	WaitForSingleObject(mutex_identifier->mutex, INFINITE);
+int netemu_thread_mutex_lock(netemu_mutex mutex_identifier) {
+	if(WaitForSingleObject(mutex_identifier->mutex, INFINITE) == WAIT_OBJECT_0)
+		return 0;
+	else
+		return -1;
 }
 
-void netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
-	ReleaseMutex(mutex_identifier->mutex);
+int netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
+	return ReleaseMutex(mutex_identifier->mutex);
 }
 
-void netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
+int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
 	/* TODO: Mutex-objektet blir förstört först när ALLA handles till objektet
 	 * har stängts, hur försäkrar man sig om att det inte finns mer handles till mutex-objektet?*/
-	CloseHandle(mutex_identifier->mutex);
+	return CloseHandle(mutex_identifier->mutex);
 }

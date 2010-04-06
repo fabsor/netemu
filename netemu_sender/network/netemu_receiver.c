@@ -15,6 +15,7 @@
  */
 void netemu_receiver_recv(void* params);
 void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data);
+void free_receiver(struct netemu_receiver*);
 
 struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int addr_len, int buffer_size) {
 	struct netemu_receiver* receiver;
@@ -44,6 +45,7 @@ struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int addr_len,
  * datagrams on the specified address and port.
  */
 void netemu_receiver_start_listening(struct netemu_receiver* receiver){
+	
 	netemu_thread_new(netemu_receiver_recv, (void*)receiver);
 }
 
@@ -63,12 +65,30 @@ void netemu_receiver_recv(void* params) {
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error == -1) {
 			receiver->error = netemu_get_last_error();
+			printf("Receive error: %i\n", receiver->error);
+			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}
 		_netemu_receiver_notify(receiver,buffer);
 		netemu_thread_mutex_release(receiver->lock);
+	}	
+	free_receiver(receiver);
+	//netemu_thread_exit();
+
+}
+
+void free_receiver(struct netemu_receiver* receiver) {
+	struct netemu_receiver_fn *receiver_fn, *receiver_next;
+	
+	netemu_free(receiver->socket);
+	free(receiver->addr);
+	receiver_fn = receiver->receiver_fn;
+	while (receiver_fn != NULL) {
+		receiver_next = receiver_fn->next;
+		free(receiver_fn);
+		receiver_fn = receiver_next;
 	}
-	netemu_thread_exit();
+	free(receiver);
 }
 
 void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data) {
@@ -100,5 +120,9 @@ void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* 
 		}
 		receiver_iter->next = receiver_fn;
 	}
+}
+
+void netemu_receiver_free(struct netemu_receiver* receiver) {
+	netemu_closesocket(receiver->socket);
 }
 

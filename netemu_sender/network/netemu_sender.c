@@ -47,6 +47,7 @@ struct netemu_sender* netemu_sender_new_on_socket(netemu_sockaddr* addr, NETEMU_
 }
 
 void netemu_sender_free(struct netemu_sender* sender) {
-	netemu_shutdown(sender->socket,0);
+	netemu_closesocket(sender->socket);
+	free(sender->addr);
 	free(sender);
 }

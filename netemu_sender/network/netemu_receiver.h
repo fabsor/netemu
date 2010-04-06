@@ -48,4 +48,6 @@ void netemu_receiver_start_listening(struct netemu_receiver* receiver);
  */
 void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver*));
 
+void netemu_receiver_free(struct netemu_receiver* receiver);
+
 #endif /* NETEMU_RECEIVER_H_ */
