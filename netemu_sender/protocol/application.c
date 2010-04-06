@@ -14,12 +14,12 @@ struct protocol_message* netemu_application_create_message(int message_type,char
 	message->id = message_type;
 	message->total_size = instruction_size;
 	message->body = instruction;
-
 	return message;
 }
 
-void netemu_application_free_message() {
-
+void netemu_application_free_message(struct protocol_message* message) {
+	free(message->body);
+	free(message);
 }
 
 struct login_request* netemu_application_create_login_request(char appName[128], int connection) {
@@ -31,5 +31,6 @@ struct login_request* netemu_application_create_login_request(char appName[128],
 }
 
 void netemu_application_free_login_request(struct login_request* request) {
-
+	free(request->name);
+	free(request);
 }
