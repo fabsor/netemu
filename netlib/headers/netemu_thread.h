@@ -51,7 +51,7 @@ extern "C" {
 	* Lock a mutex lock.
 	* @param NETEMU_MUTEX identifier the identifier of the mutex lock.
 	*/
-	void netemu_thread_mutex_lock(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_lock(netemu_mutex mutex_identifier);
 
    /**
 	* Release a lock.
