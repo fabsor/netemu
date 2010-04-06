@@ -46,11 +46,9 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 	packet->instructions = malloc(sizeof(struct transport_instruction)*count);
 	for(i = 0; i < count; i++) {
 		instruction = malloc(sizeof(struct transport_instruction));
-
 		memcpy(&instruction->serial,*(data+sizeof(int)),sizeof(int));
 		memcpy(&instruction->length,*(data+sizeof(int)*2),sizeof(int));
 		memcpy(instruction->instruction,*(data+sizeof(int)*3),instruction->length);
-
 		packet->instructions[i] = instruction;
 	}
 }

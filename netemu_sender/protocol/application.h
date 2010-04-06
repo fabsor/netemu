@@ -8,11 +8,12 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
+#define LOGIN_REQUEST	0x03;
 
 
 /*! A message to be sent to the server. */
 struct protocol_message {
-	char id[23];
+	char id; /* 1...23 */
 	char user[32];
 	int total_size;
 	void* body;
@@ -141,6 +142,8 @@ struct chat {
 	char message[128];
 };
 
+struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size);
+struct login_request* netemu_application_create_login_request(char appName[128], int connection);
 
 
 #endif /* APPLICATION_H_ */
