@@ -17,26 +17,32 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 	int pos;
 	int total_size;
 	int instruction_size;
-	total_size = sizeof(int);
+	int wrapper_size;
+
+	total_size = sizeof(char);
 	for(i = 0; i < count; i++) {
+		wrapper_size = sizeof(char)+(sizeof(char)*strlen(messages[i]->user)+1);
 		total_size +=
 			(sizeof(NETEMU_WORD) * 2) +
-			APPLICATION_INSTRUCTION_SIZE +
-			sizes[messages[i]->id - 1];
+			wrapper_size +
+			messages[i]->body_size;
 	}
 	buffer = malloc(total_size);
 	memcpy(buffer,(void *)&count,sizeof(char));
-
 	pos = sizeof(char);
 	for (i = 0; i < count; i++) {
 		index = i+1;
 		memcpy((void *)(buffer+pos),(void *)&index, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
-		instruction_size = APPLICATION_INSTRUCTION_SIZE + sizes[messages[i]->id - 1];
+		instruction_size = messages[i]->body_size + wrapper_size;
 		memcpy((void *)(buffer+pos), (void *)&instruction_size, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
-		memcpy((void *)(buffer+pos),messages[i]->body, sizes[messages[i]->id - 1]);
-		pos += sizes[messages[i]->id - 1];
+		memcpy((void *)(buffer+pos), (void *)&messages[i]->id, sizeof(char));
+		pos += sizeof(char);
+		memcpy((void *)(buffer+pos), (void *)messages[i]->user, sizeof(char)*strlen(messages[i]->user)+1);
+		pos += sizeof(char)*strlen(messages[i]->user)+1;
+		messages[i]->packBodyFn(messages[i],(buffer+pos));
+		pos += messages[i]->body_size;
 	}
 	packet_buffer.data = buffer;
 	packet_buffer.size = total_size;
@@ -69,7 +75,7 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 	}
 }
 
-netemu_transport_free_packet(struct transport_packet* packet) {
+void netemu_transport_free_packet(struct transport_packet* packet) {
 	int i;
 	for(i = 0; i < packet->count; i++) {
 		free(packet->instructions[i]->instruction);

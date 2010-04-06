@@ -19,12 +19,15 @@ int sizes[23];
 /*! A message to be sent to the server. */
 struct application_instruction {
 	char id; /* 1...23 */
-	char user[32];
-	void* body;
+	char *user;
+	void *body;
+	int body_size;
+	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
+	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
 };
 
 struct login_request {
-	char name[128];
+	char* name;
 	short connection;
 };
 
@@ -151,9 +154,10 @@ struct chat {
 };
 
 
-struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction);
+struct application_instruction* netemu_application_create_message(int message_type,char* user,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer));
 
-struct login_request* netemu_application_create_login_request(char appName[128], int connection);
+struct login_request* netemu_application_create_login_request(char* appName, int connection, int *size);
 
+void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 
 #endif /* APPLICATION_H_ */
