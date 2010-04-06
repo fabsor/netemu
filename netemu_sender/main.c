@@ -105,7 +105,7 @@ struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
 	netemu_sockaddr *addr;
 	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = htons(port);
+	addr_in.port = netemu_htons(port);
 	addr = netemu_prepare_net_addr(&addr_in);
 	sender = netemu_sender_new_on_socket(addr,socket,sizeof(addr_in));
 	return sender;
@@ -113,11 +113,18 @@ struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
 
 
 void send_communication_data(struct netemu_sender* sender) {
-	char* message;
-	message = netemu_communication_create_ping_message();
-	send_data(sender, message);
-	message = netemu_communication_create_hello_message("0.83");
-	send_data(sender, message);
+	char* ping_message;
+	char* hello_message;
+	ping_message = netemu_communication_create_ping_message();
+	send_data(sender, ping_message);
+	free(ping_message);
+	hello_message = netemu_communication_create_hello_message("0.83");
+	send_data(sender, hello_message);
+	free(hello_message);
+}
+
+void send_application_data() {
+
 }
 
 void send_data(struct netemu_sender* sender, char* data) {
