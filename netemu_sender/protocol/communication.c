@@ -48,5 +48,12 @@ int netemu_communication_parse_server_message(char* server_message) {
 }
 
 int netemu_communication_parse_server_accept_port(char* server_message) {
-	return 0;
+	int start,len;
+	char* port;
+
+	start = strlen("HELLOD00D")-1;
+	len = strlen(server_message)+1;
+	port = *(server_message+start);
+
+	return atoi(port);
 }
