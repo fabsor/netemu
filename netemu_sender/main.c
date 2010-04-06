@@ -23,8 +23,8 @@ int hello_received = 0;
 int main()
 {
 	netemu_init_network();
-	test_sender_receiver();
-	while(!ping_received && !hello_received);
+	//test_sender_receiver();
+	//while(!ping_received && !hello_received);
 	ping_received = 0;
 	hello_received = 0;
 	test_server_communication();
@@ -35,7 +35,8 @@ int main()
 
 void listener(char* data, size_t size, struct netemu_receiver* receiver) {
 	int msg;
-
+	printf("%s",data);
+	
 	if(strstr("PING",data) != NULL)
 		ping_received = 1;
 	if(strstr("HELLO",data) != NULL)
@@ -51,7 +52,6 @@ void listener(char* data, size_t size, struct netemu_receiver* receiver) {
 
 	}
 
-	printf("%s",data);
 }
 
 void test_server_communication() {
@@ -116,7 +116,7 @@ void send_communication_data(struct netemu_sender* sender) {
 	char* message;
 	message = netemu_communication_create_ping_message();
 	send_data(sender, message);
-	message = netemu_communication_create_hello_message(0.83);
+	message = netemu_communication_create_hello_message("0.83");
 	send_data(sender, message);
 }
 
