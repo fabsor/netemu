@@ -22,7 +22,7 @@ void test_network(){
 	send_network_data(sender);
 	while(!net_ping && !net_hello);
 	netemu_receiver_free(receiver);
-	//netemu_sender_free(sender);
+	netemu_sender_free(sender);
 	printf("network test finished\n");
 }
 

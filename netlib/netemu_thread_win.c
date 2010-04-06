@@ -1,6 +1,6 @@
 #include "netemu_thread.h"
 
-struct netemu_mutex_internal{
+struct netemu_mutex_internal {
 	HANDLE mutex;
 };
 
