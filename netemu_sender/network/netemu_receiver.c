@@ -102,3 +102,16 @@ void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* 
 	}
 }
 
+void netemu_receiver_free(struct netemu_receiver* receiver) {
+	struct netemu_receiver_fn *receiver_fn, *receiver_next;
+	netemu_shutdown(receiver->socket,0);
+	netemu_free(receiver->socket);
+	free(receiver->addr);
+	receiver_fn = receiver->receiver_fn;
+	while (receiver_fn != NULL) {
+		receiver_next = receiver_fn->next;
+		free(receiver_fn);
+		receiver_fn = receiver_next;
+	}
+}
+
