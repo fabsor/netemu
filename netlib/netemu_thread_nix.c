@@ -15,7 +15,7 @@
 #include "headers/netemu_thread.h"
 #include "headers/netemu_list.h"
 #include <pthread.h>
-struct netemu_mutex{
+struct netemu_mutex_internal{
 	pthread_mutex_t* mutex;
 };
 
@@ -73,9 +73,9 @@ int netemu_thread_exit() {
  * @return an identifier for the mutex lock.
  */
 netemu_mutex netemu_thread_mutex_create() {
-	netemu_mutex mutex_struct;
+	struct netemu_mutex_internal* mutex_struct;
 	/* We need a pointer to this mutex, so we can save it off in our list and send the index back to the user. Let's allocate it on the heap.*/
-	mutex_struct = malloc(sizeof(struct netemu_mutex));
+	mutex_struct = malloc(sizeof(struct netemu_mutex_internal));
 	mutex_struct->mutex = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(mutex_struct->mutex, NULL);
 	return mutex_struct;
@@ -98,15 +98,25 @@ int netemu_thread_mutex_lock(netemu_mutex mutex_identifier) {
  * Release a lock.
  * @param NETEMU_MUTEX identifier the identifier for this lock.
  */
-void netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
-	pthread_mutex_unlock(mutex_identifier->mutex);
+int netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
+	int error;
+	error = pthread_mutex_unlock(mutex_identifier->mutex);
+	if(error != 0) {
+		return -1;
+	}
+	return 0;
 }
 
 /**
  * Destroy a mutex lock.
  * @param NETEMU_MUTEX the identifier of the lock.
  */
-void netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
-	pthread_mutex_destroy(mutex_identifier->mutex);
+int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
+	int error;
+	error = pthread_mutex_destroy(mutex_identifier->mutex);
 	free(mutex_identifier);
+	if(error != 0) {
+		return -1;
+	}
+	return 0;
 }
