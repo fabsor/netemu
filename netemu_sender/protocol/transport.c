@@ -34,9 +34,33 @@ char* netemu_transport_pack(struct protocol_message **messages, int count) {
 	return (char*)buffer;
 }
 
-struct transport_packet* netemu_transport_unpack(void* data) {
-	struct tranport_packet* transport_packet;
-	struct transport_instruction instruction;
+struct transport_packet* netemu_transport_unpack(char* data) {
+	int count;
+	int i;
+	struct transport_packet* packet;
+	struct transport_instruction* instruction;
 
+	packet = malloc(sizeof(struct transport_packet));
+	memcpy(&count,data,sizeof(int));
+	packet->count = count;
+	packet->instructions = malloc(sizeof(struct transport_instruction)*count);
+	for(i = 0; i < count; i++) {
+		instruction = malloc(sizeof(struct transport_instruction));
 
+		memcpy(&instruction->serial,*(data+sizeof(int)),sizeof(int));
+		memcpy(&instruction->length,*(data+sizeof(int)*2),sizeof(int));
+		memcpy(instruction->instruction,*(data+sizeof(int)*3),instruction->length);
+
+		packet->instructions[i] = instruction;
+	}
+}
+
+netemu_transport_free_packet(struct transport_packet* packet) {
+	int i;
+	for(i = 0; i < packet->count; i++) {
+		free(packet->instructions[i]->instruction);
+		free(packet->instructions[i]);
+	}
+	free(packet->instructions);
+	free(packet);
 }

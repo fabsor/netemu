@@ -6,6 +6,7 @@
  */
 
 #include "communication.h"
+#include "netemu_util.h"
 #include <stdio.h>
 
 #include <stdlib.h>
