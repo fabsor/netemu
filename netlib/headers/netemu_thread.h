@@ -57,13 +57,13 @@ extern "C" {
 	* Release a lock.
 	* @param NETEMU_MUTEX identifier the identifier for this lock.
 	*/
-	void netemu_thread_mutex_release(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_release(netemu_mutex mutex_identifier);
 
    /**
 	* Destroy a mutex lock.
 	* @param NETEMU_MUTEX the identifier of the lock.
 	*/
-	void netemu_thread_mutex_destroy(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier);
 
 #ifdef	__cplusplus
 }
