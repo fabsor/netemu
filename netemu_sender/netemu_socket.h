@@ -171,6 +171,8 @@ extern "C" {
 
 
 
+
+
     /* Method definitions */
 
     /*! Initializes the socket usage for the application on the platform. */
