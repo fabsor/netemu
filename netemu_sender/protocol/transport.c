@@ -10,7 +10,7 @@
 #include "application.h"
 
 char* netemu_transport_pack(struct protocol_message **messages, int count) {
-	void *buffer;
+	char *buffer;
 	int i;
 	int index;
 	int total_size;

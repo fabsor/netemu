@@ -58,11 +58,11 @@ struct pong {
 	int pbody[3];
 };
 
-/* TODO: What about empty structs? do we need them? */
+/* TODO: What about empty structs? do we need them? 
 struct client_timeout {
 
 };
-
+*/
 struct user_joined {
 	int id;
 	unsigned int ping;
@@ -125,11 +125,11 @@ struct game_start {
 	short player_no;
 	short max_players;
 };
-
+/*
 struct player_ready{
 
 };
-
+*/
 struct buffered_play_values {
 	int size;
 	void** values;

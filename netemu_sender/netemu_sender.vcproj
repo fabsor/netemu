@@ -172,6 +172,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\protocol\application.c"
+				>
+			</File>
+			<File
+				RelativePath=".\protocol\communication.c"
+				>
+			</File>
+			<File
 				RelativePath=".\main.c"
 				>
 			</File>
@@ -183,6 +191,10 @@
 				RelativePath=".\network\netemu_sender.c"
 				>
 			</File>
+			<File
+				RelativePath=".\protocol\transport.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -190,11 +202,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\protocol\application.h"
+				>
+			</File>
+			<File
+				RelativePath=".\protocol\communication.h"
+				>
+			</File>
+			<File
 				RelativePath=".\network\netemu_receiver.h"
 				>
 			</File>
 			<File
 				RelativePath=".\network\netemu_sender.h"
+				>
+			</File>
+			<File
+				RelativePath=".\protocol\transport.h"
 				>
 			</File>
 		</Filter>

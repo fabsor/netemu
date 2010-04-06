@@ -17,7 +17,7 @@ char* netemu_communication_create_hello_message(float version) {
 	char* msg;
 	char* hello;
 	hello = "HELLO";
-	snprintf(str_version, 5, "%f", version);
+	_snprintf(str_version, 5, "%f", version);
 	msg = malloc(sizeof(hello)+sizeof(version));
 	strcpy(msg,hello);
 	return strcat(msg,str_version);
