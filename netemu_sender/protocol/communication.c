@@ -6,6 +6,7 @@
  */
 
 #include "communication.h"
+#include "netemu_util.h"
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -17,7 +18,7 @@ char* netemu_communication_create_hello_message(float version) {
 	char* msg;
 	char* hello;
 	hello = "HELLO";
-	_snprintf(str_version, 5, "%f", version);
+	netemu_snprintf(str_version, 5, "%f", version);
 	msg = malloc(sizeof(hello)+sizeof(version));
 	strcpy(msg,hello);
 	return strcat(msg,str_version);
