@@ -34,7 +34,7 @@ sizes[] = {
 	sizeof(struct chat) // MOTD, its the same size as chat.
 };
 
-struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size) {
+struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction) {
 	struct application_instruction* message;
 	message = malloc(sizeof(struct application_instruction));
 	message->id = message_type;

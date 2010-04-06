@@ -8,7 +8,6 @@
 #include "communication.h"
 #include "netemu_util.h"
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,7 +22,12 @@ char* netemu_communication_create_hello_message(char* version) {
 }
 
 char* netemu_communication_create_ping_message() {
-	return "PING";
+	char* msg;
+	char* ret;
+	msg = "PING";
+	ret = malloc(sizeof(char)*strlen(msg)+1);
+	ret = memcpy(ret,msg,sizeof(char)*strlen(msg)+1);
+	return ret;
 }
 
 int netemu_communication_parse_server_message(char* server_message) {
@@ -44,5 +48,12 @@ int netemu_communication_parse_server_message(char* server_message) {
 }
 
 int netemu_communication_parse_server_accept_port(char* server_message) {
-	return 0;
+	int start,len;
+	char* port;
+
+	start = strlen("HELLOD00D")-1;
+	len = strlen(server_message)+1;
+	port = (server_message+start);
+
+	return atoi(port);
 }

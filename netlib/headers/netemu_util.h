@@ -9,6 +9,9 @@
 #define NETEMU_UTIL_H_
 #include <stdlib.h>
 
+typedef unsigned long NETEMU_DWORD;
+typedef unsigned short NETEMU_WORD;
+
 void netemu_snprintf(char* dest,size_t size, char* format, void* data);
 
 

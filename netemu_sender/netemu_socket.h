@@ -206,6 +206,9 @@ extern "C" {
     /* Frees the memory allocated for the socket */
     int netemu_free(NETEMU_SOCKET socket);
 
+	/* Closes a socket */
+	int netemu_closesocket(NETEMU_SOCKET socket);
+
     /* Returns the error code for the last error that occured */
     int netemu_get_last_error();
 

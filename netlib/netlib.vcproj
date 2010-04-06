@@ -163,6 +163,10 @@
 				RelativePath=".\netemu_thread_win.c"
 				>
 			</File>
+			<File
+				RelativePath=".\netemu_util_win.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -179,6 +183,10 @@
 			</File>
 			<File
 				RelativePath=".\headers\netemu_thread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\headers\netemu_util.h"
 				>
 			</File>
 		</Filter>
