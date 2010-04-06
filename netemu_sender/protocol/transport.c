@@ -28,7 +28,7 @@ char* netemu_transport_pack(struct protocol_message **messages, int count) {
 		pos += sizeof(int);
 		memcpy((void *)(buffer+pos),(void *)&messages[i]->total_size,sizeof(int));
 		pos += sizeof(int);
-		memcpy((void *)(buffer+pos),messages[i]->body,sizeof(int));
+		memcpy((void *)(buffer+pos),messages[i]->body,sizeof(messages[i]->total_size));
 		pos += sizeof(messages[i]->total_size);
 	}
 	return (char*)buffer;

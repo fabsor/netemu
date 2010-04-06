@@ -138,6 +138,10 @@ struct buffered_play_values {
 	int emulator_word_size;
 };
 
+struct intelligently_cached_buffered_play_values {
+	char index;
+};
+
 struct chat {
 	char message[128];
 };
