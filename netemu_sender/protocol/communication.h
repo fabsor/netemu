@@ -20,7 +20,7 @@ enum {
  * @param int version the version of the protocol you want to tell the server that you have.
  * @return an appropriately formatted hello message for the server.
  */
-char* netemu_communication_create_hello_message(float version);
+char* netemu_communication_create_hello_message(char* version);
 
 /**
  * Create a ping message can be sent to the server.
