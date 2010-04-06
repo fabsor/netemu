@@ -4,6 +4,7 @@
 #include "network/netemu_sender.h"
 #include "test_util.h"
 #include "network_test.h"
+#include "communication_test.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,5 +18,6 @@ int main()
 {
 	netemu_init_network();
 	test_network();
+	test_server_communication();
 	return 0;
 }

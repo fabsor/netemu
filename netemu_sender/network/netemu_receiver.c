@@ -113,5 +113,6 @@ void netemu_receiver_free(struct netemu_receiver* receiver) {
 		free(receiver_fn);
 		receiver_fn = receiver_next;
 	}
+	free(receiver);
 }
 
