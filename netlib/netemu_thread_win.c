@@ -1,6 +1,6 @@
 #include "netemu_thread.h"
 
-struct netemu_mutex{
+struct netemu_mutex_internal{
 	HANDLE mutex;
 };
 
@@ -35,7 +35,7 @@ netemu_mutex netemu_thread_mutex_create() {
 	netemu_mutex mutex_struct;
 
 	/* TODO: ska mutex_struct verkligen vara en typdef för mutex_struct*? Namnkonflikt. */
-	mutex_struct = malloc(sizeof(struct netemu_mutex));
+	mutex_struct = malloc(sizeof(struct netemu_mutex_internal));
 	mutex_struct->mutex = CreateMutex(0, FALSE, NULL);
 	return mutex_struct;
 }

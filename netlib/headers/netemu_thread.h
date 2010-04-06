@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 	/* TODO: make sure this is a good type to use. */
-	typedef struct netemu_mutex* netemu_mutex;
+	typedef struct netemu_mutex_internal* netemu_mutex;
 
 	/**
 	* Start a new thread.
