@@ -85,8 +85,13 @@ netemu_mutex netemu_thread_mutex_create() {
  * Lock a mutex lock.
  * @param NETEMU_MUTEX identifier the identifier of the mutex lock.
  */
-void netemu_thread_mutex_lock(netemu_mutex mutex_identifier) {
-	pthread_mutex_lock(mutex_identifier->mutex);
+int netemu_thread_mutex_lock(netemu_mutex mutex_identifier) {
+	int error;
+	error = pthread_mutex_lock(mutex_identifier->mutex);
+	if(error != 0) {
+		return -1;
+	}
+	return 0;
 }
 
 /**
