@@ -8,7 +8,7 @@
 #include <string.h>
 #include "application.h"
 
-int sizes[] = {
+sizes[] = {
 	sizeof(struct user_left),
 	sizeof(struct user_joined),
 	sizeof(struct login_request),
@@ -33,18 +33,16 @@ int sizes[] = {
 	sizeof(struct login_status),
 	sizeof(struct chat) // MOTD, its the same size as chat.
 };
-//sizes[LOGIN_REQUEST] = 132;
 
-struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size) {
-	struct protocol_message* message;
-	message = malloc(sizeof(struct protocol_message));
+struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size) {
+	struct application_instruction* message;
+	message = malloc(sizeof(struct application_instruction));
 	message->id = message_type;
-	message->total_size = instruction_size;
 	message->body = instruction;
 	return message;
 }
 
-void netemu_application_free_message(struct protocol_message* message) {
+void netemu_application_free_message(struct application_instruction* message) {
 	free(message->body);
 	free(message);
 }

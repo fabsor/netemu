@@ -8,14 +8,18 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
+int sizes[];
+
+/* Size of the application_instruction struct excluding the body. */
+#define APPLICATION_INSTRUCTION_SIZE	33;
+
 #define LOGIN_REQUEST	0x03;
 
 
 /*! A message to be sent to the server. */
-struct protocol_message {
+struct application_instruction {
 	char id; /* 1...23 */
 	char user[32];
-	int total_size;
 	void* body;
 };
 
@@ -146,7 +150,7 @@ struct chat {
 	char message[128];
 };
 
-struct protocol_message* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size);
+struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction,size_t instruction_size);
 struct login_request* netemu_application_create_login_request(char appName[128], int connection);
 
 
