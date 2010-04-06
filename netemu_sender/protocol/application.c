@@ -38,6 +38,7 @@ struct application_instruction* netemu_application_create_message(int message_ty
 	struct application_instruction* message;
 	message = malloc(sizeof(struct application_instruction));
 	message->id = message_type;
+	memcpy(message->user,user,sizeof(char)*(strlen(user)+1));
 	message->body = instruction;
 	return message;
 }
@@ -47,10 +48,10 @@ void netemu_application_free_message(struct application_instruction* message) {
 	free(message);
 }
 
-struct login_request* netemu_application_create_login_request(char appName[128], int connection) {
+struct login_request* netemu_application_create_login_request(char* appName, int connection) {
 	struct login_request* request;
 	request = malloc(sizeof(struct login_request));
-	memcpy(request->name,appName,sizeof(char)*128);
+	memcpy(request->name,appName,sizeof(char)*strlen(appName)+1);
 	request->connection = connection;
 	return request;
 }

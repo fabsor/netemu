@@ -9,7 +9,8 @@
 #include "transport.h"
 #include "application.h"
 
-char* netemu_transport_pack(struct application_instruction **messages, char count) {
+struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count) {
+	struct transport_packet_buffer packet_buffer;
 	char *buffer;
 	int i;
 	int index;
@@ -25,19 +26,21 @@ char* netemu_transport_pack(struct application_instruction **messages, char coun
 	}
 	buffer = malloc(total_size);
 	memcpy(buffer,(void *)&count,sizeof(char));
+
 	pos = sizeof(char);
-	for(i = 0; i < count; i++) {
+	for (i = 0; i < count; i++) {
 		index = i+1;
 		memcpy((void *)(buffer+pos),(void *)&index, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
-
 		instruction_size = APPLICATION_INSTRUCTION_SIZE + sizes[messages[i]->id - 1];
 		memcpy((void *)(buffer+pos), (void *)&instruction_size, sizeof(NETEMU_WORD));
-
+		pos += sizeof(NETEMU_WORD);
 		memcpy((void *)(buffer+pos),messages[i]->body, sizes[messages[i]->id - 1]);
 		pos += sizes[messages[i]->id - 1];
 	}
-	return (char*)buffer;
+	packet_buffer.data = buffer;
+	packet_buffer.size = total_size;
+	return packet_buffer;
 }
 
 struct transport_packet* netemu_transport_unpack(char* data) {
@@ -52,7 +55,7 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 	packet->count = count;
 	packet->instructions = malloc(sizeof(struct transport_instruction)*count);
 	pos = sizeof(int);
-	for(i = 0; i < count; i++) {
+	for (i = 0; i < count; i++) {
 		instruction = malloc(sizeof(struct transport_instruction));
 		memcpy(&instruction->serial, data + pos, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
