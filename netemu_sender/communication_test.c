@@ -21,6 +21,7 @@ void test_server_communication() {
 	receiver = prepare_receiver(CLIENT_PORT,communication_listener);
 	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_communication_data(sender);
+	while(!com_hello_received && !com_ping_received);
 }
 
 void communication_listener(char* data, size_t size, struct netemu_receiver* receiver) {

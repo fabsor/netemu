@@ -9,7 +9,7 @@
 #define TRANSPORT_H_
 
 #include "netemu_util.h"
-
+#include "application.h"
 struct transport_instruction {
 	/* ? */
 	NETEMU_WORD serial;
@@ -22,6 +22,12 @@ struct transport_packet {
 	struct transport_instruction **instructions;
 };
 
+struct transport_packet_buffer {
+	int size;
+	char* data;
+};
 
+struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count);
+struct transport_packet* netemu_transport_unpack(char* data);
 
 #endif /* TRANSPORT_H_ */
