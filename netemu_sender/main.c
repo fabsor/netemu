@@ -19,5 +19,7 @@ int main()
 	netemu_init_network();
 	test_network();
 	test_server_communication();
+
+	getchar();
 	return 0;
 }

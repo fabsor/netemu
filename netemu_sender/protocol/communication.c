@@ -13,12 +13,18 @@
 
 
 char* netemu_communication_create_hello_message(char* version) {
-	char* msg;
+	char* hello_message;
 	char* hello;
+	int hello_message_size;
 	hello = "HELLO";
-	msg = malloc(sizeof(hello)+sizeof(version));
-	memcpy(msg,hello, strlen(hello));
-	return strcat(msg,version);
+
+	hello_message_size = strlen(hello) + strlen(version) + 1;
+	hello_message = malloc(hello_message_size);
+	memcpy(hello_message, hello, strlen(hello));
+	memcpy(hello_message + strlen(hello), version, strlen(version));
+	
+	hello_message[hello_message_size - 1] = '\0';
+	return hello_message;
 }
 
 char* netemu_communication_create_ping_message() {
