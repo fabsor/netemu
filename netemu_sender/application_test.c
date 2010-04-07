@@ -72,7 +72,7 @@ void test_login_request(struct netemu_sender* sender) {
 	int size;
 
 	request = netemu_application_create_login_request("netemu","haha",1,&size);
-	messages[0] = netemu_application_create_message(LOGIN_REQUEST,"haha",(void*)request,size,netemu_application_login_request_pack);
+	messages[0] = netemu_application_create_message(LOGIN_REQUEST,(void*)request,size,netemu_application_login_request_pack);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 
