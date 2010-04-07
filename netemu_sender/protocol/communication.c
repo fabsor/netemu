@@ -37,16 +37,16 @@ char* netemu_communication_create_ping_message() {
 }
 
 int netemu_communication_parse_server_message(char* server_message) {
-	if(strstr("VER",server_message) != NULL) {
+	if(strstr(server_message,"VER") != NULL) {
 		return CONNECTION_REJECTED_VER;
 	}
-	if(strstr("TOO",server_message) != NULL) {
+	if(strstr(server_message,"VER") != NULL) {
 		return CONNECTION_REJECTED_TOO;
 	}
-	if(strstr("HELLOD00D",server_message) != NULL) {
+	if(strstr(server_message, "HELLOD00D") != NULL) {
 		return CONNECTION_ACCEPTED;
 	}
-	if(strstr("PONG",server_message) != NULL) {
+	if(strstr(server_message, "PONG") != NULL) {
 		return PING_RECEIVED;
 	}
 
@@ -57,7 +57,7 @@ int netemu_communication_parse_server_accept_port(char* server_message) {
 	int start,len;
 	char* port;
 
-	start = strlen("HELLOD00D")-1;
+	start = strlen("HELLOD00D");
 	len = strlen(server_message)+1;
 	port = (server_message+start);
 

@@ -7,24 +7,28 @@
 
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
+#include "transport.h"
 
-int sizes[];
+int sizes[23];
 
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
-#define LOGIN_REQUEST	0x03;
-
+#define LOGIN_REQUEST	0x03
+#define PING			0x05
 
 /*! A message to be sent to the server. */
 struct application_instruction {
 	char id; /* 1...23 */
-	char user[32];
-	void* body;
+	char *user;
+	void *body;
+	int body_size;
+	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
+	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
 };
 
 struct login_request {
-	char name[128];
+	char* name;
 	short connection;
 };
 
@@ -60,7 +64,7 @@ struct ping {
 };
 
 struct pong {
-	int pbody[3];
+	char pbody[12];
 };
 
 /* TODO: What about empty structs? do we need them? 
@@ -151,9 +155,12 @@ struct chat {
 };
 
 
-struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction);
+struct application_instruction* netemu_application_create_message(int message_type,char* user,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer));
 
-struct login_request* netemu_application_create_login_request(char appName[128], int connection);
+struct login_request* netemu_application_create_login_request(char* appName, int connection, int *size);
 
+void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
+
+struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 
 #endif /* APPLICATION_H_ */

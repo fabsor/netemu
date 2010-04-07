@@ -16,4 +16,5 @@ SUBDIRS := \
 . \
 protocol \
 network \
+handlers \
 

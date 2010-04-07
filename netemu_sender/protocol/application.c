@@ -8,6 +8,7 @@
 #include <string.h>
 #include "application.h"
 
+/* TODO: This is unfortunately not possible =/ */
 sizes[] = {
 	sizeof(struct user_left),
 	sizeof(struct user_joined),
@@ -34,12 +35,30 @@ sizes[] = {
 	sizeof(struct chat) // MOTD, its the same size as chat.
 };
 
-struct application_instruction* netemu_application_create_message(int message_type,char* user,void* instruction) {
+struct application_instruction* netemu_application_create_message(int message_type,char* user,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
 	struct application_instruction* message;
 	message = malloc(sizeof(struct application_instruction));
 	message->id = message_type;
-	message->body = instruction;
+	message->user = malloc(sizeof(char)*strlen(user)+1);
+	strcpy(message->user,user);
+	message->body = body;
+	message->body_size = body_size;
+	message->packBodyFn = packBodyFn;
 	return message;
+}
+
+struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {
+	struct application_instruction *app_instruction;
+	int pos = 0;
+	app_instruction = malloc(sizeof(struct application_instruction));
+	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
+
+	switch(app_instruction->id) {
+		case PING:
+			app_instruction->body_size = 0;
+			break;
+	}
+	return app_instruction;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
@@ -47,12 +66,31 @@ void netemu_application_free_message(struct application_instruction* message) {
 	free(message);
 }
 
-struct login_request* netemu_application_create_login_request(char appName[128], int connection) {
+struct login_request* netemu_application_create_login_request(char* appName, int connection, int *size) {
 	struct login_request* request;
 	request = malloc(sizeof(struct login_request));
-	memcpy(request->name,appName,sizeof(char)*128);
+	*size = sizeof(char)*strlen(appName)+1;
+	request->name = malloc(*size);
+	memcpy(request->name,appName,*size);
 	request->connection = connection;
+	*size += sizeof(short);
 	return request;
+}
+
+struct pong* netemu_application_create_pong(int *size) {
+	struct pong* request;
+	*size = sizeof(struct pong);
+	request = malloc(*size);
+	return request;
+}
+
+void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer) {
+	struct login_request* request;
+	int size;
+	request = (struct login_request*)instruction->body;
+	size = sizeof(char)*strlen(request->name)+1;
+	memcpy(buffer,(void*)request->name,size);
+	memcpy((buffer+size),(void*)&request->connection,sizeof(char));
 }
 
 void netemu_application_free_login_request(struct login_request* request) {
