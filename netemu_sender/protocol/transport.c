@@ -20,8 +20,8 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 	int wrapper_size;
 
 	total_size = sizeof(char);
+	wrapper_size = sizeof(char);
 	for(i = 0; i < count; i++) {
-		wrapper_size = sizeof(char)+(sizeof(char)*strlen(messages[i]->user)+1);
 		total_size +=
 			(sizeof(NETEMU_WORD) * 2) +
 			wrapper_size +
@@ -39,8 +39,6 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 		pos += sizeof(NETEMU_WORD);
 		memcpy((void *)(buffer+pos), (void *)&messages[i]->id, sizeof(char));
 		pos += sizeof(char);
-		memcpy((void *)(buffer+pos), (void *)messages[i]->user, sizeof(char)*strlen(messages[i]->user)+1);
-		pos += sizeof(char)*strlen(messages[i]->user)+1;
 		messages[i]->packBodyFn(messages[i],(buffer+pos));
 		pos += messages[i]->body_size;
 	}
