@@ -16,6 +16,7 @@
 #define LOGIN_SUCCESS	0x04
 #define PING			0x05
 #define PONG			0x06
+#define USER_LEAVE		0x01
 
 /*! A message to be sent to the server. */
 struct application_instruction {
