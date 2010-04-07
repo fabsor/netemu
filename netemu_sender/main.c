@@ -12,9 +12,6 @@
 void test_server_communication();
 void test_sender_receiver();
 
-int ping_received = 0;
-int hello_received = 0;
-
 int main()
 {
 	netemu_init_network();

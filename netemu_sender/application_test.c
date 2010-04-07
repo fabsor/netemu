@@ -4,10 +4,11 @@
  *  Created on: 6 apr 2010
  *      Author: fabian
  */
-
+#include <stdlib.h>
+#include <stdio.h>
+#include "test_util.h"
 #include "network/netemu_receiver.h"
 #include "network/netemu_sender.h"
-#include "test_util.h"
 #include "protocol/application.h"
 #include "protocol/transport.h"
 #include "protocol/communication.h"
@@ -19,6 +20,7 @@ void test_login_request(struct netemu_sender* sender);
 
 int port = 0;
 int login_accepted = 0;
+int ping_received = 0;
 
 void run_application_tests() {
 	struct netemu_receiver* receiver;
@@ -29,7 +31,7 @@ void run_application_tests() {
 	while(port == 0);
 	new_sender = prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
-	while(1);
+	while(ping_received = 0);
 }
 
 void send_hello(struct netemu_sender *sender) {
@@ -66,12 +68,22 @@ void test_login_request(struct netemu_sender* sender) {
 	struct login_request* request;
 	struct transport_packet_buffer buffer;
 	struct protocol_message *messages[1];
-	int hej = LOGIN_REQUEST;
 	int size;
 
 	request = netemu_application_create_login_request("netemu",1,&size);
-	messages[0] = netemu_application_create_message(hej,"haha",(void*)request,size,netemu_application_login_request_pack);
+	messages[0] = netemu_application_create_message(LOGIN_REQUEST,"haha",(void*)request,size,netemu_application_login_request_pack);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 
+}
+
+void test_pong(struct netemu_sender* sender) {
+	struct pong *request;
+	struct transport_packet_buffer buffer;
+	struct protocol_message *messages[1];
+	int size;
+
+	request = netemu_application_create_pong(&size);
+	buffer = netemu_transport_pack(messages,1);
+	netemu_sender_send(sender,buffer.data,buffer.size);
 }
