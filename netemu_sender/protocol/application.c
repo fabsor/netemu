@@ -6,6 +6,8 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include "netemu_socket.h"
+#include "netemu_util.h"
 #include "application.h"
 
 struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
@@ -73,11 +75,15 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer) {
 	struct pong* request;
-	unsigned long dword;
+	char* pos;
+	NETEMU_DWORD dword;
+	int p;
 	request = (struct pong*)instruction->body;
 	buffer[0] = '\0';
+	pos = buffer+sizeof(char);
 	for(dword = 0; dword <= 3; dword++) {
-		memcpy((buffer+1)+sizeof(unsigned long)*dword,&dword,sizeof(unsigned long));
+		p = (sizeof(NETEMU_DWORD)*dword);
+		memcpy((pos+(sizeof(NETEMU_DWORD)*dword)),&dword,sizeof(unsigned long));
 	}
 }
 
