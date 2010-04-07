@@ -8,8 +8,11 @@
 #ifndef NETEMU_UTIL_H_
 #define NETEMU_UTIL_H_
 #include <stdlib.h>
-
+#ifdef _NIX
+typedef unsigned int NETEMU_DWORD;
+#else
 typedef unsigned long NETEMU_DWORD;
+#endif
 typedef unsigned short NETEMU_WORD;
 
 void netemu_snprintf(char* dest,size_t size, char* format, void* data);
