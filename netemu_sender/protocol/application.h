@@ -7,6 +7,7 @@
 
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
+#include "transport.h"
 
 int sizes[23];
 
@@ -159,5 +160,7 @@ struct application_instruction* netemu_application_create_message(int message_ty
 struct login_request* netemu_application_create_login_request(char* appName, int connection, int *size);
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_parse_message(struct transport_instruction *instruction);
 
 #endif /* APPLICATION_H_ */

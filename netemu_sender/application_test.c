@@ -29,22 +29,33 @@ void run_application_tests() {
 	while(port == 0);
 	new_sender = prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
+	while(1);
 }
 
 void send_hello(struct netemu_sender *sender) {
 	char* hello_message;
+
 	hello_message = netemu_communication_create_hello_message("0.83");
 	send_data(sender, hello_message);
 	free(hello_message);
 }
 
 void application_listener(char* data, size_t size, struct netemu_receiver* receiver) {
-	int status;
-	status = netemu_communication_parse_server_message(data);
-	if(status == 0) {
-		port = netemu_communication_parse_server_accept_port(data);
+	int status,i;
+	struct transport_packet *packet;
+	if (port == 0) {
+		status = netemu_communication_parse_server_message(data);
+		if(status == 0) {
+			port = netemu_communication_parse_server_accept_port(data);
+		}
 	}
-
+	else {
+		packet = netemu_transport_unpack(data);
+		for (i = 0; i < packet->count; i++) {
+			netemu_application_parse_message(packet->instructions[i]);
+		}
+	}
+	printf("%s", data);
 }
 
 /**

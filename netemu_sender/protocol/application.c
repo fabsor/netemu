@@ -47,6 +47,14 @@ struct application_instruction* netemu_application_create_message(int message_ty
 	return message;
 }
 
+void netemu_application_parse_message(struct transport_instruction *instruction) {
+	struct application_instruction *app_instruction;
+	int pos = 0;
+	app_instruction = malloc(sizeof(struct application_instruction));
+	memcpy(app_instruction->id,instruction->instruction,sizeof(char));
+
+}
+
 void netemu_application_free_message(struct application_instruction* message) {
 	free(message->body);
 	free(message);

@@ -60,7 +60,7 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 	memcpy(&count,data,sizeof(char));
 	packet->count = count;
 	packet->instructions = malloc(sizeof(struct transport_instruction)*count);
-	pos = sizeof(int);
+	pos = sizeof(char);
 	for (i = 0; i < count; i++) {
 		instruction = malloc(sizeof(struct transport_instruction));
 		memcpy(&instruction->serial, data + pos, sizeof(NETEMU_WORD));
@@ -68,11 +68,12 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 
 		memcpy(&instruction->length, data + pos, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
-
+		instruction->instruction = malloc(instruction->length);
 		memcpy(instruction->instruction, data + pos,instruction->length);
 		pos += instruction->length;
 		packet->instructions[i] = instruction;
 	}
+	return packet;
 }
 
 void netemu_transport_free_packet(struct transport_packet* packet) {
