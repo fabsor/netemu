@@ -22,10 +22,11 @@ void test_pong(struct netemu_sender* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
+struct netemu_sender* new_sender;
 
 void run_application_tests() {
 	struct netemu_receiver* receiver;
-	struct netemu_sender* sender, *new_sender;
+	struct netemu_sender* sender;
 	receiver = prepare_receiver(CLIENT_PORT,application_listener);
 	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_hello(sender);
@@ -59,6 +60,10 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 		packet = netemu_transport_unpack(data);
 		for (i = 0; i < packet->count; i++) {
 			instruction = netemu_application_parse_message(packet->instructions[i]);
+			if(instruction->id == PING) {
+				printf("PING! Sending PONG!\n");
+				test_pong(new_sender);
+			}
 			ping_received = 1;
 		}
 	}

@@ -19,7 +19,7 @@ struct netemu_receiver* prepare_receiver(int port,void (* listenerFn)(char*, siz
 	addr_in.port = netemu_htons(port);
 
 	addr = netemu_prepare_net_addr(&addr_in);
-	receiver = netemu_receiver_new(addr,sizeof(addr_in),64);
+	receiver = netemu_receiver_new(addr,sizeof(addr_in), 256);
 	netemu_receiver_register_recv_fn(receiver, listenerFn);
 	netemu_receiver_start_listening(receiver);
 	return receiver;

@@ -13,6 +13,7 @@
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
 #define LOGIN_REQUEST	0x03
+#define LOGIN_SUCCESS	0x04
 #define PING			0x05
 #define PONG			0x06
 
@@ -79,10 +80,10 @@ struct user_joined {
 
 struct game {
 	char name[128];
-	unsigned int id;
+	NETEMU_DWORD id;
 	char app_name[128];
 	char users_count[10];
-	short status;
+	char status;
 };
 
 struct user_left {
