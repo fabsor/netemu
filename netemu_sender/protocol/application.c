@@ -70,8 +70,8 @@ struct login_request* netemu_application_create_login_request(char* appName, cha
 	*size = sizeof(char)*strlen(appName)+1;
 	request->name = malloc(*size);
 	memcpy(request->name,appName,*size);
-	request->user = malloc(sizeof(char)*strlen(appName)+1);
-	*size += sizeof(char)*strlen(appName)+1 + sizeof(short);
+	request->user = malloc(sizeof(char)*strlen(user)+1);
+	*size += sizeof(char)*strlen(user)+1 + sizeof(short);
 	strcpy(request->user,user);
 	request->connection = connection;
 	return request;
