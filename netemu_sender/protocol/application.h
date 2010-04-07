@@ -87,8 +87,9 @@ struct game {
 };
 
 struct user_left {
-	int id;
-	char exit_message[128];
+	char *user;
+	NETEMU_WORD id;
+	char *exit_message;
 };
 
 struct game_created {
