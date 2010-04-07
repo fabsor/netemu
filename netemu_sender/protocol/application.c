@@ -93,8 +93,8 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 	request = (struct login_request*)instruction->body;
 	size = sizeof(char)*strlen(request->user)+1;
 	memcpy(buffer,(void*)request->user,size);
-	memcpy(buffer+size,(void*)request->name,sizeof(char)*strlen(request->name)+1);
-	size += sizeof(char)*strlen(request->user)+1;
+	memcpy((buffer+size),(void*)request->name,sizeof(char)*strlen(request->name)+1);
+	size += sizeof(char)*strlen(request->name)+1;
 	memcpy((buffer+size),(void*)&request->connection,sizeof(char));
 }
 
