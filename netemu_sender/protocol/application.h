@@ -9,8 +9,6 @@
 #define APPLICATION_H_
 #include "transport.h"
 
-int sizes[23];
-
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 

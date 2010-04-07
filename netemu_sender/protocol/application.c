@@ -8,33 +8,6 @@
 #include <string.h>
 #include "application.h"
 
-/* TODO: This is unfortunately not possible =/ */
-sizes[] = {
-	sizeof(struct user_left),
-	sizeof(struct user_joined),
-	sizeof(struct login_request),
-	sizeof(struct login_success),
-	sizeof(struct ping),
-	sizeof(struct pong),
-	sizeof(struct chat),
-	sizeof(struct chat),
-	0,
-	sizeof(struct game_created),
-	sizeof(struct player_left),
-	sizeof(struct player_joined),
-	sizeof(struct existing_player_list),
-	sizeof(struct game_status_update),
-	sizeof(struct kick_player),
-	sizeof(struct game_closed),
-	sizeof(struct game_start),
-	sizeof(struct buffered_play_values),
-	sizeof(struct intelligently_cached_buffered_play_values),
-	sizeof(struct intelligently_cached_buffered_play_values), // Player dropped. There is no such struct, but this struct is equally sized.
-	0,
-	sizeof(struct login_status),
-	sizeof(struct chat) // MOTD, its the same size as chat.
-};
-
 struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
 	struct application_instruction* message;
 	message = malloc(sizeof(struct application_instruction));
