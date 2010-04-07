@@ -66,13 +66,18 @@ void netemu_application_free_message(struct application_instruction* message) {
 
 struct login_request* netemu_application_create_login_request(char* appName, char* user, int connection, int *size) {
 	struct login_request* request;
+	int appname_len;
+	int user_len;
+
+	appname_len = sizeof(char)*strlen(appName)+1;
+	user_len = sizeof(char)*strlen(user) + 1;
 	request = malloc(sizeof(struct login_request));
-	*size = sizeof(char)*strlen(appName)+1;
-	request->name = malloc(*size);
-	memcpy(request->name,appName,*size);
-	request->user = malloc(sizeof(char)*strlen(appName)+1);
-	*size += sizeof(char)*strlen(appName)+1 + sizeof(short);
-	strcpy(request->user,user);
+	request->name = malloc(appname_len);
+	request->user = malloc(user_len);
+	memcpy(request->name, appName, appname_len);
+	memcpy(request->user, user, user_len);
+
+	*size = appname_len + user_len + sizeof(short);
 	request->connection = connection;
 	return request;
 }
