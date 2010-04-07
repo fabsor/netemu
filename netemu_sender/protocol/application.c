@@ -77,12 +77,10 @@ void netemu_application_pong_pack(struct application_instruction *instruction, c
 	struct pong* request;
 	char* pos;
 	NETEMU_DWORD dword;
-	int p;
 	request = (struct pong*)instruction->body;
 	buffer[0] = '\0';
 	pos = buffer+sizeof(char);
 	for(dword = 0; dword <= 3; dword++) {
-		p = (sizeof(NETEMU_DWORD)*dword);
 		memcpy((pos+(sizeof(NETEMU_DWORD)*dword)),&dword,sizeof(unsigned long));
 	}
 }
