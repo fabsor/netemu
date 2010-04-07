@@ -33,6 +33,7 @@ void run_application_tests() {
 	new_sender = prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
 	while(ping_received = 0);
+	while(1);
 }
 
 void send_hello(struct netemu_sender *sender) {

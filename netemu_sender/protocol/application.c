@@ -8,33 +8,6 @@
 #include <string.h>
 #include "application.h"
 
-/* TODO: This is unfortunately not possible =/ */
-sizes[] = {
-	sizeof(struct user_left),
-	sizeof(struct user_joined),
-	sizeof(struct login_request),
-	sizeof(struct login_success),
-	sizeof(struct ping),
-	sizeof(struct pong),
-	sizeof(struct chat),
-	sizeof(struct chat),
-	0,
-	sizeof(struct game_created),
-	sizeof(struct player_left),
-	sizeof(struct player_joined),
-	sizeof(struct existing_player_list),
-	sizeof(struct game_status_update),
-	sizeof(struct kick_player),
-	sizeof(struct game_closed),
-	sizeof(struct game_start),
-	sizeof(struct buffered_play_values),
-	sizeof(struct intelligently_cached_buffered_play_values),
-	sizeof(struct intelligently_cached_buffered_play_values), // Player dropped. There is no such struct, but this struct is equally sized.
-	0,
-	sizeof(struct login_status),
-	sizeof(struct chat) // MOTD, its the same size as chat.
-};
-
 struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
 	struct application_instruction* message;
 	message = malloc(sizeof(struct application_instruction));
@@ -68,7 +41,6 @@ struct login_request* netemu_application_create_login_request(char* appName, cha
 	struct login_request* request;
 	int appname_len;
 	int user_len;
-
 	appname_len = sizeof(char)*strlen(appName)+1;
 	user_len = sizeof(char)*strlen(user) + 1;
 	request = malloc(sizeof(struct login_request));
@@ -76,7 +48,6 @@ struct login_request* netemu_application_create_login_request(char* appName, cha
 	request->user = malloc(user_len);
 	memcpy(request->name, appName, appname_len);
 	memcpy(request->user, user, user_len);
-
 	*size = appname_len + user_len + sizeof(short);
 	request->connection = connection;
 	return request;
@@ -95,8 +66,8 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 	request = (struct login_request*)instruction->body;
 	size = sizeof(char)*strlen(request->user)+1;
 	memcpy(buffer,(void*)request->user,size);
-	memcpy(buffer+size,(void*)request->name,sizeof(char)*strlen(request->name)+1);
-	size += sizeof(char)*strlen(request->user)+1;
+	memcpy((buffer+size),(void*)request->name,sizeof(char)*strlen(request->name)+1);
+	size += sizeof(char)*strlen(request->name)+1;
 	memcpy((buffer+size),(void*)&request->connection,sizeof(char));
 }
 
