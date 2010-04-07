@@ -33,6 +33,7 @@ void run_application_tests() {
 	new_sender = prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
 	while(ping_received = 0);
+	test_pong(new_sender);
 	while(1);
 }
 
@@ -58,6 +59,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 		packet = netemu_transport_unpack(data);
 		for (i = 0; i < packet->count; i++) {
 			instruction = netemu_application_parse_message(packet->instructions[i]);
+			ping_received = 1;
 		}
 	}
 	printf("%s", data);
@@ -86,6 +88,7 @@ void test_pong(struct netemu_sender* sender) {
 	int size;
 
 	request = netemu_application_create_pong(&size);
+	messages[0] = netemu_application_create_message(PONG,(void*)request,size,netemu_application_pong_pack);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }

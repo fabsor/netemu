@@ -63,7 +63,7 @@ struct ping {
 };
 
 struct pong {
-	char pbody[12];
+	char pbody[17];
 };
 
 /* TODO: What about empty structs? do we need them? 
@@ -154,7 +154,7 @@ struct chat {
 };
 
 
-struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer));
+struct application_instruction* netemu_application_create_message(int message_type, void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer));
 
 struct login_request* netemu_application_create_login_request(char* appName, char* user, int connection, int *size);
 

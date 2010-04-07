@@ -10,6 +10,7 @@
 #include "application.h"
 
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count) {
+	static int current_index;
 	struct transport_packet_buffer packet_buffer;
 	char *buffer;
 	int i;
@@ -31,7 +32,7 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 	memcpy(buffer,(void *)&count,sizeof(char));
 	pos = sizeof(char);
 	for (i = 0; i < count; i++) {
-		index = i+1;
+		index = current_index+i;
 		memcpy((void *)(buffer+pos),(void *)&index, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
 		instruction_size = messages[i]->body_size + wrapper_size;
@@ -42,6 +43,7 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 		messages[i]->packBodyFn(messages[i],(buffer+pos));
 		pos += messages[i]->body_size;
 	}
+	current_index += count;
 	packet_buffer.data = buffer;
 	packet_buffer.size = total_size;
 	return packet_buffer;

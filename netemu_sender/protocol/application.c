@@ -73,8 +73,12 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer) {
 	struct pong* request;
+	unsigned long dword;
 	request = (struct pong*)instruction->body;
-	memcpy(buffer,(void*)request->pbody,12);
+	buffer[0] = '\0';
+	for(dword = 0; dword <= 3; dword++) {
+		memcpy((buffer+1)+sizeof(unsigned long)*dword,&dword,sizeof(unsigned long));
+	}
 }
 
 void netemu_application_free_login_request(struct login_request* request) {
