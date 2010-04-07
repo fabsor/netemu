@@ -15,8 +15,6 @@ void test_sender_receiver();
 int main()
 {
 	netemu_init_network();
-	//test_network();
-	//test_server_communication();
 	run_application_tests();
 	return 0;
 }
