@@ -25,7 +25,6 @@ struct application_instruction* netemu_application_create_message(int message_ty
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {
 	struct application_instruction *app_instruction;
-	int pos = 0;
 	int i;
 	app_instruction = malloc(sizeof(struct application_instruction));
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
@@ -44,10 +43,7 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 
 struct login_success* netemu_application_parse_login_success(struct transport_instruction *instruction) {
 	struct login_success *success;
-
 	success = malloc(sizeof(struct login_success));
-
-
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
