@@ -43,6 +43,7 @@ void send_hello(struct netemu_sender *sender) {
 void application_listener(char* data, size_t size, struct netemu_receiver* receiver) {
 	int status,i;
 	struct transport_packet *packet;
+	struct application_instruction *instruction;
 	if (port == 0) {
 		status = netemu_communication_parse_server_message(data);
 		if(status == 0) {
@@ -52,7 +53,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 	else {
 		packet = netemu_transport_unpack(data);
 		for (i = 0; i < packet->count; i++) {
-			netemu_application_parse_message(packet->instructions[i]);
+			instruction = netemu_application_parse_message(packet->instructions[i]);
 		}
 	}
 	printf("%s", data);

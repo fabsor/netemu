@@ -11,6 +11,7 @@ RM := rm -rf
 -include subdir.mk
 -include protocol/subdir.mk
 -include network/subdir.mk
+-include handlers/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

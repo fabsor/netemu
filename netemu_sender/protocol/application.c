@@ -47,12 +47,18 @@ struct application_instruction* netemu_application_create_message(int message_ty
 	return message;
 }
 
-void netemu_application_parse_message(struct transport_instruction *instruction) {
+struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {
 	struct application_instruction *app_instruction;
 	int pos = 0;
 	app_instruction = malloc(sizeof(struct application_instruction));
-	memcpy(app_instruction->id,instruction->instruction,sizeof(char));
+	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
 
+	switch(app_instruction->id) {
+		case PING:
+			app_instruction->body_size = 0;
+			break;
+	}
+	return app_instruction;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
@@ -68,6 +74,13 @@ struct login_request* netemu_application_create_login_request(char* appName, int
 	memcpy(request->name,appName,*size);
 	request->connection = connection;
 	*size += sizeof(short);
+	return request;
+}
+
+struct pong* netemu_application_create_pong(int *size) {
+	struct pong* request;
+	*size = sizeof(struct pong);
+	request = malloc(*size);
 	return request;
 }
 
