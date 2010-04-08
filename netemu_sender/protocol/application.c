@@ -44,10 +44,11 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			app_instruction->body_size = 0;
 			break;
 		case LOGIN_SUCCESS:
-			netemu_application_parse_login_success(app_instruction, data);
+			netemu_application_parse_login_success(app_instruction, data, user);
 			break;
 		case USER_JOINED:
-			netemu_application_parse_user_joined(app_instruction,data);
+			netemu_application_parse_user_joined(app_instruction,data, user);
+			break;
 	}
 	return app_instruction;
 }
@@ -61,7 +62,7 @@ char* parse_string(char* data) {
 	strcpy(string, data);
 }
 
-void netemu_application_parse_login_success(struct application_instruction *instruction, char* data) {
+void netemu_application_parse_login_success(struct application_instruction *instruction, char* data, char* user) {
 	struct login_success *success;
 	int i;
 	success = malloc(sizeof(struct login_success));
@@ -209,13 +210,12 @@ struct login_status * netemu_application_parse_login_status(struct transport_ins
 
 }
 
-void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer) {
+void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer, char *user) {
 	struct user_joined* status;
 	int pos;
 	status = malloc(sizeof(struct user_joined));
-	pos = _netemu_application_copy_string(&status->user,buffer);
-	memcpy(&status->id,buffer+pos,sizeof(NETEMU_WORD));
-	pos += sizeof(NETEMU_DWORD);
+	memcpy(&status->id,buffer,sizeof(NETEMU_WORD));
+	pos = sizeof(NETEMU_DWORD);
 	memcpy(&status->ping,buffer+pos,sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	memcpy(&status->connection,buffer+pos,sizeof(char));
