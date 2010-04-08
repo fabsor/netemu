@@ -37,7 +37,7 @@ void run_application_tests() {
 	while(ping_received = 0);
 	test_pong(new_sender);
 	while(user_id == 0);
-	test_send_leave(new_sender);
+	//test_send_leave(new_sender);
 }
 
 void send_hello(struct netemu_sender *sender) {
