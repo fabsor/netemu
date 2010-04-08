@@ -255,7 +255,7 @@ void netemu_application_add_join_game(struct application_instruction *instructio
 void netemu_application_add_join_game_total(struct application_instruction *instruction, NETEMU_DWORD game_id, char* username, NETEMU_DWORD ping, NETEMU_WORD user_id, char connection) {
 	struct player_joined *join;
 	int size;
-	join = malloc(sizeof(struct user_joined));
+	join = malloc(sizeof(struct player_joined));
 	join->user_id = user_id;
 	join->game_id = game_id;
 	join->ping = ping;
@@ -281,6 +281,21 @@ void netemu_application_join_game_pack(struct application_instruction *instructi
 	buffer += sizeof(NETEMU_WORD);
 	memcpy(buffer,&join->connection,sizeof(char));
 	buffer += sizeof(char);
+}
+
+void netemu_application_parse_join_game(struct application_instruction *instruction, char *buffer) {
+	struct player_joined *join;
+	join = malloc(sizeof(struct player_joined));
+	memcpy(&join->game_id,buffer,sizeof(NETEMU_DWORD));
+	buffer += sizeof(NETEMU_DWORD);
+	buffer += _netemu_application_copy_string(&join->username,buffer);
+	memcpy(&join->ping,buffer,sizeof(NETEMU_DWORD));
+	buffer += sizeof(NETEMU_DWORD);
+	memcpy(&join->user_id,buffer,sizeof(NETEMU_WORD));
+	buffer += sizeof(NETEMU_WORD);
+	memcpy(&join->connection,buffer,sizeof(char));
+	buffer += sizeof(char);
+	instruction->body = join;
 }
 
 void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer) {
