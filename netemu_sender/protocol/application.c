@@ -10,7 +10,7 @@
 #include "netemu_util.h"
 #include "application.h"
 
-int _netemu_application_copy_string(char* dest, char* src);
+int _netemu_application_copy_string(char** dest, char* src);
 int _netemu_application_pack_str(char* buffer, char* str);
 
 struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
@@ -106,18 +106,18 @@ void netemu_application_free_login_request(struct login_request* request) {
 struct user_left* netemu_application_create_leave(char* user, NETEMU_WORD id, char* exit_message, int *size) {
 	struct user_left *left_msg;
 	left_msg = malloc(sizeof(struct user_left));
-	*size = _netemu_application_copy_string(left_msg->user,user);
-	*size += _netemu_application_copy_string(left_msg->exit_message,exit_message);
+	*size = _netemu_application_copy_string(&left_msg->user,user);
+	*size += _netemu_application_copy_string(&left_msg->exit_message,exit_message);
 	left_msg->id = id;
 	*size += sizeof(NETEMU_WORD);
 	return left_msg;
 }
 
-int _netemu_application_copy_string(char* dest, char* src) {
+int _netemu_application_copy_string(char** dest, char* src) {
 	int size;
 	size = sizeof(char)*strlen(src) + 1;
-	dest = malloc(size);
-	strcpy(dest,src);
+	*dest = malloc(size);
+	strcpy(*dest,src);
 	return size;
 }
 
@@ -126,7 +126,7 @@ void netemu_application_leave_pack(struct application_instruction *instruction, 
 	int pos;
 	left_msg = (struct user_left*)instruction->body;
 	pos = _netemu_application_pack_str(buffer, left_msg->user);
-	memcpy(buffer,&instruction->id,sizeof(NETEMU_WORD));
+	memcpy(buffer+pos,&instruction->id,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
 	pos += _netemu_application_pack_str(buffer+pos, left_msg->exit_message);
 }
@@ -149,7 +149,7 @@ void netemu_application_parse_user_joined(struct application_instruction *instru
 	struct user_joined* status;
 	int pos;
 	status = malloc(sizeof(struct user_joined));
-	pos = _netemu_application_copy_string(status->user,buffer);
+	pos = _netemu_application_copy_string(&status->user,buffer);
 	memcpy(&status->id,buffer+pos,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_DWORD);
 	memcpy(&status->ping,buffer+pos,sizeof(NETEMU_DWORD));
