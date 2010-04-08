@@ -171,7 +171,7 @@ void netemu_application_pong_pack(struct application_instruction *instruction, c
 
 struct pong* netemu_application_create_pong(int *size);
 
-struct user_left* netemu_application_create_leave(char* user, NETEMU_WORD id, char* exit_message, int *size);
+struct user_left* netemu_application_create_leave(char* exit_message, int *leave);
 
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
 

@@ -99,7 +99,7 @@ void test_send_leave(struct netemu_sender *sender) {
 	struct protocol_message *messages[1];
 	int size;
 
-	request = netemu_application_create_leave("haha",user_id,"leavin.",&size);
+	request = netemu_application_create_leave("leavin.",&size);
 	messages[0] = netemu_application_create_message(USER_LEAVE,(void*)request,size,netemu_application_leave_pack);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);

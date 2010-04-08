@@ -165,12 +165,12 @@ void netemu_application_free_login_request(struct login_request* request) {
 	free(request);
 }
 
-struct user_left* netemu_application_create_leave(char* user, NETEMU_WORD id, char* exit_message, int *size) {
+struct user_left* netemu_application_create_leave(char* exit_message, int *size) {
 	struct user_left *left_msg;
 	left_msg = malloc(sizeof(struct user_left));
-	*size = _netemu_application_copy_string(&left_msg->user,user);
+	*size = sizeof(char);
 	*size += _netemu_application_copy_string(&left_msg->exit_message,exit_message);
-	left_msg->id = id;
+	left_msg->id = 0xFFFF;
 	*size += sizeof(NETEMU_WORD);
 	return left_msg;
 }
@@ -186,11 +186,13 @@ int _netemu_application_copy_string(char** dest, char* src) {
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer) {
 	struct user_left *left_msg;
 	int pos;
+	char null = '\0';
 	left_msg = (struct user_left*)instruction->body;
-	pos = _netemu_application_pack_str(buffer, left_msg->user);
+	memcpy(buffer,&null,sizeof(char));
+	pos = sizeof(char);
 	memcpy(buffer+pos,&instruction->id,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
-	pos += _netemu_application_pack_str(buffer+pos, left_msg->exit_message);
+	_netemu_application_pack_str(buffer+pos, left_msg->exit_message);
 }
 
 int _netemu_application_pack_str(char* buffer, char* str) {
