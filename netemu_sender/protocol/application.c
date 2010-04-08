@@ -242,6 +242,13 @@ void netemu_application_create_game_pack(struct application_instruction *instruc
 void netemu_application_parse_create_game(struct application_instruction *instruction, char* buffer) {
 	struct game_created *game;
 
+	game = malloc(sizeof(struct game_created));
+	buffer += _netemu_application_pack_str(buffer,game->gameName);
+	buffer += _netemu_application_pack_str(buffer,game->appName);
+	memcpy(&game->id,buffer,sizeof(NETEMU_WORD));
+	buffer += sizeof(NETEMU_WORD);
+	memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD));
+	instruction->body = game;
 }
 
 struct login_status * netemu_application_parse_login_status(struct transport_instruction *instruction) {
