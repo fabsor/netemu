@@ -82,10 +82,10 @@ struct user_joined {
 };
 
 struct game {
-	char name[128];
+	char* name;
 	NETEMU_DWORD id;
-	char app_name[128];
-	char users_count[10];
+	char* app_name;
+	char* users_count;
 	char status;
 };
 
