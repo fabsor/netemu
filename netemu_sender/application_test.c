@@ -78,9 +78,6 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 			else if(instruction->id == LOGIN_SUCCESS) {
 				printf("LOGIN SUCCESS\n");
 			}
-			else{
-				//printf("RECEIVED : %i\n", instruction->id);
-			}
 			else if(instruction->id == CREATE_GAME) {
 				game_created = 1;
 			}
