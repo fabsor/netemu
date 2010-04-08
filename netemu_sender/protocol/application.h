@@ -17,6 +17,9 @@
 #define LOGIN_SUCCESS	0x04
 #define PING			0x05
 #define PONG			0x06
+#define PARTYLINE_CHAT	0x07
+#define GAME_CHAT		0x08
+#define MOTD_CHAT		0x09
 #define USER_JOINED		0x02
 
 /*! A message to be sent to the server. */
@@ -155,7 +158,7 @@ struct intelligently_cached_buffered_play_values {
 };
 
 struct chat {
-	char message[128];
+	char *message;
 };
 
 
@@ -166,6 +169,8 @@ struct login_request* netemu_application_create_login_request(char* appName, cha
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer, char* user);
+
+void netemu_application_parse_chat(struct application_instruction *instruction, char *data, char *user);
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 

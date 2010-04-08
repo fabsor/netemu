@@ -49,9 +49,16 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case USER_JOINED:
 			netemu_application_parse_user_joined(app_instruction,data, user);
 			break;
+		case PARTYLINE_CHAT:
+		case GAME_CHAT:
+		case MOTD_CHAT:
+			netemu_application_parse_chat(app_instruction, data, user);
+			break;
+
 	}
 	return app_instruction;
 }
+
 char* parse_string(char* data) {
 	int str_len;
 	char* char_data;
@@ -62,9 +69,17 @@ char* parse_string(char* data) {
 	strcpy(string, data);
 }
 
-void netemu_application_parse_login_success(struct application_instruction *instruction, char* data, char* user) {
+void netemu_application_parse_chat(struct application_instruction *instruction, char *data, char *user) {
+	struct chat *partyline_chat;
+
+	partyline_chat = malloc(sizeof(struct chat));
+	partyline_chat->message = parse_string(data);
+}
+
+void netemu_application_parse_login_success(struct application_instruction *instruction, char *data, char *user) {
 	struct login_success *success;
 	int i;
+
 	success = malloc(sizeof(struct login_success));
 
 	success->users_count = *((NETEMU_DWORD*)data);

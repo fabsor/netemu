@@ -16,5 +16,6 @@ int main()
 {
 	netemu_init_network();
 	run_application_tests();
-	return 0;
+	getchar();
+  	return 0;
 }
