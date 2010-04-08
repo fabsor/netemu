@@ -37,18 +37,28 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	data = (char*)instruction->instruction;
 
 	user = parse_string(++data);
+	data += strlen(user) + 1;
+
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
 			break;
 		case LOGIN_SUCCESS:
-			app_instruction->body = netemu_application_parse_login_success(data + strlen(data) + 1, user);
+			netemu_application_parse_login_success(app_instruction, data, user);
 			break;
 		case USER_JOINED:
-			netemu_application_parse_user_joined(app_instruction,data+strlen(data) + 1, user);
+			netemu_application_parse_user_joined(app_instruction,data, user);
+			break;
+		case PARTYLINE_CHAT:
+		case GAME_CHAT:
+		case MOTD_CHAT:
+			netemu_application_parse_chat(app_instruction, data, user);
+			break;
+
 	}
 	return app_instruction;
 }
+
 char* parse_string(char* data) {
 	int str_len;
 	char* char_data;
@@ -59,9 +69,17 @@ char* parse_string(char* data) {
 	strcpy(string, data);
 }
 
-struct login_success* netemu_application_parse_login_success(char *data, char* user) {
+void netemu_application_parse_chat(struct application_instruction *instruction, char *data, char *user) {
+	struct chat *partyline_chat;
+
+	partyline_chat = malloc(sizeof(struct chat));
+	partyline_chat->message = parse_string(data);
+}
+
+void netemu_application_parse_login_success(struct application_instruction *instruction, char *data, char *user) {
 	struct login_success *success;
 	int i;
+
 	success = malloc(sizeof(struct login_success));
 
 	success->users_count = *((NETEMU_DWORD*)data);
@@ -106,7 +124,7 @@ struct login_success* netemu_application_parse_login_success(char *data, char* u
 		data += sizeof(char);
 	}
 
-	return success;
+	instruction->body = success;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
