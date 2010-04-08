@@ -21,10 +21,12 @@
 #define GAME_CHAT		0x08
 #define MOTD_CHAT		0x17
 #define USER_JOINED		0x02
+#define CREATE_GAME		0x0a
 
 /*! A message to be sent to the server. */
 struct application_instruction {
 	char id; /* 1...23 */
+	char *user;
 	void *body;
 	int body_size;
 	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
@@ -69,7 +71,7 @@ struct ping {
 };
 
 struct pong {
-	char pbody[17];
+	char pbody[16];
 };
 
 /* TODO: What about empty structs? do we need them? 
@@ -98,9 +100,11 @@ struct user_left {
 };
 
 struct game_created {
-	char gameName[128];
-	char appName[128];
-	unsigned int id;
+	char *gameName;
+	char *appName;
+	NETEMU_DWORD id;
+	/* Nobody has any idea what this thing is supposed to do, but it needs to be included. */
+	NETEMU_DWORD wtf;
 };
 
 struct game_closed {
@@ -161,26 +165,32 @@ struct chat {
 };
 
 
-struct application_instruction* netemu_application_create_message(int message_type, void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer));
+struct application_instruction* netemu_application_create_message();
 
-struct login_request* netemu_application_create_login_request(char* appName, char* user, int connection, int *size);
+void netemu_application_add_login_request(struct application_instruction* instruction,char* username, char* appName, int connection);
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer, char* user);
+void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer);
 
-void netemu_application_parse_chat(struct application_instruction *instruction, char *data, char *user);
+void netemu_application_parse_chat(struct application_instruction *instruction, char *data);
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 
-struct pong* netemu_application_create_pong(int *size);
+void netemu_application_add_pong(struct application_instruction* instruction);
 
-struct user_left* netemu_application_create_leave(char* exit_message, int *leave);
+void netemu_application_add_leave(struct application_instruction* instruction, char* exit_message);
 
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 
-void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer, char *user);
+void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer);
+
+void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_add_create_game(struct application_instruction *instruction, char* gamename);
+
+void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
 
 #endif /* APPLICATION_H_ */

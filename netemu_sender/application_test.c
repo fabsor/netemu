@@ -19,7 +19,7 @@ void send_hello(struct netemu_sender *sender);
 void test_login_request(struct netemu_sender* sender);
 void test_pong(struct netemu_sender* sender);
 void test_send_leave(struct netemu_sender *sender);
-
+void test_create_game(struct netemu_sender* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
@@ -37,7 +37,8 @@ void run_application_tests() {
 	while(ping_received = 0);
 	test_pong(new_sender);
 	while(user_id == 0);
-	//test_send_leave(new_sender);
+	test_create_game(new_sender);
+	test_send_leave(new_sender);
 }
 
 void send_hello(struct netemu_sender *sender) {
@@ -85,38 +86,38 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
  * Test sending a login request.
  */
 void test_login_request(struct netemu_sender* sender) {
-	struct login_request* request;
 	struct transport_packet_buffer buffer;
-	struct protocol_message *messages[1];
-	int size;
-
-	request = netemu_application_create_login_request("netemu","haha",1,&size);
-	messages[0] = netemu_application_create_message(LOGIN_REQUEST,(void*)request,size,netemu_application_login_request_pack);
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_login_request(messages[0],"netemu","haha",1);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 
 }
 
 void test_send_leave(struct netemu_sender *sender) {
-	struct user_left *request;
 	struct transport_packet_buffer buffer;
-	struct protocol_message *messages[1];
-	int size;
-
-	request = netemu_application_create_leave("leavin.",&size);
-	messages[0] = netemu_application_create_message(USER_LEAVE,(void*)request,size,netemu_application_leave_pack);
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_leave(messages[0],"leavin.");
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }
 
 void test_pong(struct netemu_sender* sender) {
-	struct pong *request;
 	struct transport_packet_buffer buffer;
-	struct protocol_message *messages[1];
-	int size;
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_pong(messages[0]);
+	buffer = netemu_transport_pack(messages,1);
+	netemu_sender_send(sender,buffer.data,buffer.size);
+}
 
-	request = netemu_application_create_pong(&size);
-	messages[0] = netemu_application_create_message(PONG,(void*)request,size,netemu_application_pong_pack);
+void test_create_game(struct netemu_sender* sender) {
+	struct transport_packet_buffer buffer;
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_create_game(messages[0],"thegame");
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }
