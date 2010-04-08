@@ -21,6 +21,7 @@
 #define GAME_CHAT		0x08
 #define MOTD_CHAT		0x17
 #define USER_JOINED		0x02
+#define CREATE_GAME		0x0a
 
 /*! A message to be sent to the server. */
 struct application_instruction {
@@ -70,7 +71,7 @@ struct ping {
 };
 
 struct pong {
-	char pbody[17];
+	char pbody[16];
 };
 
 /* TODO: What about empty structs? do we need them? 
@@ -185,6 +186,10 @@ void netemu_application_leave_pack(struct application_instruction *instruction, 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 
 void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer);
+
+void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_add_create_game(struct application_instruction *instruction, char* gamename);
 
 void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
 

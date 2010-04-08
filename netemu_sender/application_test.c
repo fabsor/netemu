@@ -19,7 +19,7 @@ void send_hello(struct netemu_sender *sender);
 void test_login_request(struct netemu_sender* sender);
 void test_pong(struct netemu_sender* sender);
 void test_send_leave(struct netemu_sender *sender);
-
+void test_create_game(struct netemu_sender* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
@@ -37,6 +37,7 @@ void run_application_tests() {
 	while(ping_received = 0);
 	test_pong(new_sender);
 	while(user_id == 0);
+	test_create_game(new_sender);
 	test_send_leave(new_sender);
 }
 
@@ -104,6 +105,15 @@ void test_pong(struct netemu_sender* sender) {
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
 	netemu_application_add_pong(messages[0]);
+	buffer = netemu_transport_pack(messages,1);
+	netemu_sender_send(sender,buffer.data,buffer.size);
+}
+
+void test_create_game(struct netemu_sender* sender) {
+	struct transport_packet_buffer buffer;
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_create_game(messages[0],"thegame");
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }

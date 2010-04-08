@@ -184,6 +184,7 @@ void netemu_application_add_leave(struct application_instruction* instruction, c
 	left_msg->id = 0xFFFF;
 	size += sizeof(NETEMU_WORD);
 	instruction->body_size = size;
+	instruction->body = left_msg;
 	instruction->id = USER_LEAVE;
 	instruction->packBodyFn = netemu_application_leave_pack;
 }
@@ -199,11 +200,8 @@ int _netemu_application_copy_string(char** dest, char* src) {
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer) {
 	struct user_left *left_msg;
 	int pos;
-	char null = '\0';
 	left_msg = (struct user_left*)instruction->body;
-	memcpy(buffer,&null,sizeof(char));
-	pos = sizeof(char);
-	memcpy(buffer+pos,&left_msg->id,sizeof(NETEMU_WORD));
+	memcpy(buffer,&left_msg->id,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
 	_netemu_application_pack_str(buffer+pos, left_msg->exit_message);
 }
@@ -220,10 +218,12 @@ void netemu_application_add_create_game(struct application_instruction *instruct
 	int size;
 	game = malloc(sizeof(struct game));
 	size = _netemu_application_copy_string(&game->gameName,gamename);
+	size += _netemu_application_copy_string(&game->appName,"");
 	game->id = 0xFFFF;
 	game->wtf = 0xFFFF;
-	size += sizeof(NETEMU_WORD)*2+1;
+	size += sizeof(NETEMU_WORD)*2;
 	instruction->body = game;
+	instruction->id = CREATE_GAME;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_create_game_pack;
 }
