@@ -177,6 +177,6 @@ void netemu_application_leave_pack(struct application_instruction *instruction, 
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 
-void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer);
+void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer, char *user);
 
 #endif /* APPLICATION_H_ */
