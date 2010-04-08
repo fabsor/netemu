@@ -10,6 +10,9 @@
 #include "netemu_util.h"
 #include "application.h"
 
+struct login_success* netemu_application_parse_login_success(struct transport_instruction *instruction);
+char* parse_string(char* data);
+
 struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
 	struct application_instruction* message;
 	message = malloc(sizeof(struct application_instruction));
@@ -22,29 +25,60 @@ struct application_instruction* netemu_application_create_message(int message_ty
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {
 	struct application_instruction *app_instruction;
+	char *data, *user;
 	int pos = 0;
-	int i;
 	app_instruction = malloc(sizeof(struct application_instruction));
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
+
+	data = (char*)instruction->instruction;
+
+	user = parse_string(++data);
 
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
 			break;
 		case LOGIN_SUCCESS:
-			
-			i = 5;
+			app_instruction->body = netemu_application_parse_login_success(data + strlen(data) + 1, user);
 			break;
 	}
 	return app_instruction;
 }
 
-struct login_success* netemu_application_parse_login_success(struct transport_instruction *instruction) {
-	struct login_success *success;
+char* parse_string(char* data) {
+	int str_len;
+	char* char_data;
+	char* string;
 
+	str_len = strlen(data);
+	string = malloc(str_len);
+	strcpy(string, data);
+}
+
+struct login_success* netemu_application_parse_login_success(char *data, char* user) {
+	struct login_success *success;
+	int i;
 	success = malloc(sizeof(struct login_success));
 
+	success->users_count = *((NETEMU_DWORD*)data);
+	data += sizeof(NETEMU_DWORD);
+	success->games_count =  *((NETEMU_DWORD*)data);
+	data += sizeof(NETEMU_DWORD);
 
+	success->users = malloc(sizeof(struct user) * success->users_count);
+	success->games = malloc(sizeof(struct game) * success->games_count);
+
+	for(i = 0; i < success->users_count; i++) {
+		success->users[i].username = parse_string(data);
+		data += strlen(success->users[i].username) + 1;
+		success->users[i].ping = *((NETEMU_DWORD*)data);
+		data += sizeof(NETEMU_DWORD);
+		success->users[i].status = *data;
+		data += sizeof(char);
+		success->users[i].id = *((NETEMU_WORD*)data);
+		data += sizeof(NETEMU_WORD);
+		success->users[i].connection = *data;
+	}
 }
 
 void netemu_application_free_message(struct application_instruction* message) {

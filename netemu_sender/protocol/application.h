@@ -33,11 +33,11 @@ struct login_request {
 };
 
 struct user {
-	char username[32];
-	unsigned int ping;
-	short status;
-	int id;
-	short connection;
+	char *username;
+	NETEMU_DWORD ping;
+	char status;
+	NETEMU_WORD id;
+	char connection;
 };
 
 struct player {
