@@ -21,6 +21,7 @@
 #define GAME_CHAT		0x08
 #define MOTD_CHAT		0x17
 #define USER_JOINED		0x02
+#define PLAYER_JOINED	0x0c
 #define CREATE_GAME		0x0a
 #define GAME_STATUS_UPDATE 0x0e
 
@@ -120,11 +121,11 @@ struct game_status_update {
 };
 
 struct player_joined {
-	unsigned int game_id;
-	char username[32];
-	unsigned int ping;
-	int user_id;
-	short connection;
+	NETEMU_DWORD game_id;
+	char* username;
+	NETEMU_DWORD ping;
+	NETEMU_WORD user_id;
+	char connection;
 };
 
 struct player_left {
@@ -195,5 +196,7 @@ void netemu_application_parse_create_game(struct application_instruction *instru
 void netemu_application_add_create_game(struct application_instruction *instruction, char* gamename);
 
 void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_join_game_pack(struct application_instruction *instruction, char *buffer);
 
 #endif /* APPLICATION_H_ */
