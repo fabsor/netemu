@@ -45,7 +45,7 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			app_instruction->body = netemu_application_parse_login_success(data + strlen(data) + 1, user);
 			break;
 		case USER_JOINED:
-			netemu_application_parse_user_joined(data+sizeof(char), user);
+			netemu_application_parse_user_joined(app_instruction,data+sizeof(char));
 	}
 	return app_instruction;
 }
