@@ -165,7 +165,7 @@ struct login_request* netemu_application_create_login_request(char* appName, cha
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 
-struct login_success* netemu_application_parse_login_success(char *data, char* user);
+void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 

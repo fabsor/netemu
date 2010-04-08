@@ -37,15 +37,17 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	data = (char*)instruction->instruction;
 
 	user = parse_string(++data);
+	data += strlen(user) + 1;
+
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
 			break;
 		case LOGIN_SUCCESS:
-			app_instruction->body = netemu_application_parse_login_success(data + strlen(data) + 1, user);
+			netemu_application_parse_login_success(app_instruction, data);
 			break;
 		case USER_JOINED:
-			netemu_application_parse_user_joined(app_instruction,data+sizeof(char));
+			netemu_application_parse_user_joined(app_instruction,data);
 	}
 	return app_instruction;
 }
@@ -59,7 +61,7 @@ char* parse_string(char* data) {
 	strcpy(string, data);
 }
 
-struct login_success* netemu_application_parse_login_success(char *data, char* user) {
+void netemu_application_parse_login_success(struct application_instruction *instruction, char* data) {
 	struct login_success *success;
 	int i;
 	success = malloc(sizeof(struct login_success));
@@ -106,7 +108,7 @@ struct login_success* netemu_application_parse_login_success(char *data, char* u
 		data += sizeof(char);
 	}
 
-	return success;
+	instruction->body = success;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
