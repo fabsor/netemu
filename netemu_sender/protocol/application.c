@@ -75,14 +75,38 @@ struct login_success* netemu_application_parse_login_success(char *data, char* u
 	for(i = 0; i < success->users_count; i++) {
 		success->users[i].username = parse_string(data);
 		data += strlen(success->users[i].username) + 1;
+
 		success->users[i].ping = *((NETEMU_DWORD*)data);
 		data += sizeof(NETEMU_DWORD);
+
 		success->users[i].status = *data;
 		data += sizeof(char);
+
 		success->users[i].id = *((NETEMU_WORD*)data);
 		data += sizeof(NETEMU_WORD);
+
 		success->users[i].connection = *data;
+		data += sizeof(char);
 	}
+
+	for(i = 0; i < success->games_count; i++) {
+		success->games[i].name = parse_string(data);
+		data += strlen(success->games[i].name) + 1;
+
+		success->games[i].id = *((NETEMU_DWORD*)data);
+		data += sizeof(NETEMU_DWORD);
+
+		success->games[i].app_name = parse_string(data);
+		data += strlen(success->games[i].app_name) + 1;
+
+		success->games[i].users_count = parse_string(data);
+		data += strlen(success->games[i].users_count) + 1;
+
+		success->games[i].status = *data;
+		data += sizeof(char);
+	}
+
+	return success;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
