@@ -76,6 +76,7 @@ void netemu_application_parse_chat(struct application_instruction *instruction, 
 
 	partyline_chat = malloc(sizeof(struct chat));
 	partyline_chat->message = parse_string(data);
+	printf("%s\n", partyline_chat->message);
 }
 
 void netemu_application_parse_login_success(struct application_instruction *instruction, char *data) {
@@ -163,7 +164,7 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 	int size;
 	request = (struct login_request*)instruction->body;
 	memcpy(buffer,(void*)request->name,sizeof(char)*strlen(request->name)+1);
-	size += sizeof(char)*strlen(request->name)+1;
+	size = sizeof(char)*strlen(request->name)+1;
 	memcpy((buffer+size),(void*)&request->connection,sizeof(char));
 }
 
@@ -207,7 +208,7 @@ void netemu_application_leave_pack(struct application_instruction *instruction, 
 	int pos;
 	left_msg = (struct user_left*)instruction->body;
 	memcpy(buffer,&left_msg->id,sizeof(NETEMU_WORD));
-	pos += sizeof(NETEMU_WORD);
+	pos = sizeof(NETEMU_WORD);
 	_netemu_application_pack_str(buffer+pos, left_msg->exit_message);
 }
 

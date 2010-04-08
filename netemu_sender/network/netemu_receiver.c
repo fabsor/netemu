@@ -14,7 +14,7 @@
  * port.
  */
 void netemu_receiver_recv(void* params);
-void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data);
+void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data, size_t size);
 void free_receiver(struct netemu_receiver*);
 
 struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int addr_len, int buffer_size) {
@@ -69,7 +69,7 @@ void netemu_receiver_recv(void* params) {
 			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}
-		_netemu_receiver_notify(receiver,buffer);
+		_netemu_receiver_notify(receiver,buffer, error);
 		netemu_thread_mutex_release(receiver->lock);
 	}	
 	free_receiver(receiver);
@@ -91,11 +91,11 @@ void free_receiver(struct netemu_receiver* receiver) {
 	free(receiver);
 }
 
-void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data) {
+void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data, size_t size) {
 	struct netemu_receiver_fn* receiver_fn;
 	receiver_fn = receiver->receiver_fn;
 	while(receiver_fn != NULL) {
-		receiver_fn->listenerFn(data,receiver->buffer_size, receiver);
+		receiver_fn->listenerFn(data,size, receiver);
 		receiver_fn = receiver_fn->next;
 	}
 }

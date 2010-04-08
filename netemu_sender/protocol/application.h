@@ -82,7 +82,6 @@ struct client_timeout {
 };
 */
 struct user_joined {
-	char* user;
 	NETEMU_WORD id;
 	NETEMU_DWORD ping;
 	char connection;
