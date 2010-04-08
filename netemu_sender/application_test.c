@@ -18,6 +18,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 void send_hello(struct netemu_sender *sender);
 void test_login_request(struct netemu_sender* sender);
 void test_pong(struct netemu_sender* sender);
+void test_send_leave(struct netemu_sender *sender);
 
 int port = 0;
 int login_accepted = 0;
@@ -35,7 +36,8 @@ void run_application_tests() {
 	test_login_request(new_sender);
 	while(ping_received = 0);
 	test_pong(new_sender);
-	while(1);
+	while(user_id == 0);
+	test_send_leave(sender);
 }
 
 void send_hello(struct netemu_sender *sender) {
@@ -91,17 +93,17 @@ void test_login_request(struct netemu_sender* sender) {
 
 }
 
-void test_send_leave() {
+void test_send_leave(struct netemu_sender *sender) {
 	struct user_left *request;
 	struct transport_packet_buffer buffer;
 	struct protocol_message *messages[1];
 	int size;
-/*
-	request = netemu_application_create_leave("haha",)
-	messages[0] = netemu_application_create_message(PONG,(void*)request,size,netemu_application_pong_pack);
+
+	request = netemu_application_create_leave("haha",user_id,"Im leaving losers.",&size);
+	messages[0] = netemu_application_create_message(USER_LEAVE,(void*)request,size,netemu_application_leave_pack);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
-*/
+
 }
 
 void test_pong(struct netemu_sender* sender) {

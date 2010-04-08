@@ -28,7 +28,6 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	int i;
 	app_instruction = malloc(sizeof(struct application_instruction));
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
-
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
@@ -38,7 +37,7 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			i = 5;
 			break;
 		case USER_JOINED:
-			netemu_application_parse_user_joined(app_instruction,instruction->instruction);
+			netemu_application_parse_user_joined(app_instruction,instruction->instruction+sizeof(char));
 	}
 	return app_instruction;
 }
@@ -110,10 +109,9 @@ struct user_left* netemu_application_create_leave(char* user, NETEMU_WORD id, ch
 	*size = _netemu_application_copy_string(left_msg->user,user);
 	*size += _netemu_application_copy_string(left_msg->exit_message,exit_message);
 	left_msg->id = id;
+	*size += sizeof(NETEMU_WORD);
 	return left_msg;
 }
-
-
 
 int _netemu_application_copy_string(char* dest, char* src) {
 	int size;
@@ -135,10 +133,11 @@ void netemu_application_leave_pack(struct application_instruction *instruction, 
 
 int _netemu_application_pack_str(char* buffer, char* str) {
 	int size;
-	size = sizeof(char)*strlen(str)+1;
+	size = sizeof(char)*(strlen(str)+1);
 	memcpy(buffer,(void*)str,size);
 	return size;
 }
+
 
 struct login_status * netemu_application_parse_login_status(struct transport_instruction *instruction) {
 	struct login_status* status;
@@ -150,13 +149,12 @@ void netemu_application_parse_user_joined(struct application_instruction *instru
 	struct user_joined* status;
 	int pos;
 	status = malloc(sizeof(struct user_joined));
-	pos = sizeof(NETEMU_WORD);
-	memcpy(&status->id,buffer,sizeof(NETEMU_WORD));
+	pos = _netemu_application_copy_string(status->user,buffer);
+	memcpy(&status->id,buffer+pos,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_DWORD);
 	memcpy(&status->ping,buffer+pos,sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	memcpy(&status->connection,buffer+pos,sizeof(char));
-
 	instruction->body = status;
 	instruction->body_size = instruction->body_size;
 }

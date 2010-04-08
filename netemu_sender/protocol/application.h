@@ -12,6 +12,7 @@
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
+#define USER_LEAVE		0x01
 #define LOGIN_REQUEST	0x03
 #define LOGIN_SUCCESS	0x04
 #define PING			0x05
@@ -74,6 +75,7 @@ struct client_timeout {
 };
 */
 struct user_joined {
+	char* user;
 	NETEMU_WORD id;
 	NETEMU_DWORD ping;
 	char connection;
