@@ -70,11 +70,15 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 			else if(instruction->id == USER_JOINED) {
 				joined = (struct user_joined*)instruction->body;
 				user_id = joined->id;
+				printf("Joined: %s\n", joined->user);
+			}
+			else if(instruction->id == LOGIN_SUCCESS) {
+				printf("LOGIN SUCCESS\n");
 			}
 			ping_received = 1;
 		}
 	}
-	printf("%s", data);
+	//printf("%s", data);
 }
 
 /**
