@@ -99,9 +99,11 @@ struct user_left {
 };
 
 struct game_created {
-	char gameName[128];
-	char appName[128];
-	unsigned int id;
+	char *gameName;
+	char *appName;
+	NETEMU_DWORD id;
+	/* Nobody has any idea what this thing is supposed to do, but it needs to be included. */
+	NETEMU_DWORD wtf;
 };
 
 struct game_closed {
