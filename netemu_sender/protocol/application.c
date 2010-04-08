@@ -10,8 +10,13 @@
 #include "netemu_util.h"
 #include "application.h"
 
+
 struct login_success* netemu_application_parse_login_success(struct transport_instruction *instruction);
 char* parse_string(char* data);
+
+int _netemu_application_copy_string(char* dest, char* src);
+int _netemu_application_pack_str(char* buffer, char* str);
+
 
 struct application_instruction* netemu_application_create_message(int message_type,void* body, int body_size, void (*packBodyFn)(struct application_instruction* instruction, char* buffer)) {
 	struct application_instruction* message;
@@ -25,6 +30,7 @@ struct application_instruction* netemu_application_create_message(int message_ty
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {
 	struct application_instruction *app_instruction;
+
 	char *data, *user;
 	int pos = 0;
 	app_instruction = malloc(sizeof(struct application_instruction));
@@ -33,7 +39,6 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	data = (char*)instruction->instruction;
 
 	user = parse_string(++data);
-
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
@@ -41,10 +46,11 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case LOGIN_SUCCESS:
 			app_instruction->body = netemu_application_parse_login_success(data + strlen(data) + 1, user);
 			break;
+		case USER_JOINED:
+			netemu_application_parse_user_joined(data+sizeof(char), user);
 	}
 	return app_instruction;
 }
-
 char* parse_string(char* data) {
 	int str_len;
 	char* char_data;
@@ -137,6 +143,61 @@ void netemu_application_free_login_request(struct login_request* request) {
 	free(request);
 }
 
-//struct pong* foo(DWORD i) {
-//	DWOR
-//}
+struct user_left* netemu_application_create_leave(char* user, NETEMU_WORD id, char* exit_message, int *size) {
+	struct user_left *left_msg;
+	left_msg = malloc(sizeof(struct user_left));
+	*size = _netemu_application_copy_string(left_msg->user,user);
+	*size += _netemu_application_copy_string(left_msg->exit_message,exit_message);
+	left_msg->id = id;
+	*size += sizeof(NETEMU_WORD);
+	return left_msg;
+}
+
+int _netemu_application_copy_string(char* dest, char* src) {
+	int size;
+	size = sizeof(char)*strlen(src) + 1;
+	dest = malloc(size);
+	strcpy(dest,src);
+	return size;
+}
+
+void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer) {
+	struct user_left *left_msg;
+	int pos;
+	left_msg = (struct user_left*)instruction->body;
+	pos = _netemu_application_pack_str(buffer, left_msg->user);
+	memcpy(buffer,&instruction->id,sizeof(NETEMU_WORD));
+	pos += sizeof(NETEMU_WORD);
+	pos += _netemu_application_pack_str(buffer+pos, left_msg->exit_message);
+}
+
+int _netemu_application_pack_str(char* buffer, char* str) {
+	int size;
+	size = sizeof(char)*(strlen(str)+1);
+	memcpy(buffer,(void*)str,size);
+	return size;
+}
+
+
+struct login_status * netemu_application_parse_login_status(struct transport_instruction *instruction) {
+	struct login_status* status;
+	status = malloc(sizeof(struct login_status));
+
+}
+
+void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer) {
+	struct user_joined* status;
+	int pos;
+	status = malloc(sizeof(struct user_joined));
+	pos = _netemu_application_copy_string(status->user,buffer);
+	memcpy(&status->id,buffer+pos,sizeof(NETEMU_WORD));
+	pos += sizeof(NETEMU_DWORD);
+	memcpy(&status->ping,buffer+pos,sizeof(NETEMU_DWORD));
+	pos += sizeof(NETEMU_DWORD);
+	memcpy(&status->connection,buffer+pos,sizeof(char));
+	instruction->body = status;
+	instruction->body_size = instruction->body_size;
+}
+
+
+

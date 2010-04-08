@@ -31,7 +31,7 @@ all: netemu_sender
 netemu_sender: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/fabian/workspace/netemu/netlib/Debug" -o"netemu_sender" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/fabbe/workspace/netemu/netlib/Debug" -o"netemu_sender" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
