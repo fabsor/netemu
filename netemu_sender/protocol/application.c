@@ -208,7 +208,7 @@ void netemu_application_leave_pack(struct application_instruction *instruction, 
 	left_msg = (struct user_left*)instruction->body;
 	memcpy(buffer,&null,sizeof(char));
 	pos = sizeof(char);
-	memcpy(buffer+pos,&instruction->id,sizeof(NETEMU_WORD));
+	memcpy(buffer+pos,&left_msg->id,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
 	_netemu_application_pack_str(buffer+pos, left_msg->exit_message);
 }

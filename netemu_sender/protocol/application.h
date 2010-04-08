@@ -93,7 +93,6 @@ struct game {
 };
 
 struct user_left {
-	char *user;
 	NETEMU_WORD id;
 	char *exit_message;
 };
