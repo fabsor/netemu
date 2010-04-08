@@ -211,8 +211,9 @@ void netemu_application_parse_user_joined(struct application_instruction *instru
 	struct user_joined* status;
 	int pos;
 	status = malloc(sizeof(struct user_joined));
+	status->user = user;
 	memcpy(&status->id,buffer,sizeof(NETEMU_WORD));
-	pos = sizeof(NETEMU_DWORD);
+	pos = sizeof(NETEMU_WORD);
 	memcpy(&status->ping,buffer+pos,sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	memcpy(&status->connection,buffer+pos,sizeof(char));
