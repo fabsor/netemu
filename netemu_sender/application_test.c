@@ -23,6 +23,7 @@ void test_create_game(struct netemu_sender* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
+int game_created = 0;
 struct netemu_sender* new_sender;
 NETEMU_WORD user_id;
 void run_application_tests() {
@@ -38,7 +39,8 @@ void run_application_tests() {
 	test_pong(new_sender);
 	while(user_id == 0);
 	test_create_game(new_sender);
-	test_send_leave(new_sender);
+	while(game_created == 0);
+	//test_send_leave(new_sender);
 }
 
 void send_hello(struct netemu_sender *sender) {
@@ -78,6 +80,9 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 			}
 			else{
 				//printf("RECEIVED : %i\n", instruction->id);
+			}
+			else if(instruction->id == CREATE_GAME) {
+				game_created = 1;
 			}
 			ping_received = 1;
 		}

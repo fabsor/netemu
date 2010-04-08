@@ -51,7 +51,12 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case MOTD_CHAT:
 			netemu_application_parse_chat(app_instruction, data);
 			break;
-
+		case CREATE_GAME:
+			netemu_application_parse_create_game(app_instruction,data);
+			break;
+		case GAME_STATUS_UPDATE:
+			netemu_application_parse_game_status(app_instruction,data);
+			break;
 	}
 	return app_instruction;
 }
@@ -244,18 +249,26 @@ void netemu_application_parse_create_game(struct application_instruction *instru
 	struct game_created *game;
 
 	game = malloc(sizeof(struct game_created));
-	buffer += _netemu_application_pack_str(buffer,game->gameName);
-	buffer += _netemu_application_pack_str(buffer,game->appName);
+	buffer += _netemu_application_copy_string(&game->gameName,buffer);
+	buffer += _netemu_application_copy_string(&game->appName,buffer);
 	memcpy(&game->id,buffer,sizeof(NETEMU_WORD));
 	buffer += sizeof(NETEMU_WORD);
 	memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD));
 	instruction->body = game;
 }
 
-struct login_status * netemu_application_parse_login_status(struct transport_instruction *instruction) {
-	struct login_status* status;
+void netemu_application_parse_game_status(struct application_instruction *instruction, char* buffer) {
+	struct game_status_update* status;
 	status = malloc(sizeof(struct login_status));
-
+	memcpy(&status->id,buffer,sizeof(NETEMU_DWORD));
+	buffer += sizeof(NETEMU_DWORD);
+	memcpy(&status->status,buffer,sizeof(char));
+	buffer += sizeof(char);
+	memcpy(&status->num_players,buffer,sizeof(char));
+	buffer += sizeof(char);
+	memcpy(&status->max_players,buffer,sizeof(char));
+	buffer += sizeof(char);
+	instruction->body = status;
 }
 
 void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer) {
