@@ -8,15 +8,16 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 #include "transport.h"
-
+#include "netemu_util.h"
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
+#define USER_LEAVE		0x01
 #define LOGIN_REQUEST	0x03
 #define LOGIN_SUCCESS	0x04
 #define PING			0x05
 #define PONG			0x06
-#define USER_LEAVE		0x01
+#define USER_JOINED		0x02
 
 /*! A message to be sent to the server. */
 struct application_instruction {
@@ -56,7 +57,7 @@ struct login_success {
 };
 
 struct login_status {
-	int id;
+	NETEMU_WORD id;
 	char message[128];
 };
 
@@ -74,9 +75,10 @@ struct client_timeout {
 };
 */
 struct user_joined {
-	int id;
-	unsigned int ping;
-	short connection;
+	char* user;
+	NETEMU_WORD id;
+	NETEMU_DWORD ping;
+	char connection;
 };
 
 struct game {
@@ -167,6 +169,12 @@ void netemu_application_pong_pack(struct application_instruction *instruction, c
 
 struct pong* netemu_application_create_pong(int *size);
 
+struct user_left* netemu_application_create_leave(char* user, NETEMU_WORD id, char* exit_message, int *size);
+
+void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
+
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
+
+void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer);
 
 #endif /* APPLICATION_H_ */
