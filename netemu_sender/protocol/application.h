@@ -22,6 +22,7 @@
 #define MOTD_CHAT		0x17
 #define USER_JOINED		0x02
 #define CREATE_GAME		0x0a
+#define GAME_STATUS_UPDATE 0x0e
 
 /*! A message to be sent to the server. */
 struct application_instruction {
@@ -112,10 +113,10 @@ struct game_closed {
 };
 
 struct game_status_update {
-	unsigned int id;
-	short status;
-	int num_players;
-	int max_players;
+	NETEMU_DWORD id;
+	char status;
+	char num_players;
+	char max_players;
 };
 
 struct player_joined {
@@ -183,11 +184,13 @@ void netemu_application_add_leave(struct application_instruction* instruction, c
 
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
 
-struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
+void netemu_application_parse_game_status(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_parse_create_game(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_add_create_game(struct application_instruction *instruction, char* gamename);
 
