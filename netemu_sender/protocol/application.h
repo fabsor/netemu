@@ -198,4 +198,6 @@ void netemu_application_create_game_pack(struct application_instruction *instruc
 
 void netemu_application_join_game_pack(struct application_instruction *instruction, char *buffer);
 
+void netemu_application_add_join_game(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection);
+
 #endif /* APPLICATION_H_ */

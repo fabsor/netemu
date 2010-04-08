@@ -57,6 +57,7 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case GAME_STATUS_UPDATE:
 			netemu_application_parse_game_status(app_instruction,data);
 			break;
+
 	}
 	return app_instruction;
 }
@@ -234,7 +235,24 @@ void netemu_application_add_create_game(struct application_instruction *instruct
 	instruction->packBodyFn = netemu_application_create_game_pack;
 }
 
-void netemu_application_add_join_game(struct application_instruction *instruction, NETEMU_DWORD game_id, char* username, NETEMU_DWORD ping, NETEMU_WORD user_id, char connection) {
+void netemu_application_add_join_game(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection) {
+	struct player_joined *join;
+	int size;
+	join = malloc(sizeof(struct user_joined));
+	join->user_id = 0xFFFF;
+	join->game_id = game_id;
+	join->ping = 0;
+	join->connection = connection;
+	size = _netemu_application_copy_string(&join->username,"");
+
+	instruction->id = PLAYER_JOINED;
+	instruction->body = join;
+	instruction->body_size = size + sizeof(NETEMU_DWORD)*2 + sizeof(NETEMU_WORD) + sizeof(char);
+	instruction->packBodyFn = netemu_application_join_game_pack;
+
+}
+
+void netemu_application_add_join_game_total(struct application_instruction *instruction, NETEMU_DWORD game_id, char* username, NETEMU_DWORD ping, NETEMU_WORD user_id, char connection) {
 	struct player_joined *join;
 	int size;
 	join = malloc(sizeof(struct user_joined));
