@@ -19,7 +19,7 @@
 #define PONG			0x06
 #define PARTYLINE_CHAT	0x07
 #define GAME_CHAT		0x08
-#define MOTD_CHAT		0x09
+#define MOTD_CHAT		0x17
 #define USER_JOINED		0x02
 
 /*! A message to be sent to the server. */
