@@ -232,8 +232,8 @@ void netemu_application_create_game_pack(struct application_instruction *instruc
 	struct game_created *game;
 	int pos;
 	game = (struct game_created*) instruction->body;
-	pos = _netemu_application_pack_str(buffer,game->appName);
-	pos += _netemu_application_pack_str(buffer+pos,game->gameName);
+	pos = _netemu_application_pack_str(buffer,game->gameName);
+	pos += _netemu_application_pack_str(buffer+pos,game->appName);
 	memcpy(buffer+pos,&game->id,sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
 	memcpy(buffer+pos,&game->wtf,sizeof(NETEMU_WORD));
