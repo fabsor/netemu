@@ -59,7 +59,12 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case GAME_STATUS_UPDATE:
 			netemu_application_parse_game_status(app_instruction,data);
 			break;
-
+		case BUFFERED_PLAY_VALUES:
+			netemu_application_parse_buffered_play_values(app_instruction, data);
+			break;
+		case INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES:
+			netemu_application_parse_intelligently_cached_play_values(app_instruction, data);
+			break;
 	}
 	return app_instruction;
 }
@@ -171,6 +176,13 @@ void netemu_application_parse_buffered_play_values(struct application_instructio
 	memcpy(play_values->values, data, play_values->size);
 
 	instruction->body = play_values;
+}
+
+void netemu_application_parse_intelligently_cached_play_values(struct application_instruction *instruction, char *data) {
+	struct intelligently_cached_buffered_play_values *cache;
+
+	cache = malloc(sizeof(struct intelligently_cached_buffered_play_values));
+	cache->index = *data;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
