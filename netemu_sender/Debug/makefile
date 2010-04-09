@@ -9,9 +9,9 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
+-include states/subdir.mk
 -include protocol/subdir.mk
 -include network/subdir.mk
--include handlers/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -31,7 +31,7 @@ all: netemu_sender
 netemu_sender: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/fabian/workspace/netemu/netlib/Debug" -o"netemu_sender" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/fabbe/workspace/netemu/netlib/Debug" -o"netemu_sender" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
