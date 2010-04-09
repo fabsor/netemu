@@ -20,6 +20,8 @@ void test_login_request(struct netemu_sender* sender);
 void test_pong(struct netemu_sender* sender);
 void test_send_leave(struct netemu_sender *sender);
 void test_create_game(struct netemu_sender* sender);
+void test_join_game(struct netemu_sender* sender);
+void test_quit_game(struct netemu_sender* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
@@ -37,8 +39,8 @@ void run_application_tests() {
 	while(port == 0);
 	new_sender = prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
-	while(ping_received == 0);
-	test_pong(new_sender);
+	//while(ping_received = 0);
+	//test_pong(new_sender);
 	while(user_id == 0);
 	test_create_game(new_sender);
 	while(game_created == 0);
@@ -72,6 +74,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 		for (i = 0; i < packet->count; i++) {
 			instruction = netemu_application_parse_message(packet->instructions[i]);
 			if(instruction->id == PING) {
+				ping_received = 1;
 				printf("PING! Sending PONG!\n");
 				test_pong(new_sender);
 			}
@@ -88,7 +91,10 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 				game_id = created->id;
 				game_created = 1;
 			}
-			ping_received = 1;
+			else {
+				//printf("RECEIVED : %i\n", instruction->id);
+			}
+			
 		}
 	}
 	//printf("%s", data);

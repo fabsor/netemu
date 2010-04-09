@@ -25,6 +25,7 @@
 #define PLAYER_LEFT		0x14
 #define PLAYER_KICK		0x0f;
 #define CREATE_GAME		0x0a
+#define EXISTING_PLAYERS_LIST	0x0d
 #define GAME_STATUS_UPDATE 0x0e
 #define START_GAME		0x11
 #define PLAYER_READY	0x15
@@ -53,10 +54,10 @@ struct user {
 };
 
 struct player {
-	char username[32];
-	unsigned int ping;
-	int word;
-	short connection;
+	char *username;
+	NETEMU_DWORD ping;
+	NETEMU_WORD id;
+	char connection;
 };
 
 struct login_success {
@@ -179,6 +180,8 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_parse_chat(struct application_instruction *instruction, char *data);
+
+void netemu_application_parse_existing_players_list(struct application_instruction *instruction, char *data);
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 

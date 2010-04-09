@@ -53,6 +53,9 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case CREATE_GAME:
 			netemu_application_parse_create_game(app_instruction,data);
 			break;
+		case EXISTING_PLAYERS_LIST:
+			netemu_application_parse_existing_players_list(app_instruction, data);
+			break;
 		case GAME_STATUS_UPDATE:
 			netemu_application_parse_game_status(app_instruction,data);
 			break;
@@ -128,6 +131,35 @@ void netemu_application_parse_login_success(struct application_instruction *inst
 	}
 
 	instruction->body = success;
+}
+
+void netemu_application_parse_existing_players_list(struct application_instruction *instruction, char *data) {
+	struct existing_player_list *list;
+	int i;
+
+	list = malloc(sizeof(struct existing_player_list));
+
+
+	list->players_count = *((NETEMU_DWORD*)data);
+	data += sizeof(NETEMU_DWORD);
+
+	list->players = malloc(sizeof(struct player) * list->players_count);
+
+	for(i = 0; i < list->players_count; i++) {
+		list->players[i].username = parse_string(data);
+		data += strlen(list->players[i].username) + 1;
+
+		list->players[i].ping = *((NETEMU_DWORD*)data);
+		data += sizeof(NETEMU_DWORD);
+
+		list->players[i].id = *((NETEMU_WORD*)data);
+		data += sizeof(NETEMU_WORD);
+
+		list->players[i].connection = *data;
+		data += sizeof(char);
+	}
+
+	instruction->body = list;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {

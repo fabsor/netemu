@@ -70,11 +70,11 @@ void netemu_receiver_recv(void* params) {
 			break;
 		}
 		_netemu_receiver_notify(receiver,buffer, error);
+		memset(buffer, NULL, receiver->buffer_size);
 		netemu_thread_mutex_release(receiver->lock);
-	}	
+	}
 	free_receiver(receiver);
 	//netemu_thread_exit();
-
 }
 
 void free_receiver(struct netemu_receiver* receiver) {
