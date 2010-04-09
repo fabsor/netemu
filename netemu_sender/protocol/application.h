@@ -27,7 +27,8 @@
 #define CREATE_GAME		0x0a
 #define EXISTING_PLAYERS_LIST	0x0d
 #define GAME_STATUS_UPDATE 0x0e
-
+#define START_GAME		0x11
+#define PLAYER_READY	0x15
 /*! A message to be sent to the server. */
 struct application_instruction {
 	char id; /* 1...23 */
@@ -144,10 +145,11 @@ struct kick_player {
 };
 
 struct game_start {
-	int time_band;
-	short player_no;
-	short max_players;
+	NETEMU_WORD time_band;
+	char player_no;
+	char max_players;
 };
+
 /*
 struct player_ready{
 
@@ -218,5 +220,13 @@ void netemu_application_add_kick_player(struct application_instruction* instruct
 void netemu_application_kick_player_pack(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_add_start_game(struct application_instruction* instruction);
+
+void netemu_application_start_game_pack(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_add_player_ready(struct application_instruction* instruction);
 
 #endif /* APPLICATION_H_ */

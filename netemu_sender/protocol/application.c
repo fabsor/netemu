@@ -428,5 +428,52 @@ void netemu_application_kick_player_parse(struct application_instruction* instru
 	memcpy(&kick->user_id,buffer,sizeof(char));
 }
 
+void netemu_application_add_start_game_total(struct application_instruction* instruction, NETEMU_WORD time_band, char player_no, char max_players) {
+	struct game_start *start;
+	start = malloc(sizeof(struct game_start));
+	start->time_band = time_band;
+	start->player_no = player_no;
+	start->max_players = max_players;
+	instruction->body_size = sizeof(struct game_start);
+	instruction->id = START_GAME;
+	instruction->packBodyFn = netemu_application_kick_player_pack;
+}
 
+void netemu_application_add_start_game(struct application_instruction* instruction) {
+	struct game_start *start;
+	start = malloc(sizeof(struct game_start));
+	start->time_band = 0xFFFF;
+	start->player_no = 0;
+	start->max_players = 0;
+	instruction->body_size = sizeof(struct game_start);
+	instruction->id = START_GAME;
+	instruction->packBodyFn = netemu_application_kick_player_pack;
+}
 
+void netemu_application_start_game_pack(struct application_instruction* instruction, char* buffer) {
+	struct game_start *start;
+	start = (struct game_start*) instruction->body;
+	memcpy(buffer,&start->time_band,sizeof(NETEMU_WORD));
+	buffer += sizeof(NETEMU_WORD);
+	memcpy(buffer,&start->player_no,sizeof(char));
+	buffer += sizeof(char);
+	memcpy(buffer,&start->max_players,sizeof(char));
+	buffer += sizeof(char);
+}
+
+void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer) {
+	struct game_start *start;
+	start = malloc(sizeof(struct game_start));
+	memcpy(&start->time_band,buffer,sizeof(NETEMU_WORD));
+	buffer += sizeof(NETEMU_WORD);
+	memcpy(&start->player_no,buffer,sizeof(char));
+	buffer += sizeof(char);
+	memcpy(&start->max_players,buffer,sizeof(char));
+	buffer += sizeof(char);
+}
+
+void netemu_application_add_player_ready(struct application_instruction* instruction) {
+	instruction->id = PLAYER_READY;
+	instruction->body_size = 0;
+	instruction->packBodyFn = NULL;
+}
