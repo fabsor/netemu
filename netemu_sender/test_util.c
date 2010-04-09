@@ -42,7 +42,7 @@ struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
 	struct netemu_sockaddr_in addr_in;
 	struct netemu_sender* sender;
 	netemu_sockaddr *addr;
-	addr_in.addr = netemu_inet_addr("192.168.106.222"); //netemu_htonl(INADDR_LOOPBACK);
+	addr_in.addr = netemu_htonl(INADDR_LOOPBACK);
 	addr_in.family = NETEMU_AF_INET;
 	addr_in.port = netemu_htons(port);
 	addr = netemu_prepare_net_addr(&addr_in);

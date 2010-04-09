@@ -9,9 +9,9 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
+-include states/subdir.mk
 -include protocol/subdir.mk
 -include network/subdir.mk
--include handlers/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

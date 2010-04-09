@@ -20,12 +20,16 @@ void test_login_request(struct netemu_sender* sender);
 void test_pong(struct netemu_sender* sender);
 void test_send_leave(struct netemu_sender *sender);
 void test_create_game(struct netemu_sender* sender);
+void test_join_game(struct netemu_sender* sender);
+void test_quit_game(struct netemu_sender* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
 int game_created = 0;
 struct netemu_sender* new_sender;
 NETEMU_WORD user_id;
+NETEMU_DWORD game_id;
+
 void run_application_tests() {
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
@@ -40,7 +44,9 @@ void run_application_tests() {
 	while(user_id == 0);
 	test_create_game(new_sender);
 	while(game_created == 0);
-	//test_send_leave(new_sender);
+	test_join_game(new_sender);
+	test_quit_game(new_sender);
+	test_send_leave(new_sender);
 }
 
 void send_hello(struct netemu_sender *sender) {
@@ -55,6 +61,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 	int status,i;
 	struct transport_packet *packet;
 	struct user_joined* joined;
+	struct game_created* created;
 	struct application_instruction *instruction;
 	if (port == 0) {
 		status = netemu_communication_parse_server_message(data);
@@ -80,6 +87,8 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 				printf("LOGIN SUCCESS\n");
 			}
 			else if(instruction->id == CREATE_GAME) {
+				created = (struct game_created*)instruction->body;
+				game_id = created->id;
 				game_created = 1;
 			}
 			else {
@@ -127,6 +136,24 @@ void test_create_game(struct netemu_sender* sender) {
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
 	netemu_application_add_create_game(messages[0],"thegame");
+	buffer = netemu_transport_pack(messages,1);
+	netemu_sender_send(sender,buffer.data,buffer.size);
+}
+
+void test_join_game(struct netemu_sender* sender) {
+	struct transport_packet_buffer buffer;
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_join_game(messages[0],game_id,1);
+	buffer = netemu_transport_pack(messages,1);
+	netemu_sender_send(sender,buffer.data,buffer.size);
+}
+
+void test_quit_game(struct netemu_sender* sender) {
+	struct transport_packet_buffer buffer;
+	struct application_instruction *messages[1];
+	messages[0] = netemu_application_create_message();
+	netemu_application_add_player_left(messages[0]);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }

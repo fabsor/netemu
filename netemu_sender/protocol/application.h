@@ -12,18 +12,21 @@
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
-#define USER_LEAVE				0x01
-#define LOGIN_REQUEST			0x03
-#define LOGIN_SUCCESS			0x04
-#define PING					0x05
-#define PONG					0x06
-#define PARTYLINE_CHAT			0x07
-#define GAME_CHAT				0x08
-#define MOTD_CHAT				0x17
-#define USER_JOINED				0x02
-#define CREATE_GAME				0x0a
+#define USER_LEAVE		0x01
+#define LOGIN_REQUEST	0x03
+#define LOGIN_SUCCESS	0x04
+#define PING			0x05
+#define PONG			0x06
+#define PARTYLINE_CHAT	0x07
+#define GAME_CHAT		0x08
+#define MOTD_CHAT		0x17
+#define USER_JOINED		0x02
+#define PLAYER_JOINED	0x0c
+#define PLAYER_LEFT		0x14
+#define PLAYER_KICK		0x0f;
+#define CREATE_GAME		0x0a
 #define EXISTING_PLAYERS_LIST	0x0d
-#define GAME_STATUS_UPDATE		0x0e
+#define GAME_STATUS_UPDATE 0x0e
 
 /*! A message to be sent to the server. */
 struct application_instruction {
@@ -120,15 +123,15 @@ struct game_status_update {
 };
 
 struct player_joined {
-	unsigned int game_id;
-	char username[32];
-	unsigned int ping;
-	int user_id;
-	short connection;
+	NETEMU_DWORD game_id;
+	char* username;
+	NETEMU_DWORD ping;
+	NETEMU_WORD user_id;
+	char connection;
 };
 
 struct player_left {
-	int user_id;
+	char user_id;
 };
 
 struct existing_player_list {
@@ -137,7 +140,7 @@ struct existing_player_list {
 };
 
 struct kick_player {
-	int user_id;
+	NETEMU_WORD user_id;
 };
 
 struct game_start {
@@ -197,5 +200,21 @@ void netemu_application_parse_create_game(struct application_instruction *instru
 void netemu_application_add_create_game(struct application_instruction *instruction, char* gamename);
 
 void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_join_game_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_add_join_game(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection);
+
+void netemu_application_add_player_left(struct application_instruction* instruction);
+
+void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_add_kick_player(struct application_instruction* instruction, NETEMU_WORD user_id);
+
+void netemu_application_kick_player_pack(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
 
 #endif /* APPLICATION_H_ */
