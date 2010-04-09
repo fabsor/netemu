@@ -136,6 +136,10 @@ struct player_joined {
 	char connection;
 };
 
+struct player_dropped {
+	char player_number;
+};
+
 struct player_left {
 	NETEMU_WORD user_id;
 };
@@ -189,6 +193,8 @@ void netemu_application_parse_existing_players_list(struct application_instructi
 void netemu_application_parse_buffered_play_values(struct application_instruction *instruction, char *data);
 
 void netemu_application_parse_intelligently_cached_play_values(struct application_instruction *instruction, char *data);
+
+void netemu_application_parse_player_dropped(struct application_instruction *instruction, char *data);
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 

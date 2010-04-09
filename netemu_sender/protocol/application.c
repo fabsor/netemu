@@ -185,6 +185,16 @@ void netemu_application_parse_intelligently_cached_play_values(struct applicatio
 	cache->index = *data;
 }
 
+void netemu_application_parse_player_dropped(struct application_instruction *instruction, char *data) {
+	struct player_dropped *dropped;
+
+	dropped = malloc(sizeof(struct player_dropped));
+
+	dropped->player_number = *data;
+	
+	instruction->body = dropped;
+}
+
 void netemu_application_free_message(struct application_instruction* message) {
 	free(message->body);
 	free(message);
