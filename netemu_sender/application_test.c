@@ -44,7 +44,7 @@ void run_application_tests() {
 	while(game_created == 0);
 	test_join_game(new_sender);
 	test_quit_game(new_sender);
-	//test_send_leave(new_sender);
+	test_send_leave(new_sender);
 }
 
 void send_hello(struct netemu_sender *sender) {
