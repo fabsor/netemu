@@ -368,5 +368,26 @@ void netemu_application_player_left_parse(struct application_instruction* instru
 	memcpy(&left->user_id,buffer,sizeof(char));
 }
 
+void netemu_application_add_kick_player(struct application_instruction* instruction, NETEMU_WORD user_id) {
+	struct kick_player *kick;
+	kick = malloc(sizeof(struct kick_player));
+	kick->user_id = user_id;
+	instruction->body_size = sizeof(NETEMU_DWORD);
+	instruction->id = PLAYER_KICK;
+	instruction->packBodyFn = netemu_application_kick_player_pack;
+}
+
+void netemu_application_kick_player_pack(struct application_instruction* instruction, char* buffer) {
+	struct kick_player *kick;
+	kick = (struct kick_player*) instruction->body;
+	memcpy(buffer,&kick->user_id,sizeof(char));
+}
+
+void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer) {
+	struct kick_player *kick;
+	kick = malloc(sizeof(struct kick_player));
+	memcpy(&kick->user_id,buffer,sizeof(char));
+}
+
 
 

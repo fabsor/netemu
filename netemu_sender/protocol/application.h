@@ -23,6 +23,7 @@
 #define USER_JOINED		0x02
 #define PLAYER_JOINED	0x0c
 #define PLAYER_LEFT		0x14
+#define PLAYER_KICK		0x0f;
 #define CREATE_GAME		0x0a
 #define GAME_STATUS_UPDATE 0x0e
 
@@ -138,7 +139,7 @@ struct existing_player_list {
 };
 
 struct kick_player {
-	int user_id;
+	NETEMU_WORD user_id;
 };
 
 struct game_start {
@@ -206,5 +207,11 @@ void netemu_application_add_player_left(struct application_instruction* instruct
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_add_kick_player(struct application_instruction* instruction, NETEMU_WORD user_id);
+
+void netemu_application_kick_player_pack(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
 
 #endif /* APPLICATION_H_ */
