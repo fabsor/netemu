@@ -18,7 +18,6 @@ void netemu_application_player_left_pack(struct application_instruction* instruc
 
 struct application_instruction* netemu_application_create_message() {
 	struct application_instruction* message;
-
 	message = malloc(sizeof(struct application_instruction));
 	message->user = malloc(sizeof(char));
 	*message->user = '\0';
