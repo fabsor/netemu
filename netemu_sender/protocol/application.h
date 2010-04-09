@@ -22,6 +22,7 @@
 #define MOTD_CHAT		0x17
 #define USER_JOINED		0x02
 #define PLAYER_JOINED	0x0c
+#define PLAYER_LEFT		0x14
 #define CREATE_GAME		0x0a
 #define GAME_STATUS_UPDATE 0x0e
 
@@ -128,7 +129,7 @@ struct player_joined {
 };
 
 struct player_left {
-	int user_id;
+	char user_id;
 };
 
 struct existing_player_list {

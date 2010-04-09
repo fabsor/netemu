@@ -14,7 +14,7 @@
 int _netemu_application_copy_string(char** dest, char* src);
 char* parse_string(char* data);
 int _netemu_application_pack_str(char* buffer, char* str);
-
+void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
 
 struct application_instruction* netemu_application_create_message() {
 	struct application_instruction* message;
@@ -346,6 +346,27 @@ void netemu_application_parse_user_joined(struct application_instruction *instru
 	memcpy(&status->connection,buffer+pos,sizeof(char));
 	instruction->body = status;
 	instruction->body_size = instruction->body_size;
+}
+
+void netemu_application_add_player_left(struct application_instruction* instruction) {
+	struct player_left *left;
+	left = malloc(sizeof(struct player_left));
+	left->user_id = 0;
+	instruction->body_size = sizeof(char);
+	instruction->id = PLAYER_JOINED;
+	instruction->packBodyFn = netemu_application_player_left_pack;
+}
+
+void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer) {
+	struct player_left *left;
+	left = (struct player_left*) instruction->body;
+	memcpy(buffer,&left->user_id,sizeof(char));
+}
+
+void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer) {
+	struct player_left *left;
+	left = malloc(sizeof(struct player_left));
+	memcpy(&left->user_id,buffer,sizeof(char));
 }
 
 
