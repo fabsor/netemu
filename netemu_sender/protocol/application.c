@@ -138,11 +138,8 @@ void netemu_application_parse_existing_players_list(struct application_instructi
 	int i;
 
 	list = malloc(sizeof(struct existing_player_list));
-
-
 	list->players_count = *((NETEMU_DWORD*)data);
 	data += sizeof(NETEMU_DWORD);
-
 	list->players = malloc(sizeof(struct player) * list->players_count);
 
 	for(i = 0; i < list->players_count; i++) {
@@ -160,6 +157,16 @@ void netemu_application_parse_existing_players_list(struct application_instructi
 	}
 
 	instruction->body = list;
+}
+
+void netemu_application_parse_buffered_play_values(struct application_instruction *instruction, char *data) {
+	struct buffered_play_values *play_values;
+
+	play_values = malloc(sizeof(struct buffered_play_values));
+
+	play_values->size = *((NETEMU_WORD*)data);
+	data += sizeof(NETEMU_WORD);
+
 }
 
 void netemu_application_free_message(struct application_instruction* message) {

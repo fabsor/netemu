@@ -181,6 +181,8 @@ void netemu_application_parse_chat(struct application_instruction *instruction, 
 
 void netemu_application_parse_existing_players_list(struct application_instruction *instruction, char *data);
 
+void netemu_application_parse_buffered_play_values(struct application_instruction *instruction, char *data);
+
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_add_pong(struct application_instruction* instruction);
