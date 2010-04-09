@@ -12,23 +12,27 @@
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
-#define USER_LEAVE		0x01
-#define LOGIN_REQUEST	0x03
-#define LOGIN_SUCCESS	0x04
-#define PING			0x05
-#define PONG			0x06
-#define PARTYLINE_CHAT	0x07
-#define GAME_CHAT		0x08
-#define MOTD_CHAT		0x17
-#define USER_JOINED		0x02
-#define PLAYER_JOINED	0x0c
-#define PLAYER_LEFT		0x14
-#define PLAYER_KICK		0x0f;
-#define CREATE_GAME		0x0a
+#define USER_LEAVE				0x01
+#define USER_JOINED				0x02
+#define LOGIN_REQUEST			0x03
+#define LOGIN_SUCCESS			0x04
+#define PING					0x05
+#define PONG					0x06
+#define PARTYLINE_CHAT			0x07
+#define GAME_CHAT				0x08
+#define CREATE_GAME				0x0a
+#define PLAYER_JOINED			0x0c
 #define EXISTING_PLAYERS_LIST	0x0d
-#define GAME_STATUS_UPDATE 0x0e
-#define START_GAME		0x11
-#define PLAYER_READY	0x15
+#define GAME_STATUS_UPDATE		0x0e
+#define PLAYER_KICK				0x0f
+#define START_GAME				0x11
+#define BUFFERED_PLAY_VALUES	0x12
+#define PLAYER_LEFT				0x14
+#define PLAYER_READY			0x15
+#define MOTD_CHAT				0x17
+
+
+
 /*! A message to be sent to the server. */
 struct application_instruction {
 	char id; /* 1...23 */
@@ -157,9 +161,7 @@ struct player_ready{
 */
 struct buffered_play_values {
 	int size;
-	void** values;
-	int player_values_size;
-	int emulator_word_size;
+	char *values;
 };
 
 struct intelligently_cached_buffered_play_values {

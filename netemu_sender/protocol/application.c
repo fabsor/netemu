@@ -167,6 +167,10 @@ void netemu_application_parse_buffered_play_values(struct application_instructio
 	play_values->size = *((NETEMU_WORD*)data);
 	data += sizeof(NETEMU_WORD);
 
+	play_values->values = malloc(play_values->size);
+	memcpy(play_values->values, data, play_values->size);
+
+	instruction->body = play_values;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
