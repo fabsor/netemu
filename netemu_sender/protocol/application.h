@@ -219,7 +219,7 @@ void netemu_application_kick_player_pack(struct application_instruction* instruc
 
 void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
 
-void netemu_application_add_start_game(struct application_instruction* instruction, NETEMU_WORD time_band, char player_no, char max_players);
+void netemu_application_add_start_game(struct application_instruction* instruction);
 
 void netemu_application_start_game_pack(struct application_instruction* instruction, char* buffer);
 

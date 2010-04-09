@@ -421,12 +421,23 @@ void netemu_application_kick_player_parse(struct application_instruction* instru
 	memcpy(&kick->user_id,buffer,sizeof(char));
 }
 
-void netemu_application_add_start_game(struct application_instruction* instruction, NETEMU_WORD time_band, char player_no, char max_players) {
+void netemu_application_add_start_game_total(struct application_instruction* instruction, NETEMU_WORD time_band, char player_no, char max_players) {
 	struct game_start *start;
 	start = malloc(sizeof(struct game_start));
 	start->time_band = time_band;
 	start->player_no = player_no;
 	start->max_players = max_players;
+	instruction->body_size = sizeof(struct game_start);
+	instruction->id = START_GAME;
+	instruction->packBodyFn = netemu_application_kick_player_pack;
+}
+
+void netemu_application_add_start_game(struct application_instruction* instruction) {
+	struct game_start *start;
+	start = malloc(sizeof(struct game_start));
+	start->time_band = 0xFFFF;
+	start->player_no = 0;
+	start->max_players = 0;
 	instruction->body_size = sizeof(struct game_start);
 	instruction->id = START_GAME;
 	instruction->packBodyFn = netemu_application_kick_player_pack;
