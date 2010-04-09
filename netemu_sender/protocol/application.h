@@ -12,17 +12,18 @@
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
-#define USER_LEAVE		0x01
-#define LOGIN_REQUEST	0x03
-#define LOGIN_SUCCESS	0x04
-#define PING			0x05
-#define PONG			0x06
-#define PARTYLINE_CHAT	0x07
-#define GAME_CHAT		0x08
-#define MOTD_CHAT		0x17
-#define USER_JOINED		0x02
-#define CREATE_GAME		0x0a
-#define GAME_STATUS_UPDATE 0x0e
+#define USER_LEAVE				0x01
+#define LOGIN_REQUEST			0x03
+#define LOGIN_SUCCESS			0x04
+#define PING					0x05
+#define PONG					0x06
+#define PARTYLINE_CHAT			0x07
+#define GAME_CHAT				0x08
+#define MOTD_CHAT				0x17
+#define USER_JOINED				0x02
+#define CREATE_GAME				0x0a
+#define EXISTING_PLAYERS_LIST	0x0d
+#define GAME_STATUS_UPDATE		0x0e
 
 /*! A message to be sent to the server. */
 struct application_instruction {
@@ -49,10 +50,10 @@ struct user {
 };
 
 struct player {
-	char username[32];
-	unsigned int ping;
-	int word;
-	short connection;
+	char *username;
+	NETEMU_DWORD ping;
+	NETEMU_WORD id;
+	char connection;
 };
 
 struct login_success {
@@ -174,6 +175,8 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_parse_chat(struct application_instruction *instruction, char *data);
+
+void netemu_application_parse_existing_players_list(struct application_instruction *instruction, char *data);
 
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
 
