@@ -137,7 +137,7 @@ struct player_joined {
 };
 
 struct player_left {
-	char user_id;
+	NETEMU_WORD user_id;
 };
 
 struct existing_player_list {

@@ -406,15 +406,16 @@ void netemu_application_add_player_left(struct application_instruction* instruct
 	struct player_left *left;
 	left = malloc(sizeof(struct player_left));
 	left->user_id = 0;
-	instruction->body_size = sizeof(char);
-	instruction->id = PLAYER_JOINED;
+	instruction->body = left;
+	instruction->body_size = sizeof(NETEMU_WORD);
+	instruction->id = PLAYER_LEFT;
 	instruction->packBodyFn = netemu_application_player_left_pack;
 }
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer) {
 	struct player_left *left;
 	left = (struct player_left*) instruction->body;
-	memcpy(buffer,&left->user_id,sizeof(char));
+	memcpy(buffer,&left->user_id,sizeof(NETEMU_WORD));
 }
 
 void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer) {
