@@ -27,7 +27,7 @@
 #define CREATE_GAME		0x0a
 #define GAME_STATUS_UPDATE 0x0e
 #define START_GAME		0x11
-
+#define PLAYER_READY	0x15
 /*! A message to be sent to the server. */
 struct application_instruction {
 	char id; /* 1...23 */
@@ -221,5 +221,7 @@ void netemu_application_add_start_game(struct application_instruction* instructi
 void netemu_application_start_game_pack(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_add_player_ready(struct application_instruction* instruction);
 
 #endif /* APPLICATION_H_ */

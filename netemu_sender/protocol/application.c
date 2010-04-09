@@ -421,3 +421,9 @@ void netemu_application_start_game_parse(struct application_instruction* instruc
 	memcpy(&start->max_players,buffer,sizeof(char));
 	buffer += sizeof(char);
 }
+
+void netemu_application_add_player_ready(struct application_instruction* instruction) {
+	instruction->id = PLAYER_READY;
+	instruction->body_size = 0;
+	instruction->packBodyFn = NULL;
+}
