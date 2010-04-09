@@ -43,8 +43,11 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 		pos += sizeof(char);
 		memcpy((void *)(buffer+pos), (void *)messages[i]->user, sizeof(char)*(strlen(messages[i]->user)+1));
 		pos += sizeof(char)*(strlen(messages[i]->user)+1);
-		messages[i]->packBodyFn(messages[i],(buffer+pos));
-		pos += messages[i]->body_size;
+		if(messages[i]->body != NULL){
+			messages[i]->packBodyFn(messages[i],(buffer+pos));
+			pos += messages[i]->body_size;
+		}
+		
 	}
 	current_index += count;
 	packet_buffer.data = buffer;
