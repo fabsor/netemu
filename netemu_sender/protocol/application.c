@@ -59,7 +59,12 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case GAME_STATUS_UPDATE:
 			netemu_application_parse_game_status(app_instruction,data);
 			break;
-
+		case BUFFERED_PLAY_VALUES:
+			netemu_application_parse_buffered_play_values(app_instruction, data);
+			break;
+		case INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES:
+			netemu_application_parse_intelligently_cached_play_values(app_instruction, data);
+			break;
 	}
 	return app_instruction;
 }
@@ -138,11 +143,8 @@ void netemu_application_parse_existing_players_list(struct application_instructi
 	int i;
 
 	list = malloc(sizeof(struct existing_player_list));
-
-
 	list->players_count = *((NETEMU_DWORD*)data);
 	data += sizeof(NETEMU_DWORD);
-
 	list->players = malloc(sizeof(struct player) * list->players_count);
 
 	for(i = 0; i < list->players_count; i++) {
@@ -160,6 +162,27 @@ void netemu_application_parse_existing_players_list(struct application_instructi
 	}
 
 	instruction->body = list;
+}
+
+void netemu_application_parse_buffered_play_values(struct application_instruction *instruction, char *data) {
+	struct buffered_play_values *play_values;
+
+	play_values = malloc(sizeof(struct buffered_play_values));
+
+	play_values->size = *((NETEMU_WORD*)data);
+	data += sizeof(NETEMU_WORD);
+
+	play_values->values = malloc(play_values->size);
+	memcpy(play_values->values, data, play_values->size);
+
+	instruction->body = play_values;
+}
+
+void netemu_application_parse_intelligently_cached_play_values(struct application_instruction *instruction, char *data) {
+	struct intelligently_cached_buffered_play_values *cache;
+
+	cache = malloc(sizeof(struct intelligently_cached_buffered_play_values));
+	cache->index = *data;
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
@@ -383,15 +406,16 @@ void netemu_application_add_player_left(struct application_instruction* instruct
 	struct player_left *left;
 	left = malloc(sizeof(struct player_left));
 	left->user_id = 0;
-	instruction->body_size = sizeof(char);
-	instruction->id = PLAYER_JOINED;
+	instruction->body = left;
+	instruction->body_size = sizeof(NETEMU_WORD);
+	instruction->id = PLAYER_LEFT;
 	instruction->packBodyFn = netemu_application_player_left_pack;
 }
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer) {
 	struct player_left *left;
 	left = (struct player_left*) instruction->body;
-	memcpy(buffer,&left->user_id,sizeof(char));
+	memcpy(buffer,&left->user_id,sizeof(NETEMU_WORD));
 }
 
 void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer) {
