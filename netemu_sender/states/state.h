@@ -26,6 +26,8 @@ struct netemu_state {
 
 void state_set_state(struct netemu_state *state,void (*stateStartFn)(struct state* state));
 
-void state_set_prev_state();
+void state_set_prev_state(struct netemu_state *state);
+
+void state_destroy(struct netemu_state *state);
 
 #endif /* STATE_H_ */
