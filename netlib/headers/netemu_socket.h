@@ -139,6 +139,9 @@ extern "C" {
 #define NETEMU_SHUT_RDWR    SHUT_RDWR   /* Disables sending and receiving data on the socket. */
 
 
+#define NETEMU_INADDR_ANY		INADDR_ANY
+#define NETEMU_INADDR_LOOPBACK	INADDR_LOOPBACK
+
 	/**
 	* Structure describing a generic socket address.
 	* Hopefully this is identical on both the unix and win32 platform, not yet verified though.
