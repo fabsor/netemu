@@ -31,7 +31,7 @@
 #define PLAYER_LEFT										0x14
 #define PLAYER_READY									0x15
 #define MOTD_CHAT										0x17
-
+#define PLAYER_DROPPED									20 // Jag har ingen internetanslutning = Jag kan inte komma åt hex-decimal konverteraren.
 
 
 /*! A message to be sent to the server. */
@@ -165,7 +165,7 @@ struct player_ready{
 };
 */
 struct buffered_play_values {
-	int size;
+	NETEMU_WORD size;
 	char *values;
 };
 
@@ -180,64 +180,81 @@ struct chat {
 
 struct application_instruction* netemu_application_create_message();
 
-void netemu_application_add_login_request(struct application_instruction* instruction,char* username, char* appName, int connection);
+void netemu_application_buffered_play_values_add(struct application_instruction *instruction);
 
-void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
+void netemu_application_buffered_play_values_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_parse_login_success(struct application_instruction *instruction, char* buffer);
+void netemu_application_buffered_play_values_parse(struct application_instruction *instruction, char *data);
 
-void netemu_application_parse_chat(struct application_instruction *instruction, char *data);
+void netemu_application_chat_game_add(struct application_instruction *instruction, char *data, char *user);
 
-void netemu_application_parse_existing_players_list(struct application_instruction *instruction, char *data);
+void netemu_application_chat_partyline_add(struct application_instruction *instruction, char *data, char *user);
 
-void netemu_application_parse_buffered_play_values(struct application_instruction *instruction, char *data);
+void netemu_application_chat_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_parse_intelligently_cached_play_values(struct application_instruction *instruction, char *data);
+void netemu_application_chat_parse(struct application_instruction *instruction, char *data);
 
-void netemu_application_parse_player_dropped(struct application_instruction *instruction, char *data);
-
-void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
-
-void netemu_application_add_pong(struct application_instruction* instruction);
-
-void netemu_application_add_leave(struct application_instruction* instruction, char* exit_message);
-
-void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
-
-void netemu_application_parse_game_status(struct application_instruction *instruction, char* buffer);
-
-void netemu_application_parse_user_joined(struct application_instruction *instruction, char* buffer);
+void netemu_application_create_game_add(struct application_instruction *instruction, char* gamename);
 
 void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_parse_create_game(struct application_instruction *instruction, char* buffer);
+void netemu_application_create_game_parse(struct application_instruction *instruction, char* buffer);
 
-void netemu_application_add_create_game(struct application_instruction *instruction, char* gamename);
+void netemu_application_existing_players_list_parse(struct application_instruction *instruction, char *data);
 
-void netemu_application_create_game_pack(struct application_instruction *instruction, char *buffer);
+void netemu_application_game_status_parse(struct application_instruction *instruction, char* buffer);
+
+void netemu_application_intelligently_cached_play_values_add(struct application_instruction *instruction, char index);
+
+void netemu_application_intelligently_cached_play_values_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_intelligently_cached_play_values_parse(struct application_instruction *instruction, char *data);
+
+void netemu_application_join_game_add(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection);
 
 void netemu_application_join_game_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_add_join_game(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection);
+void netemu_application_join_game_parse(struct application_instruction *instruction, char *data);
 
-void netemu_application_add_player_left(struct application_instruction* instruction);
-
-void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
-
-void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer);
-
-void netemu_application_add_kick_player(struct application_instruction* instruction, NETEMU_WORD user_id);
+void netemu_application_kick_player_add(struct application_instruction* instruction, NETEMU_WORD user_id);
 
 void netemu_application_kick_player_pack(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
 
-void netemu_application_add_start_game(struct application_instruction* instruction);
+/* TODO: Är detta User leave eller Player leave? Det borde skrivas i metodnamnet så man inte tar fel :D */
+void netemu_application_leave_add(struct application_instruction* instruction, char* exit_message);
+
+void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_login_request_add(struct application_instruction* instruction,char* username, char* appName, int connection);
+
+void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_login_success_parse(struct application_instruction *instruction, char* buffer);
+
+void netemu_application_player_dropped_pack(struct application_instruction *instruction, char *data);
+
+void netemu_application_player_dropped_parse(struct application_instruction *instruction, char *data);
+
+void netemu_application_player_left_add(struct application_instruction* instruction);
+
+void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_player_ready_add(struct application_instruction* instruction);
+
+void netemu_application_pong_add(struct application_instruction* instruction);
+
+void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_start_game_add(struct application_instruction* instruction);
 
 void netemu_application_start_game_pack(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer);
 
-void netemu_application_add_player_ready(struct application_instruction* instruction);
+void netemu_application_user_joined_parse(struct application_instruction *instruction, char* buffer);
 
 #endif /* APPLICATION_H_ */
