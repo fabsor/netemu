@@ -26,7 +26,8 @@ struct netemu_receiver{
 };
 
 struct netemu_receiver_fn{
-	void (* listenerFn)(char*, size_t, struct netemu_receiver*);
+	void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*);
+	void* params;
 	struct netemu_receiver_fn *next;
 };
 
@@ -46,7 +47,7 @@ void netemu_receiver_start_listening(struct netemu_receiver* receiver);
  * Register a function that will act as a listener. The function will be called when data is received.
  * The function must be thread safe.
  */
-void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver*));
+void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*), void* params);
 
 void netemu_receiver_free(struct netemu_receiver* receiver);
 

@@ -32,7 +32,7 @@ struct netemu_communication_state {
 	unsigned short status;
 };
 
-void communication_state_listener(char* data, size_t size, struct netemu_receiver* receiver);
+void communication_state_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args);
 /**
  * Set the host you want to connect to. The state will now try to establish the connection and connect to the host if possible.
  */
@@ -48,7 +48,7 @@ void communication_state_set_host(struct netemu_state *state, struct netemu_sock
 	com_state->port = hostaddr->port;
 	com_state->host = hostaddr->addr;
 	receiver = netemu_receiver_new(netemu_prepare_net_addr(clientaddr),sizeof(struct netemu_sockaddr_in),DEFAULT_BUFFER_SIZE);
-	netemu_receiver_register_recv_fn(receiver,communication_state_listener);
+	netemu_receiver_register_recv_fn(receiver,communication_state_listener, (void*)com_state);
 	sender = netemu_sender_new_on_socket(netemu_prepare_net_addr(hostaddr),receiver->socket,sizeof(struct netemu_sockaddr_in));
 	com_state->status = COMMUNICATION_CONNECTING;
 }
