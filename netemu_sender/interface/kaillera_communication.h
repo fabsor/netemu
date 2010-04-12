@@ -29,9 +29,7 @@ void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct n
 
 void kaillera_communication_connect(struct netemu_sockaddr_in *addr);
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr) {
-
-}
+void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr);
 
 
 
