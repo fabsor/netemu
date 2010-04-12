@@ -8,7 +8,7 @@
 
 
 void netemu_client_init() {
-	struct netemu_client client;
+
 }
 void netemu_client_destroy() {
 
