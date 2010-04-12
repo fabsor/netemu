@@ -33,7 +33,7 @@ NETEMU_DWORD game_id;
 void run_application_tests() {
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
-	receiver = prepare_receiver(CLIENT_PORT,application_listener);
+	receiver = prepare_receiver(CLIENT_PORT,application_listener, NULL);
 	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_hello(sender);
 	while(port == 0);

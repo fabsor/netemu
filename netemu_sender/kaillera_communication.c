@@ -27,10 +27,9 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	int result = -1;
 	client = netemu_resources_get_client();
 
-	client->receiver = prepare_receiver(CLIENT_PORT);
+	client->receiver = prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
 	client->sender = prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);
-	netemu_receiver_register_recv_fn(client->receiver,kaillera_communication_listener,&result);
 	while(result != -1);
 	free(hello);
 	connection = malloc(sizeof(connection));

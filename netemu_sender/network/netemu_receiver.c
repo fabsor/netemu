@@ -122,6 +122,7 @@ void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* 
 		receiver->receiver_fn = receiver_fn;
 	}
 	else {
+		receiver_iter = receiver->receiver_fn;
 		while (receiver_iter->next != NULL) {
 			receiver_iter = receiver_iter->next;
 		}
