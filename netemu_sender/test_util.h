@@ -16,7 +16,7 @@
 #define SERVER_PORT		27888
 #define CLIENT_PORT 	35888
 
-struct netemu_receiver* prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver*));
+struct netemu_receiver* prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*));
 struct netemu_sender* prepare_sender(int port);
 struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port);
 void send_data(struct netemu_sender* sender, char* data);

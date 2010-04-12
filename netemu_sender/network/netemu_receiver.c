@@ -51,7 +51,6 @@ struct netemu_receiver* netemu_receiver_new(netemu_sockaddr* addr, int addr_len,
  * datagrams on the specified address and port.
  */
 void netemu_receiver_start_listening(struct netemu_receiver* receiver){
-	
 	netemu_thread_new(netemu_receiver_recv, (void*)receiver);
 }
 
@@ -63,8 +62,7 @@ void netemu_receiver_recv(void* params) {
 	char *buffer;
 	int error;
 	int bind_error;
-	parameters = (struct netemu_receiver_params *)params;
-	receiver = parameters->receiver;
+	receiver = (struct netemu_receiver*)params;
 
 	buffer = malloc(sizeof(char)*receiver->buffer_size);
 	receiver->lock = netemu_thread_mutex_create();
@@ -78,7 +76,7 @@ void netemu_receiver_recv(void* params) {
 			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}
-		_netemu_receiver_notify(receiver, buffer, error, parameters->params);
+		_netemu_receiver_notify(receiver, buffer, error);
 		memset(buffer, NULL, receiver->buffer_size);
 		netemu_thread_mutex_release(receiver->lock);
 	}
@@ -100,11 +98,11 @@ void free_receiver(struct netemu_receiver* receiver) {
 	free(receiver);
 }
 
-void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data, size_t size, void* params) {
+void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data, size_t size) {
 	struct netemu_receiver_fn* receiver_fn;
 	receiver_fn = receiver->receiver_fn;
 	while(receiver_fn != NULL) {
-		receiver_fn->listenerFn(data,size, receiver, params);
+		receiver_fn->listenerFn(data,size, receiver, receiver_fn->params);
 		receiver_fn = receiver_fn->next;
 	}
 }
@@ -113,12 +111,13 @@ void _netemu_receiver_notify(struct netemu_receiver* receiver, char* data, size_
  * Register a function that will act as a listener. The function will be called when data is received.
  * The function must be thread safe.
  */
-void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver*, void* params)) {
+void netemu_receiver_register_recv_fn(struct netemu_receiver* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*), void* params) {
 	struct netemu_receiver_fn *receiver_fn;
 	struct netemu_receiver_fn *receiver_iter;
 	receiver_fn = malloc(sizeof(struct netemu_receiver_fn));
 	receiver_fn->listenerFn = listenerFn;
 	receiver_fn->next = NULL;
+	receiver_fn->params = params;
 
 	if (receiver->receiver_fn == NULL) {
 		receiver->receiver_fn = receiver_fn;

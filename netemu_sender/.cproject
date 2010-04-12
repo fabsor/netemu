@@ -38,7 +38,7 @@
 </option>
 <option id="gnu.c.compiler.option.warnings.pedantic.625873478" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.include.paths.1030402954" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/headers}&quot;"/>
+<listOptionValue builtIn="false" value="/home/fabbe/workspace/netemu/netlib/headers"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1933678315" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
