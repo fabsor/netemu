@@ -7,23 +7,32 @@
 #ifndef NETEMU_RESOURCES_H_
 #define NETEMU_RESOURCES_H_
 
+/* Common defined values. */
+
+#define CLIENT_PORT 	35888
+
+
+/**
+ * This struct contains resources commonly used by all parts of
+ * the program.
+ */
 struct netemu_client {
 	struct netemu_receiver *receiver;
 	struct netemu_sender *sender;
 
 };
 
-/* Global variable containing the shared client. */
-struct netemu_client* client = NULL;
 
 /**
  * Get the client, containing a sender and receiver object.
+ * @return the netemu_client that's currently in use.
  */
 struct netemu_client* netemu_resources_get_client();
 
 /**
- * Free the client.
+ * Free the client memory. This will free the memory of the
+ * sender and receiver contained in the struct as well.
  */
-struct netemu_client* netemu_resources_free_client();
+void netemu_resources_free_client();
 
 #endif /* NETEMU_RESOURCES_H_ */

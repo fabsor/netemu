@@ -54,7 +54,6 @@ void netemu_receiver_start_listening(struct netemu_receiver* receiver){
 	netemu_thread_new(netemu_receiver_recv, (void*)receiver);
 }
 
-
 /*! Called to receive data. */
 void netemu_receiver_recv(void* params) {
 	struct netemu_receiver_params* parameters;

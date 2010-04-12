@@ -38,7 +38,7 @@
 </option>
 <option id="gnu.c.compiler.option.warnings.pedantic.625873478" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.include.paths.1030402954" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-<listOptionValue builtIn="false" value="/home/fabbe/workspace/netemu/netlib/headers"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/headers}&quot;"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1933678315" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
@@ -367,9 +367,9 @@
 </folderInfo>
 <sourceEntries>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="protocol"/>
-<entry excluding="states|network|handlers|protocol" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="interface|interfaces|states|network|handlers|protocol" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="network"/>
-<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="states"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="interface"/>
 </sourceEntries>
 </configuration>
 </storageModule>

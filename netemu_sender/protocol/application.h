@@ -31,7 +31,7 @@
 #define PLAYER_LEFT										0x14
 #define PLAYER_READY									0x15
 #define MOTD_CHAT										0x17
-#define PLAYER_DROPPED									20 // Jag har ingen internetanslutning = Jag kan inte komma åt hex-decimal konverteraren.
+#define PLAYER_DROPPED									20 // Jag har ingen internetanslutning = Jag kan inte komma ï¿½t hex-decimal konverteraren.
 
 
 /*! A message to be sent to the server. */
@@ -180,7 +180,7 @@ struct chat {
 
 struct application_instruction* netemu_application_create_message();
 
-void netemu_application_buffered_play_values_add(struct application_instruction *instruction);
+void netemu_application_buffered_play_values_add(struct application_instruction *instruction, NETEMU_WORD size, char *data);
 
 void netemu_application_buffered_play_values_pack(struct application_instruction *instruction, char *buffer);
 
@@ -221,6 +221,10 @@ void netemu_application_kick_player_add(struct application_instruction* instruct
 void netemu_application_kick_player_pack(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
+
+void netemu_application_leave_add(struct application_instruction* instruction, char* exit_message);
+
+void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_login_request_add(struct application_instruction* instruction,char* username, char* appName, int connection);
 
