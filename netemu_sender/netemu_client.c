@@ -6,7 +6,6 @@
  */
 
 
-
 void netemu_client_init() {
 
 }

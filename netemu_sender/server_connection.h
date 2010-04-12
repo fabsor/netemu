@@ -1,7 +1,8 @@
+#include "netemu_util.h"
 
 struct server_connection {
 	char *host;
-	DWORD port;
+	NETEMU_DWORD port;
 };
 
 void server_connection_send_chat_message();
