@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\interface\application_handler.c"
+				>
+			</File>
+			<File
 				RelativePath=".\application_test.c"
 				>
 			</File>
@@ -234,6 +238,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\interface\kaillera_communication.h"
+				>
+			</File>
+			<File
+				RelativePath=".\kailleraclient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\interface\netemu_client.h"
+				>
+			</File>
+			<File
 				RelativePath=".\network\netemu_receiver.h"
 				>
 			</File>
@@ -243,6 +259,10 @@
 			</File>
 			<File
 				RelativePath=".\network_test.h"
+				>
+			</File>
+			<File
+				RelativePath=".\server_connection.h"
 				>
 			</File>
 			<File

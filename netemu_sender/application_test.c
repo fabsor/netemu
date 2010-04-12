@@ -117,7 +117,7 @@ void test_send_leave(struct netemu_sender *sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
-	netemu_application_leave_add(messages[0],"leavin.");
+	netemu_application_user_leave_add(messages[0],"leavin.");
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }

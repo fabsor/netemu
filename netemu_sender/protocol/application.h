@@ -222,11 +222,6 @@ void netemu_application_kick_player_pack(struct application_instruction* instruc
 
 void netemu_application_kick_player_parse(struct application_instruction* instruction, char* buffer);
 
-/* TODO: Är detta User leave eller Player leave? Det borde skrivas i metodnamnet så man inte tar fel :D */
-void netemu_application_leave_add(struct application_instruction* instruction, char* exit_message);
-
-void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
-
 void netemu_application_login_request_add(struct application_instruction* instruction,char* username, char* appName, int connection);
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
@@ -256,5 +251,9 @@ void netemu_application_start_game_pack(struct application_instruction* instruct
 void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_user_joined_parse(struct application_instruction *instruction, char* buffer);
+
+void netemu_application_user_leave_add(struct application_instruction* instruction, char* exit_message);
+
+void netemu_application_user_leave_pack(struct application_instruction *instruction, char *buffer);
 
 #endif /* APPLICATION_H_ */

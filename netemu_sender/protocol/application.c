@@ -330,7 +330,7 @@ void netemu_application_free_login_request(struct login_request* request) {
 	free(request);
 }
 
-void netemu_application_leave_add(struct application_instruction* instruction, char* exit_message) {
+void netemu_application_user_leave_add(struct application_instruction* instruction, char* exit_message) {
 	struct user_left *left_msg;
 	int size;
 	left_msg = malloc(sizeof(struct user_left));
@@ -340,7 +340,7 @@ void netemu_application_leave_add(struct application_instruction* instruction, c
 	instruction->body_size = size;
 	instruction->body = left_msg;
 	instruction->id = USER_LEAVE;
-	instruction->packBodyFn = netemu_application_leave_pack;
+	instruction->packBodyFn = netemu_application_user_leave_pack;
 }
 
 int _netemu_application_copy_string(char** dest, char* src) {
@@ -351,7 +351,7 @@ int _netemu_application_copy_string(char** dest, char* src) {
 	return size;
 }
 
-void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer) {
+void netemu_application_user_leave_pack(struct application_instruction *instruction, char *buffer) {
 	struct user_left *left_msg;
 	int pos;
 	left_msg = (struct user_left*)instruction->body;
