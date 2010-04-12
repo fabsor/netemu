@@ -1,7 +1,9 @@
+#include "netemu_socket.h"
 
 struct server_connection {
-	char *host;
-	DWORD port;
+	netemu_sockaddr_in *addr;
 };
 
-void server_connection_send_chat_message();
+int server_connection_send_chat_message(server_connection *connection, char *message);
+
+int server_connection_register_chat_callback(server_connection *connection, void (* chatFn)(char *user, char *message));
