@@ -10,6 +10,7 @@
 #include "protocol/communication.h"
 #include "network/netemu_sender.h"
 #include "netemu_resources.h"
+#include "netemu_util.h"
 #include "interface/server_connection.h"
 #define VERSION						"0.83"
 
@@ -47,10 +48,9 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void 
 	callback = malloc(sizeof(struct server_connection_callback));
 	client = netemu_resources_get_client();
 	callback->ConnectionReceivedFn = ConnectionReceivedFn;
-	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT);
+	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener_async,&result);
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);
-	netemu_receiver_register_recv_fn(client->receiver,kaillera_communication_listener_async,&result);
 	free(hello);
 }
 

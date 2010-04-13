@@ -54,7 +54,7 @@ struct netemu_sender_udp* netemu_util_prepare_sender_on_socket(NETEMU_SOCKET soc
 	return sender;
 }
 
-struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, struct netemu_sockaddr_in *addr_in, int port) {
+struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, struct netemu_sockaddr_in *addr_in) {
 	netemu_sockaddr *addr;
 	struct netemu_sender_udp* sender;
 	addr = netemu_prepare_net_addr(addr_in);
