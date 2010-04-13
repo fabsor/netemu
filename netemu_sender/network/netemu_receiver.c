@@ -85,8 +85,7 @@ void netemu_receiver_recv(void* params) {
 
 void free_receiver(struct netemu_receiver* receiver) {
 	struct netemu_receiver_fn *receiver_fn, *receiver_next;
-	
-	netemu_free(receiver->socket);
+
 	free(receiver->addr);
 	receiver_fn = receiver->receiver_fn;
 	while (receiver_fn != NULL) {
