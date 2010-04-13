@@ -28,7 +28,7 @@ extern "C" {
     #define INVALID_SOCKET  (NETEMU_SOCKET)(-1)
 
     /* Error code constants */
-    #define NETEMU_EINTR    EINTR //Like this?
+    #define NETEMU_EINTR    EINT
     #define EWOULDBLOCK     11
     #define EACCES          13
     #define EFAULT          14
@@ -125,17 +125,17 @@ extern "C" {
     
     /* Constants defining flags for the send/recv calls. */
 
-    #define NETEMU_MSG_OOB          MSG_OOB        // Process Out-of-band data (send/recv).
-    #define NETEMU_MSG_DONTROUTE    MSG_DONTROUTE  // Don't use local routing (send).
-    #define NETEMU_MSG_PEEK         MSG_PEEK       // Peeks at incoming data (recv).
-    #define  NETEMU_MSG_WAITALL     MSG_WAITALL     // Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv).
+    #define NETEMU_MSG_OOB          MSG_OOB        /* Process Out-of-band data (send/recv). */
+    #define NETEMU_MSG_DONTROUTE    MSG_DONTROUTE  /* Don't use local routing (send). */
+    #define NETEMU_MSG_PEEK         MSG_PEEK       /* Peeks at incoming data (recv). */
+    #define  NETEMU_MSG_WAITALL     MSG_WAITALL     /* Incoming data will be received only when the buffer is full, or when the connection is closed or an error occured (recv). */
 
 
     /* Constants for the shutdown method. */
     
-    #define NETEMU_SHUT_RD      SHUT_RD     // Disables further data receival on the socket.
-    #define NETEMU_SHUT_WR      SHUT_WR     // Disables further data sending from the socket.
-    #define NETEMU_SHUT_RDWR    SHUT_RDWR   // Disables sending and receiving data on the socket.
+    #define NETEMU_SHUT_RD      SHUT_RD     /* Disables further data receival on the socket. */
+    #define NETEMU_SHUT_WR      SHUT_WR     /* Disables further data sending from the socket. */
+    #define NETEMU_SHUT_RDWR    SHUT_RDWR   /* Disables sending and receiving data on the socket. */
     
 
     /**
