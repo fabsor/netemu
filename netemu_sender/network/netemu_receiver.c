@@ -109,7 +109,7 @@ void _netemu_receiver_tcp_recv(void* params) {
 	receiver->lock = netemu_thread_mutex_create();
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
-		netemu_thread_mutex_lock(receiver->lock);
+		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error == -1) {
 			receiver->error = netemu_get_last_error();
@@ -134,7 +134,7 @@ void netemu_receiver_recv(void* params) {
 	receiver->lock = netemu_thread_mutex_create();
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
-		netemu_thread_mutex_lock(receiver->lock);
+		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error == -1) {
 			receiver->error = netemu_get_last_error();
