@@ -6,6 +6,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application.h"
@@ -28,6 +29,9 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	char *data;
 
 	app_instruction = malloc(sizeof(struct application_instruction));
+
+	app_instruction->timestamp = time(NULL);
+
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
 
 	data = (char*)instruction->instruction;
@@ -73,12 +77,13 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 
 char* parse_string(char* data) {
 	int str_len;
-	char* char_data;
 	char* string;
 
-	str_len = strlen(data);
+	str_len = strlen(data)+1;
 	string = malloc(str_len);
-	strcpy(string, data);
+	strncpy(string, data, str_len);
+
+	return string;
 }
 
 void netemu_application_chat_game_add(struct application_instruction *instruction, char *data, char *user) {
@@ -123,12 +128,12 @@ void netemu_application_chat_parse(struct application_instruction *instruction, 
 
 	chat_msg = malloc(sizeof(struct chat));
 	chat_msg->message = parse_string(data);
-	printf("%s\n", chat_msg->message);
+	printf_s(chat_msg->message);
 }
 
 void netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
 	struct login_success *success;
-	int i;
+	unsigned int i;
 
 	success = malloc(sizeof(struct login_success));
 
@@ -179,7 +184,7 @@ void netemu_application_login_success_parse(struct application_instruction *inst
 
 void netemu_application_existing_players_list_parse(struct application_instruction *instruction, char *data) {
 	struct existing_player_list *list;
-	int i;
+	unsigned int i;
 
 	list = malloc(sizeof(struct existing_player_list));
 	list->players_count = *((NETEMU_DWORD*)data);
@@ -347,7 +352,7 @@ int _netemu_application_copy_string(char** dest, char* src) {
 	int size;
 	size = sizeof(char)*strlen(src) + 1;
 	*dest = malloc(size);
-	strcpy(*dest,src);
+	strncpy(*dest, src, size);
 	return size;
 }
 

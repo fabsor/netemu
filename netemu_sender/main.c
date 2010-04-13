@@ -8,7 +8,6 @@ void test_sender_receiver();
 
 int main()
 {
-
 	netemu_init_network();
 	run_application_tests();
 	while(1);
