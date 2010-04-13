@@ -11,7 +11,8 @@ extern "C" {
 #endif
 	#include "../structures/netemu_hashtbl.h"
 	#include "../protocol/application.h"
-	
+	#include "netemu_thread.h"
+
 	typedef struct _netemu_packet_buffer_internal* netemu_packet_buffer_internal;
 
 	struct netemu_packet_buffer {
@@ -25,7 +26,7 @@ extern "C" {
 	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, int id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
 	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);
-	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, struct netemu_mutex *mutex);
+	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_mutex mutex);
 
 #ifdef	__cplusplus
 }

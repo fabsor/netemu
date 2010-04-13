@@ -68,14 +68,14 @@ void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer) {
 	netemu_hashtbl_clear(buffer->table);
 }
 
-void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, struct netemu_mutex *mutex) {
+void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_mutex mutex) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_packet_buffer_wakeup_info));
 	wakeup->age = age;
 	wakeup->mutex = mutex;
 	wakeup->next = NULL;
 
-	netemu_thread_mutex_lock(mutex);
+	netemu_thread_mutex_lock(mutex,NETEMU_INFINITE);
 
 	if((existing_wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction_id)) == NULL) {
 		wakeup->prev = NULL;
