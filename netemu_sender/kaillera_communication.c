@@ -81,3 +81,7 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 	*result = netemu_communication_parse_server_message(data);
 	free(data);
 }
+
+struct netemu_communication_server* kaillera_communication_get_server_list() {
+
+}

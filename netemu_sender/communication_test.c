@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "netemu_util.h"
 #include "protocol/communication.h"
 
@@ -18,8 +19,8 @@ int com_ping_received;
 void test_server_communication() {
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
-	receiver = prepare_receiver(CLIENT_PORT,communication_listener, NULL);
-	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
+	receiver = netemu_util_prepare_receiver(CLIENT_PORT,communication_listener, NULL);
+	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_communication_data(sender);
 	while(!com_hello_received && !com_ping_received);
 }
@@ -53,7 +54,7 @@ void send_communication_data(struct netemu_sender* sender) {
 		printf("ERROR: Ping message incorrect.");
 		return;
 	}
-	send_data(sender, ping_message);
+	netemu_util_send_data(sender, ping_message);
 	free(ping_message);
 	hello_message = netemu_communication_create_hello_message("0.83");
 	send_data(sender, hello_message);
