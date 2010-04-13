@@ -30,7 +30,9 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	client->receiver = prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
 	client->sender = prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);
-	while(result != -1);
+	send_data(client->sender,hello);
+
+	while(result == -1);
 	free(hello);
 	connection = malloc(sizeof(connection));
 	/* TODO: Fix more data when it becomes available. */

@@ -13,7 +13,7 @@
 #define EMUNAME		"testemu"
 #define PLAYERNAME	"foobar"
 
-#define ADDR	netemu_htonl(NETEMU_INADDR_ANY)
+#define ADDR	netemu_htonl(NETEMU_INADDR_LOOPBACK)
 #define PORT	netemu_htons(27888)
 
 char* games[] = {"Foo", "Bar"};

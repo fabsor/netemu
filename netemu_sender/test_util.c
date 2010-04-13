@@ -53,11 +53,11 @@ struct netemu_sender* prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
 	return sender;
 }
 
-struct netemu_sender* prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, struct netemu_sockaddr_in *addr, int port) {
-	struct netemu_sockaddr_in addr_in;
+struct netemu_sender* prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, struct netemu_sockaddr_in *addr_in, int port) {
+	netemu_sockaddr *addr;
 	struct netemu_sender* sender;
-	addr = netemu_prepare_net_addr(&addr_in);
-	sender = netemu_sender_new_on_socket(addr,socket,sizeof(addr_in));
+	addr = netemu_prepare_net_addr(addr_in);
+	sender = netemu_sender_new_on_socket(addr,socket,sizeof(*addr_in));
 	return sender;
 }
 
