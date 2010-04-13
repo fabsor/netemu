@@ -2,8 +2,6 @@
 #include "../netemu_resources.h"
 #include "../network/netemu_sender.h"
 #include "netemu_list.h"
-//#include "../network/netemu_packet_buffer.h"
-//#include <time.h>
 
 //void _server_connection_receive(char*, size_t, struct netemu_receiver*, void*);
 
@@ -12,7 +10,7 @@ struct _server_connection_internal {
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
-	//struct netemu_packet_buffer *receive_buffer;
+	struct netemu_packet_buffer *receive_buffer;
 };
 
 int server_connection_send_chat_message(struct server_connection *connection, char *message) {
@@ -69,12 +67,14 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 }
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
+	struct netemu_mutex *mutex;
 	int error;
 	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 
+	mutex = netemu_thread_mutex_create();
 	client = netemu_resources_get_client();
 	client->sender->addr = connection->addr;
 
@@ -83,10 +83,11 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	buffer = netemu_transport_pack(messages,1);
 
 	timestamp = time(NULL);
+	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, mutex);
 	if((error = netemu_sender_udp_send(client->sender,buffer.data,buffer.size)) != 0)
 		return error;
-
-
+	
+	netemu_thread_mutex_lock(mutex);
 }
 
 struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {
