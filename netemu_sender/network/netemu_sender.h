@@ -43,4 +43,6 @@ struct netemu_sender_tcp* netemu_sender_tcp_new(netemu_sockaddr* addr, int addr_
 
 struct netemu_sender_tcp* netemu_sender_tcp_new_on_socket(netemu_sockaddr* addr, NETEMU_SOCKET socket, int addr_len);
 
+int netemu_sender_tcp_send(struct netemu_sender_tcp* sender, char* data, int size);
+
 #endif /* SENDER_H_ */

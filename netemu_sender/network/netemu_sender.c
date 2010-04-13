@@ -4,6 +4,7 @@
  *  Created on: 30 mar 2010
  *      Author: fabian
  */
+#include "netemu_socket.h"
 #include "netemu_sender.h"
 #include <stdlib.h>
 

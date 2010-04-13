@@ -128,7 +128,6 @@ void netemu_application_chat_parse(struct application_instruction *instruction, 
 
 	chat_msg = malloc(sizeof(struct chat));
 	chat_msg->message = parse_string(data);
-	printf_s(chat_msg->message);
 }
 
 void netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
