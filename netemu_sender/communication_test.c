@@ -57,6 +57,6 @@ void send_communication_data(struct netemu_sender* sender) {
 	netemu_util_send_data(sender, ping_message);
 	free(ping_message);
 	hello_message = netemu_communication_create_hello_message("0.83");
-	send_data(sender, hello_message);
+	netemu_util_send_data(sender, hello_message);
 	free(hello_message);
 }

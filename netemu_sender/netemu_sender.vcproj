@@ -212,15 +212,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\netemu_util.c"
+				>
+			</File>
+			<File
 				RelativePath=".\network_test.c"
 				>
 			</File>
 			<File
 				RelativePath=".\interface\server_connection.c"
-				>
-			</File>
-			<File
-				RelativePath=".\test_util.c"
 				>
 			</File>
 			<File
@@ -282,15 +282,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\netemu_util.h"
+				>
+			</File>
+			<File
 				RelativePath=".\network_test.h"
 				>
 			</File>
 			<File
 				RelativePath=".\interface\server_connection.h"
-				>
-			</File>
-			<File
-				RelativePath=".\test_util.h"
 				>
 			</File>
 			<File
