@@ -43,7 +43,6 @@ NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, sock
 /* Sends data through a connected socket. */
 int netmu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
     return send(socket,buffer,len,flags);
-
 }
 
 /* Sends data to a specific destination. */

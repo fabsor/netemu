@@ -12,6 +12,11 @@
 #include "netemu_resources.h"
 #include "netemu_util.h"
 #include "interface/server_connection.h"
+#include "netemu_socket.h"
+#define DOMAIN	"kaillera.com"
+#define SERVER	"http://kaillera.com/"
+#define PATH	"raw_server_list2.php?wg=1&version=0.9"
+
 #define VERSION						"0.83"
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
@@ -20,6 +25,22 @@ void kaillera_communication_listener_async(char* data, size_t size, struct netem
 struct server_connection_callback {
 	void (*ConnectionReceivedFn)(int status, struct server_connection*);
 };
+
+struct netemu_communication_server* kaillera_communication_get_server_list() {
+	struct netemu_sender_tcp *sender;
+	struct netemu_addrinfo *info;
+	char* request;
+	char* buffer;
+	int error;
+	buffer = malloc(sizeof(1024));
+	netemu_get_addr_info(DOMAIN,NULL,NULL,&info);
+	sender = netemu_receiver_tcp_new(&info->addr,sizeof(info->addr),1024);
+	request = netemu_communication_http_get(SERVER,PATH);
+
+	netemu_sender_tcp_send(sender,request,strlen(request)+1);
+	error = netemu_recv(sender->socket,buffer,1024,0);
+
+}
 
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr) {
 	struct netemu_client *client;
@@ -82,6 +103,3 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 	free(data);
 }
 
-struct netemu_communication_server* kaillera_communication_get_server_list() {
-
-}

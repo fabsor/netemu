@@ -44,4 +44,6 @@ int netemu_communication_parse_server_message(char* server_message);
  */
 int netemu_communication_parse_server_accept_port(char* server_message);
 
+char* netemu_communication_http_get(const char* host, const char* path);
+
 #endif /* COMMUNICATION_H_ */
