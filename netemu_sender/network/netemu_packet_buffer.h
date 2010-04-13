@@ -24,7 +24,7 @@ extern "C" {
 	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, int id);
 	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, int id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
-	struct netemu_packet_buffer netemu_packet_buffer_new();
+	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);
 
 #ifdef	__cplusplus
 }

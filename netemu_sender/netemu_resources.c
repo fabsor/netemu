@@ -20,7 +20,7 @@ struct netemu_client* netemu_resources_get_client() {
 }
 
 void netemu_resources_free_client() {
-	netemu_receiver_free(_netemu_resources_client->receiver);
-	netemu_sender_free(_netemu_resources_client->sender);
+netemu_receiver_free(_netemu_resources_client->receiver);
+	netemu_sender_udp_free(_netemu_resources_client->sender);
 	free(_netemu_resources_client);
 }

@@ -2,15 +2,17 @@
 #include "../netemu_resources.h"
 #include "../network/netemu_sender.h"
 #include "netemu_list.h"
-#include <time.h>
+//#include "../network/netemu_packet_buffer.h"
+//#include <time.h>
 
-void _server_connection_receive(char*, size_t, struct netemu_receiver*, void*);
+//void _server_connection_receive(char*, size_t, struct netemu_receiver*, void*);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
+	//struct netemu_packet_buffer *receive_buffer;
 };
 
 int server_connection_send_chat_message(struct server_connection *connection, char *message) {
@@ -94,9 +96,9 @@ struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr)
 	connection->_internal->game_created_callback = netemu_list_new(sizeof(gameCreatedFn), 3);
 	connection->_internal->join_callback = netemu_list_new(sizeof(joinFn), 3);
 	connection->_internal->leave_callback = netemu_list_new(sizeof(leaveFn), 3);
-
-	client = netemu_resources_get_client();
-	netemu_receiver_register_recv_fn(client->receiver, _server_connection_receive, NULL);
+	//connection->_internal->receive_buffer = netemu_packet_buffer_new(
+	//client = netemu_resources_get_client();
+	//netemu_receiver_register_recv_fn(client->receiver, _server_connection_receive, NULL);
 	return connection;
 }
 

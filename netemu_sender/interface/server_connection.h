@@ -1,3 +1,17 @@
+/*
+ * server_connection.h
+ *
+ *  Created on: 5 apr 2010
+ *      Author: emil
+ */
+
+#ifndef SERVER_CONNECTION_H_
+#define SERVER_CONNECTION_H_
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "../protocol/application.h"
@@ -43,3 +57,9 @@ int server_connection_join_game(struct server_connection *connection, NETEMU_DWO
 int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid, playerJoinFn);
 
 struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr);
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* SERVER_CONNECTION_H_ */
