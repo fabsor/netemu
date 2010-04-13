@@ -31,7 +31,7 @@
 #define PLAYER_LEFT										0x14
 #define PLAYER_READY									0x15
 #define MOTD_CHAT										0x17
-#define PLAYER_DROPPED									20 // Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren.
+#define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
 
 /*! A message to be sent to the server. */

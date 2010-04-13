@@ -14,18 +14,18 @@
 /* #define SERVER_ADDRESS	netemu_inet_addr("192.168.106.222"); */
 #define SERVER_ADDRESS	netemu_htonl(INADDR_LOOPBACK);
 
-struct netemu_receiver* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*), void* args) {
+struct netemu_receiver_udp* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* args) {
 	struct netemu_sockaddr_in addr_in;
 	netemu_sockaddr *addr;
-	struct netemu_receiver *receiver;
+	struct netemu_receiver_udp *receiver;
 	addr_in.addr = netemu_htonl(INADDR_ANY);
 	addr_in.family = NETEMU_AF_INET;
 	addr_in.port = netemu_htons(port);
 
 	addr = netemu_prepare_net_addr(&addr_in);
-	receiver = netemu_receiver_new(addr,sizeof(addr_in), 256);
-	netemu_receiver_register_recv_fn(receiver, listenerFn, args);
-	netemu_receiver_start_listening(receiver);
+	receiver = netemu_receiver_udp_new(addr,sizeof(addr_in), 256);
+	netemu_receiver_udp_register_recv_fn(receiver, listenerFn, args);
+	netemu_receiver_udp_start_receiving(receiver);
 	return receiver;
 }
 

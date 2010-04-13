@@ -11,13 +11,13 @@
 #include "protocol/communication.h"
 
 void send_communication_data(struct netemu_sender_udp* sender);
-void communication_listener(char* data, size_t size, struct netemu_receiver* receiver);
+void communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver);
 
 int com_hello_received;
 int com_ping_received;
 
 void test_server_communication() {
-	struct netemu_receiver* receiver;
+	struct netemu_receiver_udp* receiver;
 	struct netemu_sender_udp* sender;
 	receiver = netemu_util_prepare_receiver(CLIENT_PORT,communication_listener, NULL);
 	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
@@ -25,7 +25,7 @@ void test_server_communication() {
 	while(!com_hello_received && !com_ping_received);
 }
 
-void communication_listener(char* data, size_t size, struct netemu_receiver* receiver) {
+void communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver) {
 	int msg;
 	printf("%s",data);
 	/*
