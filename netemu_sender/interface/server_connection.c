@@ -102,6 +102,6 @@ struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr)
 	return connection;
 }
 
-void _server_connection_receive(char* data, size_t size, struct netemu_receiver* receiver, void* params) {
+void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
 
 }

@@ -14,7 +14,7 @@
 #include "protocol/communication.h"
 
 
-void application_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args);
+void application_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void send_hello(struct netemu_sender_udp *sender);
 void test_login_request(struct netemu_sender_udp *sender);
 void test_pong(struct netemu_sender_udp *sender);
@@ -31,7 +31,7 @@ NETEMU_WORD user_id;
 NETEMU_DWORD game_id;
 
 void run_application_tests() {
-	struct netemu_receiver* receiver;
+	struct netemu_receiver_udp* receiver;
 	struct netemu_sender_udp* sender;
 	receiver = netemu_util_prepare_receiver(CLIENT_PORT,application_listener, NULL);
 	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
@@ -55,7 +55,7 @@ void send_hello(struct netemu_sender_udp *sender) {
 	free(hello_message);
 }
 
-void application_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args) {
+void application_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	int status,i;
 	struct transport_packet *packet;
 	struct user_joined* joined;

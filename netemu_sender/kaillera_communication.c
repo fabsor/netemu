@@ -14,8 +14,8 @@
 #include "interface/server_connection.h"
 #define VERSION						"0.83"
 
-void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args);
-void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver* receiver, void* args);
+void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
+void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 
 struct server_connection_callback {
 	void (*ConnectionReceivedFn)(int status, struct server_connection*);
@@ -54,7 +54,7 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void 
 	free(hello);
 }
 
-void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver* receiver, void* args) {
+void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	int result;
 	int port;
 	struct server_connection *connection;
@@ -75,7 +75,7 @@ void kaillera_communication_listener_async(char* data, size_t size, struct netem
 	free(data);
 }
 
-void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args) {
+void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	int *result;
 	result = (int *)args;
 	*result = netemu_communication_parse_server_message(data);
