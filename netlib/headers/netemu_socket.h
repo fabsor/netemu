@@ -208,9 +208,6 @@ typedef unsigned int NETEMU_SOCKET;
 	/* Disables send or receive on a socket. */
 	int netemu_shutdown(NETEMU_SOCKET socket, int how);
 
-	/* Frees the memory allocated for the socket */
-	int netemu_free(NETEMU_SOCKET socket);
-
 	/* Close socket*/
 	int netemu_closesocket(NETEMU_SOCKET socket);
 	/* Returns the error code for the last error that occured */
