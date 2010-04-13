@@ -66,11 +66,6 @@ int netemu_shutdown(NETEMU_SOCKET socket, int how) {
     return shutdown(socket,how);
 }
 
-/* Frees the memory allocated for the socket */
-int netemu_free(NETEMU_SOCKET socket) {
-    return 1;
-}
-
 int netemu_closesocket(NETEMU_SOCKET socket) {
 	return close(socket);
 }
