@@ -20,12 +20,12 @@ extern "C" {
 	};
 
 	void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction);
-	struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, int id);
-	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, int id);
-	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, int id);
+	struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, char id);
+	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, char id);
+	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
 	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);
-	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, struct netemu_mutex *mutex);
+	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, char instruction_id, time_t age, struct netemu_mutex *mutex);
 
 #ifdef	__cplusplus
 }

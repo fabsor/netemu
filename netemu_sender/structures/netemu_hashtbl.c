@@ -92,10 +92,10 @@ void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl)
 }
 
 
-int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, void *data)
+int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len, void *data)
 {
 	struct hashnode_s *node;
-	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
+	hash_size hash=hashtbl->hashfunc(key, key_len)%hashtbl->size;
 
 
 /*	fprintf(stderr, "hashtbl_insert() key=%s, hash=%d, data=%s\n", key, hash, (char*)data);*/
@@ -124,10 +124,10 @@ int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, void *data)
 }
 
 
-int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key)
+int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len)
 {
 	struct hashnode_s *node, *prevnode=NULL;
-	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
+	hash_size hash=hashtbl->hashfunc(key, key_len)%hashtbl->size;
 
 	node=hashtbl->nodes[hash];
 	while(node) {
@@ -146,10 +146,10 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key)
 }
 
 
-void *netemu_hashtbl_get(NETEMU_HASHTBL *hashtbl, const void *key)
+void *netemu_hashtbl_get(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len)
 {
 	struct hashnode_s *node;
-	hash_size hash=hashtbl->hashfunc(key)%hashtbl->size;
+	hash_size hash=hashtbl->hashfunc(key, key_len)%hashtbl->size;
 
 /*	fprintf(stderr, "hashtbl_get() key=%s, hash=%d\n", key, hash);*/
 
@@ -176,8 +176,8 @@ int netemu_hashtbl_resize(NETEMU_HASHTBL *hashtbl, hash_size size)
 	for(n=0; n<hashtbl->size; ++n) {
 		for(node=hashtbl->nodes[n]; node; node=next) {
 			next = node->next;
-			netemu_hashtbl_insert(&newtbl, node->key, node->data);
-			netemu_hashtbl_remove(hashtbl, node->key);
+			netemu_hashtbl_insert(&newtbl, node->key, node->key_len, node->data);
+			netemu_hashtbl_remove(hashtbl, node->key, node->key_len);
 			
 		}
 	}

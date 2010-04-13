@@ -17,6 +17,7 @@ struct _netemu_packet_buffer_internal {
 
 
 hash_size _buffer_hash_function(void *key) {
+
 }
 
 struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
@@ -31,29 +32,29 @@ struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 
 void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction) {
 	struct netemu_list *list;
-	if((list = netemu_hashtbl_get(buffer->table, &instruction->id)) == NULL)
+	if((list = netemu_hashtbl_get(buffer->table, &instruction->id, sizeof(char))) == NULL)
 		list = netemu_list_new(sizeof(struct application_instruction*), 10);
 	
 	netemu_list_add(list, instruction);
-	netemu_hashtbl_insert(buffer->table, &instruction->id, instruction);
+	netemu_hashtbl_insert(buffer->table, &instruction->id, sizeof(char), instruction);
 }
 
-struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, int id) {
-	return (struct netemu_list*)netemu_hashtbl_get(buffer->table, &id);
+struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, char id) {
+	return (struct netemu_list*)netemu_hashtbl_get(buffer->table, &id, sizeof(char));
 }
 
-struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, int id) {
+struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, char id) {
 	struct netemu_list* list;
-	if((list = netemu_hashtbl_get(buffer->table, &id)) == NULL) 
+	if((list = netemu_hashtbl_get(buffer->table, &id, sizeof(char))) == NULL) 
 		return NULL;
 	
 	return (struct application_instruction*)netemu_list_get(list, list->count - 1);
 }
 
-struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, int id) {
+struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id) {
 	struct netemu_list* list;
 	struct application_instruction *instruction;
-	if((list = netemu_hashtbl_get(buffer->table, &id)) == NULL) 
+	if((list = netemu_hashtbl_get(buffer->table, &id, sizeof(char))) == NULL) 
 		return NULL;
 	
 	if(list->count == 0)
@@ -68,7 +69,7 @@ void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer) {
 	netemu_hashtbl_clear(buffer->table);
 }
 
-void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, struct netemu_mutex *mutex) {
+void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, char instruction_id, time_t age, struct netemu_mutex *mutex) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_packet_buffer_wakeup_info));
 	wakeup->age = age;
@@ -77,9 +78,9 @@ void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_bu
 
 	netemu_thread_mutex_lock(mutex);
 
-	if((existing_wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction_id)) == NULL) {
+	if((existing_wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char))) == NULL) {
 		wakeup->prev = NULL;
-		netemu_hashtbl_insert(buffer->_internal->registered_wakeups, &instruction_id, wakeup);
+		netemu_hashtbl_insert(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char), wakeup);
 	}
 	else {
 		while(existing_wakeup->next != NULL) {
@@ -92,7 +93,7 @@ void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_bu
 
 void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *nextwakeup;
-	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id)) != NULL) {
+	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id, sizeof(char))) != NULL) {
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
 				nextwakeup = wakeup->next;

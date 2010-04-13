@@ -33,6 +33,7 @@ typedef size_t hash_size;
 
 struct hashnode_s {
 	void *key;
+	size_t key_len;
 	void *data;
 	struct hashnode_s *next;
 };
@@ -41,16 +42,16 @@ struct hashnode_s {
 typedef struct netemu_hashtbl {
 	hash_size size;
 	struct hashnode_s **nodes;
-	hash_size (*hashfunc)(const char *);
+	hash_size (*hashfunc)(const void *, size_t);
 } NETEMU_HASHTBL;
 
 
 NETEMU_HASHTBL *hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *));
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl);
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl);
-int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, void *data);
-int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key);
-void *netemu_hashtbl_get(NETEMU_HASHTBL *hashtbl, const void *key);
+int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len, void *data);
+int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len);
+void *netemu_hashtbl_get(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len);
 int netemu_hashtbl_resize(NETEMU_HASHTBL *hashtbl, hash_size size);
 
 
