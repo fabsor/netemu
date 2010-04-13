@@ -17,7 +17,7 @@ int net_hello = 0;
 void test_network(){
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
-	receiver = prepare_receiver(INTERNAL_PORT,network_listener);
+	receiver = prepare_receiver(INTERNAL_PORT,network_listener, NULL);
 	sender = prepare_sender(INTERNAL_PORT);
 	send_network_data(sender);
 	while(!net_ping && !net_hello);

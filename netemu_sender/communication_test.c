@@ -18,7 +18,7 @@ int com_ping_received;
 void test_server_communication() {
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
-	receiver = prepare_receiver(CLIENT_PORT,communication_listener);
+	receiver = prepare_receiver(CLIENT_PORT,communication_listener, NULL);
 	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_communication_data(sender);
 	while(!com_hello_received && !com_ping_received);

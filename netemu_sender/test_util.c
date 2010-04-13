@@ -13,7 +13,7 @@
 //#define SERVER_ADDRESS	netemu_inet_addr("192.168.106.222");
 #define SERVER_ADDRESS	netemu_htonl(INADDR_LOOPBACK);
 
-struct netemu_receiver* prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*)) {
+struct netemu_receiver* prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*), void* args) {
 	struct netemu_sockaddr_in addr_in;
 	netemu_sockaddr *addr;
 	struct netemu_receiver *receiver;
@@ -23,7 +23,7 @@ struct netemu_receiver* prepare_receiver(int port,void (* listenerFn)(char*, siz
 
 	addr = netemu_prepare_net_addr(&addr_in);
 	receiver = netemu_receiver_new(addr,sizeof(addr_in), 256);
-	netemu_receiver_register_recv_fn(receiver, listenerFn, NULL);
+	netemu_receiver_register_recv_fn(receiver, listenerFn, args);
 	netemu_receiver_start_listening(receiver);
 	return receiver;
 }
