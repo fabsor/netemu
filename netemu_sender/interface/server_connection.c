@@ -2,6 +2,7 @@
 #include "../netemu_resources.h"
 #include "../network/netemu_sender.h"
 #include "netemu_list.h"
+#include "netemu_thread.h"
 
 //void _server_connection_receive(char*, size_t, struct netemu_receiver*, void*);
 
@@ -87,7 +88,7 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	if((error = netemu_sender_udp_send(client->sender,buffer.data,buffer.size)) != 0)
 		return error;
 	
-	netemu_thread_mutex_lock(mutex);
+	netemu_thread_mutex_lock(mutex, NETEMU_INFINITE);
 	netemu_thread_mutex_release(mutex);
 	netemu_packet_buffer_pop(connection->_internal->receive_buffer, CREATE_GAME);
 	netemu_application_free_message(messages[0]);

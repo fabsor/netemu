@@ -72,8 +72,9 @@ int netemu_get_last_error() {
 
 int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
 	PADDRINFOA addrinfo = NULL;
+	int error;
 	struct netemu_addrinfo *result_addrinfo;
-	getaddrinfo(nodename, servicetype, hints, &addrinfo);
+	error = getaddrinfo(nodename, servicetype, hints, &addrinfo);
 
 	*result = malloc(sizeof(struct netemu_addrinfo));
 
