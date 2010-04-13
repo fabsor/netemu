@@ -26,4 +26,5 @@ int main() {
 	addr.family = NETEMU_AF_INET;
 
 	kaillera_communication_connect(&addr);
+
 }

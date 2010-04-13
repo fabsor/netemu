@@ -63,7 +63,7 @@ extern "C" {
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-	typedef unsigned int NETEMU_SOCKET;
+typedef unsigned int NETEMU_SOCKET;
 #define NETEMU_INVALID_SOCKET  (NETEMU_SOCKET)(~0)
 
 #define NETEMU_ENOTINITIALIZED	WSANOTINITIALIZED

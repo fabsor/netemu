@@ -13,11 +13,10 @@ extern "C" {
 #endif
     struct netemu_list{
         int size;
-        void** elements;
+        void* elements;
         int element_size;
         int count;
     };
-
 
     struct netemu_list* netemu_list_new(int element_size, int count);
 

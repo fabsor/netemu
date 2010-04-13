@@ -18,14 +18,15 @@ struct netemu_list* netemu_list_new(int element_size, int count) {
   list = malloc(sizeof(struct netemu_list));
   intern->size = count;
   intern->element_size = element_size;
-  list->elements = malloc(sizeof(element_size)*intern->size);
+  list->elements = malloc(element_size*intern->size);
+  list->count = 0;
   list->_intern = intern;
   return list;
 }
 
 void netemu_list_add(struct netemu_list* list, void* element) {
     /* Enlarge the array if necessary. */
-	if (list->_intern->size < list->count){
+	if (list->_intern->size <= list->count){
         _netemu_enlarge_list(list,10);
     }
     list->elements[list->count] = element;
@@ -35,12 +36,11 @@ void netemu_list_add(struct netemu_list* list, void* element) {
 
 void _netemu_enlarge_list(struct netemu_list* list, int size) {
     int i;
-    void** elements;
+    void* elements;
     list->_intern->size += size;
-    elements = malloc(sizeof(list->_intern->element_size)*list->_intern->size);
-    for (i  = 0; i < list->count; i++) {
-        elements[i] = list->elements[i];
-    }
+    elements = malloc(list->_intern->element_size*list->_intern->size);
+	memcpy(elements, list->elements, list->count * (list->_intern->element_size));
+
     free(list->elements);
     list->elements = elements;
 }
@@ -63,7 +63,7 @@ int _netemu_list_search_linear(struct netemu_list* list, void* element) {
 int netemu_list_remove(struct netemu_list* list, void* element){
 	int index;
 	/*TODO: Add binary search when sorting is available. */
-	index = _netemu_list_remove_linear(list,element);
+	index = _netemu_list_search_linear(list,element);
 	if (index == -1) {
 		return index;
 	}
@@ -131,8 +131,8 @@ void netemu_list_free(struct netemu_list* list) {
  * @return the pointer to the element in the list or null.
  */
 void* netemu_list_get(struct netemu_list* list, int index) {
-	if (index > list->count) {
-		return 0;
+	if (index > list->count - 1) {
+		return NULL;
 	}
 	return list->elements[index];
 }
