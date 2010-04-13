@@ -23,7 +23,7 @@ int server_connection_send_chat_message(struct server_connection *connection, ch
 	messages[0] = netemu_application_create_message();
 	netemu_application_chat_partyline_add(messages[0], message, connection->user);
 	buffer = netemu_transport_pack(messages,1);
-	return netemu_sender_send(client->sender,buffer.data,buffer.size);
+	return netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
 }
 
 int server_connection_register_chat_callback(struct server_connection *connection, chatFn callback) {
@@ -63,7 +63,7 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 	messages[0] = netemu_application_create_message();
 	netemu_application_user_leave_add(messages[0], message);
 	buffer = netemu_transport_pack(messages,1);
-	return netemu_sender_send(client->sender ,buffer.data, buffer.size);
+	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
 }
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
@@ -80,7 +80,7 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	buffer = netemu_transport_pack(messages,1);
 
 	timestamp = time(NULL);
-	netemu_sender_send(client->sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
 }
 
 struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {

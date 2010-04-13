@@ -109,7 +109,7 @@ void test_login_request(struct netemu_sender_udp* sender) {
 	messages[0] = netemu_application_create_message();
 	netemu_application_login_request_add(messages[0],"netemu","haha",1);
 	buffer = netemu_transport_pack(messages,1);
-	netemu_sender_send(sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(sender,buffer.data,buffer.size);
 
 }
 
@@ -119,7 +119,7 @@ void test_send_leave(struct netemu_sender_udp *sender) {
 	messages[0] = netemu_application_create_message();
 	netemu_application_user_leave_add(messages[0],"leavin.");
 	buffer = netemu_transport_pack(messages,1);
-	netemu_sender_send(sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(sender,buffer.data,buffer.size);
 }
 
 void test_pong(struct netemu_sender_udp* sender) {
@@ -128,7 +128,7 @@ void test_pong(struct netemu_sender_udp* sender) {
 	messages[0] = netemu_application_create_message();
 	netemu_application_pong_add(messages[0]);
 	buffer = netemu_transport_pack(messages,1);
-	netemu_sender_send(sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(sender,buffer.data,buffer.size);
 }
 
 void test_create_game(struct netemu_sender_udp* sender) {
@@ -137,7 +137,7 @@ void test_create_game(struct netemu_sender_udp* sender) {
 	messages[0] = netemu_application_create_message();
 	netemu_application_create_game_add(messages[0],"thegame");
 	buffer = netemu_transport_pack(messages,1);
-	netemu_sender_send(sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(sender,buffer.data,buffer.size);
 }
 
 void test_join_game(struct netemu_sender_udp* sender) {
@@ -146,7 +146,7 @@ void test_join_game(struct netemu_sender_udp* sender) {
 	messages[0] = netemu_application_create_message();
 	netemu_application_join_game_add(messages[0],game_id,1);
 	buffer = netemu_transport_pack(messages,1);
-	netemu_sender_send(sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(sender,buffer.data,buffer.size);
 }
 
 void test_quit_game(struct netemu_sender_udp* sender) {
@@ -155,5 +155,5 @@ void test_quit_game(struct netemu_sender_udp* sender) {
 	messages[0] = netemu_application_create_message();
 	netemu_application_player_left_add(messages[0]);
 	buffer = netemu_transport_pack(messages,1);
-	netemu_sender_send(sender,buffer.data,buffer.size);
+	netemu_sender_udp_send(sender,buffer.data,buffer.size);
 }
