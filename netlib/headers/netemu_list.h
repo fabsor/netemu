@@ -25,7 +25,7 @@ extern "C" {
 
     void netemu_list_add(struct netemu_list* list, void* element);
 
-    int netemu_remove(struct netemu_list* list, void* element);
+    int netemu_list_remove(struct netemu_list* list, void* element);
 
     int netemu_list_remove_at(struct netemu_list* list, int index);
 

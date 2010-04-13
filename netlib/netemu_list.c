@@ -40,9 +40,7 @@ void _netemu_enlarge_list(struct netemu_list* list, int size) {
     list->_intern->size += size;
     elements = malloc(list->_intern->element_size*list->_intern->size);
 	memcpy(elements, list->elements, list->count * (list->_intern->element_size));
-    //for (i  = 0; i < list->count; i++) {
-    //    elements[i] = list->elements[i];
-    //}
+
     free(list->elements);
     list->elements = elements;
 }

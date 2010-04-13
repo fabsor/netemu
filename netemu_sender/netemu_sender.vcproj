@@ -176,10 +176,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\interface\application_handler.c"
-				>
-			</File>
-			<File
 				RelativePath=".\application_test.c"
 				>
 			</File>
@@ -196,7 +192,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\structures\netemu_hashtbl.c"
+				>
+			</File>
+			<File
 				RelativePath=".\network\netemu_receiver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\netemu_resources.c"
 				>
 			</File>
 			<File
@@ -205,6 +209,10 @@
 			</File>
 			<File
 				RelativePath=".\network_test.c"
+				>
+			</File>
+			<File
+				RelativePath=".\interface\server_connection.c"
 				>
 			</File>
 			<File
@@ -250,7 +258,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\structures\netemu_hashtbl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_packet_buffer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\network\netemu_receiver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\netemu_resources.h"
 				>
 			</File>
 			<File
@@ -262,7 +282,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\server_connection.h"
+				RelativePath=".\interface\server_connection.h"
 				>
 			</File>
 			<File
