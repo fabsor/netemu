@@ -30,6 +30,10 @@ int netemu_bind(NETEMU_SOCKET socket, const struct sockaddr *address, socklen_t 
     return bind(socket, address, address_len);
 }
 
+int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
+	return connect(socket, address, address_len);
+}
+
 int netemu_listen(NETEMU_SOCKET socket, int backlog) {
     return listen(socket, backlog);
 }

@@ -8,11 +8,12 @@ struct _netemu_packet_buffer_internal {
 hash_size _buffer_hash_function(void *key) {
 }
 
-struct netemu_packet_buffer netemu_packet_buffer_new() {
+struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	struct netemu_packet_buffer *buffer;
 
 	buffer = malloc(sizeof(struct netemu_packet_buffer));
-	buffer->table = netemu_hashtbl_create(10, _buffer_hash_function);
+	buffer->table = netemu_hashtbl_create(size, _buffer_hash_function);
+	//return buffer;
 }
 
 void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction) {
