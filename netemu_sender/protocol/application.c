@@ -6,6 +6,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application.h"
@@ -28,6 +29,9 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	char *data;
 
 	app_instruction = malloc(sizeof(struct application_instruction));
+
+	app_instruction->timestamp = time(NULL);
+
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
 
 	data = (char*)instruction->instruction;
@@ -124,6 +128,7 @@ void netemu_application_chat_parse(struct application_instruction *instruction, 
 
 	chat_msg = malloc(sizeof(struct chat));
 	chat_msg->message = parse_string(data);
+	printf_s(chat_msg->message);
 }
 
 void netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {

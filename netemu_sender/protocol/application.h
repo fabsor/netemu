@@ -9,6 +9,7 @@
 #define APPLICATION_H_
 #include "transport.h"
 #include "netlib_util.h"
+#include <time.h>
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 
@@ -42,6 +43,8 @@ struct application_instruction {
 	int body_size;
 	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
 	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
+
+	time_t timestamp;
 };
 
 struct login_request {
