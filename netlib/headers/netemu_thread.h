@@ -22,9 +22,9 @@ extern "C" {
 #else
 #include <Windows.h>
 	typedef HANDLE netemu_thread;
-#define NETEMU_INFINITE		0xFFFFFFFF
 #endif
 
+#define NETEMU_INFINITE		0xFFFFFFFF
 #include "netlib_util.h"
 
 	/* TODO: make sure this is a good type to use. */
