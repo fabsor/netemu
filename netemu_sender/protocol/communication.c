@@ -6,7 +6,7 @@
  */
 
 #include "communication.h"
-#include "netemu_util.h"
+#include "netlib_util.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,4 +62,22 @@ int netemu_communication_parse_server_accept_port(char* server_message) {
 	port = (server_message+start);
 
 	return atoi(port);
+}
+
+char* netemu_communication_http_get(const char* host, const char* path) {
+	char *get_ins, *get;
+	unsigned int size;
+
+	get_ins = "GET %s HTTP/1.1\nHost: %s";
+	/* Allocate enough memory. */
+	size = sizeof(char)*(strlen(get_ins)+1)+
+			sizeof(char)*(strlen(host)+1)+sizeof(char)*(strlen(path)+1);
+	get = malloc(size);
+
+	get = "GET ";
+	strcat(get,path);
+	strcat(get," HTTP/1.1\nHost: ");
+	strcat(get,host);
+
+	return get;
 }

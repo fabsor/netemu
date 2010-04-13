@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "netemu_socket.h"
-#include "netemu_util.h"
+#include "netlib_util.h"
 #include "application.h"
 
 int _netemu_application_copy_string(char** dest, char* src);
