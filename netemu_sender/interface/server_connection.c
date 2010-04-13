@@ -69,6 +69,7 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 }
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
+	int error;
 	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
@@ -82,7 +83,10 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	buffer = netemu_transport_pack(messages,1);
 
 	timestamp = time(NULL);
-	return netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
+	if((error = netemu_sender_udp_send(client->sender,buffer.data,buffer.size)) != 0)
+		return error;
+
+
 }
 
 struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {
