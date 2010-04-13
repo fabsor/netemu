@@ -9,20 +9,22 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-	#include "netemu_hashtbl.h"
-	#include "application.h"
+	#include "../structures/netemu_hashtbl.h"
+	#include "../protocol/application.h"
 	
-	typedef netemu_packet_buffer_internal* netemu_packet_buffer;
+	typedef struct _netemu_packet_buffer_internal* netemu_packet_buffer_internal;
 
-	struct netemu_packet_buffer_internal {
-		NETEMU_HASHTBL table;
+	struct netemu_packet_buffer {
+		NETEMU_HASHTBL *table;
+		netemu_packet_buffer_internal _internal;
 	};
 
-	void netemu_packet_buffer_add(netemu_packet_buffer buffer, struct application_instruction *instruction);
-	struct netemu_list* netemu_packet_buffer_get(netemu_packet_buffer buffer, int id);
-	struct application_instruction* netemu_packet_buffer_peek(netemu_packet_buffer buffer);
-	struct application_instruction* netemu_packet_buffer_pop(netemu_packet_buffer buffer);
-	struct application_instruction* netemu_packet_buffer_clear();
+	void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction);
+	struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, int id);
+	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, int id);
+	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, int id);
+	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
+	struct netemu_packet_buffer netemu_packet_buffer_new();
 
 #ifdef	__cplusplus
 }

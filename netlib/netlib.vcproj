@@ -164,7 +164,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\netemu_util_win.c"
+				RelativePath=".\netlib_util_win.c"
 				>
 			</File>
 		</Filter>
@@ -186,7 +186,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\headers\netemu_util.h"
+				RelativePath=".\headers\netlib_util.h"
 				>
 			</File>
 		</Filter>

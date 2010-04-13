@@ -37,7 +37,7 @@ void run_application_tests() {
 	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_hello(sender);
 	while(port == 0);
-	new_sender = prepare_sender_on_socket(receiver->socket, port);
+	new_sender = netemu_util_prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
 	//while(ping_received = 0);
 	//test_pong(new_sender);
@@ -53,7 +53,7 @@ void send_hello(struct netemu_sender_udp *sender) {
 	char* hello_message;
 	struct user_joined* joined;
 	hello_message = netemu_communication_create_hello_message("0.83");
-	send_data(sender, hello_message);
+	netemu_util_send_data(sender, hello_message);
 	free(hello_message);
 }
 

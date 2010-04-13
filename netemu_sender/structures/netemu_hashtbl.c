@@ -69,9 +69,7 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(cons
 	return hashtbl;
 }
 
-
-void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl)
-{
+void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl) {
 	hash_size n;
 	struct hashnode_s *node, *oldnode;
 	
@@ -84,6 +82,11 @@ void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl)
 			free(oldnode);
 		}
 	}
+}
+
+void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl)
+{
+	netemu_hashtbl_clear(hashtbl);
 	free(hashtbl->nodes);
 	free(hashtbl);
 }
