@@ -14,7 +14,7 @@
 #include "protocol/communication.h"
 
 
-void application_listener(char* data, size_t size, struct netemu_receiver* receiver);
+void application_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args);
 void send_hello(struct netemu_sender_udp *sender);
 void test_login_request(struct netemu_sender_udp *sender);
 void test_pong(struct netemu_sender_udp *sender);
@@ -39,25 +39,23 @@ void run_application_tests() {
 	while(port == 0);
 	new_sender = netemu_util_prepare_sender_on_socket(receiver->socket, port);
 	test_login_request(new_sender);
-	//while(ping_received = 0);
-	//test_pong(new_sender);
 	while(user_id == 0);
 	test_create_game(new_sender);
 	while(game_created == 0);
 	test_join_game(new_sender);
 	test_quit_game(new_sender);
 	test_send_leave(new_sender);
+
 }
 
 void send_hello(struct netemu_sender_udp *sender) {
 	char* hello_message;
-	struct user_joined* joined;
 	hello_message = netemu_communication_create_hello_message("0.83");
 	netemu_util_send_data(sender, hello_message);
 	free(hello_message);
 }
 
-void application_listener(char* data, size_t size, struct netemu_receiver* receiver) {
+void application_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args) {
 	int status,i;
 	struct transport_packet *packet;
 	struct user_joined* joined;
@@ -91,13 +89,8 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 				game_id = created->id;
 				game_created = 1;
 			}
-			else {
-				//printf("RECEIVED : %i\n", instruction->id);
-			}
-			
 		}
 	}
-	//printf("%s", data);
 }
 
 /**

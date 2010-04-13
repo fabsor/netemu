@@ -55,7 +55,7 @@ void netemu_sender_udp_free(struct netemu_sender_udp* sender) {
 
 
 void netemu_sender_tcp_free(struct netemu_sender_tcp* sender) {
-	netemu_sender_udp_free((struct netemu_sender*)sender);
+	netemu_sender_udp_free((struct netemu_sender_udp*)sender);
 }
 
 int netemu_sender_tcp_send(struct netemu_sender_tcp* sender, char* data, int size) {
