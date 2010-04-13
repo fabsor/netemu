@@ -11,7 +11,7 @@
  * This file contains some utilities used often in tests of the framework.
  */
 
-//#define SERVER_ADDRESS	netemu_inet_addr("192.168.106.222");
+/* #define SERVER_ADDRESS	netemu_inet_addr("192.168.106.222"); */
 #define SERVER_ADDRESS	netemu_htonl(INADDR_LOOPBACK);
 
 struct netemu_receiver* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver*, void*), void* args) {

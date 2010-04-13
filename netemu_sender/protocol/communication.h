@@ -5,8 +5,8 @@
  *      Author: fabian
  */
 
-#ifndef APPLICATION_H_
-#define APPLICATION_H_
+#ifndef COMMUNICATION_H_
+#define COMMUNICATION_H_
 
 enum {
 	CONNECTION_ACCEPTED,
@@ -44,4 +44,4 @@ int netemu_communication_parse_server_message(char* server_message);
  */
 int netemu_communication_parse_server_accept_port(char* server_message);
 
-#endif /* APPLICATION_H_ */
+#endif /* COMMUNICATION_H_ */
