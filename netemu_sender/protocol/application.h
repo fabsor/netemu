@@ -8,7 +8,7 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 #include "transport.h"
-#include "netemu_util.h"
+#include "netlib_util.h"
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
 

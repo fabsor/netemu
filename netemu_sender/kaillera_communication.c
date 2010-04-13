@@ -10,7 +10,7 @@
 #include "protocol/communication.h"
 #include "network/netemu_sender.h"
 #include "netemu_resources.h"
-#include "server_connection.h"
+#include "interface/server_connection.h"
 #define VERSION						"0.83"
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver* receiver, void* args);
