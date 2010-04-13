@@ -196,6 +196,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\network\netemu_packet_buffer.c"
+				>
+			</File>
+			<File
 				RelativePath=".\network\netemu_receiver.c"
 				>
 			</File>

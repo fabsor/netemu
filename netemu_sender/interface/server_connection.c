@@ -2,6 +2,7 @@
 #include "../netemu_resources.h"
 #include "../network/netemu_sender.h"
 #include "netemu_list.h"
+#include <time.h>
 
 void _server_connection_receive(char*, size_t, struct netemu_receiver*, void*);
 
@@ -66,6 +67,7 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 }
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
+	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
@@ -76,6 +78,8 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	messages[0] = netemu_application_create_message();
 	netemu_application_create_game_add(messages[0], gamename);
 	buffer = netemu_transport_pack(messages,1);
+
+	timestamp = time(NULL);
 	netemu_sender_send(client->sender,buffer.data,buffer.size);
 }
 
