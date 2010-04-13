@@ -82,7 +82,7 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	buffer = netemu_transport_pack(messages,1);
 
 	timestamp = time(NULL);
-	netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
+	return netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
 }
 
 struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {
