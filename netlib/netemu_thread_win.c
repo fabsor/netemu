@@ -40,8 +40,8 @@ netemu_mutex netemu_thread_mutex_create() {
 	return mutex_struct;
 }
 
-int netemu_thread_mutex_lock(netemu_mutex mutex_identifier) {
-	if(WaitForSingleObject(mutex_identifier->mutex, INFINITE) == WAIT_OBJECT_0)
+int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
+	if(WaitForSingleObject(mutex_identifier->mutex, timeout) == WAIT_OBJECT_0)
 		return 0;
 	else
 		return -1;

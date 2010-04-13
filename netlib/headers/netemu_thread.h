@@ -22,7 +22,10 @@ extern "C" {
 #else
 #include <Windows.h>
 	typedef HANDLE netemu_thread;
+#define NETEMU_INFINITE		0xFFFFFFFF
 #endif
+
+#include "netlib_util.h"
 
 	/* TODO: make sure this is a good type to use. */
 	typedef struct netemu_mutex_internal* netemu_mutex;
@@ -51,7 +54,7 @@ extern "C" {
 	* Lock a mutex lock.
 	* @param NETEMU_MUTEX identifier the identifier of the mutex lock.
 	*/
-	int netemu_thread_mutex_lock(netemu_mutex mutex_identifier);
+	int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, NETEMU_DWORD timeout);
 
    /**
 	* Release a lock.
