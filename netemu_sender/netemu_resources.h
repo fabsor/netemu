@@ -17,9 +17,8 @@
  * the program.
  */
 struct netemu_client {
-	struct netemu_receiver *receiver;
-	struct netemu_sender *sender;
-
+	struct netemu_receiver_udp *receiver;
+	struct netemu_sender_udp *sender;
 };
 
 
