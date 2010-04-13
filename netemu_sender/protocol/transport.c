@@ -91,3 +91,7 @@ void netemu_transport_free_packet(struct transport_packet* packet) {
 	free(packet->instructions);
 	free(packet);
 }
+
+void netemu_transport_free_packet_buffer(struct transport_packet_buffer* buffer) {
+	free(buffer->data);
+}

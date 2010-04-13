@@ -173,6 +173,8 @@ struct chat {
 
 struct application_instruction* netemu_application_create_message();
 
+void netemu_application_free_message(struct application_instruction* message);
+
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 
 void netemu_application_buffered_play_values_add(struct application_instruction *instruction, NETEMU_WORD size, char *data);

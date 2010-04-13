@@ -46,7 +46,7 @@ typedef struct netemu_hashtbl {
 } NETEMU_HASHTBL;
 
 
-NETEMU_HASHTBL *hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *));
+NETEMU_HASHTBL *hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t));
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl);
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl);
 int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len, void *data);

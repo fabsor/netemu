@@ -280,10 +280,9 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 	memcpy(buffer, &play_values->values, play_values->size);
 }
 
-
-
 void netemu_application_free_message(struct application_instruction* message) {
 	free(message->body);
+	free(message->user);
 	free(message);
 }
 

@@ -29,5 +29,6 @@ struct transport_packet_buffer {
 
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count);
 struct transport_packet* netemu_transport_unpack(char* data);
+void netemu_transport_free_packet_buffer(struct transport_packet_buffer* buffer);
 
 #endif /* TRANSPORT_H_ */

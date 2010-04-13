@@ -67,12 +67,12 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 }
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
-	struct netemu_mutex *mutex;
+	netemu_mutex mutex;
 	int error;
 	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
-	struct application_instruction *messages[1];
+	struct application_instruction *messages[1], *reply;
 
 	mutex = netemu_thread_mutex_create();
 	client = netemu_resources_get_client();
@@ -88,6 +88,12 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 		return error;
 	
 	netemu_thread_mutex_lock(mutex);
+	netemu_thread_mutex_release(mutex);
+	netemu_packet_buffer_pop(connection->_internal->receive_buffer, CREATE_GAME);
+	netemu_application_free_message(messages[0]);
+	netemu_thread_mutex_destroy(mutex);
+
+
 }
 
 struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {

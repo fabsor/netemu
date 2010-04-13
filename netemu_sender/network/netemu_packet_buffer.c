@@ -15,18 +15,13 @@ struct _netemu_packet_buffer_internal {
 };
 
 
-
-hash_size _buffer_hash_function(void *key) {
-
-}
-
 struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	struct netemu_packet_buffer *buffer;
 
 	buffer = malloc(sizeof(struct netemu_packet_buffer));
-	buffer->table = netemu_hashtbl_create(size, _buffer_hash_function);
+	buffer->table = netemu_hashtbl_create(size, NULL);
 	buffer->_internal = malloc(sizeof(struct _netemu_packet_buffer_internal));
-	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, _buffer_hash_function);
+	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, NULL);
 	return buffer;
 }
 

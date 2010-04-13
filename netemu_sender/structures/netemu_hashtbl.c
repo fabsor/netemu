@@ -38,7 +38,7 @@ static char *mystrdup(const char *s)
 }
 
 
-static hash_size def_hashfunc(const void *key)
+static hash_size def_hashfunc(const void *key, size_t key_len)
 {
 	char* char_key = (char*) key;
 	hash_size hash=0;
@@ -50,7 +50,7 @@ static hash_size def_hashfunc(const void *key)
 
 
 
-NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *))
+NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t))
 {
 	NETEMU_HASHTBL *hashtbl;
 
