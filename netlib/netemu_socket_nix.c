@@ -98,6 +98,10 @@ netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
     return (netemu_sockaddr*) in_addr;
 }
 
+int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
+	return connect(socket,address,address_len);
+}
+
 
 /* Converts an unsigned long from host order to network order. */
 unsigned long netemu_htonl(unsigned long value) {

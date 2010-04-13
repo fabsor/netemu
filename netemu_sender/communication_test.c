@@ -10,7 +10,7 @@
 #include "netemu_util.h"
 #include "protocol/communication.h"
 
-void send_communication_data(struct netemu_sender* sender);
+void send_communication_data(struct netemu_sender_udp* sender);
 void communication_listener(char* data, size_t size, struct netemu_receiver* receiver);
 
 int com_hello_received;
@@ -18,7 +18,7 @@ int com_ping_received;
 
 void test_server_communication() {
 	struct netemu_receiver* receiver;
-	struct netemu_sender* sender;
+	struct netemu_sender_udp* sender;
 	receiver = netemu_util_prepare_receiver(CLIENT_PORT,communication_listener, NULL);
 	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_communication_data(sender);
@@ -46,7 +46,7 @@ void communication_listener(char* data, size_t size, struct netemu_receiver* rec
 	}
 }
 
-void send_communication_data(struct netemu_sender* sender) {
+void send_communication_data(struct netemu_sender_udp* sender) {
 	char* ping_message;
 	char* hello_message;
 	ping_message = netemu_communication_create_ping_message();

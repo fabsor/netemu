@@ -15,24 +15,24 @@
 
 
 void application_listener(char* data, size_t size, struct netemu_receiver* receiver);
-void send_hello(struct netemu_sender *sender);
-void test_login_request(struct netemu_sender* sender);
-void test_pong(struct netemu_sender* sender);
-void test_send_leave(struct netemu_sender *sender);
-void test_create_game(struct netemu_sender* sender);
-void test_join_game(struct netemu_sender* sender);
-void test_quit_game(struct netemu_sender* sender);
+void send_hello(struct netemu_sender_udp *sender);
+void test_login_request(struct netemu_sender_udp *sender);
+void test_pong(struct netemu_sender_udp *sender);
+void test_send_leave(struct netemu_sender_udp *sender);
+void test_create_game(struct netemu_sender_udp* sender);
+void test_join_game(struct netemu_sender_udp* sender);
+void test_quit_game(struct netemu_sender_udp* sender);
 int port = 0;
 int login_accepted = 0;
 int ping_received = 0;
 int game_created = 0;
-struct netemu_sender* new_sender;
+struct netemu_sender_udp* new_sender;
 NETEMU_WORD user_id;
 NETEMU_DWORD game_id;
 
 void run_application_tests() {
 	struct netemu_receiver* receiver;
-	struct netemu_sender* sender;
+	struct netemu_sender_udp* sender;
 	receiver = netemu_util_prepare_receiver(CLIENT_PORT,application_listener, NULL);
 	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_hello(sender);
@@ -49,7 +49,7 @@ void run_application_tests() {
 	test_send_leave(new_sender);
 }
 
-void send_hello(struct netemu_sender *sender) {
+void send_hello(struct netemu_sender_udp *sender) {
 	char* hello_message;
 	struct user_joined* joined;
 	hello_message = netemu_communication_create_hello_message("0.83");
@@ -103,7 +103,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver* recei
 /**
  * Test sending a login request.
  */
-void test_login_request(struct netemu_sender* sender) {
+void test_login_request(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
@@ -113,7 +113,7 @@ void test_login_request(struct netemu_sender* sender) {
 
 }
 
-void test_send_leave(struct netemu_sender *sender) {
+void test_send_leave(struct netemu_sender_udp *sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
@@ -122,7 +122,7 @@ void test_send_leave(struct netemu_sender *sender) {
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }
 
-void test_pong(struct netemu_sender* sender) {
+void test_pong(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
@@ -131,7 +131,7 @@ void test_pong(struct netemu_sender* sender) {
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }
 
-void test_create_game(struct netemu_sender* sender) {
+void test_create_game(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
@@ -140,7 +140,7 @@ void test_create_game(struct netemu_sender* sender) {
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }
 
-void test_join_game(struct netemu_sender* sender) {
+void test_join_game(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
@@ -149,7 +149,7 @@ void test_join_game(struct netemu_sender* sender) {
 	netemu_sender_send(sender,buffer.data,buffer.size);
 }
 
-void test_quit_game(struct netemu_sender* sender) {
+void test_quit_game(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();

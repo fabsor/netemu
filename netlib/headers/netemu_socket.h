@@ -184,6 +184,9 @@ typedef unsigned int NETEMU_SOCKET;
 	/*! Binds a given NETEMU_SOCKET to an address. */
 	int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len);
 
+	/*! Connects a given NETEMU_SOCKET to an address. */
+	int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len);
+
 	/*! Places a socket in a state where it listens for incoming connection attempts. */
 	int netemu_listen(NETEMU_SOCKET socket, int backlog);
 
