@@ -1,9 +1,7 @@
-/* 
-* File:   netemu_socket.h
-* Author: emil
-*
-* Created on March 22, 2010, 1:22 PM
-*/
+/**
+ * @file
+ * Header for the netlib socket component.
+ */
 
 #ifndef _NETEMU_SOCKET_H
 #define	_NETEMU_SOCKET_H
@@ -12,7 +10,7 @@
 extern "C" {
 #endif
 
-	/* Platform-specific socket typedefs.
+	/*  Platform-specific socket typedefs.
 	* Unix uses signed integers for the socket file descriptor,
 	* while windows uses an unsigned integer.
 	* TODO: Since there are no namespaces, we need to prefix all these with NETEMU_

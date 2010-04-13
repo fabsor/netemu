@@ -8,7 +8,7 @@
 #ifndef TRANSPORT_H_
 #define TRANSPORT_H_
 
-#include "netemu_util.h"
+#include "netlib_util.h"
 #include "application.h"
 struct transport_instruction {
 	/* ? */

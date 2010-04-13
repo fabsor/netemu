@@ -1,4 +1,5 @@
 #include "netemu_socket.h"
+#include "netlib_util.h"
 #include "../protocol/application.h"
 
 typedef struct _server_connection_internal *server_connection_internal;
