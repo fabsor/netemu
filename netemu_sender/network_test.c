@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "test_util.h"
+#include "netemu_util.h"
 
 void network_listener(char* data, size_t size, struct netemu_receiver* receiver);
 void send_network_data(struct netemu_sender* sender);
@@ -17,7 +17,7 @@ int net_hello = 0;
 void test_network(){
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
-	receiver = prepare_receiver(INTERNAL_PORT,network_listener, NULL);
+	receiver = netemu_util_prepare_receiver(INTERNAL_PORT,network_listener, NULL);
 	sender = prepare_sender(INTERNAL_PORT);
 	send_network_data(sender);
 	while(!net_ping && !net_hello);
@@ -38,8 +38,8 @@ void send_network_data(struct netemu_sender* sender) {
 	char* ping_message;
 	char* hello_message;
 	ping_message = "PING";
-	send_data(sender, ping_message);
+	netemu_util_send_data(sender, ping_message);
 	hello_message = "HELLO";
-	send_data(sender, hello_message);
+	netemu_util_send_data(sender, hello_message);
 }
 

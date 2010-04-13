@@ -6,7 +6,7 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "test_util.h"
+#include "netemu_util.h"
 #include "network/netemu_receiver.h"
 #include "network/netemu_sender.h"
 #include "protocol/application.h"
@@ -33,8 +33,8 @@ NETEMU_DWORD game_id;
 void run_application_tests() {
 	struct netemu_receiver* receiver;
 	struct netemu_sender* sender;
-	receiver = prepare_receiver(CLIENT_PORT,application_listener, NULL);
-	sender = prepare_sender_on_socket(receiver->socket, SERVER_PORT);
+	receiver = netemu_util_prepare_receiver(CLIENT_PORT,application_listener, NULL);
+	sender = netemu_util_prepare_sender_on_socket(receiver->socket, SERVER_PORT);
 	send_hello(sender);
 	while(port == 0);
 	new_sender = prepare_sender_on_socket(receiver->socket, port);

@@ -1,4 +1,4 @@
-#include "netemu_util.h"
+#include "netlib_util.h"
 
 struct server_connection {
 	char *host;

@@ -27,10 +27,10 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	int result = -1;
 	client = netemu_resources_get_client();
 
-	client->receiver = prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
-	client->sender = prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
+	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
+	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);
-	send_data(client->sender,hello);
+	netemu_util_send_data(client->sender,hello);
 
 	while(result == -1);
 	free(hello);
@@ -47,8 +47,8 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void 
 	callback = malloc(sizeof(struct server_connection_callback));
 	client = netemu_resources_get_client();
 	callback->ConnectionReceivedFn = ConnectionReceivedFn;
-	client->receiver = prepare_receiver(CLIENT_PORT);
-	client->sender = prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
+	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT);
+	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);
 	netemu_receiver_register_recv_fn(client->receiver,kaillera_communication_listener_async,&result);
 	free(hello);
@@ -62,7 +62,7 @@ void kaillera_communication_listener_async(char* data, size_t size, struct netem
 
 	callback = (struct server_connection_callback*)args;
 	result = netemu_communication_parse_server_message(data);
-	if(result == CONNECTION_ACCEPTED) {
+	if (result == CONNECTION_ACCEPTED) {
 		port = netemu_communication_parse_server_accept_port(data);
 		connection = malloc(sizeof(connection));
 		callback->ConnectionReceivedFn(result, connection);

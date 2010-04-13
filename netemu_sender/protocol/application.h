@@ -85,11 +85,6 @@ struct pong {
 	char pbody[16];
 };
 
-/* TODO: What about empty structs? do we need them? 
-struct client_timeout {
-
-};
-*/
 struct user_joined {
 	NETEMU_WORD id;
 	NETEMU_DWORD ping;
@@ -159,11 +154,6 @@ struct game_start {
 	char max_players;
 };
 
-/*
-struct player_ready{
-
-};
-*/
 struct buffered_play_values {
 	NETEMU_WORD size;
 	char *values;
