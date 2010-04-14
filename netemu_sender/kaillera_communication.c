@@ -13,7 +13,7 @@
 #include "netemu_util.h"
 #include "interface/server_connection.h"
 #include "netemu_socket.h"
-#define DOMAIN	"www.kaillera.com"
+#define DOMAIN	"google.com"
 #define SERVER	"http://kaillera.com/"
 #define PATH	"raw_server_list2.php?wg=1&version=0.9"
 
@@ -33,8 +33,9 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	char* buffer;
 	int error;
 	buffer = malloc(sizeof(1024));
-	netemu_get_addr_info(DOMAIN,NULL,NULL,&info);
-	sender = netemu_receiver_tcp_new(&info->addr,sizeof(info->addr),1024);
+	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
+
+	sender = netemu_receiver_tcp_new(&info->addr,info->addrlen,1024);
 	request = netemu_communication_http_get(SERVER,PATH);
 
 	netemu_sender_tcp_send(sender,request,strlen(request)+1);
@@ -48,7 +49,6 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	char* hello;
 	int result = -1;
 	client = netemu_resources_get_client();
-
 	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);

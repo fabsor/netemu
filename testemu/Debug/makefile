@@ -28,7 +28,7 @@ all: testemu
 testemu: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L"/home/fabbe/workspace/netemu/netemu_sender/Debug" -L"/home/fabbe/workspace/netemu/netlib/Debug" -o"testemu" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L"/home/fabian/workspace/netemu/netemu_sender/Debug" -L"/home/fabian/workspace/netemu/netlib/Debug" -o"testemu" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

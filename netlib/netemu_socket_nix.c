@@ -87,20 +87,20 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	info = info->ai_next;
 	iter = addr_result->next;
 	while(info != NULL) {
-		iter->next = malloc(sizeof(struct netemu_addrinfo));
+		iter = malloc(sizeof(struct netemu_addrinfo));
 		_fill_netemu_addrinfo(info, iter);
 		iter = iter->next;
 		info = info->ai_next;
 	}
+
 	result = &addr_result;
 	return error;
 }
 
 void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *netemuinfo) {
 	netemuinfo->addrlen = addrinfo->ai_addrlen;
-	if(addrinfo->ai_canonname != NULL);
-		netemuinfo->hostname = malloc(strlen(addrinfo->ai_canonname)+1);
-	netemuinfo->hostname = addrinfo->ai_canonname;
+	if(addrinfo->ai_canonname != NULL)
+		netemuinfo->hostname = addrinfo->ai_canonname;
 	netemuinfo->addr = addrinfo->ai_addr;
 }
 
