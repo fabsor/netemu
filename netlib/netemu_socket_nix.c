@@ -78,10 +78,20 @@ int netemu_get_last_error() {
 
 int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
 	struct addrinfo* info;
+
+	struct addrinfo info_hints;
+	struct addrinfo* info_hints_ptr;
 	struct netemu_addrinfo *addr_result, *iter;
 	int error;
-
-	error = getaddrinfo(nodename,servicetype,NULL,&info);
+	if(hints == NULL) {
+		info_hints_ptr = NULL;
+	}
+	else {
+		info_hints.ai_family = hints->ai_family;
+		info_hints.ai_socktype = hints->ai_socktype;
+		info_hints.ai_protocol = hints->ai_protocol;
+	}
+	error = getaddrinfo(nodename,servicetype,&info_hints,&info);
 	addr_result = malloc(sizeof(struct netemu_addrinfo));
 	_fill_netemu_addrinfo(info,addr_result);
 	info = info->ai_next;

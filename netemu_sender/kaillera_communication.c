@@ -13,7 +13,7 @@
 #include "netemu_util.h"
 #include "interface/server_connection.h"
 #include "netemu_socket.h"
-#define DOMAIN	"google.com"
+#define DOMAIN	"kaillera.com"
 #define SERVER	"http://kaillera.com/"
 #define PATH	"raw_server_list2.php?wg=1&version=0.9"
 
