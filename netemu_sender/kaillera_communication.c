@@ -34,8 +34,7 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	int error;
 	buffer = malloc(sizeof(1024));
 	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
-
-	sender = netemu_receiver_tcp_new(&info->addr,info->addrlen,1024);
+	sender = netemu_sender_tcp_new(info->addr,info->addrlen);
 	request = netemu_communication_http_get(SERVER,PATH);
 
 	netemu_sender_tcp_send(sender,request,strlen(request)+1);
