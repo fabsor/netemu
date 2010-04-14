@@ -168,7 +168,7 @@ typedef unsigned int NETEMU_SOCKET;
 		char* hostname;
 		size_t addrlen;
 		struct netemu_sockaddr* addr;
-		struct netemu_addrinfo** next;
+		struct netemu_addrinfo* next;
 	};
 
 

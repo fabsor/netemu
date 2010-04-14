@@ -7,19 +7,19 @@ C_SRCS += \
 ../netemu_list.c \
 ../netemu_socket_nix.c \
 ../netemu_thread_nix.c \
-../netemu_util_nix.c 
+../netlib_util_nix.c 
 
 OBJS += \
 ./netemu_list.o \
 ./netemu_socket_nix.o \
 ./netemu_thread_nix.o \
-./netemu_util_nix.o 
+./netlib_util_nix.o 
 
 C_DEPS += \
 ./netemu_list.d \
 ./netemu_socket_nix.d \
 ./netemu_thread_nix.d \
-./netemu_util_nix.d 
+./netlib_util_nix.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
