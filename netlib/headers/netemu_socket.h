@@ -121,6 +121,8 @@ typedef unsigned int NETEMU_SOCKET;
 #define NETEMU_SOCK_RDM     SOCK_RDM
 #define NETEMU_SOCK_STREAM  SOCK_STREAM
 
+	/* Constans for the different  */
+
 
 	/* Constants defining flags for the send/recv calls. */
 
@@ -165,8 +167,12 @@ typedef unsigned int NETEMU_SOCKET;
 	/*! Winsock has a handy struct which contains address information of a specific host. This struct
 	* aims to replicate this.*/
 	struct netemu_addrinfo {
-		char* hostname;
+		int ai_flags;       // AI_PASSIVE, AI_CANONNAME, AI_NUMERICHOST
+		int ai_family;      // PF_xxx
+		int ai_socktype;    // SOCK_xxx
+		int ai_protocol;    // 0 or IPPROTO_xxx for IPv4 and IPv6
 		size_t addrlen;
+		char* hostname;
 		struct netemu_sockaddr* addr;
 		struct netemu_addrinfo* next;
 	};
