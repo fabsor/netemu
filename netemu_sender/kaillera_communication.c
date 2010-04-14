@@ -6,9 +6,8 @@
  */
 
 #include <stdlib.h>
-#include "network/netemu_receiver.h"
 #include "protocol/communication.h"
-#include "network/netemu_sender.h"
+#include "network/netemu_tcp.h"
 #include "netemu_resources.h"
 #include "netemu_util.h"
 #include "interface/server_connection.h"
@@ -18,6 +17,7 @@
 #define PATH	"/raw_server_list2.php?wg=1&version=0.9"
 #define VERSION						"0.83"
 
+
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 
@@ -26,7 +26,7 @@ struct server_connection_callback {
 };
 
 struct netemu_communication_server* kaillera_communication_get_server_list() {
-	struct netemu_sender_tcp *sender;
+	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
 	struct netemu_addrinfo hints;
 	char* request;
@@ -38,10 +38,9 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
     hints.ai_socktype = NETEMU_SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
-	sender = netemu_sender_tcp_new(info->addr,info->addrlen);
+	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
 	request = netemu_communication_http_get(SERVER,PATH);
-	netemu_sender_tcp_send(sender,request,strlen(request));
-
+	netemu_tcp_connection_send(sender,request,strlen(request));
 	buffer = malloc(1024);
 	error = netemu_recv(sender->socket,buffer,1024,0);
 

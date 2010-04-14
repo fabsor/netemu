@@ -6,7 +6,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "netemu_socket.h"
 #include "kaillera_communication.h"
 
 

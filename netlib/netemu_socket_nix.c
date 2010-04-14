@@ -54,7 +54,7 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
 
 /* Receives data on a connected socket. */
 int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
-    return send(socket,buffer,len,flags);
+    return recv(socket,buffer,len,flags);
 }
 
 /* Received a datagram and stores the sender address */
@@ -90,8 +90,12 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		info_hints.ai_family = hints->ai_family;
 		info_hints.ai_socktype = hints->ai_socktype;
 		info_hints.ai_protocol = hints->ai_protocol;
+		info_hints_ptr = &info_hints;
 	}
-	error = getaddrinfo(nodename,servicetype,&info_hints,&info);
+	error = getaddrinfo(nodename,servicetype,info_hints_ptr,&info);
+	if(error == -1) {
+		return error;
+	}
 	addr_result = malloc(sizeof(struct netemu_addrinfo));
 	_fill_netemu_addrinfo(info,addr_result);
 	info = info->ai_next;

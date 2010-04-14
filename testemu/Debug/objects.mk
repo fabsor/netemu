@@ -4,4 +4,4 @@
 
 USER_OBJS :=
 
-LIBS := -lnetemu -lpthread -lnetlib
+LIBS := -lnetemu -lnetlib -lpthread

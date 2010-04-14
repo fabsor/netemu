@@ -25,25 +25,6 @@ struct netemu_receiver_udp{
 	int error;
 };
 
-struct netemu_receiver_tcp{
-	NETEMU_SOCKET socket;
-	netemu_sockaddr* addr;
-	netemu_mutex lock;
-	struct netemu_receiver_tcp_fn *receiver_fn;
-	int buffer_size;
-	int addr_len;
-	int fn_count;
-	int listening;
-	int error;
-};
-
-struct netemu_receiver_tcp_fn{
-	void (* listenerFn)(char*, size_t, struct netemu_receiver_tcp*, NETEMU_SOCKET socket, void*);
-	void* params;
-	struct netemu_receiver_tcp_fn *next;
-};
-
-
 struct netemu_receiver_udp_fn{
 	void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*);
 	void* params;
@@ -69,9 +50,5 @@ void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver);
 void netemu_receiver_udp_register_recv_fn(struct netemu_receiver_udp* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* params);
 
 void netemu_receiver_udp_free(struct netemu_receiver_udp* receiver);
-
-struct netemu_receiver_tcp* netemu_receiver_tcp_new(netemu_sockaddr* addr, int addr_len, int buffer_size);
-
-void netemu_receiver_tcp_start_listening(struct netemu_receiver_tcp *receiver);
 
 #endif /* NETEMU_RECEIVER_H_ */
