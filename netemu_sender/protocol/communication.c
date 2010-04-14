@@ -65,19 +65,37 @@ int netemu_communication_parse_server_accept_port(char* server_message) {
 }
 
 char* netemu_communication_http_get(char* host, char* path) {
-	char *get_ins, *get;
+	char *format;
+	char *buffer;
 	unsigned int size;
 
-	get_ins = "GET %s HTTP/1.1\nHost: %s";
+	format = "GET %s HTTP/1.0\r\nHost:%s\r\n\r\n";
 	/* Allocate enough memory. */
-	size = sizeof(char)*(strlen(get_ins)+1)+
-			sizeof(char)*(strlen(host)+1)+sizeof(char)*(strlen(path)+1);
-	get = malloc(size);
+	size = strlen(format) - 4 + 
+		strlen(host) + 
+		strlen(path);
+	buffer = (char*)malloc(size);
+	sprintf(buffer, format, path, host);
 
-	strcat(get, "GET ");
-	strcat(get,path);
-	strcat(get," HTTP/1.1\nHost: ");
-	strcat(get,host);
-
-	return get;
+	return buffer;
 }
+
+//char* netemu_communication_http_get(char* host, char* path) {
+//	char *get_ins, *get;
+//	char *format;
+//	unsigned int size;
+//
+//	format = "GET %s HTTP/1.1\n\nHost: %s\n\n"
+//	get_ins = "GET %s HTTP/1.1\nHost: %s";
+//	/* Allocate enough memory. */
+//	size = sizeof(char)*(strlen(get_ins)+1)+
+//			sizeof(char)*(strlen(host)+1)+sizeof(char)*(strlen(path)+1);
+//	get = malloc(size);
+//	sprintf(get,
+//	strcat(get, "GET ");
+//	strcat(get,path);
+//	strcat(get," HTTP/1.1\nHost: ");
+//	strcat(get,host);
+//
+//	return get;
+//}

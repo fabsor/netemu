@@ -61,7 +61,7 @@ void netemu_sender_tcp_free(struct netemu_sender_tcp* sender) {
 
 int netemu_sender_tcp_send(struct netemu_sender_tcp* sender, char* data, int size) {
 	int success;
-	success = netemu_recv(sender->socket,data,size,0);
+	success = netemu_send(sender->socket,data,size,0);
 	if(success == -1){
 		sender->error = netemu_get_last_error();
 	}

@@ -13,9 +13,9 @@
 #include "netemu_util.h"
 #include "interface/server_connection.h"
 #include "netemu_socket.h"
-#define DOMAIN	"google.com"
-#define SERVER	"http://kaillera.com/"
-#define PATH	"raw_server_list2.php?wg=1&version=0.9"
+#define DOMAIN	"www.kaillera.com"
+#define SERVER	"kaillera.com"
+#define PATH	"/raw_server_list2.php?wg=1&version=0.9"
 
 #define VERSION						"0.83"
 
@@ -33,13 +33,17 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	char* request;
 	char* buffer;
 	int error;
-	buffer = malloc(sizeof(1024));
+
+	
+    hints.ai_family = NETEMU_AF_UNSPEC;
+    hints.ai_socktype = NETEMU_SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
 	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
 	sender = netemu_sender_tcp_new(info->addr,info->addrlen);
-	netemu_get_addr_info(DOMAIN, NULL, NULL, &info);
-	sender = netemu_receiver_tcp_new(&info->addr,info->addrlen,1024);
 	request = netemu_communication_http_get(SERVER,PATH);
-	netemu_sender_tcp_send(sender,request,strlen(request)+1);
+	netemu_sender_tcp_send(sender,request,strlen(request));
+
+	buffer = malloc(1024);
 	error = netemu_recv(sender->socket,buffer,1024,0);
 
 }
