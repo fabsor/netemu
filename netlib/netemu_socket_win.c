@@ -74,7 +74,13 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	PADDRINFOA addrinfo = NULL;
 	int error;
 	struct netemu_addrinfo *result_addrinfo;
-	error = getaddrinfo(nodename, servicetype, hints, &addrinfo);
+	struct addrinfo info_hints;
+
+	memset(&info_hints, 0, sizeof(struct addrinfo));
+	info_hints.ai_family = hints->ai_family;
+	info_hints.ai_socktype = hints->ai_socktype;
+	info_hints.ai_protocol = hints->ai_protocol;
+	error = getaddrinfo(nodename, servicetype, &info_hints, &addrinfo);
 
 	*result = malloc(sizeof(struct netemu_addrinfo));
 
@@ -83,6 +89,10 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		result_addrinfo->addr = addrinfo->ai_addr;
 		result_addrinfo->hostname = addrinfo->ai_canonname;
 		result_addrinfo->addrlen = addrinfo->ai_addrlen;
+		result_addrinfo->ai_family = addrinfo->ai_family;
+		result_addrinfo->ai_flags = addrinfo->ai_flags;
+		result_addrinfo->ai_protocol = addrinfo->ai_protocol;
+		result_addrinfo->ai_socktype = addrinfo->ai_socktype;
 		addrinfo = addrinfo->ai_next;
 		if(addrinfo != NULL) {
 			result_addrinfo->next = malloc(sizeof(struct netemu_addrinfo));
@@ -119,7 +129,7 @@ netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr) {
     in_addr->sin_port = netaddr->port;
     in_addr->sin_family = netaddr->family;
     in_addr->sin_addr.s_addr = netaddr->addr;
-    
+    in_addr->sin_addr.s_addr = 4;
     return (netemu_sockaddr*) in_addr;
 }
 

@@ -29,11 +29,17 @@ struct server_connection_callback {
 struct netemu_communication_server* kaillera_communication_get_server_list() {
 	struct netemu_sender_tcp *sender;
 	struct netemu_addrinfo *info;
+	struct netemu_addrinfo hints;
 	char* request;
 	char* buffer;
 	int error;
+
+	hints.ai_family = NETEMU_AF_INET;
+	hints.ai_socktype = NETEMU_SOCK_STREAM;
+	hints.ai_protocol = 0;
 	buffer = malloc(sizeof(1024));
-	netemu_get_addr_info(DOMAIN,NULL,NULL,&info);
+	netemu_get_addr_info(DOMAIN, NULL, &hints, &info);
+
 	sender = netemu_receiver_tcp_new(&info->addr,sizeof(info->addr),1024);
 	request = netemu_communication_http_get(SERVER,PATH);
 
