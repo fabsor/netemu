@@ -64,7 +64,7 @@ int netemu_communication_parse_server_accept_port(char* server_message) {
 	return atoi(port);
 }
 
-char* netemu_communication_http_get(const char* host, const char* path) {
+char* netemu_communication_http_get(char* host, char* path) {
 	char *get_ins, *get;
 	unsigned int size;
 
@@ -74,7 +74,7 @@ char* netemu_communication_http_get(const char* host, const char* path) {
 			sizeof(char)*(strlen(host)+1)+sizeof(char)*(strlen(path)+1);
 	get = malloc(size);
 
-	get = "GET ";
+	strcat(get, "GET ");
 	strcat(get,path);
 	strcat(get," HTTP/1.1\nHost: ");
 	strcat(get,host);
