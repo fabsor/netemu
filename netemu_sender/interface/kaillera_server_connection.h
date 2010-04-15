@@ -56,7 +56,7 @@ int server_connection_join_game(struct server_connection *connection, NETEMU_DWO
 
 int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid, playerJoinFn);
 
-struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr);
+struct server_connection *server_connection_new(char* username);
 
 #ifdef	__cplusplus
 }

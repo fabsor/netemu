@@ -76,14 +76,9 @@ void netemu_receiver_recv(void* params) {
 }
 
 void free_receiver(struct netemu_receiver_udp* receiver) {
-	struct netemu_receiver_udp_fn *receiver_fn, *receiver_next;
 	free(receiver->addr);
-	receiver_fn = receiver->receiver_fn;
-	while (receiver_fn != NULL) {
-		receiver_next = receiver_fn->next;
-		free(receiver_fn);
-		receiver_fn = receiver_next;
-	}
+	netemu_receiver_udp_clear_listeners(receiver);
+	netemu_closesocket(receiver->socket);
 	free(receiver);
 }
 
@@ -94,6 +89,18 @@ void _netemu_receiver_udp_notify(struct netemu_receiver_udp* receiver, char* dat
 		receiver_fn->listenerFn(data,size, receiver, receiver_fn->params);
 		receiver_fn = receiver_fn->next;
 	}
+}
+
+void netemu_receiver_udp_clear_listeners(struct netemu_receiver_udp* receiver) {
+	struct netemu_receiver_udp_fn *receiver_fn, *receiver_next;
+	receiver_fn = receiver->receiver_fn;
+
+	while (receiver_fn != NULL) {
+		receiver_next = receiver_fn->next;
+		free(receiver_fn);
+		receiver_fn = receiver_next;
+	}
+	receiver->receiver_fn = NULL;
 }
 
 /**

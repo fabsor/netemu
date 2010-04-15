@@ -7,8 +7,12 @@
 
 #include <stdlib.h>
 #include "protocol/communication.h"
+#include "interface/kaillera_server_connection.h"
 #include "network/netemu_tcp.h"
 #include "netemu_resources.h"
+#include "network/netemu_sender.h"
+#include "network/netemu_receiver.h"
+#include "netemu_thread.h"
 #include "netemu_util.h"
 #include "netemu_socket.h"
 #define DOMAIN	"www.kaillera.com"
@@ -45,26 +49,31 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 
 }
 
-struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr) {
+struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* username) {
 	struct netemu_client *client;
+	struct netemu_sender_udp* sender;
+	struct netemu_receiver_udp* receiver;
 	struct server_connection *connection;
-	struct netemu_sockaddr_in *new_addr;
 	char* hello;
-	int result = -1;
+	int result;
+
+	result = -1;
+
 	client = netemu_resources_get_client();
-	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
-	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
+	receiver = client->receiver;
+	sender = client->sender;
+
+	receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
+	sender = netemu_util_prepare_sender_on_socket_at_addr(receiver->socket, addr, addr_size);
 	hello = netemu_communication_create_hello_message(VERSION);
-	netemu_util_send_data(client->sender,hello);
+	netemu_util_send_data(sender,hello);
 	while(result == -1);
-	free(hello);
-	addr->port = htonl(result);
-	client->sender->addr = netemu_prepare_net_addr(addr);
-	connection = server_connection_new(addr);
-	/* TODO: Fix more data when it becomes available. */
+	addr->port = netemu_htons(result);
+	sender->addr = netemu_prepare_net_addr(addr);
+	connection = server_connection_new(username);
 	return connection;
 }
-
+/*
 void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void (*ConnectionReceivedFn)(int status, struct server_connection*)) {
 	struct netemu_client *client;
 	char* hello;
@@ -78,7 +87,7 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void 
 	hello = netemu_communication_create_hello_message(VERSION);
 	free(hello);
 }
-
+*/
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	int result;
 	int port;
@@ -104,6 +113,5 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 	int *result;
 	result = (int *)args;
 	*result = netemu_communication_parse_server_message(data);
-	free(data);
 }
 

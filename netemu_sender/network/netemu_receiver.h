@@ -51,4 +51,6 @@ void netemu_receiver_udp_register_recv_fn(struct netemu_receiver_udp* receiver, 
 
 void netemu_receiver_udp_free(struct netemu_receiver_udp* receiver);
 
+void netemu_receiver_udp_clear_listeners(struct netemu_receiver_udp* receiver);
+
 #endif /* NETEMU_RECEIVER_H_ */

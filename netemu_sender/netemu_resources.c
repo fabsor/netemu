@@ -13,7 +13,7 @@
 struct netemu_client* _netemu_resources_client = NULL;
 
 struct netemu_client* netemu_resources_get_client() {
-	if (_netemu_resources_client== NULL) {
+	if (_netemu_resources_client == NULL) {
 		_netemu_resources_client = malloc(sizeof(struct netemu_client));
 	}
 	return _netemu_resources_client;

@@ -24,8 +24,7 @@ int main() {
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;
 	netemu_init_network();
-
 	//kaillera_communication_get_server_list();
-	kaillera_communication_connect(&addr);
-
+	kaillera_communication_connect(&addr,sizeof(addr),PLAYERNAME);
+	return 0;
 }

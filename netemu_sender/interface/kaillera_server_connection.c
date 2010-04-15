@@ -94,16 +94,16 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	netemu_packet_buffer_pop(connection->_internal->receive_buffer, CREATE_GAME);
 	netemu_application_free_message(messages[0]);
 	netemu_thread_mutex_destroy(mutex);
-
-
 }
 
-struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {
+struct server_connection *server_connection_new(char* user) {
 	struct server_connection *connection;
-	struct netemu_client *client;
-	connection = malloc(sizeof(struct server_connection));
-	connection->addr = addr;
-	connection->user = NULL;
+
+	connection = (struct server_connection*)malloc(sizeof(struct server_connection));
+	if(connection == NULL) {
+		return NULL;
+	}
+	connection->user = user;
 	connection->_internal = malloc(sizeof(struct _server_connection_internal));
 	connection->_internal->chat_callback = netemu_list_new(sizeof(chatFn), 3);
 	connection->_internal->game_created_callback = netemu_list_new(sizeof(gameCreatedFn), 3);

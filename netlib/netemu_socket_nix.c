@@ -115,7 +115,7 @@ void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *ne
 	netemuinfo->addrlen = addrinfo->ai_addrlen;
 	if(addrinfo->ai_canonname != NULL)
 		netemuinfo->hostname = addrinfo->ai_canonname;
-	netemuinfo->addr = addrinfo->ai_addr;
+	netemuinfo->addr = (netemu_sockaddr*)addrinfo->ai_addr;
 }
 
 unsigned long netemu_inet_addr(char* addr) {
@@ -123,13 +123,13 @@ unsigned long netemu_inet_addr(char* addr) {
 }
 
 netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
-    struct sockaddr_in* in_addr;
-    in_addr = malloc(sizeof(struct sockaddr_in));
-    in_addr->sin_port = netaddr->port;
-    in_addr->sin_family = netaddr->family;
-    in_addr->sin_addr.s_addr = netaddr->addr;
+    struct sockaddr_in* addr;
+    addr = malloc(sizeof(struct sockaddr_in));
+    addr->sin_port = netaddr->port;
+    addr->sin_family = netaddr->family;
+    addr->sin_addr.s_addr = netaddr->addr;
     
-    return (netemu_sockaddr*) in_addr;
+    return (netemu_sockaddr*) addr;
 }
 
 int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
