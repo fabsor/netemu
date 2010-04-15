@@ -37,7 +37,7 @@ static void *keydup(const void *s, const size_t size) {
 	return b;
 }
 
-static hash_size def_hashfunc_str(const void *key, size_t key_len) {
+hash_size def_hashfunc_str(const void *key, size_t key_len) {
 	char* char_key = (char*) key;
 	hash_size hash = 0;
 
@@ -47,7 +47,7 @@ static hash_size def_hashfunc_str(const void *key, size_t key_len) {
 	return hash;
 }
 
-static hash_size def_hashfunc_int(const void *key, size_t key_len) {
+hash_size def_hashfunc_int(const void *key, size_t key_len) {
 	int* int_key = (int*) key;
 	return *int_key;
 }

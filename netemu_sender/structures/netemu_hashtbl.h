@@ -46,7 +46,7 @@ typedef struct netemu_hashtbl {
 } NETEMU_HASHTBL;
 
 
-NETEMU_HASHTBL *hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t));
+NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t));
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl);
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl);
 int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len, void *data);
@@ -54,6 +54,7 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_l
 void *netemu_hashtbl_get(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len);
 int netemu_hashtbl_resize(NETEMU_HASHTBL *hashtbl, hash_size size);
 
-
+hash_size def_hashfunc_str(const void *key, size_t key_len);
+hash_size def_hashfunc_int(const void *key, size_t key_len);
 #endif
 

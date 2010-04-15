@@ -1,5 +1,6 @@
 ﻿
 #include "kaillera_server_connection.h"
+#include "../protocol/application.h"
 #include "../netemu_resources.h"
 #include "../network/netemu_packet_buffer.h"
 #include "../network/netemu_sender.h"
@@ -10,6 +11,7 @@
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);
 int server_connection_login(struct server_connection* connection);
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id);
+void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
@@ -119,6 +121,8 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_packet_buffer_new(100);
 
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing);
+
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
@@ -144,11 +148,17 @@ int server_connection_wait_for_instruction(struct server_connection* connection,
 	int error;
 	mutex = netemu_thread_mutex_create();
 	timestamp = time(NULL);
-
 	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, mutex);
 	netemu_thread_mutex_lock(mutex, NETEMU_INFINITE);
 	netemu_thread_mutex_release(mutex);
 	netemu_thread_mutex_destroy(mutex);
+}
+
+void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
+	struct application_instruction* pong;
+	pong = netemu_application_create_message();
+	netemu_application_pong_add(pong);
+	netemu_packet_buffer_add(buffer,pong);
 }
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {

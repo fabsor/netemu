@@ -18,7 +18,7 @@
 #define DOMAIN	"www.kaillera.com"
 #define SERVER	"kaillera.com"
 #define PATH	"/raw_server_list2.php?wg=1&version=0.9"
-#define VERSION						"0.83"
+#define VERSION	"0.83"
 
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
@@ -50,8 +50,6 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username) {
 	struct netemu_client *client;
-	struct netemu_sender_udp* sender;
-	struct netemu_receiver_udp* receiver;
 	struct server_connection *connection;
 	char* hello;
 	int result;
@@ -59,20 +57,18 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	result = -1;
 
 	client = netemu_resources_get_client();
-	receiver = client->receiver;
-	sender = client->sender;
+	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
+	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
 
-	receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
-	sender = netemu_util_prepare_sender_on_socket_at_addr(receiver->socket, addr, addr_size);
 	hello = netemu_communication_create_hello_message(VERSION);
-	netemu_util_send_data(sender,hello);
+	netemu_util_send_data(client->sender,hello);
 	while(result == -1);
 	free(hello);
 	addr->port = netemu_htons(result);
-	free(sender->addr);
-	sender->addr = netemu_prepare_net_addr(addr);
+	free(client->sender->addr);
+	netemu_receiver_udp_clear_listeners(client->receiver);
+	client->sender->addr = netemu_prepare_net_addr(addr);
 	connection = server_connection_new(username,emulator_name);
-	/* TODO: Fix more data when it becomes available. */
 	return connection;
 }
 /*
@@ -112,8 +108,13 @@ void kaillera_communication_listener_async(char* data, size_t size, struct netem
 }
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
-	int *result;
-	result = (int *)args;
-	*result = netemu_communication_parse_server_message(data);
+	int *port;
+	int result;
+	port = (int *)args;
+	result = netemu_communication_parse_server_message(data);
+
+	if(result == CONNECTION_ACCEPTED) {
+		*port = netemu_communication_parse_server_accept_port(data);
+	}
 }
 
