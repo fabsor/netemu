@@ -24,11 +24,13 @@ int main() {
 	struct server_connection* connection;
 	struct game result;
 	int i;
+
 	addr.addr = ADDR;
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;
-	info = netemu_client_new(EMUNAME,games);
-	//kaillera_communication_get_server_list();
+	netemu_init_network();
+	//info = netemu_client_new(EMUNAME,games);
+	kaillera_communication_get_server_list();
 	connection = kaillera_communication_connect(&addr,sizeof(addr),PLAYERNAME);
 	for(i = 0; i < NO_GAMES; i++) {
 		server_connection_create_game(connection,games[i],&result);

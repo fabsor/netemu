@@ -41,8 +41,7 @@ struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int a
 	return receiver;
 }
 
-/**
- * This function creates a new thread and starts listening for incoming
+ /* This function creates a new thread and starts listening for incoming
  * datagrams on the specified address and port.
  */
 void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver) {

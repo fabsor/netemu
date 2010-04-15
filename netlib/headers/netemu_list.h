@@ -21,13 +21,15 @@ extern "C" {
         netemu_list_internal _intern;
     };
 
-    struct netemu_list* netemu_list_new(int element_size, int count);
+    struct netemu_list* netemu_list_new(int count);
 
     void netemu_list_add(struct netemu_list* list, void* element);
 
     int netemu_list_remove(struct netemu_list* list, void* element);
 
     int netemu_list_remove_at(struct netemu_list* list, int index);
+
+	int netemu_list_copy(struct netemu_list* list, void **buffer);
 
     /**
      * Check if the element in the list contains the provided element.

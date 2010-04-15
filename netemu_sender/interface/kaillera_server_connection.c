@@ -114,10 +114,10 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->user = user;
 	connection->emulator_name = emulator_name;
 	connection->_internal = malloc(sizeof(struct _server_connection_internal));
-	connection->_internal->chat_callback = netemu_list_new(sizeof(chatFn), 3);
-	connection->_internal->game_created_callback = netemu_list_new(sizeof(gameCreatedFn), 3);
-	connection->_internal->join_callback = netemu_list_new(sizeof(joinFn), 3);
-	connection->_internal->leave_callback = netemu_list_new(sizeof(leaveFn), 3);
+	connection->_internal->chat_callback = netemu_list_new(3);
+	connection->_internal->game_created_callback = netemu_list_new(3);
+	connection->_internal->join_callback = netemu_list_new(3);
+	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_packet_buffer_new(100);
 

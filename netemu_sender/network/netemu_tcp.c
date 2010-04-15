@@ -16,7 +16,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	NETEMU_SOCKET socket;
 	struct netemu_tcp_connection* sender;
 	sender = malloc(sizeof(struct netemu_tcp_connection));
-	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
+	socket = netemu_socket(NETEMU_AF_INET, NETEMU_SOCK_STREAM);
 	if (socket == INVALID_SOCKET) {
 		sender->error = netemu_get_last_error();
 	}
