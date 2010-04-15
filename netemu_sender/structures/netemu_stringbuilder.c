@@ -31,10 +31,14 @@ struct netemu_stringbuilder *netemu_stringbuilder_new(NETEMU_DWORD capacity) {
 	return builder;
 }
 
+void netemu_stringbuilder_free(struct netemu_stringbuilder *builder) {
+	free(builder->string);
+	free(builder);
+}
+
 int netemu_stringbuilder_append_chars(struct netemu_stringbuilder *builder, char* string, NETEMU_DWORD len) {
 	NETEMU_DWORD new_size;
 	int error;
-
 	error = 0;
 	new_size = builder->count + len + 1;
 	while(new_size > builder->capacity) {
@@ -69,6 +73,15 @@ int netemu_stringbuilder_append_char(struct netemu_stringbuilder *builder, char 
 }
 
 int _netemu_enlarge_stringbuilder(struct netemu_stringbuilder *builder) {
+	char *buffer;
+	
+	/* realloc would in theory be a better option here, but for some reason
+	 * it kept corrupting our data when the capacity reached a high number ( >4096).*/
 	builder->capacity *= 2;
-	return (realloc(builder->string, builder->capacity) == NULL ? -1 : 0);
+	if((buffer = (char*)malloc(sizeof(char) * builder->capacity)) == NULL)
+		return -1;
+	memcpy(buffer, builder->string, builder->count + 1);
+	free(builder->string);
+	builder->string = buffer;
+	return 0;
 }

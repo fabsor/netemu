@@ -30,8 +30,9 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	struct netemu_sender_tcp *sender;
 	struct netemu_addrinfo *info;
 	struct netemu_addrinfo hints;
+	struct waiting_game *games;
+	struct server *servers;
 	char* request;
-	struct waiting_game *games = NULL;
 	int error;
 
 	
@@ -43,7 +44,7 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	request = netemu_communication_http_get(SERVER,PATH);
 	netemu_sender_tcp_send(sender,request,strlen(request));
 
-	netemu_communication_parse_http(sender->socket, &games);
+	netemu_communication_parse_http(sender->socket, &games, &servers);
 
 }
 

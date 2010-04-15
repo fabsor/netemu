@@ -17,6 +17,7 @@ struct netemu_stringbuilder {
 };
 
 struct netemu_stringbuilder *netemu_stringbuilder_new(NETEMU_DWORD capacity);
+void netemu_stringbuilder_free(struct netemu_stringbuilder *builder);
 
 int netemu_stringbuilder_append_chars(struct netemu_stringbuilder *builder, char* string, NETEMU_DWORD len);
 int netemu_stringbuilder_append_char(struct netemu_stringbuilder *builder, char character);
