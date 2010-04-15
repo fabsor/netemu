@@ -21,6 +21,15 @@ char* games[] = {"Foo", "Bar"};
 
 int main() {
 	struct netemu_sockaddr_in addr;
+
+	struct netemu_stringbuilder *builder;
+	builder = netemu_stringbuilder_new(1);
+	netemu_stringbuilder_append_char(builder, 'y');
+	netemu_stringbuilder_append_char(builder, 'x');
+	netemu_stringbuilder_append_char(builder, 'a');
+	netemu_stringbuilder_append_char(builder, 'n');
+	netemu_stringbuilder_append_char(builder, '1');
+
 	addr.addr = ADDR;
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;

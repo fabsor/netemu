@@ -2,6 +2,7 @@
 #include "application_test.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "structures/netemu_stringbuilder.h"
 
 void test_server_communication();
 void test_sender_receiver();

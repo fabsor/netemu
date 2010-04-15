@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "netemu_socket.h"
+#include "netemu_list.h"
+
+#define HTTP_BUFFER_SIZE 512
 
 
 char* netemu_communication_create_hello_message(char* version) {
@@ -80,22 +84,46 @@ char* netemu_communication_http_get(char* host, char* path) {
 	return buffer;
 }
 
-//char* netemu_communication_http_get(char* host, char* path) {
-//	char *get_ins, *get;
-//	char *format;
-//	unsigned int size;
-//
-//	format = "GET %s HTTP/1.1\n\nHost: %s\n\n"
-//	get_ins = "GET %s HTTP/1.1\nHost: %s";
-//	/* Allocate enough memory. */
-//	size = sizeof(char)*(strlen(get_ins)+1)+
-//			sizeof(char)*(strlen(host)+1)+sizeof(char)*(strlen(path)+1);
-//	get = malloc(size);
-//	sprintf(get,
-//	strcat(get, "GET ");
-//	strcat(get,path);
-//	strcat(get," HTTP/1.1\nHost: ");
-//	strcat(get,host);
-//
-//	return get;
-//}
+int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_games** games) {
+	char *receive_buffer, *temp_buffer;
+	int received;
+	int buffer_size;
+	struct netemu_list *list;
+	int i;
+	int size;
+	list = netemu_list_new(sizeof(char), 6000);
+	buffer_size = 0;
+	receive_buffer = malloc(HTTP_BUFFER_SIZE);
+	size = SIZE_MAX;
+	do{
+		received = netemu_recv(socket, receive_buffer, HTTP_BUFFER_SIZE, 0);
+		if(received < 0) {
+			buffer_size = netemu_get_last_error();
+			break;
+		}
+		else
+		{
+			/* We can not pass receive_buffer to addrange,
+			 *since that will corrupt the list when we modify the receive_buffer.
+			 * To solve this, we supply the list with a copy of our data. */
+			//temp_buffer = (char*)malloc(received);
+			//memcpy(temp_buffer, receive_buffer, received);
+			//netemu_list_addrange(list, temp_buffer, received);
+
+			for(i = 0; i < received; i++) {
+				netemu_list_add(list, &receive_buffer[i]);
+			}
+		}
+
+		if(list->count > 3) {
+			if((char)netemu_list_get(list, list->count - 1) == 0x0a &&
+				(char)netemu_list_get(list, list->count - 2) == 0x0d &&
+				(char)netemu_list_get(list, list->count - 3) == 0x0a &&
+				(char)netemu_list_get(list, list->count - 4) == 0x0d) {
+					break;
+			}
+		}
+	}while(1);
+
+	return received < 0 ? -1 : 0;
+}

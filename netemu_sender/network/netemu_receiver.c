@@ -59,7 +59,6 @@ struct netemu_receiver_tcp* netemu_receiver_tcp_new(netemu_sockaddr* addr, int a
 	receiver->receiver_fn = NULL;
 	if (receiver->socket == INVALID_SOCKET) {
 		receiver->error = netemu_get_last_error();
-
 	}
 	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if (bind_error == -1) {

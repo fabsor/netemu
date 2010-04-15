@@ -15,6 +15,16 @@ enum {
 	PING_RECEIVED
 };
 
+struct waiting_game {
+	char *gamename;
+	char *address;
+	char *player;
+	char *clientname;
+	int num_players;
+	char *servername;
+	char *location;
+};
+
 /**
  * Create an hello message that can be sent to the server.
  * @param int version the version of the protocol you want to tell the server that you have.

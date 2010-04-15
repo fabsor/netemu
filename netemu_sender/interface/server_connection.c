@@ -113,7 +113,3 @@ struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr)
 	//netemu_receiver_register_recv_fn(client->receiver, _server_connection_receive, NULL);
 	return connection;
 }
-
-void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
-
-}
