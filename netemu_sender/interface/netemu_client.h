@@ -10,11 +10,11 @@
 
 struct  netemu_emulator_info {
 	char *appName;
-	char *gameList;
+	char **gameList;
 	char *userName;
 };
 
-struct netemu_emulator_info* netemu_client_new(char* appName, char* gameList);
+struct netemu_emulator_info* netemu_client_new(char* appName, char** gameList);
 void netemu_client_destroy(struct netemu_emulator_info* info);
 
 #endif /* NETEMU_CLIENT_H_ */

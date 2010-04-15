@@ -98,19 +98,19 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 
 }
 
-struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr) {
+struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr, char* user) {
 	struct server_connection *connection;
 	struct netemu_client *client;
 	connection = malloc(sizeof(struct server_connection));
 	connection->addr = addr;
-	connection->user = NULL;
+	connection->user = user;
 	connection->_internal = malloc(sizeof(struct _server_connection_internal));
 	connection->_internal->chat_callback = netemu_list_new(sizeof(chatFn), 3);
 	connection->_internal->game_created_callback = netemu_list_new(sizeof(gameCreatedFn), 3);
 	connection->_internal->join_callback = netemu_list_new(sizeof(joinFn), 3);
 	connection->_internal->leave_callback = netemu_list_new(sizeof(leaveFn), 3);
 	//connection->_internal->receive_buffer = netemu_packet_buffer_new(
-	//client = netemu_resources_get_client();
+	client = netemu_resources_get_client();
 	//netemu_receiver_register_recv_fn(client->receiver, _server_connection_receive, NULL);
 	return connection;
 }

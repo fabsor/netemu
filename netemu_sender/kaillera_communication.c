@@ -32,7 +32,6 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	char* buffer;
 	int error;
 
-	
     hints.ai_family = NETEMU_AF_UNSPEC;
     hints.ai_socktype = NETEMU_SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
@@ -45,10 +44,9 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 
 }
 
-struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr) {
+struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, char* username) {
 	struct netemu_client *client;
 	struct server_connection *connection;
-	struct netemu_sockaddr_in *new_addr;
 	char* hello;
 	int result = -1;
 	client = netemu_resources_get_client();
@@ -59,8 +57,8 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	while(result == -1);
 	free(hello);
 	addr->port = htonl(result);
-	client->sender->addr = netemu_prepare_net_addr(addr);
-	connection = server_connection_new(addr);
+	//client->sender->addr = netemu_prepare_net_addr(addr);
+	connection = server_connection_new(client->sender->addr, username);
 	/* TODO: Fix more data when it becomes available. */
 	return connection;
 }
