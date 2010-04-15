@@ -38,7 +38,7 @@ struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, def_hashfunc_int);
 	buffer->_internal->registered_fns = netemu_hashtbl_create(size, def_hashfunc_int);
 	buffer->_internal->add_mutex = netemu_thread_mutex_create();
-	buffer->_internal->instructions_to_add = netemu_list_new(sizeof(void*),20);
+	buffer->_internal->instructions_to_add = netemu_list_new(20);
 	netemu_thread_new(_netemu_packet_buffer_update,buffer);
 	return buffer;
 }
@@ -129,7 +129,7 @@ void _netemu_packet_buffer_update(void* args) {
 void _netemu_packet_buffer_internal_add(struct netemu_packet_buffer *buffer, struct application_instruction* instruction) {
 	struct netemu_list *list;
 	if((list = netemu_hashtbl_get(buffer->table, &instruction->id, sizeof(char))) == NULL)
-		list = netemu_list_new(sizeof(struct application_instruction*), 10);
+		list = netemu_list_new(10);
 
 	netemu_list_add(list, instruction);
 	netemu_hashtbl_insert(buffer->table, &instruction->id, sizeof(char), instruction);
