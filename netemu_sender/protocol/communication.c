@@ -111,7 +111,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_game **
 		return -1;
 	}
 
-	game_list = netemu_list_new(sizeof(struct waiting_game*), 128);
+	game_list = netemu_list_new(128);
 	response_body += strlen(HTTP_HEADER_END);
 
 	response_body = _netemu_parse_game_list(response_body, game_list);
@@ -122,7 +122,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_game **
 	}
 
 
-	server_list = netemu_list_new(sizeof(struct server*), 128);
+	server_list = netemu_list_new(128);
 
 	response_body = _netemu_parse_server_list(response_body, server_list);
 	if(response_body == NULL) {
@@ -131,6 +131,26 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_game **
 		netemu_list_free(server_list);
 		return -1;
 	}
+
+	return_value = netemu_list_copy(game_list, games);
+	if(return_value != 0) {
+		netemu_stringbuilder_free(builder);
+		netemu_list_free(game_list);
+		netemu_list_free(server_list);
+		return -1;
+	}
+
+	return_value = netemu_list_copy(server_list, servers);
+	if(return_value != 0) {
+		netemu_stringbuilder_free(builder);
+		netemu_list_free(game_list);
+		netemu_list_free(server_list);
+		return -1;
+	}
+
+	netemu_stringbuilder_free(builder);
+	netemu_list_free(game_list);
+	netemu_list_free(server_list);
 
 	return 0;
 }

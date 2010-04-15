@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include "headers/netemu_list.h"
+#include <string.h>
+#include "netlib_util.h"
 
 struct _netemu_list_internal {
-	size_t element_size;
 	int (* comparator)(const void *, const void *);
 	int size;
 };
@@ -10,15 +11,14 @@ struct _netemu_list_internal {
 void _netemu_enlarge_list(struct netemu_list* list, int size);
 int _netemu_list_search_linear(struct netemu_list* list, void* element);
 
-struct netemu_list* netemu_list_new(int element_size, int count) {
+struct netemu_list* netemu_list_new(int count) {
 	struct netemu_list* list;
 	struct _netemu_list_internal* intern;
 
 	intern = malloc(sizeof(struct _netemu_list_internal));
 	list = malloc(sizeof(struct netemu_list));
 	intern->size = count;
-	intern->element_size = element_size;
-	list->elements = malloc(element_size * intern->size);
+	list->elements = malloc(sizeof(void*) * intern->size);
 	list->count = 0;
 	list->_intern = intern;
 	return list;
@@ -37,9 +37,8 @@ void netemu_list_add(struct netemu_list* list, void* element) {
 void _netemu_enlarge_list(struct netemu_list* list, int size) {
 	void* elements;
 	list->_intern->size += size;
-	elements = malloc(list->_intern->element_size * list->_intern->size);
-	memcpy(elements, list->elements, list->count
-			* (list->_intern->element_size));
+	elements = malloc(sizeof(void*) * list->_intern->size);
+	memcpy(elements, list->elements, sizeof(void*) * list->count);
 
 	free(list->elements);
 	list->elements = elements;
@@ -82,6 +81,15 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 	return 1;
 }
 
+int netemu_list_copy(struct netemu_list* list, void **buffer) {
+	NETEMU_DWORD size;
+	size = sizeof(void*) * list->count;
+	if((*buffer = malloc(size)) == NULL)
+		return -1;
+
+	memcpy(*buffer, *list->elements, size);
+	return 0;
+}
 /**
  * Register a sorting function for your elements. If you do this, the elements will be sorted with
  * qsort and searches can be done with binary search.
@@ -104,7 +112,7 @@ int netemu_list_sort(struct netemu_list* list) {
 
 	/* We can't sort if we don't have a comparator. */
 	if (list->_intern->comparator != 0) {
-		qsort(list->elements[0], list->count, list->_intern->element_size,
+		qsort(list->elements[0], list->count, sizeof(void*),
 				list->_intern->comparator);
 		list->sorted = 1;
 		return 1;

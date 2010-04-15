@@ -42,10 +42,12 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
     hints.ai_protocol = IPPROTO_TCP;
 	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
 	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
+	netemu_tcp_connection_connect(sender);
 	request = netemu_communication_http_get(SERVER,PATH);
 
-	netemu_communication_parse_http(sender->socket, &games, &servers);
 	netemu_tcp_connection_send(sender,request,strlen(request));
+	netemu_communication_parse_http(sender->socket, &games, &servers);
+	
 	buffer = malloc(1024);
 	error = netemu_recv(sender->socket,buffer,1024,0);
 }
