@@ -87,7 +87,8 @@ int netemu_list_copy(struct netemu_list* list, void **buffer) {
 	if((*buffer = malloc(size)) == NULL)
 		return -1;
 
-	memcpy(*buffer, *list->elements, size);
+	//memset(buffer, 0, size);
+	//memcpy(buffer, list->elements, size);
 	return 0;
 }
 /**
