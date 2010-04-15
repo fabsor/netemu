@@ -48,7 +48,7 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 
 }
 
-struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* username) {
+struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username) {
 	struct netemu_client *client;
 	struct netemu_sender_udp* sender;
 	struct netemu_receiver_udp* receiver;
@@ -68,9 +68,10 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	netemu_util_send_data(sender,hello);
 	while(result == -1);
 	free(hello);
-	addr->port = htonl(result);
-	//client->sender->addr = netemu_prepare_net_addr(addr);
-	connection = server_connection_new(client->sender->addr, username);
+	addr->port = netemu_htons(result);
+	free(sender->addr);
+	sender->addr = netemu_prepare_net_addr(addr);
+	connection = server_connection_new(username,emulator_name);
 	/* TODO: Fix more data when it becomes available. */
 	return connection;
 }

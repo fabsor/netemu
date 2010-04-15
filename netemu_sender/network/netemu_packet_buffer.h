@@ -19,6 +19,7 @@ extern "C" {
 		NETEMU_HASHTBL *table;
 		netemu_packet_buffer_internal _internal;
 	};
+	typedef void (*bufferListenerFn)(struct netemu_packet_buffer* buffer, struct application_instruction *instruction);
 
 	void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction);
 	struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, char id);

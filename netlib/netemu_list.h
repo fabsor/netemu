@@ -13,7 +13,7 @@ extern "C" {
 #endif
     struct netemu_list{
         int size;
-        void* elements;
+        void** elements;
         int element_size;
         int count;
     };
@@ -29,7 +29,9 @@ extern "C" {
     /**
      * Get a pointer to an element in the list.
      */
-    void* netemu_list_get(int index);
+    void* netemu_list_get(struct netemu_list* list, int index);
+
+    void netemu_list_clear(struct netemu_list* list);
 #ifdef	__cplusplus
 }
 #endif

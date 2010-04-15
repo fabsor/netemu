@@ -19,6 +19,14 @@ struct netemu_client* netemu_resources_get_client() {
 	return _netemu_resources_client;
 }
 
+struct netemu_receiver_udp* netemu_resources_get_receiver() {
+	return _netemu_resources_client->receiver;
+}
+
+struct netemu_sender_udp* netemu_resources_get_sender() {
+	return _netemu_resources_client->sender;
+}
+
 void netemu_resources_free_client() {
 netemu_receiver_udp_free(_netemu_resources_client->receiver);
 	netemu_sender_udp_free(_netemu_resources_client->sender);
