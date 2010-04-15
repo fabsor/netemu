@@ -6,18 +6,20 @@
  */
 
 #include <stdlib.h>
-#include "network/netemu_receiver.h"
 #include "protocol/communication.h"
-#include "network/netemu_sender.h"
+#include "interface/kaillera_server_connection.h"
+#include "network/netemu_tcp.h"
 #include "netemu_resources.h"
+#include "network/netemu_sender.h"
+#include "network/netemu_receiver.h"
+#include "netemu_thread.h"
 #include "netemu_util.h"
-#include "interface/server_connection.h"
 #include "netemu_socket.h"
 #define DOMAIN	"www.kaillera.com"
 #define SERVER	"kaillera.com"
 #define PATH	"/raw_server_list2.php?wg=1&version=0.9"
-
 #define VERSION						"0.83"
+
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
@@ -27,45 +29,55 @@ struct server_connection_callback {
 };
 
 struct netemu_communication_server* kaillera_communication_get_server_list() {
-	struct netemu_sender_tcp *sender;
+	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
 	struct netemu_addrinfo hints;
 	struct waiting_game *games;
 	struct server *servers;
-	char* request;
+	char* request, *buffer;
 	int error;
 
-	
     hints.ai_family = NETEMU_AF_UNSPEC;
     hints.ai_socktype = NETEMU_SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
-	sender = netemu_sender_tcp_new(info->addr,info->addrlen);
+	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
 	request = netemu_communication_http_get(SERVER,PATH);
-	netemu_sender_tcp_send(sender,request,strlen(request));
 
 	netemu_communication_parse_http(sender->socket, &games, &servers);
-
+	netemu_tcp_connection_send(sender,request,strlen(request));
+	buffer = malloc(1024);
+	error = netemu_recv(sender->socket,buffer,1024,0);
 }
 
-struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr) {
+struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username) {
 	struct netemu_client *client;
+	struct netemu_sender_udp* sender;
+	struct netemu_receiver_udp* receiver;
 	struct server_connection *connection;
 	char* hello;
-	int result = -1;
-	client = netemu_resources_get_client();
-	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
-	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
-	hello = netemu_communication_create_hello_message(VERSION);
-	netemu_util_send_data(client->sender,hello);
+	int result;
 
+	result = -1;
+
+	client = netemu_resources_get_client();
+	receiver = client->receiver;
+	sender = client->sender;
+
+	receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&result);
+	sender = netemu_util_prepare_sender_on_socket_at_addr(receiver->socket, addr, addr_size);
+	hello = netemu_communication_create_hello_message(VERSION);
+	netemu_util_send_data(sender,hello);
 	while(result == -1);
 	free(hello);
-	connection = malloc(sizeof(connection));
+	addr->port = netemu_htons(result);
+	free(sender->addr);
+	sender->addr = netemu_prepare_net_addr(addr);
+	connection = server_connection_new(username,emulator_name);
 	/* TODO: Fix more data when it becomes available. */
 	return connection;
 }
-
+/*
 void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void (*ConnectionReceivedFn)(int status, struct server_connection*)) {
 	struct netemu_client *client;
 	char* hello;
@@ -79,7 +91,7 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void 
 	hello = netemu_communication_create_hello_message(VERSION);
 	free(hello);
 }
-
+*/
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	int result;
 	int port;
@@ -105,6 +117,5 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 	int *result;
 	result = (int *)args;
 	*result = netemu_communication_parse_server_message(data);
-	free(data);
 }
 

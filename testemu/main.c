@@ -6,9 +6,8 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "netemu_socket.h"
 #include "kaillera_communication.h"
-
+#include "netemu_client.h"
 
 #define EMUNAME		"testemu"
 #define PLAYERNAME	"foobar"
@@ -17,29 +16,24 @@
 #define PORT	netemu_htons(27888)
 
 char* games[] = {"Foo", "Bar"};
-
+#define NO_GAMES	2
 
 int main() {
 	struct netemu_sockaddr_in addr;
-	//struct netemu_stringbuilder *builder;
-	//char *text;
-	//text = malloc(4);
-	//text[0] = 'E';
-	//text[1] = 'm';
-	//text[2] = 'i';
-	//text[3] = 'l';
-	//builder = netemu_stringbuilder_new(8);
-	//netemu_stringbuilder_append_chars(builder, text, 4);
-	//text[0] = 'G';
-	//text[1] = 'r';
-	//text[2] = 'ö';
-	//text[3] = 't';
-	//netemu_stringbuilder_append_chars(builder, text, 4);
+	struct netemu_emulator_info *info;
+	struct server_connection* connection;
+	struct game result;
+	int i;
+
 	addr.addr = ADDR;
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;
 	netemu_init_network();
+	//info = netemu_client_new(EMUNAME,games);
 	kaillera_communication_get_server_list();
-	kaillera_communication_connect(&addr);
-
+	connection = kaillera_communication_connect(&addr,sizeof(addr),PLAYERNAME);
+	for(i = 0; i < NO_GAMES; i++) {
+		server_connection_create_game(connection,games[i],&result);
+	}
+	return 0;
 }

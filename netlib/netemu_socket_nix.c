@@ -54,7 +54,7 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
 
 /* Receives data on a connected socket. */
 int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
-    return send(socket,buffer,len,flags);
+    return recv(socket,buffer,len,flags);
 }
 
 /* Received a datagram and stores the sender address */
@@ -78,10 +78,24 @@ int netemu_get_last_error() {
 
 int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
 	struct addrinfo* info;
+
+	struct addrinfo info_hints;
+	struct addrinfo* info_hints_ptr;
 	struct netemu_addrinfo *addr_result, *iter;
 	int error;
-
-	error = getaddrinfo(nodename,servicetype,NULL,&info);
+	if(hints == NULL) {
+		info_hints_ptr = NULL;
+	}
+	else {
+		info_hints.ai_family = hints->ai_family;
+		info_hints.ai_socktype = hints->ai_socktype;
+		info_hints.ai_protocol = hints->ai_protocol;
+		info_hints_ptr = &info_hints;
+	}
+	error = getaddrinfo(nodename,servicetype,info_hints_ptr,&info);
+	if(error == -1) {
+		return error;
+	}
 	addr_result = malloc(sizeof(struct netemu_addrinfo));
 	_fill_netemu_addrinfo(info,addr_result);
 	info = info->ai_next;
@@ -101,7 +115,7 @@ void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *ne
 	netemuinfo->addrlen = addrinfo->ai_addrlen;
 	if(addrinfo->ai_canonname != NULL)
 		netemuinfo->hostname = addrinfo->ai_canonname;
-	netemuinfo->addr = addrinfo->ai_addr;
+	netemuinfo->addr = (netemu_sockaddr*)addrinfo->ai_addr;
 }
 
 unsigned long netemu_inet_addr(char* addr) {
@@ -109,13 +123,13 @@ unsigned long netemu_inet_addr(char* addr) {
 }
 
 netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
-    struct sockaddr_in* in_addr;
-    in_addr = malloc(sizeof(struct sockaddr_in));
-    in_addr->sin_port = netaddr->port;
-    in_addr->sin_family = netaddr->family;
-    in_addr->sin_addr.s_addr = netaddr->addr;
+    struct sockaddr_in* addr;
+    addr = malloc(sizeof(struct sockaddr_in));
+    addr->sin_port = netaddr->port;
+    addr->sin_family = netaddr->family;
+    addr->sin_addr.s_addr = netaddr->addr;
     
-    return (netemu_sockaddr*) in_addr;
+    return (netemu_sockaddr*) addr;
 }
 
 int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {

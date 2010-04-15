@@ -65,6 +65,8 @@ extern "C" {
      * @param the comparator function.
      */
     void netemu_list_register_sort_fn(struct netemu_list* list, int ( * comparator ) ( const void *, const void * ));
+
+    void netemu_list_clear(struct netemu_list* list);
 #ifdef	__cplusplus
 }
 #endif

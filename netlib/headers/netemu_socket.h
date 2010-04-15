@@ -167,10 +167,10 @@ typedef unsigned int NETEMU_SOCKET;
 	/*! Winsock has a handy struct which contains address information of a specific host. This struct
 	* aims to replicate this.*/
 	struct netemu_addrinfo {
-		int ai_flags;       // AI_PASSIVE, AI_CANONNAME, AI_NUMERICHOST
-		int ai_family;      // PF_xxx
-		int ai_socktype;    // SOCK_xxx
-		int ai_protocol;    // 0 or IPPROTO_xxx for IPv4 and IPv6
+		int ai_flags;       /* AI_PASSIVE, AI_CANONNAME, AI_NUMERICHOST */
+		int ai_family;      /* PF_xxx */
+		int ai_socktype;    /* SOCK_xxx */
+		int ai_protocol;    /* 0 or IPPROTO_xxx for IPv4 and IPv6 */
 		size_t addrlen;
 		char* hostname;
 		struct netemu_sockaddr* addr;

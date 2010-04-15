@@ -238,7 +238,7 @@ int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder 
 	do{
 		received = netemu_recv(socket, receive_buffer, HTTP_BUFFER_SIZE, 0);
 		if(received < 0) {
-			error = -1;
+			error = netemu_get_last_error();
 			break;
 		}
 		else if(received == 0) {

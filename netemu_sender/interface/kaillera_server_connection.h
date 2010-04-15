@@ -27,6 +27,7 @@ typedef void (* playerJoinFn)(struct player_joined *result);
 struct server_connection {
 	struct netemu_sockaddr_in *addr;
 	char *user;
+	char *emulator_name;
 	server_connection_internal _internal;
 };
 
@@ -56,7 +57,8 @@ int server_connection_join_game(struct server_connection *connection, NETEMU_DWO
 
 int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid, playerJoinFn);
 
-struct server_connection *server_connection_new(struct netemu_sockaddr_in *addr);
+struct server_connection *server_connection_new(char* username, char* emulator_name);
+
 
 #ifdef	__cplusplus
 }

@@ -10,4 +10,5 @@
 
 void run_application_tests();
 
+
 #endif /* APPLICATION_TEST_H_ */

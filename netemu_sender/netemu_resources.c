@@ -13,10 +13,18 @@
 struct netemu_client* _netemu_resources_client = NULL;
 
 struct netemu_client* netemu_resources_get_client() {
-	if (_netemu_resources_client== NULL) {
+	if (_netemu_resources_client == NULL) {
 		_netemu_resources_client = malloc(sizeof(struct netemu_client));
 	}
 	return _netemu_resources_client;
+}
+
+struct netemu_receiver_udp* netemu_resources_get_receiver() {
+	return _netemu_resources_client->receiver;
+}
+
+struct netemu_sender_udp* netemu_resources_get_sender() {
+	return _netemu_resources_client->sender;
 }
 
 void netemu_resources_free_client() {

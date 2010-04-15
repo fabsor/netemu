@@ -28,6 +28,10 @@ struct netemu_client {
  */
 struct netemu_client* netemu_resources_get_client();
 
+struct netemu_receiver_udp* netemu_resources_get_receiver();
+
+struct netemu_sender_udp* netemu_resources_get_sender();
+
 /**
  * Free the client memory. This will free the memory of the
  * sender and receiver contained in the struct as well.
