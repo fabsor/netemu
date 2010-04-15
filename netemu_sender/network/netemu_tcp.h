@@ -55,6 +55,8 @@ int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data,
 
 struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, size_t addr_len);
 
+int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender);
+
 #ifdef	__cplusplus
 }
 #endif

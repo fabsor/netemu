@@ -131,11 +131,20 @@ int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data,
 	return success;
 }
 
+int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender) {
+	int success;
+	success = netemu_connect(sender->socket,sender->addr,sender->addr_len);
+	if(success == -1){
+		sender->error = netemu_get_last_error();
+	}
+	return success;
+}
+
 struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, size_t addr_len) {
 	NETEMU_SOCKET socket;
 	struct netemu_tcp_listener* sender;
 	sender = malloc(sizeof(struct netemu_tcp_listener));
-	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
+	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_STREAM);
 	if (socket == INVALID_SOCKET) {
 		sender->error = netemu_get_last_error();
 	}
