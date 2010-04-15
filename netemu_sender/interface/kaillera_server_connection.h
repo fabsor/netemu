@@ -58,6 +58,7 @@ int server_connection_join_game_async(struct server_connection *connection, NETE
 
 struct server_connection *server_connection_new(char* username);
 
+
 #ifdef	__cplusplus
 }
 #endif

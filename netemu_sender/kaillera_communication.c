@@ -36,7 +36,6 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 	char* buffer;
 	int error;
 
-	
     hints.ai_family = NETEMU_AF_UNSPEC;
     hints.ai_socktype = NETEMU_SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
@@ -68,9 +67,11 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	hello = netemu_communication_create_hello_message(VERSION);
 	netemu_util_send_data(sender,hello);
 	while(result == -1);
-	addr->port = netemu_htons(result);
-	sender->addr = netemu_prepare_net_addr(addr);
-	connection = server_connection_new(username);
+	free(hello);
+	addr->port = htonl(result);
+	//client->sender->addr = netemu_prepare_net_addr(addr);
+	connection = server_connection_new(client->sender->addr, username);
+	/* TODO: Fix more data when it becomes available. */
 	return connection;
 }
 /*
