@@ -10,7 +10,6 @@
 #include "network/netemu_tcp.h"
 #include "netemu_resources.h"
 #include "netemu_util.h"
-#include "interface/server_connection.h"
 #include "netemu_socket.h"
 #define DOMAIN	"www.kaillera.com"
 #define SERVER	"kaillera.com"
@@ -49,6 +48,7 @@ struct netemu_communication_server* kaillera_communication_get_server_list() {
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr) {
 	struct netemu_client *client;
 	struct server_connection *connection;
+	struct netemu_sockaddr_in *new_addr;
 	char* hello;
 	int result = -1;
 	client = netemu_resources_get_client();
@@ -56,10 +56,11 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr);
 	hello = netemu_communication_create_hello_message(VERSION);
 	netemu_util_send_data(client->sender,hello);
-
 	while(result == -1);
 	free(hello);
-	connection = malloc(sizeof(connection));
+	addr->port = htonl(result);
+	client->sender->addr = netemu_prepare_net_addr(addr);
+	connection = server_connection_new(addr);
 	/* TODO: Fix more data when it becomes available. */
 	return connection;
 }

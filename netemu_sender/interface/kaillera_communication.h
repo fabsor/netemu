@@ -12,7 +12,7 @@
 #include "../network/netemu_receiver.h"
 #include "../protocol/communication.h"
 #include "../network/netemu_sender.h"
-#include "server_connection.h"
+#include "kaillera_server_connection.h"
 
 struct netemu_communication_server {
 	char *name;
