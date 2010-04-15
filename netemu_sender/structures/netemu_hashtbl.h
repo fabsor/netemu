@@ -41,12 +41,14 @@ struct hashnode_s {
 
 typedef struct netemu_hashtbl {
 	hash_size size;
+	int count;
 	struct hashnode_s **nodes;
+	int (*comparator)(const void* value1, const void* value2);
 	hash_size (*hashfunc)(const void *, size_t);
 } NETEMU_HASHTBL;
 
 
-NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t));
+NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t), int (*comparator)(const void* value1, const void* value2));
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl);
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl);
 int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key, size_t key_len, void *data);
@@ -56,5 +58,6 @@ int netemu_hashtbl_resize(NETEMU_HASHTBL *hashtbl, hash_size size);
 
 hash_size def_hashfunc_str(const void *key, size_t key_len);
 hash_size def_hashfunc_int(const void *key, size_t key_len);
+int comparator_int(const void* value1, const void* value2);
 #endif
 

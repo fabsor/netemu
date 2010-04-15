@@ -11,7 +11,7 @@
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);
 int server_connection_login(struct server_connection* connection);
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id);
-void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction);
+void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
@@ -118,10 +118,10 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->game_created_callback = netemu_list_new(3);
 	connection->_internal->join_callback = netemu_list_new(3);
 	connection->_internal->leave_callback = netemu_list_new(3);
-	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
-	connection->_internal->send_buffer = netemu_packet_buffer_new(100);
+	connection->_internal->receive_buffer = netemu_packet_buffer_new(100,1,0);
+	connection->_internal->send_buffer = netemu_packet_buffer_new(100,0,1);
 
-	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
@@ -154,11 +154,13 @@ int server_connection_wait_for_instruction(struct server_connection* connection,
 	netemu_thread_mutex_destroy(mutex);
 }
 
-void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
+void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct application_instruction* pong;
+	struct server_connection* connection;
+	connection = (struct server_connection*)connection;
 	pong = netemu_application_create_message();
 	netemu_application_pong_add(pong);
-	netemu_packet_buffer_add(buffer,pong);
+	netemu_packet_buffer_add(connection->_internal->send_buffer,pong);
 }
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {

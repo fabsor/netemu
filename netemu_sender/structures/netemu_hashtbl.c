@@ -52,8 +52,12 @@ hash_size def_hashfunc_int(const void *key, size_t key_len) {
 	return *int_key;
 }
 
+int comparator_int(const void* value1, const void* value2) {
+	return (*(int*)value1)-(*(int*)value2);
+}
+
 NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
-		const void *, size_t)) {
+		const void *, size_t), int (*comparator)(const void* value1, const void* value2)) {
 	NETEMU_HASHTBL *hashtbl;
 
 	if (!(hashtbl = malloc(sizeof(NETEMU_HASHTBL))))
@@ -87,6 +91,7 @@ void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl) {
 			free(oldnode);
 		}
 	}
+	hashtbl->count = 0;
 }
 
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl) {
@@ -104,7 +109,7 @@ int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key,
 
 	node = hashtbl->nodes[hash];
 	while (node) {
-		if (!strcmp(node->key, key)) {
+		if (hashtbl->comparator(node->key, key) == 0) {
 			node->data = data;
 			return 0;
 		}
@@ -120,7 +125,7 @@ int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key,
 	node->data = data;
 	node->next = hashtbl->nodes[hash];
 	hashtbl->nodes[hash] = node;
-
+	hashtbl->count++;
 	return 0;
 }
 
@@ -131,18 +136,20 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key,
 
 	node = hashtbl->nodes[hash];
 	while (node) {
-		if (!strcmp(node->key, key)) {
+		if (hashtbl->comparator(node->key, key) == 0) {
 			free(node->key);
 			if (prevnode)
 				prevnode->next = node->next;
 			else
 				hashtbl->nodes[hash] = node->next;
 			free(node);
+			hashtbl->count--;
 			return 0;
 		}
 		prevnode = node;
 		node = node->next;
 	}
+
 
 	return -1;
 }

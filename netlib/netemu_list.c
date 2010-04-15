@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "headers/netemu_list.h"
 #include <string.h>
-#include "netlib_util.h"
+#include "headers/netlib_util.h"
 
 struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
