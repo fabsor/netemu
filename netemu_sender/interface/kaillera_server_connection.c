@@ -3,8 +3,10 @@
 #include "../protocol/application.h"
 #include "../netemu_resources.h"
 #include "../network/netemu_packet_buffer.h"
+#include "../network/netemu_sender_buffer.h"
 #include "../network/netemu_sender.h"
 #include "../network/netemu_receiver.h"
+
 #include "netemu_list.h"
 #include "netemu_thread.h"
 
@@ -19,7 +21,7 @@ struct _server_connection_internal {
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
 	struct netemu_packet_buffer *receive_buffer;
-	struct netemu_packet_buffer *send_buffer;
+	struct netemu_sender_buffer *send_buffer;
 };
 
 int server_connection_send_chat_message(struct server_connection *connection, char *message) {
@@ -118,8 +120,8 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->game_created_callback = netemu_list_new(3);
 	connection->_internal->join_callback = netemu_list_new(3);
 	connection->_internal->leave_callback = netemu_list_new(3);
-	connection->_internal->receive_buffer = netemu_packet_buffer_new(100,1,0);
-	connection->_internal->send_buffer = netemu_packet_buffer_new(100,0,1);
+	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
+	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
 
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 
@@ -129,14 +131,13 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 }
 
 int server_connection_login(struct server_connection* connection) {
-	struct transport_packet_buffer buffer;
 	struct application_instruction *message;
 	struct netemu_sender_udp *sender;
 	sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_login_request_add(message,connection->emulator_name,connection->user,1);
-	buffer = netemu_transport_pack(&message,1);
-	netemu_sender_udp_send(sender,buffer.data,buffer.size);
+	message->important = 1;
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
 	server_connection_wait_for_instruction(connection,LOGIN_SUCCESS);
 	netemu_packet_buffer_pop(connection->_internal->receive_buffer, LOGIN_SUCCESS);
 	return 1;
@@ -145,22 +146,22 @@ int server_connection_login(struct server_connection* connection) {
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id) {
 	netemu_mutex mutex;
 	time_t timestamp;
-	int error;
 	mutex = netemu_thread_mutex_create();
 	timestamp = time(NULL);
 	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, mutex);
 	netemu_thread_mutex_lock(mutex, NETEMU_INFINITE);
 	netemu_thread_mutex_release(mutex);
 	netemu_thread_mutex_destroy(mutex);
+	return 1;
 }
 
 void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct application_instruction* pong;
 	struct server_connection* connection;
-	connection = (struct server_connection*)connection;
+	connection = (struct server_connection*)arg;
 	pong = netemu_application_create_message();
 	netemu_application_pong_add(pong);
-	netemu_packet_buffer_add(connection->_internal->send_buffer,pong);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,pong);
 }
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {

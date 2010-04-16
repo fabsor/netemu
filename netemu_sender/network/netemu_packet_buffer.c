@@ -30,13 +30,11 @@ void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, s
 void _netemu_packet_buffer_update(void* args);
 
 
-struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size, int receiving, int sending) {
+struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	struct netemu_packet_buffer *buffer;
 
 	buffer = malloc(sizeof(struct netemu_packet_buffer));
 	buffer->table = netemu_hashtbl_create(size, def_hashfunc_int,comparator_int);
-	buffer->receiving = receiving;
-	buffer->sending = sending;
 	buffer->_internal = malloc(sizeof(struct _netemu_packet_buffer_internal));
 	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, def_hashfunc_int, comparator_int);
 	buffer->_internal->registered_fns = netemu_hashtbl_create(size, def_hashfunc_int, comparator_int);
@@ -79,11 +77,6 @@ struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_bu
 	return instruction;
 }
 
-struct transport_packet* netemu_packet_buffer_pack(struct netemu_packet_buffer *buffer) {
-	struct transport_packet* packet;
-	struct application_instruction **instructions;
-	instructions = malloc(sizeof(struct application_instruction**)*buffer->table->count);
-}
 
 void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer) {
 	netemu_hashtbl_clear(buffer->table);
@@ -123,11 +116,10 @@ void _netemu_packet_buffer_update(void* args) {
 			netemu_thread_mutex_lock(lock,NETEMU_INFINITE);
 			for (i = 0; i < itemsToAdd->count; i++) {
 				_netemu_packet_buffer_internal_add(buffer,itemsToAdd->elements[i]);
-				if(buffer->receiving) {
-					/* wakeup and notify */
-					_netemu_packet_buffer_perform_notify(buffer,itemsToAdd->elements[i]);
-					_netemu_packet_buffer_perform_wakeup(buffer,itemsToAdd->elements[i]);
-				}
+				/* wakeup and notify */
+				_netemu_packet_buffer_perform_notify(buffer,itemsToAdd->elements[i]);
+				_netemu_packet_buffer_perform_wakeup(buffer,itemsToAdd->elements[i]);
+
 			}
 			netemu_list_clear(itemsToAdd);
 			netemu_thread_mutex_release(lock);

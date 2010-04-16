@@ -21,8 +21,6 @@ extern "C" {
 
 	struct netemu_packet_buffer {
 		NETEMU_HASHTBL *table;
-		unsigned short sending;
-		unsigned short receiving;
 		netemu_packet_buffer_internal _internal;
 	};
 	typedef void (*bufferListenerFn)(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
@@ -32,7 +30,7 @@ extern "C" {
 	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, char id);
 	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
-	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size, int receiving, int sending);
+	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);
 	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_mutex mutex);
 	void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, int instruction, bufferListenerFn fn, void* arg);
 #ifdef	__cplusplus
