@@ -28,28 +28,18 @@ struct server_connection_callback {
 	void (*ConnectionReceivedFn)(int status, struct server_connection*);
 };
 
-struct netemu_communication_server* kaillera_communication_get_server_list() {
+int kaillera_communication_get_server_list(struct server ***servers, struct existing_game ***games) {
 	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
-	struct netemu_addrinfo hints;
-	struct waiting_game *games;
-	struct server *servers;
-	char* request, *buffer;
-	int error;
+	char* request;
 
-    hints.ai_family = NETEMU_AF_UNSPEC;
-    hints.ai_socktype = NETEMU_SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
 	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
 	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
 	netemu_tcp_connection_connect(sender);
 	request = netemu_communication_http_get(SERVER,PATH);
 
 	netemu_tcp_connection_send(sender,request,strlen(request));
-	netemu_communication_parse_http(sender->socket, &games, &servers);
-	
-	buffer = malloc(1024);
-	error = netemu_recv(sender->socket,buffer,1024,0);
+	netemu_communication_parse_http(sender->socket, games, servers);
 }
 
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username) {

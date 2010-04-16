@@ -14,13 +14,16 @@
 #include "../network/netemu_sender.h"
 #include "kaillera_server_connection.h"
 
-struct netemu_communication_server {
-	char *name;
-	struct netemu_sockaddr_in addr;
-	struct netemu_communication_server *next;
-};
+//struct netemu_communication_server {
+//	char *name;
+//	struct netemu_sockaddr_in addr;
+//	struct netemu_communication_server *next;
+//};
 
-struct netemu_communication_server* kaillera_communication_get_server_list();
+typedef struct server kaillera_server;
+typedef struct existing_game kaillera_existing_game;
+
+int kaillera_communication_get_server_list(struct server ***servers, struct existing_game ***games)
 
 /**
  *

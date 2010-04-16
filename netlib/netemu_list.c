@@ -81,16 +81,18 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 	return 1;
 }
 
-int netemu_list_copy(struct netemu_list* list, void **buffer) {
+int netemu_list_copy(struct netemu_list* list, void ***buffer) {
 	NETEMU_DWORD size;
 	size = sizeof(void*) * list->count;
+
 	if((*buffer = malloc(size)) == NULL)
 		return -1;
 
 	//memset(buffer, 0, size);
-	//memcpy(buffer, list->elements, size);
+	memcpy(*buffer, list->elements, size);
 	return 0;
 }
+
 /**
  * Register a sorting function for your elements. If you do this, the elements will be sorted with
  * qsort and searches can be done with binary search.

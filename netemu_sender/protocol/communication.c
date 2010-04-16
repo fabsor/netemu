@@ -91,10 +91,11 @@ char* netemu_communication_http_get(char* host, char* path) {
 	return buffer;
 }
 
-int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_game **games, struct server **servers) {
+int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, struct server ***servers) {
 	struct netemu_stringbuilder *builder;
 	struct netemu_list *game_list, *server_list;
 	char *response_body, *serverlist;
+	struct existing_game **eg;
 	int return_value;
 
 	builder = netemu_stringbuilder_new(1024);
@@ -156,11 +157,11 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_game **
 }
 
 char *_netemu_parse_game_list(char* response_body, struct netemu_list *game_list) {
-	struct waiting_game *game;
+	struct existing_game *game;
 	char *return_value;
 	char *player_int;
 	while(*response_body != '\n') {
-		game = malloc(sizeof(struct waiting_game));
+		game = malloc(sizeof(struct existing_game));
 
 		/* Game name */
 		if((response_body = _netemu_parse_response_string(response_body, &game->gamename, GAME_STRING_SEPARATOR)) == NULL) {

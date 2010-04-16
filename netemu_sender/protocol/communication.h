@@ -17,7 +17,7 @@ enum {
 	PING_RECEIVED
 };
 
-struct waiting_game {
+struct existing_game {
 	char *gamename;
 	char *address;
 	char *player;
@@ -67,6 +67,6 @@ int netemu_communication_parse_server_accept_port(char* server_message);
 
 char* netemu_communication_http_get(char* host, char* path);
 
-int netemu_communication_parse_http(NETEMU_SOCKET socket, struct waiting_game **games, struct server **servers);
+int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game **games, struct server **servers);
 
 #endif /* COMMUNICATION_H_ */
