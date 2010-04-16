@@ -47,6 +47,12 @@ typedef struct netemu_hashtbl {
 	hash_size (*hashfunc)(const void *, size_t);
 } NETEMU_HASHTBL;
 
+struct netemu_hashtable_iter {
+	NETEMU_HASHTBL *table;
+	int hashindex;
+	struct hashnode_s *currentnode;
+
+};
 
 NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t), int (*comparator)(const void* value1, const void* value2));
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl);
