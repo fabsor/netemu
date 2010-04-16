@@ -94,6 +94,42 @@ void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl) {
 	hashtbl->count = 0;
 }
 
+struct netemu_hashtable_iter  *netemu_hashtbl_iterator_new(NETEMU_HASHTBL *hashtbl) {
+	struct netemu_hashtable_iter *iterator;
+	iterator = (struct netemu_hashtable_iter*)malloc(sizeof(struct netemu_hashtable_iter));
+	iterator->currentnode = hashtbl->nodes[0];
+}
+
+void* netemu_hashtbl_iterator_next(struct netemu_hashtable_iter  *iterator) {
+	void* element;
+	if(iterator->currentnode == NULL)
+		return NULL;
+
+	element = iterator->currentnode->data;
+	if(iterator->currentnode->next == NULL) {
+		iterator->hashindex++;
+		if(iterator->hashindex >= iterator->table->size)
+			iterator->currentnode = NULL;
+		else {
+			iterator->currentnode = iterator->table->nodes[iterator->hashindex];
+		}
+	}
+	else {
+		iterator->currentnode = iterator->currentnode->next;
+	}
+	return element;
+
+}
+
+void* netemu_hashtbl_iterator_reset(struct netemu_hashtable_iter *iterator) {
+	iterator->hashindex = 0;
+	iterator->currentnode = iterator->table->nodes[0];
+}
+
+void netemu_hashtbl_iterator_free(struct netemu_hashtable_iter* iterator) {
+	free(iterator);
+}
+
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl) {
 	netemu_hashtbl_clear(hashtbl);
 	free(hashtbl->nodes);

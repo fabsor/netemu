@@ -79,8 +79,10 @@ struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_bu
 	return instruction;
 }
 
-struct transport_packet* netemu_packet_buffer_pack() {
-
+struct transport_packet* netemu_packet_buffer_pack(struct netemu_packet_buffer *buffer) {
+	struct transport_packet* packet;
+	struct application_instruction **instructions;
+	instructions = malloc(sizeof(struct application_instruction**)*buffer->table->count);
 }
 
 void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer) {
