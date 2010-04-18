@@ -87,8 +87,12 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		error = getaddrinfo(nodename, servicetype, &info_hints, &addrinfo);
 	}
 	
+	if(error != 0) 
+		return -1;
+	
 
-	*result = malloc(sizeof(struct netemu_addrinfo));
+	if((*result = malloc(sizeof(struct netemu_addrinfo))) == NULL) 
+		return -1;
 
 	result_addrinfo = *result;
 	while(addrinfo != NULL) {
@@ -101,9 +105,16 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		result_addrinfo->ai_socktype = addrinfo->ai_socktype;
 		addrinfo = addrinfo->ai_next;
 		if(addrinfo != NULL) {
-			result_addrinfo->next = malloc(sizeof(struct netemu_addrinfo));
+			if((result_addrinfo->next = malloc(sizeof(struct netemu_addrinfo))) == NULL) {
+				error = -1;
+				break;
+			}
 			result_addrinfo = result_addrinfo->next;
 		}
+	}
+
+	if(error != 0) {
+
 	}
 
 }

@@ -221,6 +221,8 @@ typedef unsigned int NETEMU_SOCKET;
 
 	int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result);
 
+	void netemu_free_addr_info(struct netemu_addrinfo *info);
+
 	netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr);
 
 	/* Converts a string containing a dotted IPv4 address to a network order unsigned long. */
