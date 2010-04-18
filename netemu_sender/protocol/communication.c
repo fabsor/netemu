@@ -134,7 +134,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		return -1;
 	}
 
-	return_value = netemu_list_copy(game_list, games);
+	return_value = netemu_list_copy(game_list, (void***)games);
 	if(return_value != 0) {
 		netemu_stringbuilder_free(builder);
 		netemu_list_free(game_list);
@@ -142,7 +142,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		return -1;
 	}
 
-	return_value = netemu_list_copy(server_list, servers);
+	return_value = netemu_list_copy(server_list, (void***)servers);
 	if(return_value != 0) {
 		netemu_stringbuilder_free(builder);
 		netemu_list_free(game_list);

@@ -9,6 +9,7 @@
 #include "../protocol/application.h"
 #include "../protocol/transport.h"
 #include "../netemu_resources.h"
+#include "netemu_sender.h"
 #include "netemu_sender_buffer.h"
 void _netemu_sender_buffer_update(void* arg);
 
@@ -44,7 +45,7 @@ void _netemu_sender_buffer_update(void* arg) {
 	struct netemu_sender_udp *sender;
 	struct transport_packet_buffer packet_buffer;
 	int i;
-
+	int count;
 	buffer = (struct netemu_sender_buffer*) arg;
 	itemsToSend = buffer->instructions;
 	sender = netemu_resources_get_sender();
@@ -55,15 +56,19 @@ void _netemu_sender_buffer_update(void* arg) {
 		if (buffer->instructions->count > buffer->preferred_no_packets
 				|| buffer->send == 1) {
 			netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
+			count = itemsToSend->count;
 			for (i = 0; i < itemsToSend->count; i++) {
 				instructions[i] = itemsToSend->elements[i];
 			}
 			netemu_list_clear(itemsToSend);
 			netemu_thread_mutex_release(buffer->send_lock);
-			packet_buffer = netemu_transport_pack(instructions,
-					itemsToSend->count);
+			packet_buffer = netemu_transport_pack(instructions, count);
 			netemu_sender_udp_send(sender, packet_buffer.data,
 					packet_buffer.size);
+			free(packet_buffer.data);
+			for(i = 0; i < count; i++) {
+				netemu_application_free_message(instructions[i]);
+			}
 			buffer->send = 0;
 		}
 	}
