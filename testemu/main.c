@@ -15,7 +15,7 @@
 #define ADDR	netemu_htonl(NETEMU_INADDR_LOOPBACK)
 #define PORT	netemu_htons(27888)
 
-char* games[] = {"Foo", "Bar"};
+char* games[2] = {"Foo", "Bar"};
 #define NO_GAMES	2
 
 int main() {

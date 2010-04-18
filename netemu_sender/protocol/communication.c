@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "netemu_socket.h"
+#include "netemu_list.h"
 #include "../structures/netemu_stringbuilder.h"
 
 #define HTTP_BUFFER_SIZE			512

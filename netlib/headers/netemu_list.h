@@ -29,7 +29,7 @@ extern "C" {
 
     int netemu_list_remove_at(struct netemu_list* list, int index);
 
-	int netemu_list_copy(struct netemu_list* list, void **buffer);
+    int netemu_list_copy(struct netemu_list* list, void ***buffer);
 
     /**
      * Check if the element in the list contains the provided element.
