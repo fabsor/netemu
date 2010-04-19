@@ -26,9 +26,6 @@ extern "C" {
 	typedef void (*bufferListenerFn)(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 	void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction);
-	struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, char id);
-	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, char id);
-	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
 	void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, char instruction, bufferListenerFn fn, void* arg);
 	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);

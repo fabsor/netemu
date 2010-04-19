@@ -1,4 +1,5 @@
 ﻿
+#include <stdio.h>
 #include "kaillera_server_connection.h"
 #include "../protocol/application.h"
 #include "../netemu_resources.h"
@@ -186,7 +187,7 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 	packet = netemu_transport_unpack(data);
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id == 14) {
+		if(instruction->id == CREATE_GAME) {
 			printf("GAME CREATED");
 		}
 		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
