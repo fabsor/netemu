@@ -4,6 +4,10 @@ struct netemu_mutex_internal {
 	HANDLE mutex;
 };
 
+struct netemu_event_internal {
+	HANDLE eventhandle;
+};
+
 struct netemu_thread_args {
 	void (*start_fn) (void *);
 	void *arguments;
@@ -55,4 +59,32 @@ int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
 	/* TODO: Mutex-objektet blir förstört först när ALLA handles till objektet
 	 * har stängts, hur försäkrar man sig om att det inte finns mer handles till mutex-objektet?*/
 	return CloseHandle(mutex_identifier->mutex);
+}
+
+netemu_event netemu_thread_event_create() {
+	netemu_event event_struct;
+	HANDLE handle;
+
+	/* Manual reset sätts till false, vilket betyder att såfort den signaleras och nåt objekt väntat på eventet,
+	 * så nollställs det till non-signaled automatiskt.*/
+	if((handle = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL)
+		return NULL;
+
+	if((event_struct = malloc(sizeof(struct netemu_event_internal))) == NULL)
+		return NULL;
+
+	event_struct->eventhandle = handle;
+
+	return event_struct;
+}
+
+int netemu_thread_event_signal(netemu_event event_identifier) {
+	return SetEvent(event_identifier->eventhandle);
+}
+
+int netemu_thread_event_wait(netemu_event event_identifier) {
+	if(WaitForSingleObject(event_identifier->eventhandle, INFINITE) == WAIT_OBJECT_0)
+		return 0;
+	else
+		return -1;
 }
