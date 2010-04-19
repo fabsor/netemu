@@ -15,7 +15,7 @@
 #define ADDR	INADDR_ANY
 #define PORT	netemu_htons(27888)
 
-char* games[2] = {"Foo", "Bar"};
+char* games[] = {"Foo", "Bar"};
 #define NO_GAMES	2
 
 int main() {
@@ -23,7 +23,7 @@ int main() {
 	struct netemu_emulator_info *info;
 	struct server_connection* connection;
 	kaillera_server **servers;
-	kaillera_existing_game **games;
+	kaillera_existing_game **existing_games;
 	struct game result;
 	int i;
 

@@ -96,30 +96,18 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 }
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
-	netemu_mutex mutex;
 	int error;
 	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
-	struct application_instruction *message, *reply;
+	struct application_instruction *message;
 
-	mutex = netemu_thread_mutex_create();
-	client = netemu_resources_get_client();
 	message = netemu_application_create_message();
 	netemu_application_create_game_add(message, gamename);
-	buffer = netemu_transport_pack(&message,1);
 
 	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, mutex);
-	if((error = netemu_sender_udp_send(client->sender,buffer.data,buffer.size)) != 0)
-		return error;
-	
-	netemu_thread_mutex_lock(mutex, NETEMU_INFINITE);
-	netemu_thread_mutex_release(mutex);
-	netemu_packet_buffer_pop(connection->_internal->receive_buffer, CREATE_GAME);
-	netemu_application_free_message(message);
-	netemu_thread_mutex_destroy(mutex);
-
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	server_connection_wait_for_instruction(connection, CREATE_GAME, timestamp);
 	return 0;
 }
 
