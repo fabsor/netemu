@@ -34,10 +34,10 @@ struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	struct netemu_packet_buffer *buffer;
 
 	buffer = malloc(sizeof(struct netemu_packet_buffer));
-	buffer->table = netemu_hashtbl_create(size, def_hashfunc_int,comparator_int);
+	buffer->table = netemu_hashtbl_create(size, def_hashfunc_char,comparator_char);
 	buffer->_internal = malloc(sizeof(struct _netemu_packet_buffer_internal));
-	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, def_hashfunc_int, comparator_int);
-	buffer->_internal->registered_fns = netemu_hashtbl_create(size, def_hashfunc_int, comparator_int);
+	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, def_hashfunc_char, comparator_char);
+	buffer->_internal->registered_fns = netemu_hashtbl_create(size, def_hashfunc_char, comparator_char);
 	buffer->_internal->add_mutex = netemu_thread_mutex_create();
 	buffer->_internal->instructions_to_add = netemu_list_new(20);
 	netemu_thread_new(_netemu_packet_buffer_update,buffer);
@@ -82,7 +82,7 @@ void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer) {
 	netemu_hashtbl_clear(buffer->table);
 }
 
-void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, int instruction, bufferListenerFn fn, void* arg) {
+void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, char instruction, bufferListenerFn fn, void* arg) {
 	struct _netemu_packet_buffer_notify_info *info, *existing_info;
 	info = malloc(sizeof(struct _netemu_packet_buffer_notify_info));
 	info->fn = fn;
@@ -158,13 +158,17 @@ void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_bu
 
 void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *nextwakeup;
+
 	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id, sizeof(char))) != NULL) {
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
 				nextwakeup = wakeup->next;
 				netemu_thread_event_signal(wakeup->eventhandle);
-				wakeup->prev->next = wakeup->next;
-				wakeup->next->prev = wakeup->prev;
+				if(wakeup->prev != NULL)
+					wakeup->prev->next = wakeup->next;
+				if(wakeup->next != NULL)
+					wakeup->next->prev = wakeup->prev;
+
 				free(wakeup);
 				wakeup = nextwakeup;
 			}

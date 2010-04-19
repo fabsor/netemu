@@ -52,8 +52,17 @@ hash_size def_hashfunc_int(const void *key, size_t key_len) {
 	return *int_key;
 }
 
+hash_size def_hashfunc_char(const void *key, size_t key_len) {
+	char* char_key = (char*) key;
+	return *char_key;
+}
+
 int comparator_int(const void* value1, const void* value2) {
 	return (*(int*)value1)-(*(int*)value2);
+}
+
+int comparator_char(const void* value1, const void* value2) {
+	return (*(char*)value1)-(*(char*)value2);
 }
 
 NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
@@ -204,7 +213,7 @@ void *netemu_hashtbl_get(NETEMU_HASHTBL *hashtbl, const void *key,
 
 	node = hashtbl->nodes[hash];
 	while (node) {
-		if (!strcmp(node->key, key))
+		if (!hashtbl->comparator(node->key, key))
 			return node->data;
 		node = node->next;
 	}

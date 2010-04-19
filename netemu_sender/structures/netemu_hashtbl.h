@@ -64,6 +64,8 @@ int netemu_hashtbl_resize(NETEMU_HASHTBL *hashtbl, hash_size size);
 
 hash_size def_hashfunc_str(const void *key, size_t key_len);
 hash_size def_hashfunc_int(const void *key, size_t key_len);
-int comparator_int(const void* value1, const void* value2);
+hash_size def_hashfunc_char(const void *key, size_t key_len);
+int comparator_int(const void *value1, const void *value2);
+int comparator_char(const void *value1, const void *value2);
 #endif
 
