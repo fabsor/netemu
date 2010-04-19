@@ -146,7 +146,6 @@ netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr) {
     in_addr->sin_port = netaddr->port;
     in_addr->sin_family = netaddr->family;
     in_addr->sin_addr.s_addr = netaddr->addr;
-    in_addr->sin_addr.s_addr = 4;
     return (netemu_sockaddr*) in_addr;
 }
 
