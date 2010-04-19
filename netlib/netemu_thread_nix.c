@@ -15,6 +15,12 @@
 #include "headers/netemu_thread.h"
 #include "headers/netemu_list.h"
 #include <pthread.h>
+
+struct netemu_event_internal {
+	pthread_mutex_t* mutex;
+	pthread_cond_t* cond;
+};
+
 struct netemu_mutex_internal{
 	pthread_mutex_t* mutex;
 };
@@ -123,5 +129,46 @@ int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
 	if(error != 0) {
 		return -1;
 	}
+	return 0;
+}
+
+/**
+ * Creates an event.
+ * @return an identifier for the event, or NULL if something went wrong.
+ */
+netemu_event netemu_thread_event_create() {
+	struct netemu_event_internal *event;
+
+	event = (struct netemu_event_internal*)malloc(sizeof(struct netemu_event_internal));
+	event->mutex = malloc(sizeof(pthread_mutex_t));
+	event->cond = malloc(sizeof(pthread_cond_t));
+
+	pthread_cond_init(event->cond, NULL);
+	pthread_mutex_init(event->mutex, NULL);
+
+	return event;
+}
+
+/**
+ * Signals an event.
+ * @param event_identifier the identifier of the event.
+ */
+int netemu_thread_event_signal(netemu_event event_identifier) {
+	pthread_mutex_lock(event_identifier->mutex);
+	pthread_cond_signal(event_identifier->cond);
+	pthread_mutex_unlock(event_identifier->mutex);
+
+	return 0;
+}
+
+/**
+ * Waits for an event to be signaled.
+ * @param event_identifier the identifier of the event.
+ */
+int netemu_thread_event_wait(netemu_event event_identifier) {
+	pthread_mutex_lock(event_identifier->mutex);
+	pthread_cond_wait(event_identifier->cond,event_identifier->mutex);
+	pthread_mutex_unlock(event_identifier->mutex);
+
 	return 0;
 }

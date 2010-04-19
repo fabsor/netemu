@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#include "netemu_thread.h"
+#include "netemu_list.h"
 #define LIST_START_SIZE	10
 
 struct netemu_sender_buffer {
