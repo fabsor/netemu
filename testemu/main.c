@@ -12,7 +12,7 @@
 #define EMUNAME		"testemu"
 #define PLAYERNAME	"foobar"
 
-#define ADDR	netemu_inet_addr("192.168.106.222")
+#define ADDR	INADDR_ANY
 #define PORT	netemu_htons(27888)
 
 char* games[2] = {"Foo", "Bar"};
@@ -34,8 +34,8 @@ int main() {
 	//info = netemu_client_new(EMUNAME,games);
 	//kaillera_communication_get_server_list(&servers, &games);
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
-	//for(i = 0; i < NO_GAMES; i++) {
-	//	server_connection_create_game(connection,games[i],&result);
-	//}
+	for(i = 0; i < NO_GAMES; i++) {
+		server_connection_create_game(connection,games[i],&result);
+	}
 	return 0;
 }
