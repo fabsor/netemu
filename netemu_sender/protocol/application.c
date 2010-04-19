@@ -283,7 +283,7 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 void netemu_application_free_message(struct application_instruction* message) {
 	free(message->body);
 	free(message->user);
-	free(message);
+	//free(message); why?
 }
 
 void netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection) {
