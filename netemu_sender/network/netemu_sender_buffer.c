@@ -63,7 +63,7 @@ void _netemu_sender_buffer_update(void* arg) {
 			packet_buffer = netemu_transport_pack(instructions, count);
 			netemu_sender_udp_send(sender, packet_buffer.data,
 					packet_buffer.size);
-			free(packet_buffer.data);
+			//free(packet_buffer.data);
 			for(i = 0; i < count; i++) {
 				netemu_application_free_message(instructions[i]);
 			}
