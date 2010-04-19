@@ -31,7 +31,7 @@ extern "C" {
 	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
 	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);
-	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_mutex mutex);
+	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle);
 	void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, int instruction, bufferListenerFn fn, void* arg);
 #ifdef	__cplusplus
 }

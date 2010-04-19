@@ -4,7 +4,7 @@
 void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, struct application_instruction *instruction);
 
 struct _netemu_packet_buffer_wakeup_info {
-	netemu_mutex mutex;
+	netemu_event eventhandle;
 	time_t age;
 	struct _netemu_packet_buffer_wakeup_info *next;
 	struct _netemu_packet_buffer_wakeup_info *prev;
@@ -136,14 +136,12 @@ void _netemu_packet_buffer_internal_add(struct netemu_packet_buffer *buffer, str
 	netemu_hashtbl_insert(buffer->table, &instruction->id, sizeof(char), instruction);
 }
 
-void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_mutex mutex) {
+void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_packet_buffer_wakeup_info));
 	wakeup->age = age;
-	wakeup->mutex = mutex;
+	wakeup->eventhandle = eventhandle;
 	wakeup->next = NULL;
-
-	netemu_thread_mutex_lock(mutex,NETEMU_INFINITE);
 
 	if((existing_wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char))) == NULL) {
 		wakeup->prev = NULL;
@@ -164,7 +162,7 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
 				nextwakeup = wakeup->next;
-				netemu_thread_mutex_release(wakeup->mutex);
+				netemu_thread_event_signal(wakeup->eventhandle);
 				wakeup->prev->next = wakeup->next;
 				wakeup->next->prev = wakeup->prev;
 				free(wakeup);

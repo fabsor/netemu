@@ -144,14 +144,14 @@ int server_connection_login(struct server_connection* connection) {
 }
 
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id) {
-	netemu_mutex mutex;
+	netemu_event eventhandle;
 	time_t timestamp;
-	mutex = netemu_thread_mutex_create();
+	
+	eventhandle = netemu_thread_event_create();
 	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, mutex);
-	netemu_thread_mutex_lock(mutex, NETEMU_INFINITE);
-	netemu_thread_mutex_release(mutex);
-	netemu_thread_mutex_destroy(mutex);
+	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, eventhandle);
+	netemu_thread_event_wait(eventhandle);
+	netemu_thread_event_destroy(eventhandle);
 	return 1;
 }
 

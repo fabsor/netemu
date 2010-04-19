@@ -88,3 +88,7 @@ int netemu_thread_event_wait(netemu_event event_identifier) {
 	else
 		return -1;
 }
+
+int netemu_thread_event_destroy(netemu_event event_identifier) {
+	return CloseHandle(event_identifier->eventhandle);
+}
