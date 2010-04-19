@@ -24,7 +24,7 @@ int main() {
 	struct server_connection* connection;
 	kaillera_server **servers;
 	kaillera_existing_game **existing_games;
-	struct game result;
+	struct game *result;
 	int i;
 
 	addr.addr = ADDR;
@@ -36,6 +36,7 @@ int main() {
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 	for(i = 0; i < NO_GAMES; i++) {
 		server_connection_create_game(connection,games[i],&result);
+		printf("FIRST!");
 	}
 	return 0;
 }

@@ -98,14 +98,15 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
-	struct application_instruction *message;
+	struct application_instruction *message, *reply;
 
 	message = netemu_application_create_message();
 	netemu_application_create_game_add(message, gamename);
 
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	*result = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp);
+	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp);
+	*result = (struct game*)reply->body;
 	return 1;
 }
 
