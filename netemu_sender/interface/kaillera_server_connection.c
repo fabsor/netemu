@@ -12,7 +12,7 @@
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);
 int server_connection_login(struct server_connection* connection);
-int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id);
+int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp);
 void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 struct _server_connection_internal {
@@ -133,23 +133,25 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 int server_connection_login(struct server_connection* connection) {
 	struct application_instruction *message;
 	struct netemu_sender_udp *sender;
+	time_t timestamp;
+
 	sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_login_request_add(message,connection->emulator_name,connection->user,1);
 	message->important = 1;
+
+	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	server_connection_wait_for_instruction(connection,LOGIN_SUCCESS);
+	server_connection_wait_for_instruction(connection, LOGIN_SUCCESS, timestamp);
 	netemu_packet_buffer_pop(connection->_internal->receive_buffer, LOGIN_SUCCESS);
 	return 1;
 }
 
-int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id) {
+int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp) {
 	netemu_event eventhandle;
-	time_t timestamp;
 	
 	eventhandle = netemu_thread_event_create();
-	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, eventhandle);
+	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, instruction_id, timestamp, eventhandle);
 	netemu_thread_event_wait(eventhandle);
 	netemu_thread_event_destroy(eventhandle);
 	return 1;
