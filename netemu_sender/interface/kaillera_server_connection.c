@@ -38,30 +38,48 @@ int server_connection_send_chat_message(struct server_connection *connection, ch
 }
 
 int server_connection_register_chat_callback(struct server_connection *connection, chatFn callback) {
-	netemu_list_add(connection->_internal->chat_callback, callback);
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->chat_fn = callback;
+	netemu_list_add(connection->_internal->chat_callback, fn);
 	return 0;
 }
 
 int server_connection_unregister_chat_callback(struct server_connection *connection, chatFn callback) {
-	return netemu_list_remove(connection->_internal->chat_callback, callback);
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->chat_fn = callback;
+	return netemu_list_remove(connection->_internal->chat_callback, fn);
 }
 
 int server_connection_register_user_join_callback(struct server_connection *connection, joinFn callback) {
-	netemu_list_add(connection->_internal->join_callback, callback);
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->join_fn = callback;
+	netemu_list_add(connection->_internal->join_callback, fn);
 	return 0;
 }
 
 int server_connection_unregister_user_join_callback(struct server_connection *connection, joinFn callback) {
-	return netemu_list_remove(connection->_internal->join_callback, callback);
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->join_fn = callback;
+	return netemu_list_remove(connection->_internal->join_callback, fn);
 }
 
 int server_connection_register_user_leave_callback(struct server_connection *connection, leaveFn callback) {
-	netemu_list_add(connection->_internal->leave_callback, callback);
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->leave_fn = callback;
+	netemu_list_add(connection->_internal->leave_callback, fn);
 	return 0;
 }
 
 int server_connection_unregister_user_leave_callback(struct server_connection *connection, leaveFn callback) {
-	return netemu_list_remove(connection->_internal->leave_callback, callback);
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->leave_fn = callback;
+	return netemu_list_remove(connection->_internal->leave_callback, fn);
 }
 
 int server_connection_disconnect(struct server_connection *connection, char *message) {
@@ -143,13 +161,26 @@ int server_connection_login(struct server_connection* connection) {
 	return 1;
 }
 
+void server_connection_respond_to_chat(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct server_connection* connection;
+	struct chat *chat;
+	union callback_fn* fn;
+	int i;
+	connection = (struct server_connection*)arg;
+	chat = (struct chat*)instruction->body;
+	for(i = 0; i< connection->_internal->chat_callback->count; i++) {
+		fn = (union callback_fn*)connection->_internal->chat_callback->elements[i];
+		fn->chat_fn(instruction->user,chat->message);
+	}
+}
+
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id) {
 	netemu_event eventhandle;
 	time_t timestamp;
 	
 	eventhandle = netemu_thread_event_create();
 	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, eventhandle);
+	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, instruction_id, timestamp, eventhandle);
 	netemu_thread_event_wait(eventhandle);
 	netemu_thread_event_destroy(eventhandle);
 	return 1;
@@ -174,6 +205,9 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 	packet = netemu_transport_unpack(data);
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
+		if(instruction->id != 5) {
+			i = i;
+		}
 		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
 	}
 }
