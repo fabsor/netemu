@@ -161,6 +161,7 @@ void respondToPing(struct netemu_packet_buffer* buffer, struct application_instr
 	connection = (struct server_connection*)arg;
 	pong = netemu_application_create_message();
 	netemu_application_pong_add(pong);
+	pong->important = 1;
 	netemu_sender_buffer_add(connection->_internal->send_buffer,pong);
 }
 

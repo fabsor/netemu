@@ -119,7 +119,7 @@ void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *ne
 }
 
 unsigned long netemu_inet_addr(char* addr) {
-	return htonl(inet_addr(addr));
+	return inet_addr(addr);
 }
 
 netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
