@@ -172,3 +172,9 @@ int netemu_thread_event_wait(netemu_event event_identifier) {
 
 	return 0;
 }
+
+int netemu_thread_event_destroy(netemu_event event_identifier) {
+	pthread_mutex_destroy(event_identifier->mutex);
+	pthread_cond_destroy(event_identifier->cond);
+	return 0;
+}
