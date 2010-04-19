@@ -35,13 +35,8 @@ void netemu_list_add(struct netemu_list* list, void* element) {
 }
 
 void _netemu_enlarge_list(struct netemu_list* list, int size) {
-	void* elements;
 	list->_intern->size += size;
-	elements = malloc(sizeof(void*) * list->_intern->size);
-	memcpy(elements, list->elements, sizeof(void*) * list->count);
-
-	free(list->elements);
-	list->elements = elements;
+	list->elements = realloc(list->elements,list->_intern->size * sizeof(void*));
 }
 
 int netemu_list_contains(struct netemu_list* list, void* element) {

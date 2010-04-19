@@ -75,6 +75,11 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 	else
 		hashtbl->hashfunc = def_hashfunc_str;
 
+	if (comparator)
+		hashtbl->comparator = comparator;
+	else
+		hashtbl->comparator = comparator_int;
+
 	return hashtbl;
 }
 
