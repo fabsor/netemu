@@ -7,7 +7,7 @@
 #include "../network/netemu_sender_buffer.h"
 #include "../network/netemu_sender.h"
 #include "../network/netemu_receiver.h"
-
+#include "../structures/netemu_hashtbl.h"
 #include "netemu_list.h"
 #include "netemu_thread.h"
 
@@ -21,15 +21,17 @@ struct _server_connection_internal {
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
+	NETEMU_HASHTBL *users;
+	NETEMU_HASHTBL *games;
 	struct netemu_packet_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
+
 };
 
 int server_connection_send_chat_message(struct server_connection *connection, char *message) {
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-
 	messages[0] = netemu_application_create_message();
 
 	return 1;
@@ -127,7 +129,8 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
-
+	connection->_internal->users = netemu_list_new(3);
+	connection->_internal->games = netemu_list_new(3);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
@@ -177,6 +180,20 @@ void respondToPing(struct netemu_packet_buffer* buffer, struct application_instr
 	netemu_application_pong_add(pong);
 	pong->important = 1;
 	netemu_sender_buffer_add(connection->_internal->send_buffer,pong);
+}
+
+void server_connection_add_user(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct user_joined *joined;
+	struct user* user;
+	struct server_connection* connection;
+	connection = (struct server_connection*)arg;
+	joined = (struct user_joined*)instruction->body;
+	user = malloc(sizeof(struct user*));
+	user->id = joined->id;
+	user->connection = joined->connection;
+	user->username = instruction->user;
+	netemu_hashtbl_insert(connection->_internal->users,user->id,sizeof(NETEMU_WORD),user);
+	netemu_application_free_message(instruction);
 }
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {

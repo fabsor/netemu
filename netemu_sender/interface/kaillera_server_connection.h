@@ -34,10 +34,16 @@ union callback_fn {
 	playerJoinFn player_join_fn;
 };
 
+typedef struct game* kaillera_game;
+typedef struct user* kaillera_user;
+
 struct server_connection {
 	struct netemu_sockaddr_in *addr;
 	char *user;
+	int game_count;
+	int user_count;
 	char *emulator_name;
+
 	server_connection_internal _internal;
 };
 
