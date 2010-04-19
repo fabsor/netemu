@@ -133,7 +133,7 @@ void _netemu_packet_buffer_internal_add(struct netemu_packet_buffer *buffer, str
 		list = netemu_list_new(10);
 
 	netemu_list_add(list, instruction);
-	netemu_hashtbl_insert(buffer->table, &instruction->id, sizeof(char), instruction);
+	netemu_hashtbl_insert(buffer->table, &instruction->id, sizeof(char), list);
 }
 
 void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_mutex mutex) {
