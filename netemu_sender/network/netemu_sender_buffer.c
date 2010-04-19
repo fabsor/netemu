@@ -4,8 +4,6 @@
  *  Created on: 16 apr 2010
  *      Author: fabian
  */
-#include "netemu_list.h"
-#include "netemu_thread.h"
 #include "../protocol/application.h"
 #include "../protocol/transport.h"
 #include "../netemu_resources.h"

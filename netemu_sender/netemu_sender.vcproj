@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\network\netemu_sender_buffer.c"
+				>
+			</File>
+			<File
 				RelativePath=".\structures\netemu_stringbuilder.c"
 				>
 			</File>
@@ -285,6 +289,10 @@
 			</File>
 			<File
 				RelativePath=".\network\netemu_sender.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_sender_buffer.h"
 				>
 			</File>
 			<File
