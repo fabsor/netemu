@@ -30,6 +30,8 @@ extern "C" {
 	/* TODO: make sure this is a good type to use. */
 	typedef struct netemu_mutex_internal* netemu_mutex;
 
+	typedef struct netemu_event_internal* netemu_event;
+
 	/**
 	* Start a new thread.
 	* @param netemu_thread* identifier an identifier that can be used to identify the thread.
@@ -67,6 +69,26 @@ extern "C" {
 	* @param NETEMU_MUTEX the identifier of the lock.
 	*/
 	int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier);
+
+   /**
+	* Creates an event.
+	* @return an identifier for the event, or NULL if something went wrong.
+	*/
+	netemu_event netemu_thread_event_create();
+
+   /**
+	* Signals an event.
+	* @param event_identifier the identifier of the event.
+	*/
+	int netemu_thread_event_signal(netemu_event event_identifier);
+
+	/**
+	* Waits for an event to be signaled.
+	* @param event_identifier the identifier of the event.
+	*/
+	int netemu_thread_event_wait(netemu_event event_identifier);
+	
+	
 
 #ifdef	__cplusplus
 }
