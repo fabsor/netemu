@@ -87,8 +87,12 @@ extern "C" {
 	* @param event_identifier the identifier of the event.
 	*/
 	int netemu_thread_event_wait(netemu_event event_identifier);
-	
-	
+
+	/**
+	* Destroy an event.
+	* @param event_identifier the identifier of the event.
+	*/
+	int netemu_thread_event_destroy(netemu_event event_identifier);
 
 #ifdef	__cplusplus
 }
