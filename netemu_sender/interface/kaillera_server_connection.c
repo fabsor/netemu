@@ -29,12 +29,9 @@ int server_connection_send_chat_message(struct server_connection *connection, ch
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
 
-	client = netemu_resources_get_client();
-	client->sender->addr = connection->addr;
 	messages[0] = netemu_application_create_message();
-	netemu_application_chat_partyline_add(messages[0], message, connection->user);
-	buffer = netemu_transport_pack(messages,1);
-	return netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
+
+	return 1;
 }
 
 int server_connection_register_chat_callback(struct server_connection *connection, chatFn callback) {
@@ -95,7 +92,7 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
 }
 
-int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
+int server_connection_create_game(struct server_connection *connection, char *gamename, struct game** result) {
 	int error;
 	time_t timestamp;
 	struct netemu_client *client;
@@ -107,8 +104,8 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	server_connection_wait_for_instruction(connection, CREATE_GAME, timestamp);
-	return 0;
+	*result = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp);
+	return 1;
 }
 
 
@@ -138,6 +135,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 
 int server_connection_login(struct server_connection* connection) {
 	struct application_instruction *message;
+	struct application_instruction *success;
 	struct netemu_sender_udp *sender;
 	time_t timestamp;
 
@@ -148,8 +146,8 @@ int server_connection_login(struct server_connection* connection) {
 
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	server_connection_wait_for_instruction(connection, LOGIN_SUCCESS, timestamp);
-	netemu_packet_buffer_pop(connection->_internal->receive_buffer, LOGIN_SUCCESS);
+	success = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
+	netemu_application_free_message(success);
 	return 1;
 }
 
@@ -167,15 +165,7 @@ void server_connection_respond_to_chat(struct netemu_packet_buffer* buffer, stru
 	}
 }
 
-int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp) {
-	netemu_event eventhandle;
-	eventhandle = netemu_thread_event_create();
-	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, instruction_id, timestamp, eventhandle);
-	netemu_thread_event_wait(eventhandle);
-	netemu_thread_event_destroy(eventhandle);
-	return 1;
-}
+
 
 void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct application_instruction* pong;
@@ -196,8 +186,8 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 	packet = netemu_transport_unpack(data);
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id != 5) {
-			i = i;
+		if(instruction->id == 14) {
+			printf("GAME CREATED");
 		}
 		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
 	}

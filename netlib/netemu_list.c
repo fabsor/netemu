@@ -147,7 +147,7 @@ void* netemu_list_get(struct netemu_list* list, int index) {
 
 void netemu_list_clear(struct netemu_list* list) {
 	int i;
-	free(list->elements);
+	//free(list->elements);
 	list->elements = malloc(sizeof(void*)*20);
 	list->count = 0;
 }

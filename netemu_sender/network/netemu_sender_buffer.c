@@ -21,6 +21,7 @@ struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_p
 	buffer->preferred_delay_time = preferred_delay_time;
 	buffer->send_lock = netemu_thread_mutex_create();
 	buffer->running = 1;
+	buffer->event = netemu_thread_event_create();
 	/* Start a new thread. */
 	netemu_thread_new(_netemu_sender_buffer_update,buffer);
 	return buffer;
@@ -33,6 +34,7 @@ void netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 	if (instruction->important) {
 		buffer->send = 1;
 	}
+	netemu_thread_event_signal(buffer->event);
 	netemu_thread_mutex_release(buffer->send_lock);
 }
 
@@ -44,6 +46,7 @@ void _netemu_sender_buffer_update(void* arg) {
 	struct transport_packet_buffer packet_buffer;
 	int i;
 	int count;
+	time_t current_time;
 	buffer = (struct netemu_sender_buffer*) arg;
 	itemsToSend = buffer->instructions;
 	sender = netemu_resources_get_sender();
@@ -51,8 +54,11 @@ void _netemu_sender_buffer_update(void* arg) {
 			* itemsToSend->count);
 
 	while (buffer->running) {
-		if (buffer->instructions->count > buffer->preferred_no_packets
-				|| buffer->send == 1) {
+		if(buffer->instructions->count == 0) {
+			netemu_thread_event_wait(buffer->event);
+		}
+		current_time = time(NULL);
+		if (buffer->instructions->count > 0 && (buffer->instructions->count > buffer->preferred_no_packets || buffer->send == 1 || (current_time - buffer->last_send ) > PACKET_SEND_INTERVAL)) {
 			netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
 			count = itemsToSend->count;
 			for (i = 0; i < itemsToSend->count; i++) {
@@ -68,6 +74,7 @@ void _netemu_sender_buffer_update(void* arg) {
 				netemu_application_free_message(instructions[i]);
 			}
 			buffer->send = 0;
+			buffer->last_send = current_time;
 		}
 	}
 }

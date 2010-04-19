@@ -14,7 +14,9 @@ extern "C" {
 
 #include "netemu_thread.h"
 #include "netemu_list.h"
+
 #define LIST_START_SIZE	10
+#define PACKET_SEND_INTERVAL 30
 
 struct netemu_sender_buffer {
 	struct netemu_list* instructions;
@@ -23,6 +25,8 @@ struct netemu_sender_buffer {
 	char send;
 	char running;
 	netemu_mutex send_lock;
+	netemu_event event;
+	time_t last_send;
 };
 
 struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_packets,

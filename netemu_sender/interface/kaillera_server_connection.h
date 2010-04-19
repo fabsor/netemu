@@ -57,7 +57,7 @@ int server_connection_unregister_user_leave_callback(struct server_connection *c
 
 int server_connection_disconnect(struct server_connection *connection, char *message);
 
-int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result);
+int server_connection_create_game(struct server_connection *connection, char *gamename, struct game** result);
 
 int server_connection_create_game_async(struct server_connection *connection, char *gamename, createGameFn);
 
