@@ -132,6 +132,7 @@ struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_
 	netemu_thread_mutex_lock(buffer->_internal->wakeup_mutex, NETEMU_INFINITE);
 	if((existing_wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char))) == NULL) {
 		wakeup->prev = NULL;
+		wakeup->next = NULL;
 		netemu_hashtbl_insert(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char), wakeup);
 	}
 	else {
@@ -139,6 +140,7 @@ struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_
 			existing_wakeup = existing_wakeup->next;
 		}
 		wakeup->prev = existing_wakeup;
+		wakeup->next = NULL;
 		existing_wakeup->next = wakeup;
 	}
 	netemu_thread_mutex_release(buffer->_internal->wakeup_mutex);
