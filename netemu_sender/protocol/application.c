@@ -293,7 +293,7 @@ void netemu_application_login_request_add(struct application_instruction* instru
 	int size;
 	request = malloc(sizeof(struct login_request));
 	size = _netemu_application_copy_string(&request->name,appName);
-	size += _netemu_application_copy_string(&instruction->user,user);
+	_netemu_application_copy_string(&instruction->user,user);
 	request->connection = connection;
 	instruction->body_size = size + sizeof(char);
 	instruction->body = request;
