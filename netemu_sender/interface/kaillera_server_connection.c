@@ -1,4 +1,5 @@
 ﻿
+#include <stdio.h>
 #include "kaillera_server_connection.h"
 #include "../protocol/application.h"
 #include "../netemu_resources.h"
@@ -6,7 +7,7 @@
 #include "../network/netemu_sender_buffer.h"
 #include "../network/netemu_sender.h"
 #include "../network/netemu_receiver.h"
-
+#include "../structures/netemu_hashtbl.h"
 #include "netemu_list.h"
 #include "netemu_thread.h"
 
@@ -14,27 +15,31 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 int server_connection_login(struct server_connection* connection);
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp);
 void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
+void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
+void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username);
+void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
+void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count);
+void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
+	NETEMU_HASHTBL *users;
+	NETEMU_HASHTBL *games;
 	struct netemu_packet_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
+
 };
 
 int server_connection_send_chat_message(struct server_connection *connection, char *message) {
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-
-	client = netemu_resources_get_client();
-	client->sender->addr = connection->addr;
 	messages[0] = netemu_application_create_message();
-	netemu_application_chat_partyline_add(messages[0], message, connection->user);
-	buffer = netemu_transport_pack(messages,1);
-	return netemu_sender_udp_send(client->sender,buffer.data,buffer.size);
+
+	return 1;
 }
 
 int server_connection_register_chat_callback(struct server_connection *connection, chatFn callback) {
@@ -95,32 +100,21 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
 }
 
-int server_connection_create_game(struct server_connection *connection, char *gamename, struct game* result) {
-	netemu_mutex mutex;
+int server_connection_create_game(struct server_connection *connection, char *gamename, struct game** result) {
 	int error;
 	time_t timestamp;
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
 	struct application_instruction *message, *reply;
 
-	mutex = netemu_thread_mutex_create();
-	client = netemu_resources_get_client();
 	message = netemu_application_create_message();
 	netemu_application_create_game_add(message, gamename);
-	buffer = netemu_transport_pack(&message,1);
 
 	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp, mutex);
-	if((error = netemu_sender_udp_send(client->sender,buffer.data,buffer.size)) != 0)
-		return error;
-	
-	netemu_thread_mutex_lock(mutex, NETEMU_INFINITE);
-	netemu_thread_mutex_release(mutex);
-	netemu_packet_buffer_pop(connection->_internal->receive_buffer, CREATE_GAME);
-	netemu_application_free_message(message);
-	netemu_thread_mutex_destroy(mutex);
-
-	return 0;
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp);
+	*result = (struct game*)reply->body;
+	return 1;
 }
 
 
@@ -140,9 +134,11 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
-
+	connection->_internal->users = netemu_hashtbl_create(10,def_hashfunc_int, comparator_int);
+	connection->_internal->games = netemu_hashtbl_create(10,def_hashfunc_int, comparator_int);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
-
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,server_connection_respond_to_user_join, connection);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,server_connection_respond_to_login_success, connection);
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
@@ -150,6 +146,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 
 int server_connection_login(struct server_connection* connection) {
 	struct application_instruction *message;
+	struct application_instruction *success;
 	struct netemu_sender_udp *sender;
 	time_t timestamp;
 
@@ -160,8 +157,8 @@ int server_connection_login(struct server_connection* connection) {
 
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	server_connection_wait_for_instruction(connection, LOGIN_SUCCESS, timestamp);
-	netemu_packet_buffer_pop(connection->_internal->receive_buffer, LOGIN_SUCCESS);
+	success = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
+	netemu_application_free_message(success);
 	return 1;
 }
 
@@ -179,15 +176,7 @@ void server_connection_respond_to_chat(struct netemu_packet_buffer* buffer, stru
 	}
 }
 
-int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp) {
-	netemu_event eventhandle;
-	eventhandle = netemu_thread_event_create();
-	timestamp = time(NULL);
-	netemu_packet_buffer_register_wakeup_on_instruction(connection->_internal->receive_buffer, instruction_id, timestamp, eventhandle);
-	netemu_thread_event_wait(eventhandle);
-	netemu_thread_event_destroy(eventhandle);
-	return 1;
-}
+
 
 void respondToPing(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct application_instruction* pong;
@@ -199,6 +188,56 @@ void respondToPing(struct netemu_packet_buffer* buffer, struct application_instr
 	netemu_sender_buffer_add(connection->_internal->send_buffer,pong);
 }
 
+void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct user_joined *joined;
+	struct server_connection* connection;
+	connection = (struct server_connection*)arg;
+	joined = (struct user_joined*)instruction->body;
+	server_connection_add_user(connection, joined->id, joined->connection, instruction->user);
+	//netemu_application_free_message(instruction);
+}
+
+void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct login_success *accepted;
+	struct server_connection* connection;
+	int i;
+	connection = (struct server_connection*)arg;
+	accepted = (struct login_success*)instruction->body;
+	for(i = 0; i < accepted->users_count; i++) {
+		netemu_hashtbl_insert(connection->_internal->users,&accepted->users[i]->id,sizeof(NETEMU_WORD),accepted->users[i]);
+	}
+	for(i = 0; i < accepted->games_count; i++) {
+		netemu_hashtbl_insert(connection->_internal->games,&accepted->games[i]->id,sizeof(NETEMU_WORD),accepted->games[i]);
+	}
+	//netemu_application_free_message(instruction);
+}
+
+void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct game_created *created;
+	struct server_connection* connection;
+	connection = (struct server_connection*)arg;
+	created = (struct game_created*)instruction->body;
+	server_connection_add_game(connection,created->appName, created->id,0, 0);
+}
+
+void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count) {
+	struct game* game;
+	game->app_name = app_name;
+	game->id = id;
+	game->status = status;
+	game->users_count = users_count;
+}
+
+void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username) {
+	struct user* user;
+	user = malloc(sizeof(struct user*));
+	user->id = user_id;
+	user->connection = connection_type;
+	user->username = username;
+
+	netemu_hashtbl_insert(connection->_internal->users,&user->id,sizeof(NETEMU_WORD),user);
+}
+
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
 	struct server_connection* connection;
 	struct transport_packet* packet;
@@ -208,8 +247,8 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 	packet = netemu_transport_unpack(data);
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id != 5) {
-			i = i;
+		if(instruction->id == CREATE_GAME) {
+			printf("GAME CREATED");
 		}
 		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
 	}

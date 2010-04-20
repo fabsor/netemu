@@ -18,20 +18,18 @@ extern "C" {
 	#define PREFERRED_SEND_DELAY	10
 
 	typedef struct _netemu_packet_buffer_internal* netemu_packet_buffer_internal;
-
+	/* TODO: Swap this against a clean typedef instead. */
 	struct netemu_packet_buffer {
-		NETEMU_HASHTBL *table;
 		netemu_packet_buffer_internal _internal;
 	};
+
 	typedef void (*bufferListenerFn)(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 	void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction);
-	struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, char id);
-	struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, char id);
-	struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id);
 	void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer);
+	void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, char instruction, bufferListenerFn fn, void* arg);
 	struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size);
-	void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle);
+	struct application_instruction* netemu_packet_buffer_wait_for_instruction(struct netemu_packet_buffer* buffer, int instruction_id, time_t timestamp);
 #ifdef	__cplusplus
 }
 #endif

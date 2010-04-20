@@ -71,8 +71,8 @@ struct player {
 struct login_success {
 	unsigned int users_count;
 	unsigned int games_count;
-	struct user *users;
-	struct game *games;
+	struct user **users;
+	struct game **games;
 };
 
 struct login_status {

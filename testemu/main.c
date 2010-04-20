@@ -12,10 +12,11 @@
 #define EMUNAME		"testemu"
 #define PLAYERNAME	"foobar"
 
-#define ADDR	htonl(INADDR_LOOPBACK)//netemu_inet_addr("192.168.106.222")
+
+#define ADDR	INADDR_ANY
 #define PORT	netemu_htons(27888)
 
-char* games[2] = {"Foo", "Bar"};
+char* games[] = {"Foo", "Bar"};
 #define NO_GAMES	2
 
 int main() {
@@ -23,8 +24,8 @@ int main() {
 	struct netemu_emulator_info *info;
 	struct server_connection* connection;
 	kaillera_server **servers;
-	kaillera_existing_game **games;
-	struct game result;
+	kaillera_existing_game **existing_games;
+	struct game *result;
 	int i;
 	int no_games, no_servers;
 
@@ -33,10 +34,9 @@ int main() {
 	addr.family = NETEMU_AF_INET;
 	netemu_init_network();
 	//info = netemu_client_new(EMUNAME,games);
-	kaillera_communication_get_server_list(&servers, &no_servers, &games, &no_games);
-	//connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
-	//for(i = 0; i < NO_GAMES; i++) {
-	//	server_connection_create_game(connection,games[i],&result);
-	//}
+	//kaillera_communication_get_server_list(&servers, &games);
+	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+	server_connection_create_game(connection,games[i],&result);
+	printf("FIRST!");
 	return 0;
 }

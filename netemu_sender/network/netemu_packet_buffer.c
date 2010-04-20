@@ -6,6 +6,7 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 struct _netemu_packet_buffer_wakeup_info {
 	netemu_event eventhandle;
 	time_t age;
+	struct application_instruction* instruction;
 	struct _netemu_packet_buffer_wakeup_info *next;
 	struct _netemu_packet_buffer_wakeup_info *prev;
 };
@@ -20,6 +21,8 @@ struct _netemu_packet_buffer_notify_info {
 struct _netemu_packet_buffer_internal {
 	struct netemu_list* instructions_to_add;
 	netemu_mutex add_mutex;
+	netemu_mutex wakeup_mutex;
+	netemu_mutex fn_mutex;
 	NETEMU_HASHTBL *registered_wakeups;
 	NETEMU_HASHTBL *registered_fns;
 };
@@ -28,17 +31,18 @@ struct _netemu_packet_buffer_internal {
 void _netemu_packet_buffer_internal_add(struct netemu_packet_buffer *buffer, struct application_instruction* instruction);
 void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, struct application_instruction *instruction);
 void _netemu_packet_buffer_update(void* args);
-
+struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle);
 
 struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	struct netemu_packet_buffer *buffer;
 
 	buffer = malloc(sizeof(struct netemu_packet_buffer));
-	buffer->table = netemu_hashtbl_create(size, def_hashfunc_char,comparator_char);
 	buffer->_internal = malloc(sizeof(struct _netemu_packet_buffer_internal));
 	buffer->_internal->registered_wakeups = netemu_hashtbl_create(23, def_hashfunc_char, comparator_char);
-	buffer->_internal->registered_fns = netemu_hashtbl_create(size, def_hashfunc_char, comparator_char);
+	buffer->_internal->registered_fns = netemu_hashtbl_create(23, def_hashfunc_char, comparator_char);
 	buffer->_internal->add_mutex = netemu_thread_mutex_create();
+	buffer->_internal->wakeup_mutex = netemu_thread_mutex_create();
+	buffer->_internal->fn_mutex = netemu_thread_mutex_create();
 	buffer->_internal->instructions_to_add = netemu_list_new(20);
 	netemu_thread_new(_netemu_packet_buffer_update,buffer);
 	return buffer;
@@ -51,36 +55,6 @@ void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct applic
 	netemu_thread_mutex_release(buffer->_internal->add_mutex);
 }
 
-struct netemu_list* netemu_packet_buffer_get(struct netemu_packet_buffer *buffer, char id) {
-	return (struct netemu_list*)netemu_hashtbl_get(buffer->table, &id, sizeof(char));
-}
-
-struct application_instruction* netemu_packet_buffer_peek(struct netemu_packet_buffer *buffer, char id) {
-	struct netemu_list* list;
-	if((list = netemu_hashtbl_get(buffer->table, &id, sizeof(char))) == NULL) 
-		return NULL;
-	
-	return (struct application_instruction*)netemu_list_get(list, list->count - 1);
-}
-
-struct application_instruction* netemu_packet_buffer_pop(struct netemu_packet_buffer *buffer, char id) {
-	struct netemu_list* list;
-	struct application_instruction *instruction;
-	if((list = netemu_hashtbl_get(buffer->table, &id, sizeof(char))) == NULL) 
-		return NULL;
-	
-	if(list->count == 0)
-		return NULL;
-	instruction = (struct application_instruction*)netemu_list_get(list, list->count - 1);
-	netemu_list_remove_at(list, list->count - 1);
-
-	return instruction;
-}
-
-
-void netemu_packet_buffer_clear(struct netemu_packet_buffer *buffer) {
-	netemu_hashtbl_clear(buffer->table);
-}
 
 void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, char instruction, bufferListenerFn fn, void* arg) {
 	struct _netemu_packet_buffer_notify_info *info, *existing_info;
@@ -88,7 +62,7 @@ void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffe
 	info->fn = fn;
 	info->arg = arg;
 	info->next = NULL;
-
+	netemu_thread_mutex_lock(buffer->_internal->fn_mutex,NETEMU_INFINITE);
 	if((existing_info = netemu_hashtbl_get(buffer->_internal->registered_fns, &instruction, sizeof(char))) == NULL) {
 		info->prev = NULL;
 		netemu_hashtbl_insert(buffer->_internal->registered_fns, &instruction, sizeof(char), info);
@@ -100,49 +74,62 @@ void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffe
 		info->prev = existing_info;
 		info->next = info;
 	}
+	netemu_thread_mutex_release(buffer->_internal->fn_mutex);
 }
 
 void _netemu_packet_buffer_update(void* args) {
 	struct netemu_packet_buffer *buffer;
 	struct netemu_list* itemsToAdd;
+	struct netemu_list* itemsToNotify;
 	netemu_mutex lock;
 	int i;
 	buffer = (struct netemu_packet_buffer*)args;
 	itemsToAdd = buffer->_internal->instructions_to_add;
+	itemsToNotify = netemu_list_new(10);
 	lock = buffer->_internal->add_mutex;
 
 	while(1) {
 		if(itemsToAdd->count > 0) {
 			netemu_thread_mutex_lock(lock,NETEMU_INFINITE);
+			/* We copy the contents of the array here in order to not lock the list longer than necessary. */
 			for (i = 0; i < itemsToAdd->count; i++) {
-				_netemu_packet_buffer_internal_add(buffer,itemsToAdd->elements[i]);
-				/* wakeup and notify */
-				_netemu_packet_buffer_perform_notify(buffer,itemsToAdd->elements[i]);
-				_netemu_packet_buffer_perform_wakeup(buffer,itemsToAdd->elements[i]);
-
+				netemu_list_add(itemsToNotify, itemsToAdd->elements[i]);
 			}
 			netemu_list_clear(itemsToAdd);
 			netemu_thread_mutex_release(lock);
+			/* Then we use the newly created list to notify. */
+			for(i = 0; i < itemsToNotify->count; i++) {
+				/* wakeup and notify */
+				_netemu_packet_buffer_perform_notify(buffer,itemsToNotify->elements[i]);
+				_netemu_packet_buffer_perform_wakeup(buffer,itemsToNotify->elements[i]);
+			}
+			/* Finally clear everything out. */
+			netemu_list_clear(itemsToNotify);
 		}
 	}
 }
 
-void _netemu_packet_buffer_internal_add(struct netemu_packet_buffer *buffer, struct application_instruction* instruction) {
-	struct netemu_list *list;
-	if((list = netemu_hashtbl_get(buffer->table, &instruction->id, sizeof(char))) == NULL)
-		list = netemu_list_new(10);
+struct application_instruction* netemu_packet_buffer_wait_for_instruction(struct netemu_packet_buffer* buffer, int instruction_id, time_t timestamp) {
+	netemu_event eventhandle;
+	struct _netemu_packet_buffer_wakeup_info* info;
+	struct application_instruction* instruction;
 
-	netemu_list_add(list, instruction);
-	netemu_hashtbl_insert(buffer->table, &instruction->id, sizeof(char), list);
+	eventhandle = netemu_thread_event_create();
+	info = _netemu_packet_buffer_register_wakeup_on_instruction(buffer, instruction_id, timestamp, eventhandle);
+	netemu_thread_event_wait(eventhandle);
+	netemu_thread_event_destroy(eventhandle);
+	instruction = info->instruction;
+	free(info);
+	return instruction;
 }
 
-void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
+struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_packet_buffer_wakeup_info));
 	wakeup->age = age;
 	wakeup->eventhandle = eventhandle;
 	wakeup->next = NULL;
-
+	netemu_thread_mutex_lock(buffer->_internal->wakeup_mutex, NETEMU_INFINITE);
 	if((existing_wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char))) == NULL) {
 		wakeup->prev = NULL;
 		netemu_hashtbl_insert(buffer->_internal->registered_wakeups, &instruction_id, sizeof(char), wakeup);
@@ -154,34 +141,47 @@ void netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_bu
 		wakeup->prev = existing_wakeup;
 		existing_wakeup->next = wakeup;
 	}
+	netemu_thread_mutex_release(buffer->_internal->wakeup_mutex);
+	return wakeup;
 }
 
 void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *nextwakeup;
-
+	netemu_thread_mutex_lock(buffer->_internal->wakeup_mutex, NETEMU_INFINITE);
+	if(instruction->id == CREATE_GAME) {
+		printf("AHAHAHAH");
+	}
 	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id, sizeof(char))) != NULL) {
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
-				nextwakeup = wakeup->next;
+				wakeup->instruction = instruction;
 				netemu_thread_event_signal(wakeup->eventhandle);
 				if(wakeup->prev != NULL)
 					wakeup->prev->next = wakeup->next;
-				if(wakeup->next != NULL)
+				if(wakeup->next != NULL) {
 					wakeup->next->prev = wakeup->prev;
-
-				free(wakeup);
+					nextwakeup = wakeup->next;
+				}
+				else {
+					nextwakeup = NULL;
+				}
 				wakeup = nextwakeup;
+
 			}
 			else {
 				wakeup = wakeup->next;
 			}
 		}
 		wakeup = NULL;
+		/* We remove the node completely, we don't want a bunch of null pointers in the hash table. */
+		netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char));
 	}
+	netemu_thread_mutex_release(buffer->_internal->wakeup_mutex);
 }
 
 void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_notify_info *notify, *nextnotify;
+	netemu_thread_mutex_lock(buffer->_internal->fn_mutex, NETEMU_INFINITE);
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
 				nextnotify = notify->next;
@@ -189,4 +189,5 @@ void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, s
 				notify = nextnotify;
 		}
 	}
+	netemu_thread_mutex_release(buffer->_internal->fn_mutex);
 }
