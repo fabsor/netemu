@@ -34,9 +34,8 @@ int main() {
 	//info = netemu_client_new(EMUNAME,games);
 	//kaillera_communication_get_server_list(&servers, &games);
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
-	for(i = 0; i < NO_GAMES; i++) {
-		server_connection_create_game(connection,games[i],&result);
-		printf("FIRST!");
-	}
+	server_connection_create_game(connection,games[i],&result);
+	printf("FIRST!");
+
 	return 0;
 }

@@ -136,7 +136,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->games = netemu_hashtbl_create(10,def_hashfunc_int, comparator_int);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,server_connection_respond_to_user_join, connection);
-	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,server_connection_respond_to_login_success, connection);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,server_connection_respond_to_login_success, connection);
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
@@ -192,7 +192,7 @@ void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer,
 	connection = (struct server_connection*)arg;
 	joined = (struct user_joined*)instruction->body;
 	server_connection_add_user(connection, joined->id, joined->connection, instruction->user);
-	netemu_application_free_message(instruction);
+	//netemu_application_free_message(instruction);
 }
 
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
@@ -207,7 +207,7 @@ void server_connection_respond_to_login_success(struct netemu_packet_buffer* buf
 	for(i = 0; i < accepted->games_count; i++) {
 		netemu_hashtbl_insert(connection->_internal->games,&accepted->games[i]->id,sizeof(NETEMU_WORD),accepted->games[i]);
 	}
-	netemu_application_free_message(instruction);
+	//netemu_application_free_message(instruction);
 }
 
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username) {
