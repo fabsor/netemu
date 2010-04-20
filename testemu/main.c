@@ -40,6 +40,7 @@ int main() {
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 	server_connection_create_game(connection,games[i],&result);
 	game_list = server_connection_get_game_list(connection, &no_games);
+	server_connection_start_game(connection);
 	printf("FIRST!");
 	return 0;
 }

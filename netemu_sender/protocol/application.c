@@ -558,8 +558,8 @@ void netemu_application_start_game_add(struct application_instruction* instructi
 	struct game_start *start;
 	start = malloc(sizeof(struct game_start));
 	start->time_band = 0xFFFF;
-	start->player_no = 0;
-	start->max_players = 0;
+	start->player_no = 0xFF;
+	start->max_players = 0xFF;
 	instruction->body_size = sizeof(struct game_start);
 	instruction->id = START_GAME;
 	instruction->packBodyFn = netemu_application_kick_player_pack;

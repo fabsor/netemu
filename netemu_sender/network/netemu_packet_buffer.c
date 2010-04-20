@@ -123,7 +123,7 @@ struct application_instruction* netemu_packet_buffer_wait_for_instruction(struct
 	return instruction;
 }
 
-struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
+struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_on_instructiangon(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_packet_buffer_wakeup_info));
 	wakeup->age = age;

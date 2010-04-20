@@ -132,16 +132,14 @@ void _server_connection_add_game_struct(struct server_connection* connection, st
 }
 
 int server_connection_start_game(struct server_connection *connection) {
-	int error;
 	time_t timestamp;
-	struct netemu_client *client;
-	struct transport_packet_buffer buffer;
 	struct application_instruction *message, *reply;
 
 	message = netemu_application_create_message();
 	netemu_application_start_game_add(message);
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	message->important = 1;
 	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, START_GAME, timestamp);
 	return 1;
 }
@@ -253,7 +251,6 @@ void server_connection_respond_to_game_created(struct netemu_packet_buffer* buff
 
 void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count) {
 	struct game* game;
-	int index;
 	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
 	game->id = id;

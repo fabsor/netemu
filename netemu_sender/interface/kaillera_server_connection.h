@@ -76,6 +76,7 @@ struct server_connection *server_connection_new(char* username, char* emulator_n
 
 struct game** server_connection_get_game_list(struct server_connection* connection, int *count);
 
+int server_connection_start_game(struct server_connection *connection);
 
 #ifdef	__cplusplus
 }
