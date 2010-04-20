@@ -83,7 +83,6 @@ int netemu_list_copy(struct netemu_list* list, void ***buffer) {
 	if((*buffer = malloc(size)) == NULL)
 		return -1;
 
-	//memset(buffer, 0, size);
 	memcpy(*buffer, list->elements, size);
 	return 0;
 }
@@ -146,7 +145,6 @@ void* netemu_list_get(struct netemu_list* list, int index) {
 }
 
 void netemu_list_clear(struct netemu_list* list) {
-	int i;
 	//free(list->elements);
 	list->elements = malloc(sizeof(void*)*20);
 	list->count = 0;
