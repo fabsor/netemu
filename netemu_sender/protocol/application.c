@@ -141,40 +141,42 @@ void netemu_application_login_success_parse(struct application_instruction *inst
 	success->games_count =  *((NETEMU_DWORD*)data);
 	data += sizeof(NETEMU_DWORD);
 
-	success->users = malloc(sizeof(struct user) * success->users_count);
-	success->games = malloc(sizeof(struct game) * success->games_count);
+	success->users = malloc(sizeof(struct user*) * success->users_count);
+	success->games = malloc(sizeof(struct game*) * success->games_count);
 
 	for(i = 0; i < success->users_count; i++) {
-		success->users[i].username = parse_string(data);
-		data += strlen(success->users[i].username) + 1;
+		success->users[i] = malloc(sizeof(struct user));
+		success->users[i]->username = parse_string(data);
+		data += strlen(success->users[i]->username) + 1;
 
-		success->users[i].ping = *((NETEMU_DWORD*)data);
+		success->users[i]->ping = *((NETEMU_DWORD*)data);
 		data += sizeof(NETEMU_DWORD);
 
-		success->users[i].status = *data;
+		success->users[i]->status = *data;
 		data += sizeof(char);
 
-		success->users[i].id = *((NETEMU_WORD*)data);
+		success->users[i]->id = *((NETEMU_WORD*)data);
 		data += sizeof(NETEMU_WORD);
 
-		success->users[i].connection = *data;
+		success->users[i]->connection = *data;
 		data += sizeof(char);
 	}
 
 	for(i = 0; i < success->games_count; i++) {
-		success->games[i].name = parse_string(data);
-		data += strlen(success->games[i].name) + 1;
+		success->games[i] = malloc(sizeof(struct game));
+		success->games[i]->name = parse_string(data);
+		data += strlen(success->games[i]->name) + 1;
 
-		success->games[i].id = *((NETEMU_DWORD*)data);
+		success->games[i]->id = *((NETEMU_DWORD*)data);
 		data += sizeof(NETEMU_DWORD);
 
-		success->games[i].app_name = parse_string(data);
-		data += strlen(success->games[i].app_name) + 1;
+		success->games[i]->app_name = parse_string(data);
+		data += strlen(success->games[i]->app_name) + 1;
 
-		success->games[i].users_count = parse_string(data);
-		data += strlen(success->games[i].users_count) + 1;
+		success->games[i]->users_count = parse_string(data);
+		data += strlen(success->games[i]->users_count) + 1;
 
-		success->games[i].status = *data;
+		success->games[i]->status = *data;
 		data += sizeof(char);
 	}
 
