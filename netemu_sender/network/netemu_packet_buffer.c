@@ -157,7 +157,7 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
 				wakeup->instruction = instruction;
-				netemu_thread_event_signal(wakeup->eventhandle);
+
 				if(wakeup->prev != NULL)
 					wakeup->prev->next = wakeup->next;
 				if(wakeup->next != NULL) {
@@ -167,13 +167,14 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 				else {
 					nextwakeup = NULL;
 				}
+				netemu_thread_event_signal(wakeup->eventhandle);
 				wakeup = nextwakeup;
-
 			}
 			else {
 				wakeup = wakeup->next;
 			}
 		}
+
 		wakeup = NULL;
 		/* We remove the node completely, we don't want a bunch of null pointers in the hash table. */
 		netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char));
