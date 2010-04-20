@@ -13,7 +13,7 @@
 #define PLAYERNAME	"foobar"
 
 
-#define ADDR	INADDR_ANY
+#define ADDR	netemu_inet_addr("127.0.0.1")
 #define PORT	netemu_htons(27888)
 
 char* games[] = {"Foo", "Bar"};

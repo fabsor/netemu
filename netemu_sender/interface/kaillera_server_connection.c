@@ -139,6 +139,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,server_connection_respond_to_user_join, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,server_connection_respond_to_login_success, connection);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,CREATE_GAME,server_connection_respond_to_game_created, connection);
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
@@ -222,10 +223,12 @@ void server_connection_respond_to_game_created(struct netemu_packet_buffer* buff
 
 void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count) {
 	struct game* game;
+	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
 	game->id = id;
 	game->status = status;
 	game->users_count = users_count;
+	netemu_hashtbl_insert(connection->_internal->games,&game->id,sizeof(NETEMU_WORD),game);
 }
 
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username) {
