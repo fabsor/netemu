@@ -100,6 +100,7 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
 }
 
+
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game** result) {
 	int error;
 	time_t timestamp;
@@ -239,6 +240,22 @@ void server_connection_add_user(struct server_connection* connection, NETEMU_WOR
 	user->username = username;
 
 	netemu_hashtbl_insert(connection->_internal->users,&user->id,sizeof(NETEMU_WORD),user);
+}
+
+struct game* server_connection_get_game_list(struct server_connection* connection, int *count) {
+	struct game** games;
+	struct game* game;
+	struct netemu_hashtable_iter *iter;
+	int i = 0;
+	games = malloc(sizeof(struct game*)*connection->_internal->games->count);
+	iter = netemu_hashtbl_iterator_new(connection->_internal->games);
+	while(game = (struct game*)netemu_hashtbl_iterator_next(iter) != NULL) {
+		games[i] = game;
+		i++;
+	}
+	*count = connection->_internal->games->count;
+	//netemu_hashtbl_iterator_free(iter);
+	return game;
 }
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {

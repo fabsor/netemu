@@ -26,6 +26,7 @@ int main() {
 	kaillera_server **servers;
 	kaillera_existing_game **existing_games;
 	struct game *result;
+	struct game **game_list;
 	int i;
 	int no_games, no_servers;
 
@@ -37,6 +38,7 @@ int main() {
 	//kaillera_communication_get_server_list(&servers, &games);
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 	server_connection_create_game(connection,games[i],&result);
+	game_list = server_connection_get_game_list(connection, &no_games);
 	printf("FIRST!");
 	return 0;
 }
