@@ -23,7 +23,7 @@
 typedef struct server kaillera_server;
 typedef struct existing_game kaillera_existing_game;
 
-int kaillera_communication_get_server_list(struct server ***servers, struct existing_game ***games);
+int kaillera_communication_get_server_list(struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount);
 
 /**
  *

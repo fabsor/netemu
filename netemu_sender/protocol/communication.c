@@ -92,7 +92,7 @@ char* netemu_communication_http_get(char* host, char* path) {
 	return buffer;
 }
 
-int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, struct server ***servers) {
+int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount) {
 	struct netemu_stringbuilder *builder;
 	struct netemu_list *game_list, *server_list;
 	char *response_body, *serverlist;
@@ -150,6 +150,9 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		return -1;
 	}
 
+	*gamecount = game_list->count;
+	*servercount = server_list->count;
+
 	netemu_stringbuilder_free(builder);
 	netemu_list_free(game_list);
 	netemu_list_free(server_list);
@@ -161,6 +164,7 @@ char *_netemu_parse_game_list(char* response_body, struct netemu_list *game_list
 	struct existing_game *game;
 	char *return_value;
 	char *player_int;
+	int gg;
 	while(*response_body != '\n') {
 		game = malloc(sizeof(struct existing_game));
 
@@ -173,7 +177,9 @@ char *_netemu_parse_game_list(char* response_body, struct netemu_list *game_list
 		if((response_body = _netemu_parse_response_string(response_body, &game->address, GAME_STRING_SEPARATOR)) == NULL) {
 			break;
 		}
-
+		if(strcmp(game->address, "194.177.99.213:27888") == 0) {
+gg = 4;
+		}
 		/* Player name */
 		if((response_body = _netemu_parse_response_string(response_body, &game->player, GAME_STRING_SEPARATOR)) == NULL) {
 			break;

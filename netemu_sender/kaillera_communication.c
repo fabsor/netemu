@@ -28,7 +28,7 @@ struct server_connection_callback {
 	void (*ConnectionReceivedFn)(int status, struct server_connection*);
 };
 
-int kaillera_communication_get_server_list(struct server ***servers, struct existing_game ***games) {
+int kaillera_communication_get_server_list(struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount) {
 	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
 	char* request;
@@ -39,7 +39,7 @@ int kaillera_communication_get_server_list(struct server ***servers, struct exis
 	request = netemu_communication_http_get(SERVER,PATH);
 
 	netemu_tcp_connection_send(sender,request,strlen(request));
-	netemu_communication_parse_http(sender->socket, games, servers);
+	netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
 }
 
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username) {
