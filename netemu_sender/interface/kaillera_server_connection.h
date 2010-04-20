@@ -34,7 +34,6 @@ union callback_fn {
 	playerJoinFn player_join_fn;
 };
 
-typedef struct game* kaillera_game;
 typedef struct user* kaillera_user;
 
 struct server_connection {
@@ -44,7 +43,8 @@ struct server_connection {
 	int user_count;
 	char *emulator_name;
 	struct game *current_game;
-
+	char has_id;
+	NETEMU_WORD player_id;
 	server_connection_internal _internal;
 };
 
@@ -75,6 +75,8 @@ int server_connection_join_game(struct server_connection *connection, NETEMU_DWO
 int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid, playerJoinFn);
 
 struct server_connection *server_connection_new(char* username, char* emulator_name);
+
+struct game* server_connection_get_game_list(struct server_connection* connection, int *count);
 
 
 #ifdef	__cplusplus

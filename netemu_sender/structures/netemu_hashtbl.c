@@ -68,7 +68,7 @@ int comparator_char(const void* value1, const void* value2) {
 NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 		const void *, size_t), int (*comparator)(const void* value1, const void* value2)) {
 	NETEMU_HASHTBL *hashtbl;
-
+	int i;
 	if (!(hashtbl = malloc(sizeof(NETEMU_HASHTBL))))
 		return NULL;
 
@@ -89,6 +89,10 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 	else
 		hashtbl->comparator = comparator_int;
 
+	/* We explicitly set all nodes to NULL. */
+	for(i = 0; i < hashtbl->size; i++) {
+		hashtbl->nodes[i] = NULL;
+	}
 	return hashtbl;
 }
 
@@ -111,28 +115,28 @@ void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl) {
 struct netemu_hashtable_iter  *netemu_hashtbl_iterator_new(NETEMU_HASHTBL *hashtbl) {
 	struct netemu_hashtable_iter *iterator;
 	iterator = (struct netemu_hashtable_iter*)malloc(sizeof(struct netemu_hashtable_iter));
-	iterator->currentnode = hashtbl->nodes[0];
+	iterator->table = hashtbl;
+	iterator->hashindex = 0;
+	iterator->currentnode = NULL;
+	return iterator;
 }
 
 void* netemu_hashtbl_iterator_next(struct netemu_hashtable_iter  *iterator) {
-	void* element;
-	if(iterator->currentnode == NULL)
-		return NULL;
-
-	element = iterator->currentnode->data;
-	if(iterator->currentnode->next == NULL) {
-		iterator->hashindex++;
-		if(iterator->hashindex >= iterator->table->size)
-			iterator->currentnode = NULL;
-		else {
-			iterator->currentnode = iterator->table->nodes[iterator->hashindex];
+	if (iterator->currentnode != NULL) {
+		iterator->currentnode = iterator->currentnode->next;
+		if(iterator->currentnode != NULL) {
+			return iterator->currentnode->data;
 		}
 	}
-	else {
-		iterator->currentnode = iterator->currentnode->next;
+	while (iterator->hashindex < iterator->table->size) {
+		iterator->currentnode = iterator->table->nodes[iterator->hashindex];
+		if(iterator->currentnode != NULL) {
+			return iterator->currentnode->data;
+		}
+		iterator->hashindex++;
 	}
-	return element;
 
+	return NULL;
 }
 
 void* netemu_hashtbl_iterator_reset(struct netemu_hashtable_iter *iterator) {

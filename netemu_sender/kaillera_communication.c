@@ -39,7 +39,7 @@ int kaillera_communication_get_server_list(struct server ***servers, int *server
 	request = netemu_communication_http_get(SERVER,PATH);
 
 	netemu_tcp_connection_send(sender,request,strlen(request));
-	netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
+	//netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
 }
 
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username) {

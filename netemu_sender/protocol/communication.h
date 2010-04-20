@@ -67,6 +67,7 @@ int netemu_communication_parse_server_accept_port(char* server_message);
 
 char* netemu_communication_http_get(char* host, char* path);
 
-netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount);
+int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount);
+
 
 #endif /* COMMUNICATION_H_ */

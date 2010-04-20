@@ -13,7 +13,7 @@
 #define PLAYERNAME	"foobar"
 
 
-#define ADDR	INADDR_ANY
+#define ADDR	netemu_inet_addr("127.0.0.1")
 #define PORT	netemu_htons(27888)
 
 char* games[] = {"Foo", "Bar"};
@@ -26,9 +26,11 @@ int main() {
 	kaillera_server **servers;
 	kaillera_existing_game **existing_games;
 	struct game *result;
+	struct game **game_list;
 	int i;
 	int no_games, no_servers;
 
+	i = 0;
 	addr.addr = ADDR;
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;
@@ -37,6 +39,7 @@ int main() {
 	//kaillera_communication_get_server_list(&servers, &games);
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 	server_connection_create_game(connection,games[i],&result);
+	//game_list = server_connection_get_game_list(connection, &no_games);
 	printf("FIRST!");
 	return 0;
 }
