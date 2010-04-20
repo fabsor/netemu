@@ -20,14 +20,16 @@ void server_connection_add_user(struct server_connection* connection, NETEMU_WOR
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count);
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
+int _server_connection_user_comparator(const void* item1,const void* item2);
+int _server_connection_game_comparator(const void* item1, const void* item2);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
-	NETEMU_HASHTBL *users;
-	NETEMU_HASHTBL *games;
+	struct netemu_list *users;
+	struct netemu_list *games;
 	struct netemu_packet_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
 
@@ -102,10 +104,7 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game** result) {
-	int error;
 	time_t timestamp;
-	struct netemu_client *client;
-	struct transport_packet_buffer buffer;
 	struct application_instruction *message, *reply;
 
 	message = netemu_application_create_message();
@@ -152,8 +151,10 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
-	connection->_internal->users = netemu_hashtbl_create(10,def_hashfunc_int, comparator_int);
-	connection->_internal->games = netemu_hashtbl_create(10,def_hashfunc_int, comparator_int);
+	connection->_internal->users = netemu_list_new(10);
+	netemu_list_register_sort_fn(connection->_internal->users,_server_connection_user_comparator);
+	connection->_internal->games = netemu_list_new(10);
+	netemu_list_register_sort_fn(connection->_internal->games,_server_connection_game_comparator);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,server_connection_respond_to_user_join, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,server_connection_respond_to_login_success, connection);
@@ -213,7 +214,7 @@ void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer,
 	connection = (struct server_connection*)arg;
 	joined = (struct user_joined*)instruction->body;
 	server_connection_add_user(connection, joined->id, joined->connection, instruction->user);
-	//netemu_application_free_message(instruction);
+
 }
 
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
@@ -228,7 +229,6 @@ void server_connection_respond_to_login_success(struct netemu_packet_buffer* buf
 	for(i = 0; i < accepted->games_count; i++) {
 		netemu_hashtbl_insert(connection->_internal->games,&accepted->games[i]->id,sizeof(NETEMU_WORD),accepted->games[i]);
 	}
-	//netemu_application_free_message(instruction);
 }
 
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
@@ -241,12 +241,20 @@ void server_connection_respond_to_game_created(struct netemu_packet_buffer* buff
 
 void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count) {
 	struct game* game;
+	int index;
 	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
 	game->id = id;
 	game->status = status;
 	game->users_count = users_count;
-	netemu_hashtbl_insert(connection->_internal->games,&game->id,sizeof(NETEMU_WORD),game);
+	index = netemu_list_contains(connection->_internal->games,game);
+	if(index != -1) {
+		/* TODO: Free memory here... */
+		connection->_internal->games->elements[index] = game;
+	}
+	else {
+		netemu_list_add(connection->_internal->games,game);
+	}
 }
 
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username) {
@@ -255,24 +263,27 @@ void server_connection_add_user(struct server_connection* connection, NETEMU_WOR
 	user->id = user_id;
 	user->connection = connection_type;
 	user->username = username;
-
-	netemu_hashtbl_insert(connection->_internal->users,&user->id,sizeof(NETEMU_WORD),user);
+	_server_connection_add_user_struct(connection,user);
 }
 
-struct game* server_connection_get_game_list(struct server_connection* connection, int *count) {
-	struct game** games;
-	struct game* game;
-	struct netemu_hashtable_iter *iter;
-	int i = 0;
-	games = malloc(sizeof(struct game*)*connection->_internal->games->count);
-	iter = netemu_hashtbl_iterator_new(connection->_internal->games);
-	while(game = (struct game*)netemu_hashtbl_iterator_next(iter) != NULL) {
-		games[i] = game;
-		i++;
+void _server_connection_add_user_struct(struct server_connection* connection, struct user *user) {
+	int index;
+	index = netemu_list_contains(connection->_internal->users,user);
+	if(index != -1) {
+		/* TODO: Free memory here... */
+		connection->_internal->users->elements[index] = user;
 	}
+	else {
+		netemu_list_add(connection->_internal->users,user);
+	}
+}
+
+struct game** server_connection_get_game_list(struct server_connection* connection, int *count) {
+	struct game** games;
+	netemu_list_copy(connection->_internal->games,&games);
 	*count = connection->_internal->games->count;
 	//netemu_hashtbl_iterator_free(iter);
-	return game;
+	return games;
 }
 
 void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
@@ -289,4 +300,17 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 		}
 		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
 	}
+}
+
+/**
+ * Compare users.
+ */
+int _server_connection_user_comparator(const void* item1,const void* item2) {
+	return ((struct user*)item1)->id - ((struct user*)item2)->id;
+}
+/**
+ * Compare games.
+ */
+int _server_connection_game_comparator(const void* item1, const void* item2) {
+	return ((struct game*)item1)->id - ((struct game*)item2)->id;
 }

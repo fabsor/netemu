@@ -74,7 +74,7 @@ int server_connection_join_game_async(struct server_connection *connection, NETE
 
 struct server_connection *server_connection_new(char* username, char* emulator_name);
 
-struct game* server_connection_get_game_list(struct server_connection* connection, int *count);
+struct game** server_connection_get_game_list(struct server_connection* connection, int *count);
 
 
 #ifdef	__cplusplus
