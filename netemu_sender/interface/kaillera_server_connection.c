@@ -18,6 +18,8 @@ void respondToPing(struct netemu_packet_buffer* buffer, struct application_instr
 void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username);
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
+void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count);
+void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
@@ -208,6 +210,22 @@ void server_connection_respond_to_login_success(struct netemu_packet_buffer* buf
 		netemu_hashtbl_insert(connection->_internal->games,&accepted->games[i]->id,sizeof(NETEMU_WORD),accepted->games[i]);
 	}
 	//netemu_application_free_message(instruction);
+}
+
+void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct game_created *created;
+	struct server_connection* connection;
+	connection = (struct server_connection*)arg;
+	created = (struct game_created*)instruction->body;
+	server_connection_add_game(connection,created->appName, created->id,0, 0);
+}
+
+void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count) {
+	struct game* game;
+	game->app_name = app_name;
+	game->id = id;
+	game->status = status;
+	game->users_count = users_count;
 }
 
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username) {
