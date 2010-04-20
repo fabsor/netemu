@@ -130,8 +130,8 @@ void _server_connection_add_game_struct(struct server_connection* connection, st
 		netemu_list_add(connection->_internal->games,game);
 	}
 }
-/*
-int server_connection_start_game() {
+
+int server_connection_start_game(struct server_connection *connection) {
 	int error;
 	time_t timestamp;
 	struct netemu_client *client;
@@ -139,15 +139,13 @@ int server_connection_start_game() {
 	struct application_instruction *message, *reply;
 
 	message = netemu_application_create_message();
-	netemu_application_create_game_add(message, gamename);
-
+	netemu_application_start_game_add(message);
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, CREATE_GAME, timestamp);
-	*result = (struct game*)reply->body;
+	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, START_GAME, timestamp);
 	return 1;
 }
-*/
+
 
 struct server_connection *server_connection_new(char* user, char* emulator_name) {
 	struct server_connection *connection;
