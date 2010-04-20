@@ -20,7 +20,7 @@ void server_connection_add_user(struct server_connection* connection, NETEMU_WOR
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count);
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
-
+void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg);
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
@@ -127,6 +127,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	}
 	connection->user = user;
 	connection->emulator_name = emulator_name;
+	connection->current_game = NULL;
 	connection->_internal = malloc(sizeof(struct _server_connection_internal));
 	connection->_internal->chat_callback = netemu_list_new(3);
 	connection->_internal->game_created_callback = netemu_list_new(3);
@@ -139,6 +140,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,respondToPing, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,server_connection_respond_to_user_join, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,server_connection_respond_to_login_success, connection);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer, PLAYER_JOINED, server_connection_respond_to_player_joined, connection);
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
@@ -210,6 +212,20 @@ void server_connection_respond_to_login_success(struct netemu_packet_buffer* buf
 		netemu_hashtbl_insert(connection->_internal->games,&accepted->games[i]->id,sizeof(NETEMU_WORD),accepted->games[i]);
 	}
 	//netemu_application_free_message(instruction);
+}
+
+void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg) {
+	struct player_joined *joined;
+	struct server_connection *connection;
+
+	connection = (struct server_connection*)arg;
+	joined = (struct player_joined*)instruction->body;
+
+	if(connection->current_game != NULL) {
+		if(connection->current_game->id == joined->game_id) {
+			//joined->
+		}
+	}
 }
 
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {

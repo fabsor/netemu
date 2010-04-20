@@ -43,6 +43,7 @@ struct server_connection {
 	int game_count;
 	int user_count;
 	char *emulator_name;
+	struct game *current_game;
 
 	server_connection_internal _internal;
 };
