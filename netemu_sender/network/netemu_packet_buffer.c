@@ -9,6 +9,7 @@ struct _netemu_packet_buffer_wakeup_info {
 	struct application_instruction* instruction;
 	struct _netemu_packet_buffer_wakeup_info *next;
 	struct _netemu_packet_buffer_wakeup_info *prev;
+	int FOO;
 };
 
 struct _netemu_packet_buffer_notify_info {
@@ -156,6 +157,7 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id, sizeof(char))) != NULL) {
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
+				wakeup->FOO++;
 				wakeup->instruction = instruction;
 
 				if(wakeup->prev != NULL)
@@ -167,6 +169,12 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 				else {
 					nextwakeup = NULL;
 				}
+
+				if(wakeup->next == NULL && wakeup->prev == NULL) {
+					/* We remove the node completely, we don't want a bunch of null pointers in the hash table. */
+					netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char));
+				}
+
 				netemu_thread_event_signal(wakeup->eventhandle);
 				wakeup = nextwakeup;
 			}
@@ -176,8 +184,10 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 		}
 
 		wakeup = NULL;
+		/* Moved the above line to the loop above, since we just want to remove the entire linked list from the hashtable
+		 * when the last wakeupinfo is removed from the linked list. */
 		/* We remove the node completely, we don't want a bunch of null pointers in the hash table. */
-		netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char));
+		/*netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char)); */
 	}
 	netemu_thread_mutex_release(buffer->_internal->wakeup_mutex);
 }
