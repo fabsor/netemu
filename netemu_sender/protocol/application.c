@@ -624,6 +624,7 @@ void netemu_application_start_game_parse(struct application_instruction* instruc
 void netemu_application_player_ready_add(struct application_instruction* instruction) {
 	instruction->id = PLAYER_READY;
 	instruction->body_size = 0;
+	instruction->body = NULL;
 	instruction->packBodyFn = NULL;
 }
 
