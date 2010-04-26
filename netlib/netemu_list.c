@@ -6,6 +6,7 @@
 struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
 	int size;
+	int FOO;
 };
 
 int _netemu_enlarge_list(struct netemu_list* list, int size);
@@ -29,6 +30,7 @@ struct netemu_list* netemu_list_new(int count) {
 		free(list->elements);
 		return NULL;
 	}
+	intern->FOO = 0;
 	list->count = 0;
 	list->_intern = intern;
 	return list;
@@ -164,6 +166,7 @@ void* netemu_list_get(struct netemu_list* list, int index) {
 
 int netemu_list_clear(struct netemu_list* list) {
 	int error = 0;
+	list->_intern->FOO++;
 	free(list->elements);
 	if((list->elements = malloc(sizeof(void*)*20)) == NULL)
 		error = -1;

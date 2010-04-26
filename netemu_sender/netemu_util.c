@@ -66,6 +66,6 @@ void netemu_util_send_data(struct netemu_sender_udp* sender, char* data) {
 	int error;
 	error = netemu_sender_udp_send(sender,data,strlen(data)+1);
 	if(error < 0) {
-		printf("Send Error: %d\n", netemu_get_last_error());
+		//printf("Send Error: %d\n", netemu_get_last_error());
 	}
 }

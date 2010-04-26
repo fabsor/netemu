@@ -18,7 +18,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	sender = malloc(sizeof(struct netemu_tcp_connection));
 	socket = netemu_socket(NETEMU_AF_INET, NETEMU_SOCK_STREAM);
 	if (socket == INVALID_SOCKET) {
-		sender->error = netemu_get_last_error();
+		//sender->error = netemu_get_last_error();
 	}
 	sender->addr_len = addr_len;
 	sender->addr = addr;
@@ -50,7 +50,7 @@ void _netemu_listener_listen(void* params) {
 
 	error = netemu_listen(listener->socket,LISTEN_BACKLOG);
 	if(error == -1) {
-		listener->error = netemu_get_last_error();
+		//listener->error = netemu_get_last_error();
 		return;
 	}
 	while (1) {
@@ -103,7 +103,7 @@ void _netemu_tcp_connection_recv(void* params) {
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error == -1) {
-			receiver->error = netemu_get_last_error();
+			//receiver->error = netemu_get_last_error();
 			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}
@@ -126,7 +126,7 @@ int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data,
 	int success;
 	success = netemu_sendto(sender->socket,data,size,0,sender->addr,sender->addr_len);
 	if(success == -1){
-		sender->error = netemu_get_last_error();
+		//sender->error = netemu_get_last_error();
 	}
 	return success;
 }
@@ -135,7 +135,7 @@ int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender) {
 	int success;
 	success = netemu_connect(sender->socket,sender->addr,sender->addr_len);
 	if(success == -1){
-		sender->error = netemu_get_last_error();
+		//sender->error = netemu_get_last_error();
 	}
 	return success;
 }
@@ -146,7 +146,7 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 	sender = malloc(sizeof(struct netemu_tcp_listener));
 	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_STREAM);
 	if (socket == INVALID_SOCKET) {
-		sender->error = netemu_get_last_error();
+		//sender->error = netemu_get_last_error();
 	}
 	sender->addr_len = addr_len;
 	sender->addr = bind_addr;

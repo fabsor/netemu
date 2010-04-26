@@ -216,8 +216,6 @@ typedef unsigned int NETEMU_SOCKET;
 
 	/* Close socket*/
 	int netemu_closesocket(NETEMU_SOCKET socket);
-	/* Returns the error code for the last error that occured */
-	int netemu_get_last_error();
 
 	int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result);
 
