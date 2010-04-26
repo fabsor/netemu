@@ -374,6 +374,9 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 		if(instruction->id == CREATE_GAME) {
 			printf("GAME CREATED");
 		}
+		if(instruction->id == LOGIN_SUCCESS) {
+			printf("YAY!");
+		}
 		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
 	}
 }

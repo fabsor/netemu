@@ -72,6 +72,9 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			netemu_application_player_dropped_parse(app_instruction, data);
 			break;
 	}
+
+	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user));
+
 	return app_instruction;
 }
 
