@@ -59,9 +59,10 @@ void _netemu_sender_buffer_update(void* arg) {
 		current_time = time(NULL);
 		if (buffer->instructions->count > 0 /*&& (buffer->instructions->count > buffer->preferred_no_packets || buffer->send == 1 || (current_time - buffer->last_send ) > PACKET_SEND_INTERVAL)*/) {
 			netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
-			instructions = malloc(sizeof(struct netemu_application_instruction*)
-					* itemsToSend->count);
 			count = itemsToSend->count;
+			instructions = malloc(sizeof(struct netemu_application_instruction*)
+					* count);
+
 			for (i = 0; i < itemsToSend->count; i++) {
 				instructions[i] = itemsToSend->elements[i];
 			}
@@ -70,11 +71,6 @@ void _netemu_sender_buffer_update(void* arg) {
 			packet_buffer = netemu_transport_pack(instructions, count);
 			netemu_sender_udp_send(sender, packet_buffer.data,
 					packet_buffer.size);
-
-			for(i = 0; i < count; i++) {
-				netemu_application_free_message(instructions[i]);
-			}
-			free(instructions);
 			buffer->send = 0;
 			buffer->last_send = current_time;
 		}
