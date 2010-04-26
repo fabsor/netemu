@@ -8,35 +8,52 @@ struct _netemu_list_internal {
 	int size;
 };
 
-void _netemu_enlarge_list(struct netemu_list* list, int size);
+int _netemu_enlarge_list(struct netemu_list* list, int size);
 int _netemu_list_search_linear(struct netemu_list* list, void* element);
 
 struct netemu_list* netemu_list_new(int count) {
 	struct netemu_list* list;
 	struct _netemu_list_internal* intern;
 
-	intern = malloc(sizeof(struct _netemu_list_internal));
-	list = malloc(sizeof(struct netemu_list));
+	if((intern = malloc(sizeof(struct _netemu_list_internal))) == NULL) {
+		return NULL;
+	}
+	if((list = malloc(sizeof(struct netemu_list))) == NULL) {
+		free(intern);
+		return NULL;
+	}
 	intern->size = count;
-	list->elements = malloc(sizeof(void*) * intern->size);
+	if((list->elements = malloc(sizeof(void*) * intern->size)) == NULL) {
+		free(intern);
+		free(list);
+		free(list->elements);
+		return NULL;
+	}
 	list->count = 0;
 	list->_intern = intern;
 	return list;
 }
 
-void netemu_list_add(struct netemu_list* list, void* element) {
+int netemu_list_add(struct netemu_list* list, void* element) {
+	int error = 0;
 	/* Enlarge the array if necessary. */
 	if (list->_intern->size <= list->count) {
-		_netemu_enlarge_list(list, 10);
+		error = _netemu_enlarge_list(list, 10);
 	}
 	list->elements[list->count] = element;
 	list->count++;
 	list->sorted = 0;
+
+	return error;
 }
 
-void _netemu_enlarge_list(struct netemu_list* list, int size) {
+int _netemu_enlarge_list(struct netemu_list* list, int size) {
 	list->_intern->size += size;
-	list->elements = realloc(list->elements,list->_intern->size * sizeof(void*));
+	/* TODO: Should we really use realloc here? */
+	if((list->elements = realloc(list->elements,list->_intern->size * sizeof(void*))) == NULL)
+		return -1;
+	else
+		return 0;
 }
 
 int netemu_list_contains(struct netemu_list* list, void* element) {
@@ -73,7 +90,7 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 		list->elements[i] = list->elements[i + 1];
 	}
 	list->count--;
-	return 1;
+	return 0;
 }
 
 int netemu_list_copy(struct netemu_list* list, void ***buffer) {
@@ -131,6 +148,7 @@ void netemu_list_trim(struct netemu_list* list) {
 void netemu_list_free(struct netemu_list* list) {
 	free(list->_intern);
 	free(list->elements);
+	free(list);
 }
 
 /**
@@ -144,8 +162,12 @@ void* netemu_list_get(struct netemu_list* list, int index) {
 	return list->elements[index];
 }
 
-void netemu_list_clear(struct netemu_list* list) {
+int netemu_list_clear(struct netemu_list* list) {
+	int error = 0;
 	free(list->elements);
-	list->elements = malloc(sizeof(void*)*20);
+	if((list->elements = malloc(sizeof(void*)*20)) == NULL)
+		error = -1;
 	list->count = 0;
+
+	return error;
 }
