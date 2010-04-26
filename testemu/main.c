@@ -28,6 +28,7 @@ void start_game(struct server_connection *connection);
 
 void send_play_values(struct server_connection *connection);
 void show_user_list(struct server_connection* connection);
+void player_ready(struct server_connection *connection);
 
 int main() {
 	struct netemu_sockaddr_in addr;
@@ -58,7 +59,7 @@ void menu(struct server_connection* connection) {
 	val = 'n';
 
 	while(val != '0') {
-		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. Send Play Values");
+		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY");
 		val = getchar();
 		switch(val) {
 			case '1':
@@ -78,6 +79,9 @@ void menu(struct server_connection* connection) {
 				break;
 			case '6':
 				send_play_values(connection);
+				break;
+			case '7':
+				player_ready(connection);
 				break;
 		}
 	}
@@ -123,6 +127,10 @@ void show_user_list(struct server_connection* connection) {
 void start_game(struct server_connection *connection) {
 	printf("Starting game\n");
 	server_connection_start_game(connection);
+}
+
+void player_ready(struct server_connection *connection) {
+	server_connection_send_player_ready(connection);
 }
 
 

@@ -29,7 +29,6 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	char *data;
 
 	app_instruction = malloc(sizeof(struct application_instruction));
-
 	app_instruction->timestamp = time(NULL);
 
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
@@ -242,7 +241,6 @@ void netemu_application_player_dropped_parse(struct application_instruction *ins
 	dropped = malloc(sizeof(struct player_dropped));
 
 	dropped->player_number = *data;
-	
 	instruction->body = dropped;
 }
 

@@ -78,7 +78,7 @@ struct server_connection *server_connection_new(char* username, char* emulator_n
 
 struct game** server_connection_get_game_list(struct server_connection* connection, int *count);
 
-void server_connection_send_player_ready(struct server_connection* connection);
+int server_connection_send_player_ready(struct server_connection *connection);
 
 void server_connection_send_play_values(struct server_connection* connection, int size, void* data);
 
