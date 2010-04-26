@@ -38,6 +38,8 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	app_instruction->user = parse_string(++data);
 	data += strlen(app_instruction->user) + 1;
 
+	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user));
+
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
@@ -72,8 +74,6 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			netemu_application_player_dropped_parse(app_instruction, data);
 			break;
 	}
-
-	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user));
 
 	return app_instruction;
 }
