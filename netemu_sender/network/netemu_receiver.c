@@ -99,6 +99,7 @@ void netemu_receiver_udp_clear_listeners(struct netemu_receiver_udp* receiver) {
 		free(receiver_fn);
 		receiver_fn = receiver_next;
 	}
+
 	receiver->receiver_fn = NULL;
 }
 

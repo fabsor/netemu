@@ -14,7 +14,7 @@
 #include "netemu_client.h"
 
 #define EMUNAME		"testemu"
-#define PLAYERNAME	"stefan"
+#define PLAYERNAME	"foobar"
 
 
 #define ADDR	netemu_inet_addr("192.168.106.222")//netemu_inet_addr("127.0.0.1")

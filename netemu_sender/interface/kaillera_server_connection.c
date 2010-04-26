@@ -207,13 +207,13 @@ int server_connection_login(struct server_connection* connection) {
 
 	sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
+
 	netemu_application_login_request_add(message,connection->emulator_name,connection->user,1);
 	message->important = 1;
 
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
 	success = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
-	//netemu_application_free_message(success);
 	return 1;
 }
 
@@ -410,6 +410,5 @@ int server_connection_send_player_ready(struct server_connection *connection) {
 	netemu_application_player_ready_add(message);
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	//reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, START_GAME, timestamp);
 	return 1;
 }

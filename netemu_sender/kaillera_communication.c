@@ -56,6 +56,7 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 
 	hello = netemu_communication_create_hello_message(VERSION);
 	netemu_util_send_data(client->sender,hello);
+	free(hello);
 	while(result == -1);
 	addr->port = netemu_htons(result);
 	netemu_receiver_udp_clear_listeners(client->receiver);
@@ -63,6 +64,7 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	connection = server_connection_new(username,emulator_name);
 	return connection;
 }
+
 /*
 void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void (*ConnectionReceivedFn)(int status, struct server_connection*)) {
 	struct netemu_client *client;
@@ -78,6 +80,7 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void 
 	free(hello);
 }
 */
+
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	int result;
 	int port;
@@ -106,4 +109,3 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 		*port = netemu_communication_parse_server_accept_port(data);
 	}
 }
-
