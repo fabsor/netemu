@@ -120,7 +120,7 @@ struct application_instruction* netemu_packet_buffer_wait_for_instruction(struct
 	info = _netemu_packet_buffer_register_wakeup_on_instruction(buffer, instruction_id, timestamp, eventhandle);
 	netemu_thread_event_wait(eventhandle);
 	netemu_thread_event_destroy(eventhandle);
-	instruction = netemu_application_instruction_copy(info->instruction);
+	instruction = info->instruction;
 	free(info);
 	return instruction;
 }
