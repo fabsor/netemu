@@ -406,6 +406,5 @@ int server_connection_send_player_ready(struct server_connection *connection) {
 	netemu_application_player_ready_add(message);
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
-	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, START_GAME, timestamp);
 	return 1;
 }
