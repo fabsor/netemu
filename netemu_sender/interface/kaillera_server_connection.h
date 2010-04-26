@@ -36,6 +36,11 @@ union callback_fn {
 	valuesReceivedFn valuesReceivedFn;
 };
 
+struct callback {
+	short disposable;
+	union callback_fn fn;
+};
+
 typedef struct user* kaillera_user;
 
 struct server_connection {
@@ -68,13 +73,13 @@ int server_connection_disconnect(struct server_connection *connection, char *mes
 
 int server_connection_create_game(struct server_connection *connection, char *gamename, struct game** result);
 
-int server_connection_create_game_async(struct server_connection *connection, char *gamename, createGameFn);
+void server_connection_create_game_async(struct server_connection *connection, char *gamename, gameCreatedFn fn);
 
 int server_connection_register_game_created_callback(struct server_connection *connection, gameCreatedFn);
 
 int server_connection_join_game(struct server_connection *connection, NETEMU_DWORD gameid, struct player_joined *result);
 
-int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid, playerJoinFn);
+void server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid, playerJoinFn);
 
 struct server_connection *server_connection_new(char* username, char* emulator_name);
 

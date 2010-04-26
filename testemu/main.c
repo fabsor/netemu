@@ -24,6 +24,7 @@
 
 
 char* games[] = {"Foo", "Bar"};
+struct server_connection *connection;
 #define NO_GAMES	2
 
 void menu(struct server_connection* connection);
@@ -36,18 +37,15 @@ void send_play_values(struct server_connection *connection);
 void show_user_list(struct server_connection* connection);
 void player_ready(struct server_connection *connection);
 void receive_values(struct buffered_play_values *result);
-
+void login_success(int status, struct server_connection* connection);
+void connect_async(struct netemu_sockaddr_in addr);
+void server_connect(struct netemu_sockaddr_in addr);
 int main() {
 	struct netemu_sockaddr_in addr;
-	struct server_connection* connection;
-	struct netemu_list* list, *list2;
-	struct game *result;
-	struct player_joined *joined;
-	struct game **game_list;
-	int i;
-	int no_games, no_servers;
+	char choice;
 
-	i = 0;
+
+	connection = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;
@@ -55,11 +53,33 @@ int main() {
 	//info = netemu_client_new(EMUNAME,games);
 	//kaillera_communication_get_server_list(&servers, &games);
 //_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	printf("Connecting\n");
-	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+
+	printf("1. Connect Async\n2. Connect\n");
+	choice = getchar();
+	switch(choice) {
+		case '1':
+			connect_async(addr);
+		break;
+		case '2':
+			server_connect(addr);
+		break;
+	}
 	server_connection_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
 	return 0;
+}
+
+void connect_async(struct netemu_sockaddr_in addr) {
+	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success);
+	while(connection == NULL);
+}
+
+void server_connect(struct netemu_sockaddr_in addr) {
+	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+}
+
+void login_success(int status, struct server_connection* server_connection) {
+	connection = server_connection;
 }
 
 void receive_values(struct buffered_play_values *result) {

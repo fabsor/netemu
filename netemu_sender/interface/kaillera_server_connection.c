@@ -148,6 +148,18 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	return 1;
 }
 
+void server_connection_create_game_async(struct server_connection *connection, char *gamename, gameCreatedFn fn) {
+	time_t timestamp;
+	struct application_instruction *message, *reply;
+
+	message = netemu_application_create_message();
+	netemu_application_create_game_add(message, gamename);
+	timestamp = time(NULL);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	server_connection_register_game_created_callback(connection,fn);
+}
+
+
 void _server_connection_add_game_struct(struct server_connection* connection, struct game* game) {
 	int index;
 	index = netemu_list_contains(connection->_internal->games,game);
