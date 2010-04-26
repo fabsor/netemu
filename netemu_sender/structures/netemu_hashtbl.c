@@ -195,6 +195,7 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key,
 				prevnode->next = node->next;
 			else
 				hashtbl->nodes[hash] = node->next;
+			free(node);
 			hashtbl->count--;
 			return 0;
 		}
