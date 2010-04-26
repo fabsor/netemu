@@ -26,6 +26,9 @@ void show_game_list(struct server_connection *connection);
 void join_game(struct server_connection* connection);
 void start_game(struct server_connection *connection);
 
+void send_play_values(struct server_connection *connection);
+void show_user_list(struct server_connection* connection);
+
 int main() {
 	struct netemu_sockaddr_in addr;
 	struct server_connection* connection;

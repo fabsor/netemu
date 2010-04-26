@@ -23,7 +23,7 @@ extern "C" {
 
     struct netemu_list* netemu_list_new(int count);
 
-    void netemu_list_add(struct netemu_list* list, void* element);
+    int netemu_list_add(struct netemu_list* list, void* element);
 
     int netemu_list_remove(struct netemu_list* list, void* element);
 
@@ -68,7 +68,7 @@ extern "C" {
      */
     void netemu_list_register_sort_fn(struct netemu_list* list, int ( * comparator ) ( const void *, const void * ));
 
-    void netemu_list_clear(struct netemu_list* list);
+    int netemu_list_clear(struct netemu_list* list);
 #ifdef	__cplusplus
 }
 #endif

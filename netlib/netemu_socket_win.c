@@ -114,7 +114,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	}
 
 	if(error != 0) {
-
+		
 	}
 
 }

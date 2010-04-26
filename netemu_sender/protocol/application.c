@@ -37,6 +37,8 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	app_instruction->user = parse_string(++data);
 	data += strlen(app_instruction->user) + 1;
 
+	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user));
+
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
@@ -70,7 +72,11 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case PLAYER_DROPPED:
 			netemu_application_player_dropped_parse(app_instruction, data);
 			break;
+		case PLAYER_JOINED:
+			netemu_application_player_joined_parse(app_instruction, data);
+			break;
 	}
+
 	return app_instruction;
 }
 
@@ -465,8 +471,8 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 	game = malloc(sizeof(struct game_created));
 	buffer += _netemu_application_copy_string(&game->gameName,buffer);
 	buffer += _netemu_application_copy_string(&game->appName,buffer);
-	memcpy(&game->id,buffer,sizeof(NETEMU_WORD));
-	buffer += sizeof(NETEMU_WORD);
+	memcpy(&game->id,buffer,sizeof(NETEMU_DWORD));
+	buffer += sizeof(NETEMU_DWORD);
 	memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD));
 	instruction->body = game;
 }
@@ -518,6 +524,28 @@ void netemu_application_player_left_parse(struct application_instruction* instru
 	struct player_left *left;
 	left = malloc(sizeof(struct player_left));
 	memcpy(&left->user_id,buffer,sizeof(char));
+}
+
+void netemu_application_player_joined_parse(struct application_instruction* instruction, char* data) {
+	struct player_joined *joined;
+	
+	joined = malloc(sizeof(struct player_joined));
+
+	joined->game_id = *((NETEMU_DWORD*)data);
+	data += sizeof(NETEMU_DWORD);
+
+	joined->username = parse_string(data);
+	data += strlen(joined->username) + 1;
+
+	joined->ping = *((NETEMU_DWORD*)data);
+	data += sizeof(NETEMU_DWORD);
+
+	joined->user_id = *((NETEMU_WORD*)data);
+	data += sizeof(NETEMU_WORD);
+
+	joined->connection = *data;
+
+	instruction->body = joined;
 }
 
 void netemu_application_kick_player_add(struct application_instruction* instruction, NETEMU_WORD user_id) {

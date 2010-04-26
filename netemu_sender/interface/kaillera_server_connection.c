@@ -18,7 +18,7 @@ void respondToPing(struct netemu_packet_buffer* buffer, struct application_instr
 void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username);
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
-void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count);
+void server_connection_add_game(struct server_connection *connection, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count);
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg);
 void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
@@ -313,14 +313,15 @@ void server_connection_respond_to_game_created(struct netemu_packet_buffer* buff
 	struct server_connection* connection;
 	connection = (struct server_connection*)arg;
 	created = (struct game_created*)instruction->body;
-	server_connection_add_game(connection,created->appName, created->id,0, 0);
+	server_connection_add_game(connection, created->appName, created->gameName, created->id, 0, 0);
 }
 
-void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count) {
+void server_connection_add_game(struct server_connection *connection, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count) {
 	struct game* game;
 	int index;
 	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
+	game->name = game_name;
 	game->id = id;
 	game->status = status;
 	game->users_count = users_count;

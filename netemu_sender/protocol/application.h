@@ -238,7 +238,7 @@ void netemu_application_player_left_add(struct application_instruction* instruct
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
 
-void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer);
+void netemu_application_player_joined_parse(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_player_ready_add(struct application_instruction* instruction);
 
