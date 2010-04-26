@@ -103,6 +103,7 @@ void _netemu_packet_buffer_update(void* args) {
 				/* wakeup and notify */
 				_netemu_packet_buffer_perform_notify(buffer,itemsToNotify->elements[i]);
 				_netemu_packet_buffer_perform_wakeup(buffer,itemsToNotify->elements[i]);
+				//free(itemsToNotify->elements[i]);
 			}
 			/* Finally clear everything out. */
 			netemu_list_clear(itemsToNotify);
@@ -119,7 +120,7 @@ struct application_instruction* netemu_packet_buffer_wait_for_instruction(struct
 	info = _netemu_packet_buffer_register_wakeup_on_instruction(buffer, instruction_id, timestamp, eventhandle);
 	netemu_thread_event_wait(eventhandle);
 	netemu_thread_event_destroy(eventhandle);
-	instruction = info->instruction;
+	instruction = netemu_application_instruction_copy(info->instruction);
 	free(info);
 	return instruction;
 }
@@ -151,9 +152,6 @@ struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_
 void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *nextwakeup;
 	netemu_thread_mutex_lock(buffer->_internal->wakeup_mutex, NETEMU_INFINITE);
-	if(instruction->id == CREATE_GAME) {
-		printf("AHAHAHAH");
-	}
 	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id, sizeof(char))) != NULL) {
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
@@ -194,11 +192,13 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 
 void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_notify_info *notify, *nextnotify;
+	struct application_instruction* copy;
 	netemu_thread_mutex_lock(buffer->_internal->fn_mutex, NETEMU_INFINITE);
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
 				nextnotify = notify->next;
-				notify->fn(buffer,instruction,notify->arg);
+				copy = netemu_application_instruction_copy(instruction);
+				notify->fn(buffer,copy,notify->arg);
 				notify = nextnotify;
 		}
 	}

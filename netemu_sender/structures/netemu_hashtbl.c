@@ -191,12 +191,10 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key,
 	node = hashtbl->nodes[hash];
 	while (node) {
 		if (hashtbl->comparator(node->key, key) == 0) {
-			free(node->key);
 			if (prevnode)
 				prevnode->next = node->next;
 			else
 				hashtbl->nodes[hash] = node->next;
-			free(node);
 			hashtbl->count--;
 			return 0;
 		}
@@ -244,8 +242,6 @@ int netemu_hashtbl_resize(NETEMU_HASHTBL *hashtbl, hash_size size) {
 
 		}
 	}
-
-	free(hashtbl->nodes);
 	hashtbl->size = newtbl.size;
 	hashtbl->nodes = newtbl.nodes;
 

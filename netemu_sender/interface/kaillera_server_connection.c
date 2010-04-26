@@ -21,6 +21,7 @@ void server_connection_respond_to_login_success(struct netemu_packet_buffer* buf
 void server_connection_add_game(struct server_connection *connection, char* app_name, NETEMU_WORD id, char status, int users_count);
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg);
+void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 
 int _server_connection_user_comparator(const void* item1,const void* item2);
 int _server_connection_game_comparator(const void* item1, const void* item2);
@@ -34,6 +35,7 @@ struct _server_connection_internal {
 	struct netemu_list *game_created_callback;
 	struct netemu_list *users;
 	struct netemu_list *games;
+	struct buffered_play_values *buffered_values;
 	struct netemu_packet_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
 
@@ -167,6 +169,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
+	connection->_internal->buffered_values = malloc(sizeof(struct buffered_play_values));
 	connection->_internal->users = netemu_list_new(10);
 	netemu_list_register_sort_fn(connection->_internal->users,_server_connection_user_comparator);
 	connection->_internal->games = netemu_list_new(10);
@@ -176,9 +179,20 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,server_connection_respond_to_login_success, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer, PLAYER_JOINED, server_connection_respond_to_player_joined, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,CREATE_GAME,server_connection_respond_to_game_created, connection);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,BUFFERED_PLAY_VALUES,server_connection_respond_to_buffered_values, connection);
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
+}
+
+void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct server_connection* connection;
+	struct buffered_play_values* values;
+	connection = (struct server_connection*)arg;
+	values = (struct buffered_play_values*)instruction->body;
+	free(connection->_internal->buffered_values);
+	connection->_internal->buffered_values = values;
+
 }
 
 int server_connection_login(struct server_connection* connection) {
@@ -195,7 +209,21 @@ int server_connection_login(struct server_connection* connection) {
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
 	success = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
-	netemu_application_free_message(success);
+	//netemu_application_free_message(success);
+	return 1;
+}
+
+void server_connection_send_player_ready(struct server_connection* connection) {
+	int error;
+	time_t timestamp;
+	struct netemu_client *client;
+	struct transport_packet_buffer buffer;
+	struct application_instruction *message, *reply;
+
+	message = netemu_application_create_message();
+	netemu_application_player_ready_add(message);
+	timestamp = time(NULL);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
 	return 1;
 }
 
@@ -243,6 +271,15 @@ void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer,
 
 }
 
+int server_connection_join_game(struct server_connection *connection, NETEMU_DWORD gameid, struct player_joined *result) {
+	struct application_instruction* message;
+
+	message = netemu_application_create_message();
+	netemu_application_join_game_add(message,gameid,1);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+
+}
+
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct login_success *accepted;
 	struct server_connection* connection;
@@ -266,7 +303,7 @@ void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buf
 
 	if(connection->current_game != NULL) {
 		if(connection->current_game->id == joined->game_id) {
-			//joined->
+
 		}
 	}
 }
@@ -320,7 +357,7 @@ struct game** server_connection_get_game_list(struct server_connection* connecti
 
 struct user** server_connection_get_user_list(struct server_connection* connection, int *count) {
 	struct user** users;
-	netemu_list_copy(connection->_internal->games,&users);
+	netemu_list_copy(connection->_internal->users,&users);
 	*count = connection->_internal->users->count;
 	return users;
 }
@@ -352,4 +389,22 @@ int _server_connection_user_comparator(const void* item1,const void* item2) {
  */
 int _server_connection_game_comparator(const void* item1, const void* item2) {
 	return ((struct game*)item1)->id - ((struct game*)item2)->id;
+}
+
+void server_connection_get_play_values(struct server_connection *connection) {
+	return connection->_internal->buffered_values;
+}
+
+void server_connection_send_play_values(struct server_connection* connection, int size, void* data) {
+	int error;
+	time_t timestamp;
+	struct netemu_client *client;
+	struct transport_packet_buffer buffer;
+	struct application_instruction *message, *reply;
+
+	message = netemu_application_create_message();
+	netemu_application_buffered_play_values_add(message,size,data);
+	timestamp = time(NULL);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	return 1;
 }

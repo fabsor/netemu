@@ -549,6 +549,7 @@ void netemu_application_start_game_total_add(struct application_instruction* ins
 	start->time_band = time_band;
 	start->player_no = player_no;
 	start->max_players = max_players;
+	instruction->body = start;
 	instruction->body_size = sizeof(struct game_start);
 	instruction->id = START_GAME;
 	instruction->packBodyFn = netemu_application_kick_player_pack;
@@ -558,11 +559,12 @@ void netemu_application_start_game_add(struct application_instruction* instructi
 	struct game_start *start;
 	start = malloc(sizeof(struct game_start));
 	start->time_band = 0xFFFF;
-	start->player_no = 0;
-	start->max_players = 0;
+	start->player_no = 0xFF;
+	start->max_players = 0xFF;
+	instruction->body = start;
 	instruction->body_size = sizeof(struct game_start);
 	instruction->id = START_GAME;
-	instruction->packBodyFn = netemu_application_kick_player_pack;
+	instruction->packBodyFn = netemu_application_start_game_pack;
 }
 
 void netemu_application_start_game_pack(struct application_instruction* instruction, char* buffer) {
@@ -574,6 +576,12 @@ void netemu_application_start_game_pack(struct application_instruction* instruct
 	buffer += sizeof(char);
 	memcpy(buffer,&start->max_players,sizeof(char));
 	buffer += sizeof(char);
+}
+
+void netemu_application_client_timeout_request_add(struct application_instruction* instruction) {
+	instruction->body_size = 0;
+	instruction->id = CLIENT_TIMEOUT;
+	instruction->packBodyFn = NULL;
 }
 
 void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer) {
@@ -591,4 +599,22 @@ void netemu_application_player_ready_add(struct application_instruction* instruc
 	instruction->id = PLAYER_READY;
 	instruction->body_size = 0;
 	instruction->packBodyFn = NULL;
+}
+
+struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction) {
+	struct application_instruction *copy;
+	copy = malloc(sizeof(struct application_instruction));
+	copy->body = malloc(sizeof(instruction->body_size));
+	copy->user = malloc(sizeof(char)*(strlen(instruction->user)+1));
+	copy->id = instruction->id;
+	copy->important = instruction->important;
+	copy->timestamp = instruction->timestamp;
+	copy->packBodyFn = instruction->packBodyFn;
+	copy->body_size = instruction->body_size;
+
+	strcpy(copy->user,instruction->user);
+	memcpy(copy->body, instruction->body, instruction->body_size);
+
+	return copy;
+
 }
