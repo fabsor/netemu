@@ -75,6 +75,10 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case PLAYER_JOINED:
 			netemu_application_player_joined_parse(app_instruction, data);
 			break;
+		case START_GAME:
+			netemu_application_start_game_parse(app_instruction, data);
+			break;
+			
 	}
 
 	return app_instruction;
@@ -619,6 +623,8 @@ void netemu_application_start_game_parse(struct application_instruction* instruc
 	buffer += sizeof(char);
 	memcpy(&start->max_players,buffer,sizeof(char));
 	buffer += sizeof(char);
+
+	instruction->body = start;
 }
 
 void netemu_application_player_ready_add(struct application_instruction* instruction) {
