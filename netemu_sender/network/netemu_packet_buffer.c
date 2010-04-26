@@ -197,8 +197,8 @@ void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, s
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
 				nextnotify = notify->next;
-				copy = netemu_application_instruction_copy(instruction);
-				notify->fn(buffer,copy,notify->arg);
+				//copy = netemu_application_instruction_copy(instruction);
+				notify->fn(buffer,instruction,notify->arg);
 				notify = nextnotify;
 		}
 	}
