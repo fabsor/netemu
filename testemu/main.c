@@ -35,6 +35,7 @@ void start_game(struct server_connection *connection);
 void send_play_values(struct server_connection *connection);
 void show_user_list(struct server_connection* connection);
 void player_ready(struct server_connection *connection);
+void receive_values(struct buffered_play_values *result);
 
 int main() {
 	struct netemu_sockaddr_in addr;
@@ -56,8 +57,13 @@ int main() {
 //_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	printf("Connecting\n");
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+	server_connection_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
 	return 0;
+}
+
+void receive_values(struct buffered_play_values *result) {
+	printf("%s",result->values);
 }
 
 void menu(struct server_connection* connection) {

@@ -33,6 +33,7 @@ struct _server_connection_internal {
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
+	struct netemu_list *play_values_callback;
 	struct netemu_list *users;
 	struct netemu_list *games;
 	struct buffered_play_values *buffered_values;
@@ -72,6 +73,30 @@ int server_connection_register_user_join_callback(struct server_connection *conn
 	netemu_list_add(connection->_internal->join_callback, fn);
 	return 0;
 }
+
+int server_connection_register_play_values_received_callback(struct server_connection *connection, valuesReceivedFn callback) {
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		return -1;
+	}
+	fn->valuesReceivedFn = callback;
+	netemu_list_add(connection->_internal->play_values_callback, fn);
+	return 0;
+}
+
+int server_connection_unregister_play_values_callback(struct server_connection *connection, joinFn callback) {
+	int error;
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		return -1;
+	}
+	fn->join_fn = callback;
+	error = netemu_list_remove(connection->_internal->join_callback, fn);
+	free(fn);
+
+	return error;
+}
+
 
 int server_connection_unregister_user_join_callback(struct server_connection *connection, joinFn callback) {
 	union callback_fn *fn;
@@ -167,6 +192,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->game_created_callback = netemu_list_new(3);
 	connection->_internal->join_callback = netemu_list_new(3);
 	connection->_internal->leave_callback = netemu_list_new(3);
+	connection->_internal->play_values_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
 	connection->_internal->buffered_values = malloc(sizeof(struct buffered_play_values));
@@ -189,7 +215,11 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct server_connection* connection;
 	struct buffered_play_values* values;
+	struct netemu_list *callbacks;
+	int i;
+
 	connection = (struct server_connection*)arg;
+	callbacks = connection->_internal->play_values_callback;
 	values = (struct buffered_play_values*)instruction->body;
 	connection->_internal->buffered_values->size = values->size;
 	if(connection->_internal->buffered_values->values !=NULL)
@@ -197,6 +227,9 @@ void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* b
 	connection->_internal->buffered_values->values = malloc(values->size);
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
+	for(i = 0; i < callbacks->count; i++) {
+		((union callback_fn*)callbacks->elements[i])->valuesReceivedFn(values);
+	}
 }
 
 int server_connection_login(struct server_connection* connection) {
