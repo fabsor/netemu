@@ -4,7 +4,11 @@
  *  Created on: 12 apr 2010
  *      Author: fabian
  */
+//#define _CRTDBG_MAP_ALLOC
+//#define _CRTDBG_MAPALLOC
 #include <stdlib.h>
+
+//#include <crtdbg.h>
 #include <stdio.h>
 #include "kaillera_communication.h"
 #include "netemu_client.h"
@@ -16,6 +20,8 @@
 #define ADDR	netemu_inet_addr("192.168.106.222")//netemu_inet_addr("127.0.0.1")
 #define PORT	netemu_htons(27888)
 #define VALUE	"0x0x0xff"
+
+
 
 char* games[] = {"Foo", "Bar"};
 #define NO_GAMES	2
@@ -47,7 +53,7 @@ int main() {
 	netemu_init_network();
 	//info = netemu_client_new(EMUNAME,games);
 	//kaillera_communication_get_server_list(&servers, &games);
-
+//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	printf("Connecting\n");
 	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 	menu(connection);
@@ -61,6 +67,7 @@ void menu(struct server_connection* connection) {
 	while(val != '0') {
 		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY");
 		val = getchar();
+		
 		switch(val) {
 			case '1':
 				create_game(connection);
@@ -85,6 +92,7 @@ void menu(struct server_connection* connection) {
 				break;
 		}
 	}
+	//_CrtDumpMemoryLeaks();
 }
 
 void send_play_values(struct server_connection *connection) {
