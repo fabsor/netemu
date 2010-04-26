@@ -156,7 +156,7 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
 				wakeup->FOO++;
-				wakeup->instruction = instruction;
+				wakeup->instruction = netemu_application_instruction_copy(instruction);
 
 				if(wakeup->prev != NULL)
 					wakeup->prev->next = wakeup->next;
