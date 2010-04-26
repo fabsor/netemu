@@ -169,6 +169,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
+	connection->_internal->buffered_values = malloc(sizeof(struct buffered_play_values));
 	connection->_internal->users = netemu_list_new(10);
 	netemu_list_register_sort_fn(connection->_internal->users,_server_connection_user_comparator);
 	connection->_internal->games = netemu_list_new(10);
@@ -188,7 +189,7 @@ void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* b
 	struct server_connection* connection;
 	struct buffered_play_values* values;
 	connection = (struct server_connection*)arg;
-	values = (struct chat*)instruction->body;
+	values = (struct buffered_play_values*)instruction->body;
 	free(connection->_internal->buffered_values);
 	connection->_internal->buffered_values = values;
 

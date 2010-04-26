@@ -63,14 +63,19 @@ void menu(struct server_connection* connection) {
 				break;
 			case '2':
 				show_game_list(connection);
+				break;
 			case '3':
 				show_user_list(connection);
+				break;
 			case '4':
 				join_game(connection);
+				break;
 			case '5':
 				start_game(connection);
+				break;
 			case '6':
 				send_play_values(connection);
+				break;
 		}
 	}
 }
