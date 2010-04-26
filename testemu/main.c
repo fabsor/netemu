@@ -10,10 +10,10 @@
 #include "netemu_client.h"
 
 #define EMUNAME		"testemu"
-#define PLAYERNAME	"foobar"
+#define PLAYERNAME	"stefan"
 
 
-#define ADDR	netemu_inet_addr("127.0.0.1")
+#define ADDR	netemu_inet_addr("192.168.106.222")//netemu_inet_addr("127.0.0.1")
 #define PORT	netemu_htons(27888)
 #define VALUE	"0x0x0xff"
 
