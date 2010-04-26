@@ -57,8 +57,9 @@ void _netemu_sender_buffer_update(void* arg) {
 		if(buffer->instructions->count == 0) {
 			netemu_thread_event_wait(buffer->event);
 		}
+
 		current_time = time(NULL);
-		if (buffer->instructions->count > 0 && (buffer->instructions->count > buffer->preferred_no_packets || buffer->send == 1 || (current_time - buffer->last_send ) > PACKET_SEND_INTERVAL)) {
+		if (buffer->instructions->count > 0 /*&& (buffer->instructions->count > buffer->preferred_no_packets || buffer->send == 1 || (current_time - buffer->last_send ) > PACKET_SEND_INTERVAL)*/) {
 			netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
 			count = itemsToSend->count;
 			for (i = 0; i < itemsToSend->count; i++) {
@@ -70,7 +71,7 @@ void _netemu_sender_buffer_update(void* arg) {
 			netemu_sender_udp_send(sender, packet_buffer.data,
 					packet_buffer.size);
 			for(i = 0; i < count; i++) {
-				netemu_application_free_message(instructions[i]);
+				//netemu_application_free_message(instructions[i]);
 			}
 			buffer->send = 0;
 			buffer->last_send = current_time;
