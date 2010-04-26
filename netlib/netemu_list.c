@@ -168,6 +168,6 @@ int netemu_list_clear(struct netemu_list* list) {
 	if((list->elements = malloc(sizeof(void*)*20)) == NULL)
 		error = -1;
 	list->count = 0;
-
+	list->_intern->size = 20;
 	return error;
 }
