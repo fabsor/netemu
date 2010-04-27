@@ -324,7 +324,7 @@ void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* b
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
 	for(i = 0; i < callbacks->count; i++) {
-		((union callback_fn*)callbacks->elements[i])->valuesReceivedFn(values);
+		((struct callback*)callbacks->elements[i])->fn->valuesReceivedFn(values);
 	}
 }
 

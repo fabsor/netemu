@@ -44,8 +44,6 @@ void game_created(struct game* game);
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
-
-
 	connection = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
@@ -165,7 +163,7 @@ void game_created(struct game* game) {
 
 void start_game(struct server_connection *connection) {
 	printf("Starting game\n");
-	server_connection_create_game_async(connection, games[0], game_created);
+	server_connection_start_game(connection);
 }
 
 void player_ready(struct server_connection *connection) {
