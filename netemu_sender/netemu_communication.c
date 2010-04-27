@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 #include "protocol/communication.h"
-#include "interface/kaillera_server_connection.h"
+#include "netemu_server_connection.h"
 #include "network/netemu_tcp.h"
 #include "netemu_resources.h"
 #include "network/netemu_sender.h"
@@ -15,6 +15,8 @@
 #include "netemu_thread.h"
 #include "netemu_util.h"
 #include "netemu_socket.h"
+#include "interface/netemu_kaillera.h"
+
 #define DOMAIN	"www.kaillera.com"
 #define SERVER	"kaillera.com"
 #define PATH	"/raw_server_list2.php?wg=1&version=0.9"
@@ -69,7 +71,7 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	addr->port = netemu_htons(callback.port);
 	netemu_receiver_udp_clear_listeners(client->receiver);
 	client->sender->addr = netemu_prepare_net_addr(addr);
-	connection = server_connection_new(username,emulatorname);
+	connection = netemu_server_connection_new(username,emulatorname);
 	return connection;
 }
 
@@ -113,7 +115,7 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	netemu_receiver_udp_clear_listeners(client->receiver);
 	callback->addr->port = netemu_htons(callback->port);
 	client->sender->addr = netemu_prepare_net_addr(callback->addr);
-	connection = server_connection_new(callback->username,callback->username);
+	connection = netemu_server_connection_new(callback->username,callback->username);
 	callback->ConnectionReceivedFn(callback->port, connection);
 	free(callback);
 }

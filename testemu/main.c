@@ -10,8 +10,7 @@
 
 //#include <crtdbg.h>
 #include <stdio.h>
-#include "kaillera_communication.h"
-#include "netemu_client.h"
+#include "netemu_kaillera.h"
 
 #define EMUNAME		"testemu"
 #define PLAYERNAME	"foobar"
@@ -63,7 +62,7 @@ int main() {
 			server_connect(addr);
 		break;
 	}
-	server_connection_register_play_values_received_callback(connection, receive_values);
+	netemu_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
 	return 0;
 }
@@ -122,19 +121,19 @@ void menu(struct server_connection* connection) {
 
 void send_play_values(struct server_connection *connection) {
 	char* data = VALUE;
-	server_connection_send_play_values(connection, strlen(data)+1, data);
+	netemu_send_play_values(connection, strlen(data)+1, data);
 }
 
 void create_game(struct server_connection* connection) {
 	struct game *result;
 	printf("Creating game\n");
-	server_connection_create_game_async(connection,games[0],game_created);
+	netemu_create_game_async(connection,games[0],game_created);
 }
 
 void show_game_list(struct server_connection* connection) {
 	int no_games, i;
 	struct game **games;
-	games = server_connection_get_game_list(connection, &no_games);
+	games = netemu_get_game_list(connection, &no_games);
 
 	for(i = 0; i < no_games; i++) {
 		if(games[i]->name != NULL) {
@@ -167,15 +166,15 @@ void start_game(struct server_connection *connection) {
 }
 
 void player_ready(struct server_connection *connection) {
-	server_connection_send_player_ready(connection);
+	netemu_send_player_ready(connection);
 }
 
 
 void join_game(struct server_connection* connection) {
 	struct game** list;
 	int count;
-	list = server_connection_get_game_list(connection,&count);
+	list = netemu_get_game_list(connection,&count);
 	if(count > 0) {
-		server_connection_join_game(connection,list[0]->id);
+		netemu_join_game(connection,list[0]->id);
 	}
 }
