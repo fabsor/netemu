@@ -10,16 +10,26 @@
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application.h"
+#include "netlib_error.h"
 
 int _netemu_application_copy_string(char** dest, char* src);
 char* parse_string(char* data);
 int _netemu_application_pack_str(char* buffer, char* str);
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
+int _netemu_application_login_success_games_parse(struct login_success *success, char **data);
+int _netemu_application_login_success_users_parse(struct login_success *success, char **data);
 
 struct application_instruction* netemu_application_create_message() {
 	struct application_instruction* message;
-	message = malloc(sizeof(struct application_instruction));
-	message->user = malloc(sizeof(char));
+	if((message = malloc(sizeof(struct application_instruction))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
+	if((message->user = malloc(sizeof(char))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		free(message);
+		return NULL;
+	}
 	*message->user = '\0';
 	return message;
 }
@@ -28,14 +38,20 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	struct application_instruction *app_instruction;
 	char *data;
 
-	if((app_instruction = malloc(sizeof(struct application_instruction))) == NULL)
+	if((app_instruction = malloc(sizeof(struct application_instruction))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
+	}
 	app_instruction->timestamp = time(NULL);
 
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
 
 	data = (char*)instruction->instruction;
-	app_instruction->user = parse_string(++data);
+	if((app_instruction->user = parse_string(++data)) == NULL) {
+		/* Error code already set in parse_string */
+		free(app_instruction);
+		return NULL;
+	}
 	data += strlen(app_instruction->user) + 1;
 
 	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user));
@@ -90,40 +106,69 @@ char* parse_string(char* data) {
 	char* string;
 
 	str_len = strlen(data)+1;
-	string = malloc(str_len);
+	if((string = malloc(str_len)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	strncpy(string, data, str_len);
 
 	return string;
 }
 
-void netemu_application_chat_game_add(struct application_instruction *instruction, char *data, char *user) {
+int netemu_application_chat_game_add(struct application_instruction *instruction, char *data, char *user) {
 	struct chat *partyline_chat;
 	int size;
 	size = 0;
-	partyline_chat = malloc(sizeof(struct chat));
+	if((partyline_chat = malloc(sizeof(struct chat))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 
-	size += _netemu_application_copy_string(&partyline_chat->message, data);
-	size += _netemu_application_copy_string(&instruction->user, user);
+	if((size += _netemu_application_copy_string(&partyline_chat->message, data)) == NULL) {
+		/* Error code already set in _netemu_application_copy_string */
+		free(partyline_chat);
+		return -1;
+	}
+	if((size += _netemu_application_copy_string(&instruction->user, user)) == NULL) {
+		/* Error code already set in _netemu_application_copy_string */
+		free(partyline_chat->message);
+		free(partyline_chat);
+		return -1;
+	}
 
 	instruction->body = partyline_chat;
 	instruction->body_size = size;
 	instruction->id = GAME_CHAT;
 	instruction->packBodyFn = netemu_application_chat_pack;
+	return 0;
 }
 
-void netemu_application_chat_partyline_add(struct application_instruction *instruction, char *data, char* user) {
+int netemu_application_chat_partyline_add(struct application_instruction *instruction, char *data, char* user) {
 	struct chat *partyline_chat;
 	int size;
 	size = 0;
-	partyline_chat = malloc(sizeof(struct chat));
+	if((partyline_chat = malloc(sizeof(struct chat))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 
-	size += _netemu_application_copy_string(&partyline_chat->message, data);
-	size += _netemu_application_copy_string(&instruction->user, user);
+	if((size += _netemu_application_copy_string(&partyline_chat->message, data)) == NULL) {
+		/* Error code already set in _netemu_application_copy_string */
+		free(partyline_chat);
+		return -1;
+	}
+	if((size += _netemu_application_copy_string(&instruction->user, user)) == NULL) {
+		/* Error code already set in _netemu_application_copy_string */
+		free(partyline_chat->message);
+		free(partyline_chat);
+		return -1;
+	}
 
 	instruction->body = partyline_chat;
 	instruction->body_size = size;
 	instruction->id = PARTYLINE_CHAT;
 	instruction->packBodyFn = netemu_application_chat_pack;
+	return 0;
 }
 
 void netemu_application_chat_pack(struct application_instruction *instruction, char *buffer) {
@@ -133,64 +178,176 @@ void netemu_application_chat_pack(struct application_instruction *instruction, c
 	memcpy(buffer, chat_msg->message, strlen(chat_msg->message) + 1);
 }
 
-void netemu_application_chat_parse(struct application_instruction *instruction, char *data) {
+int netemu_application_chat_parse(struct application_instruction *instruction, char *data) {
 	struct chat *chat_msg;
 
-	chat_msg = malloc(sizeof(struct chat));
-	chat_msg->message = parse_string(data);
+	if((chat_msg = malloc(sizeof(struct chat))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+	if((chat_msg->message = parse_string(data)) == NULL) {
+		/* Error code already set in parse_string */
+		free(chat_msg);
+		return -1;
+	}
+	return 0;
 }
 
-void netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
+int netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
 	struct login_success *success;
-	unsigned int i;
+	unsigned int i, j;
 
-	success = malloc(sizeof(struct login_success));
+	if((success = malloc(sizeof(struct login_success))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 
 	success->users_count = *((NETEMU_DWORD*)data);
 	data += sizeof(NETEMU_DWORD);
 	success->games_count =  *((NETEMU_DWORD*)data);
 	data += sizeof(NETEMU_DWORD);
 
-	success->users = malloc(sizeof(struct user*) * success->users_count);
-	success->games = malloc(sizeof(struct game*) * success->games_count);
-
-	for(i = 0; i < success->users_count; i++) {
-		success->users[i] = malloc(sizeof(struct user));
-		success->users[i]->username = parse_string(data);
-		data += strlen(success->users[i]->username) + 1;
-
-		success->users[i]->ping = *((NETEMU_DWORD*)data);
-		data += sizeof(NETEMU_DWORD);
-
-		success->users[i]->status = *data;
-		data += sizeof(char);
-
-		success->users[i]->id = *((NETEMU_WORD*)data);
-		data += sizeof(NETEMU_WORD);
-
-		success->users[i]->connection = *data;
-		data += sizeof(char);
+	if(_netemu_application_login_success_users_parse(success, &data) == -1) {
+		free(success);
+		return -1;
 	}
 
-	for(i = 0; i < success->games_count; i++) {
-		success->games[i] = malloc(sizeof(struct game));
-		success->games[i]->name = parse_string(data);
-		data += strlen(success->games[i]->name) + 1;
-
-		success->games[i]->id = *((NETEMU_DWORD*)data);
-		data += sizeof(NETEMU_DWORD);
-
-		success->games[i]->app_name = parse_string(data);
-		data += strlen(success->games[i]->app_name) + 1;
-
-		success->games[i]->users_count = parse_string(data);
-		data += strlen(success->games[i]->users_count) + 1;
-
-		success->games[i]->status = *data;
-		data += sizeof(char);
+	if(_netemu_application_login_success_games_parse(success, &data) == -1) {
+		free(success->users);
+		free(success);
+		return -1;
 	}
 
 	instruction->body = success;
+	return 0;
+}
+
+int _netemu_application_login_success_games_parse(struct login_success *success, char **data) {
+	unsigned int i, j;
+
+	if((success->games = malloc(sizeof(struct game*) * success->games_count)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	for(i = 0; i < success->games_count; i++) {
+		if((success->games[i] = malloc(sizeof(struct game))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			/* Free the games we have created thus far */
+			for(j = 0; j < i; j++) {
+				free(success->games[j]->users_count);
+				free(success->games[j]->app_name);
+				free(success->games[j]->name);
+				free(success->games[j]);
+			}
+			free(success->games);
+			return -1;
+		}
+
+		if((success->games[i]->name = parse_string(*data)) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			/* Free the games we have created thus far */
+			for(j = 0; j < i; j++) {
+				free(success->games[j]->users_count);
+				free(success->games[j]->app_name);
+				free(success->games[j]->name);
+				free(success->games[j]);
+			}
+			free(success->games[i]);
+			free(success->games);
+			return -1;
+		}
+		*data += strlen(success->games[i]->name) + 1;
+
+		success->games[i]->id = *((NETEMU_DWORD*)*data);
+		*data += sizeof(NETEMU_DWORD);
+
+		if((success->games[i]->app_name = parse_string(*data)) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			/* Free the games we have created thus far */
+			for(j = 0; j < i; j++) {
+				free(success->games[j]->users_count);
+				free(success->games[j]->app_name);
+				free(success->games[j]->name);
+				free(success->games[j]);
+			}
+			free(success->games[i]->name);
+			free(success->games[i]);
+			free(success->games);
+			return -1;
+		}
+		*data += strlen(success->games[i]->app_name) + 1;
+
+		if((success->games[i]->users_count = parse_string(*data)) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			/* Free the games we have created thus far */
+			for(j = 0; j < i; j++) {
+				free(success->games[j]->users_count);
+				free(success->games[j]->app_name);
+				free(success->games[j]->name);
+				free(success->games[j]);
+			}
+			free(success->games[i]->app_name);
+			free(success->games[i]->name);
+			free(success->games[i]);
+			free(success->games);
+			return -1;
+		}
+		*data += strlen(success->games[i]->users_count) + 1;
+
+		success->games[i]->status = **data;
+		*data += sizeof(char);
+	}
+	
+	return 0;
+}
+
+int _netemu_application_login_success_users_parse(struct login_success *success, char **data) {
+	unsigned int i, j;
+
+	if((success->users = malloc(sizeof(struct user*) * success->users_count)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	for(i = 0; i < success->users_count; i++) {
+		if((success->users[i] = malloc(sizeof(struct user))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			/* Free memory of all users we have created thus far.*/
+			for(j = 0; j < i; j++) {
+				free(success->users[j]->username);
+				free(success->users[j]);
+			}
+			free(success->users);
+			return -1;
+		}
+
+		if((success->users[i]->username = parse_string(*data)) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			/* Free memory of all users we have created thus far.*/
+			for(j = 0; j < i; j++) {
+				free(success->users[j]->username);
+				free(success->users[j]);
+			}
+			free(success->users[i]);
+			free(success->users);
+			return -1;
+		}
+		*data += strlen(success->users[i]->username) + 1;
+
+		success->users[i]->ping = *((NETEMU_DWORD*)*data);
+		*data += sizeof(NETEMU_DWORD);
+
+		success->users[i]->status = **data;
+		*data += sizeof(char);
+
+		success->users[i]->id = *((NETEMU_WORD*)*data);
+		*data += sizeof(NETEMU_WORD);
+
+		success->users[i]->connection = **data;
+		*data += sizeof(char);
+	}
+	return 0;
 }
 
 void netemu_application_existing_players_list_parse(struct application_instruction *instruction, char *data) {
@@ -360,7 +517,10 @@ void netemu_application_user_leave_add(struct application_instruction* instructi
 int _netemu_application_copy_string(char** dest, char* src) {
 	int size;
 	size = sizeof(char)*strlen(src) + 1;
-	*dest = malloc(size);
+	if((*dest = malloc(size)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 	strncpy(*dest, src, size);
 	return size;
 }

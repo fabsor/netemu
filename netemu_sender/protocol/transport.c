@@ -31,7 +31,7 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 	}
 	if((buffer = malloc(total_size)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-		return NULL;
+		/* **** NEED TO RETURN FROM THE FUNCTION HERE **** */
 	}
 	memcpy(buffer,(void *)&count,sizeof(char));
 	pos = sizeof(char);
