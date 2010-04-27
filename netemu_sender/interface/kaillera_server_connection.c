@@ -23,7 +23,7 @@ void server_connection_respond_to_game_created(struct netemu_packet_buffer* buff
 void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg);
 void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void server_connection_respond_to_player_list(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
-
+void server_connection_respond_to_game_status_update(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg);
 void server_connection_add_player(struct game *game, struct player *player);
 
 int _server_connection_user_comparator(const void* item1,const void* item2);
@@ -257,9 +257,33 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,CREATE_GAME,server_connection_respond_to_game_created, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,BUFFERED_PLAY_VALUES,server_connection_respond_to_buffered_values, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,EXISTING_PLAYERS_LIST,server_connection_respond_to_player_list, connection);
+	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,GAME_STATUS_UPDATE,server_connection_respond_to_game_status_update, connection);
 	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
+}
+
+void server_connection_respond_to_game_status_update(struct netemu_packet_buffer *buffer, struct application_instruction *instruction, void *arg) {
+	struct server_connection* connection;
+	struct game *game;
+	struct game_status_update *update;
+	int i;
+	game = NULL;
+	connection = (struct server_connection*)arg;
+	update = (struct game_status_update*)instruction->body;
+	if(connection->current_game != NULL && connection->current_game->id == update->id) {
+		game = connection->current_game;
+	}
+	for(i = 0; i < connection->_internal->games->count; i++) {
+		if(((struct game*)connection->_internal->games->elements[i])->id == update->id) {
+			game = (struct game*)connection->_internal->games->elements[i];
+			break;
+		}
+	}
+	if(game != NULL) {
+		game->users_count = update->num_players;
+		game->status = update->status;
+	}
 }
 
 void server_connection_respond_to_player_list(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
