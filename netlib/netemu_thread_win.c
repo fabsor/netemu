@@ -133,7 +133,7 @@ int netemu_thread_event_signal(netemu_event event_identifier) {
 	errcode = SetEvent(event_identifier->eventhandle);
 	if(errcode == 0) {
 		netlib_set_last_mapped_error(GetLastError());
-		return -1
+		return -1;
 	}
 	return 0;
 }
