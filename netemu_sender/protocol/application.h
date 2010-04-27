@@ -101,6 +101,8 @@ struct game {
 	char* app_name;
 	char* users_count;
 	char status;
+	int player_count;
+	struct existing_player_list *players;
 };
 
 struct user_left {
