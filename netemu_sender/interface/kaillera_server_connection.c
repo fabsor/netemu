@@ -27,12 +27,14 @@ int _server_connection_user_comparator(const void* item1,const void* item2);
 int _server_connection_game_comparator(const void* item1, const void* item2);
 void _server_connection_add_user_struct(struct server_connection* connection, struct user *user);
 void _server_connection_add_game_struct(struct server_connection* connection, struct game* game);
+int _server_connection_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable);
 
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
+	struct netemu_list *play_values_callback;
 	struct netemu_list *users;
 	struct netemu_list *games;
 	struct buffered_play_values *buffered_values;
@@ -54,7 +56,7 @@ int server_connection_register_chat_callback(struct server_connection *connectio
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->chat_fn = callback;
-	netemu_list_add(connection->_internal->chat_callback, fn);
+	_server_connection_register_callback(connection->_internal->chat_callback, fn, 0);
 	return 0;
 }
 
@@ -69,9 +71,57 @@ int server_connection_register_user_join_callback(struct server_connection *conn
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->join_fn = callback;
-	netemu_list_add(connection->_internal->join_callback, fn);
+	_server_connection_register_callback(connection->_internal->join_callback, fn, 0);
 	return 0;
 }
+
+int _server_connection_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable) {
+	struct callback *callback;
+
+	if((callback = malloc(sizeof(struct callback))) == NULL ) {
+		return -1;
+	}
+	callback->fn = fn;
+	callback->disposable = disposable;
+	netemu_list_add(list,callback);
+	return 0;
+}
+
+int _server_connection_unregister_callback(struct netemu_list *list, union callback_fn *fn) {
+	struct callback *callback;
+
+	if((callback = malloc(sizeof(struct callback))) == NULL ) {
+		return -1;
+	}
+	callback->fn = fn;
+	callback->disposable = 0;
+	return netemu_list_remove(list,callback);
+
+}
+
+int server_connection_register_play_values_received_callback(struct server_connection *connection, valuesReceivedFn callback) {
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		return -1;
+	}
+	fn->valuesReceivedFn = callback;
+	_server_connection_register_callback(connection->_internal->play_values_callback, fn, 0);
+	return 0;
+}
+
+int server_connection_unregister_play_values_callback(struct server_connection *connection, joinFn callback) {
+	int error;
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		return -1;
+	}
+	fn->join_fn = callback;
+	error = netemu_list_remove(connection->_internal->join_callback, fn);
+	free(fn);
+
+	return error;
+}
+
 
 int server_connection_unregister_user_join_callback(struct server_connection *connection, joinFn callback) {
 	union callback_fn *fn;
@@ -84,9 +134,10 @@ int server_connection_register_user_leave_callback(struct server_connection *con
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->leave_fn = callback;
-	netemu_list_add(connection->_internal->leave_callback, fn);
+	_server_connection_register_callback(connection->_internal->leave_callback, fn, 0);
 	return 0;
 }
+
 
 int server_connection_unregister_user_leave_callback(struct server_connection *connection, leaveFn callback) {
 	union callback_fn *fn;
@@ -123,6 +174,20 @@ int server_connection_create_game(struct server_connection *connection, char *ga
 	return 1;
 }
 
+void server_connection_create_game_async(struct server_connection *connection, char *gamename, gameCreatedFn callback) {
+	time_t timestamp;
+	struct application_instruction *message, *reply;
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->game_created_fn = callback;
+	message = netemu_application_create_message();
+	netemu_application_create_game_add(message, gamename);
+	timestamp = time(NULL);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	_server_connection_register_callback(connection->_internal->game_created_callback, fn, 1);
+}
+
+
 void _server_connection_add_game_struct(struct server_connection* connection, struct game* game) {
 	int index;
 	index = netemu_list_contains(connection->_internal->games,game);
@@ -136,16 +201,14 @@ void _server_connection_add_game_struct(struct server_connection* connection, st
 }
 
 int server_connection_start_game(struct server_connection *connection) {
-	int error;
 	time_t timestamp;
-	struct netemu_client *client;
-	struct transport_packet_buffer buffer;
 	struct application_instruction *message, *reply;
 
 	message = netemu_application_create_message();
 	netemu_application_start_game_add(message);
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	message->important = 1;
 	reply = netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, START_GAME, timestamp);
 	return 1;
 }
@@ -167,6 +230,7 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 	connection->_internal->game_created_callback = netemu_list_new(3);
 	connection->_internal->join_callback = netemu_list_new(3);
 	connection->_internal->leave_callback = netemu_list_new(3);
+	connection->_internal->play_values_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
 	connection->_internal->buffered_values = malloc(sizeof(struct buffered_play_values));
@@ -189,7 +253,11 @@ struct server_connection *server_connection_new(char* user, char* emulator_name)
 void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct server_connection* connection;
 	struct buffered_play_values* values;
+	struct netemu_list *callbacks;
+	int i;
+
 	connection = (struct server_connection*)arg;
+	callbacks = connection->_internal->play_values_callback;
 	values = (struct buffered_play_values*)instruction->body;
 	connection->_internal->buffered_values->size = values->size;
 	if(connection->_internal->buffered_values->values !=NULL)
@@ -197,6 +265,9 @@ void server_connection_respond_to_buffered_values(struct netemu_packet_buffer* b
 	connection->_internal->buffered_values->values = malloc(values->size);
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
+	for(i = 0; i < callbacks->count; i++) {
+		((union callback_fn*)callbacks->elements[i])->valuesReceivedFn(values);
+	}
 }
 
 int server_connection_login(struct server_connection* connection) {
@@ -260,14 +331,27 @@ void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer,
 
 }
 
-int server_connection_join_game(struct server_connection *connection, NETEMU_DWORD gameid, struct player_joined *result) {
+int server_connection_join_game(struct server_connection *connection, NETEMU_DWORD gameid) {
+	struct application_instruction* message;
+	time_t timestamp;
+	message = netemu_application_create_message();
+	timestamp = time(NULL);
+	netemu_application_join_game_add(message,gameid,1);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, PLAYER_JOINED, timestamp);
+	return 1;
+}
+
+int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
 
 	message = netemu_application_create_message();
 	netemu_application_join_game_add(message,gameid,1);
 	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
 
+	return 1;
 }
+
 
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct login_success *accepted;
@@ -300,14 +384,27 @@ void server_connection_respond_to_player_joined(struct netemu_packet_buffer *buf
 void server_connection_respond_to_game_created(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct game_created *created;
 	struct server_connection* connection;
+	int* itemsToRemove, i, j;
+
+	j = 0;
 	connection = (struct server_connection*)arg;
+	itemsToRemove = malloc(sizeof(int)*connection->_internal->game_created_callback->count);
 	created = (struct game_created*)instruction->body;
 	server_connection_add_game(connection, created->appName, created->gameName, created->id, 0, 0);
+	for(i = 0; i < connection->_internal->game_created_callback->count; i++) {
+		((struct callback*)connection->_internal->game_created_callback->elements[i])->fn->game_created_fn(connection->_internal->games->elements[connection->_internal->games->count-1]);
+		if(((struct callback*)connection->_internal->game_created_callback->elements[i])->disposable) {
+			itemsToRemove[j] = i;
+			j++;
+		}
+	}
+	for(i = 0; i < j+1; i++) {
+		netemu_list_remove(connection->_internal->game_created_callback, itemsToRemove[j]);
+	}
 }
 
 void server_connection_add_game(struct server_connection *connection, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count) {
 	struct game* game;
-	int index;
 	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
 	game->name = game_name;

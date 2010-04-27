@@ -62,7 +62,6 @@ void _netemu_sender_buffer_update(void* arg) {
 			count = itemsToSend->count;
 			instructions = malloc(sizeof(struct netemu_application_instruction*)
 					* count);
-
 			for (i = 0; i < itemsToSend->count; i++) {
 				instructions[i] = itemsToSend->elements[i];
 			}
@@ -71,6 +70,7 @@ void _netemu_sender_buffer_update(void* arg) {
 			packet_buffer = netemu_transport_pack(instructions, count);
 			netemu_sender_udp_send(sender, packet_buffer.data,
 					packet_buffer.size);
+
 			buffer->send = 0;
 			buffer->last_send = current_time;
 		}

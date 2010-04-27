@@ -32,6 +32,6 @@ void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct n
 
 struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username);
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, void (*ConnectionReceivedFn)(int status, struct server_connection*));
+void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct server_connection*));
 
 #endif /* COMMUNICATION_STATE_H_ */
