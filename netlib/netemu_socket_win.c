@@ -107,7 +107,6 @@ int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
 	int errcode;
 
 	errcode = recv(socket, buffer, len, flags);
-
 	if(errcode == SOCKET_ERROR)
 		netlib_set_last_error(WSAGetLastError());
 
@@ -163,7 +162,6 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	}
 	
 	if(errcode != 0) {
-		wsa_error_code = WSAGetLastError();
 		/* If a memory error occured, we map it to our general out-of-memory error code for consistency, 
 		 * otherwise, we just use the WSA error code directly */
 		if(wsa_error_code == WSA_NOT_ENOUGH_MEMORY) 

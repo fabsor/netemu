@@ -1,4 +1,5 @@
 #include "netemu_thread.h"
+#include "netlib_error.h"
 
 struct netemu_mutex_internal {
 	HANDLE mutex;
@@ -16,13 +17,24 @@ struct netemu_thread_args {
 DWORD WINAPI _netemu_thread_callback(void *arg);
 
 netemu_thread netemu_thread_new(void (*start_fn) (void *), void* arg) {
+	netemu_thread return_thread;
+	int errcode;
 	struct netemu_thread_args *thread_args;
-	if((thread_args = malloc(sizeof(struct netemu_thread_args))) == NULL)
+	if((thread_args = malloc(sizeof(struct netemu_thread_args))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
+	}
 
 	thread_args->start_fn = start_fn;
 	thread_args->arguments = arg;
-	return CreateThread(NULL, 0, _netemu_thread_callback, thread_args, 0, NULL);
+	return_thread = CreateThread(NULL, 0, _netemu_thread_callback, thread_args, 0, NULL);
+
+	if(return_thread == NULL) {
+		netlib_set_last_mapped_error(GetLastError());
+		free(thread_args);
+	}
+
+	return return_thread;
 }
 
 int netemu_thread_exit() {
@@ -38,42 +50,77 @@ DWORD WINAPI _netemu_thread_callback(void *arg) {
 }
 
 netemu_mutex netemu_thread_mutex_create() {
+	int errcode;
 	netemu_mutex mutex_struct;
 
-	if((mutex_struct = malloc(sizeof(struct netemu_mutex_internal))) == NULL)
+	if((mutex_struct = malloc(sizeof(struct netemu_mutex_internal))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
-	mutex_struct->mutex = CreateMutex(0, FALSE, NULL);
+	}
+
+	if((mutex_struct->mutex = CreateMutex(0, FALSE, NULL)) == NULL) {
+		netlib_set_last_error(GetLastError());
+		free(mutex_struct);
+
+		return NULL;
+	}
 	return mutex_struct;
 }
 
 int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
-	if(WaitForSingleObject(mutex_identifier->mutex, timeout) == WAIT_OBJECT_0)
+	int errcode;
+
+	errcode = WaitForSingleObject(mutex_identifier->mutex, timeout);
+	if(errcode == WAIT_OBJECT_0)
 		return 0;
-	else
-		return -1;
+	else if(errcode == WAIT_FAILED)
+		netlib_set_last_mapped_error(GetLastError());
+
+	/* TODO: Det är inte så bra att bara returnera -1 här, eftersom det antyder att något gick fel i WaitForSingleObject,
+	 * vilket det nödvändigtvis inte gjorde.*/
+	return -1;
 }
 
 int netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
-	return ReleaseMutex(mutex_identifier->mutex);
+	int errcode;
+	
+	errcode = ReleaseMutex(mutex_identifier->mutex);
+	if(errcode == 0) {
+		netlib_set_last_mapped_error(GetLastError());
+		return -1;
+	}
+	return 0;
 }
 
 int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
+	int errcode;
+
 	/* TODO: Mutex-objektet blir förstört först när ALLA handles till objektet
 	 * har stängts, hur försäkrar man sig om att det inte finns mer handles till mutex-objektet?*/
-	return CloseHandle(mutex_identifier->mutex);
+	errcode = CloseHandle(mutex_identifier->mutex);
+	if(errcode == 0) {
+		netlib_set_last_mapped_error(GetLastError());
+		return -1;
+	}
+	return 0;
 }
 
 netemu_event netemu_thread_event_create() {
 	netemu_event event_struct;
 	HANDLE handle;
 
+	if((event_struct = malloc(sizeof(struct netemu_event_internal))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
+
 	/* Manual reset sätts till false, vilket betyder att såfort den signaleras och nåt objekt väntat på eventet,
 	 * så nollställs det till non-signaled automatiskt.*/
-	if((handle = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL)
+	if((handle = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+		netlib_set_last_mapped_error(GetLastError());
+		free(event_struct);
 		return NULL;
-
-	if((event_struct = malloc(sizeof(struct netemu_event_internal))) == NULL)
-		return NULL;
+	}
 
 	event_struct->eventhandle = handle;
 
@@ -81,16 +128,36 @@ netemu_event netemu_thread_event_create() {
 }
 
 int netemu_thread_event_signal(netemu_event event_identifier) {
-	return SetEvent(event_identifier->eventhandle);
+	int errcode;
+	
+	errcode = SetEvent(event_identifier->eventhandle);
+	if(errcode == 0) {
+		netlib_set_last_mapped_error(GetLastError());
+		return -1
+	}
+	return 0;
 }
 
 int netemu_thread_event_wait(netemu_event event_identifier) {
-	if(WaitForSingleObject(event_identifier->eventhandle, INFINITE) == WAIT_OBJECT_0)
+	int errcode;
+	
+	errcode = WaitForSingleObject(event_identifier->eventhandle, INFINITE);
+	if(errcode == WAIT_OBJECT_0)
 		return 0;
-	else
-		return -1;
+	else if(errcode == WAIT_FAILED)
+		netlib_set_last_mapped_error(GetLastError());
+
+	/* TODO: Se kommentaren i mutex_lock! */
+	return -1;
 }
 
 int netemu_thread_event_destroy(netemu_event event_identifier) {
-	return CloseHandle(event_identifier->eventhandle);
+	int errcode;
+
+	errcode = CloseHandle(event_identifier->eventhandle);
+	if(errcode == 0) {
+		netlib_set_last_mapped_error(GetLastError());
+		return -1;
+	}
+	return 0;
 }
