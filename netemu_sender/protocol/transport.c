@@ -8,7 +8,7 @@
 #include <string.h>
 #include "transport.h"
 #include "application.h"
-
+#include "netlib_error.h"
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count) {
 	static int current_index;
 	struct transport_packet_buffer packet_buffer;
@@ -29,7 +29,10 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 			wrapper_size +
 			messages[i]->body_size;
 	}
-	buffer = malloc(total_size);
+	if((buffer = malloc(total_size)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	memcpy(buffer,(void *)&count,sizeof(char));
 	pos = sizeof(char);
 	for (i = 0; i < count; i++) {
@@ -57,18 +60,34 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 
 struct transport_packet* netemu_transport_unpack(char* data) {
 	char count;
-	int i;
+	int i, j;
 	unsigned int pos;
 	struct transport_packet* packet;
 	struct transport_instruction* instruction;
 
-	packet = malloc(sizeof(struct transport_packet));
+	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	memcpy(&count,data,sizeof(char));
 	packet->count = count;
-	packet->instructions = malloc(sizeof(struct transport_instruction)*count);
+	if((packet->instructions = malloc(sizeof(struct transport_instruction)*count)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		free(packet);
+		return NULL;
+	}
 	pos = sizeof(char);
 	for (i = 0; i < count; i++) {
-		instruction = malloc(sizeof(struct transport_instruction));
+		if((instruction = malloc(sizeof(struct transport_instruction))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+
+			for(j = 0; j <= i; j++)
+				free(instruction);
+
+			free(packet->instructions);
+			free(packet);
+			return NULL;
+		}
 		memcpy(&instruction->serial, data + pos, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
 

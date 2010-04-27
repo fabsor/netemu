@@ -164,7 +164,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\netlib_error.c"
+				RelativePath=".\netlib_error_win.c"
 				>
 			</File>
 			<File
