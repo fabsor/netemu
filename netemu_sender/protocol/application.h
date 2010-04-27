@@ -21,6 +21,7 @@
 #define PONG											0x06
 #define PARTYLINE_CHAT									0x07
 #define GAME_CHAT										0x08
+#define CLIENT_TIMEOUT									0x09
 #define CREATE_GAME										0x0a
 #define PLAYER_JOINED									0x0c
 #define EXISTING_PLAYERS_LIST							0x0d
@@ -237,7 +238,7 @@ void netemu_application_player_left_add(struct application_instruction* instruct
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
 
-void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer);
+void netemu_application_player_joined_parse(struct application_instruction* instruction, char* buffer);
 
 void netemu_application_player_ready_add(struct application_instruction* instruction);
 
@@ -257,4 +258,7 @@ void netemu_application_user_leave_add(struct application_instruction* instructi
 
 void netemu_application_user_leave_pack(struct application_instruction *instruction, char *buffer);
 
+void netemu_application_client_timeout_request_add(struct application_instruction* instruction);
+
+struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction);
 #endif /* APPLICATION_H_ */

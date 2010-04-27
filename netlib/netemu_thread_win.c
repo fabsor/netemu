@@ -17,7 +17,9 @@ DWORD WINAPI _netemu_thread_callback(void *arg);
 
 netemu_thread netemu_thread_new(void (*start_fn) (void *), void* arg) {
 	struct netemu_thread_args *thread_args;
-	thread_args = malloc(sizeof(struct netemu_thread_args));
+	if((thread_args = malloc(sizeof(struct netemu_thread_args))) == NULL)
+		return NULL;
+
 	thread_args->start_fn = start_fn;
 	thread_args->arguments = arg;
 	return CreateThread(NULL, 0, _netemu_thread_callback, thread_args, 0, NULL);
@@ -38,8 +40,8 @@ DWORD WINAPI _netemu_thread_callback(void *arg) {
 netemu_mutex netemu_thread_mutex_create() {
 	netemu_mutex mutex_struct;
 
-	/* TODO: ska mutex_struct verkligen vara en typdef för mutex_struct*? Namnkonflikt. */
-	mutex_struct = malloc(sizeof(struct netemu_mutex_internal));
+	if((mutex_struct = malloc(sizeof(struct netemu_mutex_internal))) == NULL)
+		return NULL;
 	mutex_struct->mutex = CreateMutex(0, FALSE, NULL);
 	return mutex_struct;
 }

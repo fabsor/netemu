@@ -9,6 +9,7 @@ struct _netemu_packet_buffer_wakeup_info {
 	struct application_instruction* instruction;
 	struct _netemu_packet_buffer_wakeup_info *next;
 	struct _netemu_packet_buffer_wakeup_info *prev;
+	int FOO;
 };
 
 struct _netemu_packet_buffer_notify_info {
@@ -102,6 +103,7 @@ void _netemu_packet_buffer_update(void* args) {
 				/* wakeup and notify */
 				_netemu_packet_buffer_perform_notify(buffer,itemsToNotify->elements[i]);
 				_netemu_packet_buffer_perform_wakeup(buffer,itemsToNotify->elements[i]);
+				free(itemsToNotify->elements[i]);
 			}
 			/* Finally clear everything out. */
 			netemu_list_clear(itemsToNotify);
@@ -123,7 +125,7 @@ struct application_instruction* netemu_packet_buffer_wait_for_instruction(struct
 	return instruction;
 }
 
-struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_on_instructiangon(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
+struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_on_instruction(struct netemu_packet_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_packet_buffer_wakeup_info));
 	wakeup->age = age;
@@ -150,13 +152,11 @@ struct _netemu_packet_buffer_wakeup_info* _netemu_packet_buffer_register_wakeup_
 void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_wakeup_info *wakeup, *nextwakeup;
 	netemu_thread_mutex_lock(buffer->_internal->wakeup_mutex, NETEMU_INFINITE);
-	if(instruction->id == CREATE_GAME) {
-		printf("AHAHAHAH");
-	}
 	if((wakeup = netemu_hashtbl_get(buffer->_internal->registered_wakeups, &instruction->id, sizeof(char))) != NULL) {
 		while(wakeup != NULL) {
 			if(wakeup->age <= instruction->timestamp) {
-				wakeup->instruction = instruction;
+				wakeup->FOO++;
+				wakeup->instruction = netemu_application_instruction_copy(instruction);
 
 				if(wakeup->prev != NULL)
 					wakeup->prev->next = wakeup->next;
@@ -167,6 +167,12 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 				else {
 					nextwakeup = NULL;
 				}
+
+				if(wakeup->next == NULL && wakeup->prev == NULL) {
+					/* We remove the node completely, we don't want a bunch of null pointers in the hash table. */
+					netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char));
+				}
+
 				netemu_thread_event_signal(wakeup->eventhandle);
 				wakeup = nextwakeup;
 			}
@@ -176,18 +182,22 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 		}
 
 		wakeup = NULL;
+		/* Moved the above line to the loop above, since we just want to remove the entire linked list from the hashtable
+		 * when the last wakeupinfo is removed from the linked list. */
 		/* We remove the node completely, we don't want a bunch of null pointers in the hash table. */
-		netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char));
+		/*netemu_hashtbl_remove(buffer->_internal->registered_wakeups,&instruction->id,sizeof(char)); */
 	}
 	netemu_thread_mutex_release(buffer->_internal->wakeup_mutex);
 }
 
 void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_notify_info *notify, *nextnotify;
+	struct application_instruction* copy;
 	netemu_thread_mutex_lock(buffer->_internal->fn_mutex, NETEMU_INFINITE);
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
 				nextnotify = notify->next;
+				//copy = netemu_application_instruction_copy(instruction);
 				notify->fn(buffer,instruction,notify->arg);
 				notify = nextnotify;
 		}
