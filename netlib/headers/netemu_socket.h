@@ -216,8 +216,6 @@ typedef unsigned int NETEMU_SOCKET;
 
 	/* Close socket*/
 	int netemu_closesocket(NETEMU_SOCKET socket);
-	/* Returns the error code for the last error that occured */
-	int netemu_get_last_error();
 
 	int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result);
 
@@ -235,7 +233,7 @@ typedef unsigned int NETEMU_SOCKET;
 	unsigned long netemu_ntohl(unsigned long value);
 
 	/* Converts an unsigned long from network order to host order. */
-	unsigned long netemu_htons(unsigned long value);
+	unsigned short netemu_htons(unsigned short value);
 
 #ifdef	__cplusplus
 }

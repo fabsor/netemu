@@ -164,6 +164,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\netlib_error_win.c"
+				>
+			</File>
+			<File
 				RelativePath=".\netlib_util_win.c"
 				>
 			</File>
@@ -183,6 +187,10 @@
 			</File>
 			<File
 				RelativePath=".\headers\netemu_thread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\headers\netlib_error.h"
 				>
 			</File>
 			<File

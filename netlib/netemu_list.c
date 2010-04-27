@@ -2,10 +2,12 @@
 #include "headers/netemu_list.h"
 #include <string.h>
 #include "headers/netlib_util.h"
+#include "netlib_error.h"
 
 struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
 	int size;
+	int FOO;
 };
 
 int _netemu_enlarge_list(struct netemu_list* list, int size);
@@ -16,42 +18,50 @@ struct netemu_list* netemu_list_new(int count) {
 	struct _netemu_list_internal* intern;
 
 	if((intern = malloc(sizeof(struct _netemu_list_internal))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 	if((list = malloc(sizeof(struct netemu_list))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		free(intern);
 		return NULL;
 	}
 	intern->size = count;
 	if((list->elements = malloc(sizeof(void*) * intern->size)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		free(intern);
 		free(list);
 		free(list->elements);
 		return NULL;
 	}
+	intern->FOO = 0;
 	list->count = 0;
 	list->_intern = intern;
 	return list;
 }
 
 int netemu_list_add(struct netemu_list* list, void* element) {
-	int error = 0;
+	int error;
 	/* Enlarge the array if necessary. */
 	if (list->_intern->size <= list->count) {
 		error = _netemu_enlarge_list(list, 10);
+		if(error == -1)
+			return -1;
 	}
 	list->elements[list->count] = element;
 	list->count++;
 	list->sorted = 0;
 
-	return error;
+	return 0;
 }
 
 int _netemu_enlarge_list(struct netemu_list* list, int size) {
 	list->_intern->size += size;
 	/* TODO: Should we really use realloc here? */
-	if((list->elements = realloc(list->elements,list->_intern->size * sizeof(void*))) == NULL)
+	if((list->elements = realloc(list->elements,list->_intern->size * sizeof(void*))) == NULL) {
+		netlib_set_last_mapped_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
+	}
 	else
 		return 0;
 }
@@ -97,8 +107,10 @@ int netemu_list_copy(struct netemu_list* list, void ***buffer) {
 	NETEMU_DWORD size;
 	size = sizeof(void*) * list->count;
 
-	if((*buffer = malloc(size)) == NULL)
+	if((*buffer = malloc(size)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
+	}
 
 	memcpy(*buffer, list->elements, size);
 	return 0;
@@ -122,16 +134,16 @@ void netemu_list_register_sort_fn(struct netemu_list* list, int(* comparator)(
 int netemu_list_sort(struct netemu_list* list) {
 	/* If this list is sorted, then there's nothing to be done. */
 	if (list->sorted)
-		return 1;
+		return 0;
 
 	/* We can't sort if we don't have a comparator. */
 	if (list->_intern->comparator != 0) {
 		qsort(list->elements[0], list->count, sizeof(void*),
 				list->_intern->comparator);
 		list->sorted = 1;
-		return 1;
+		return 0;
 	}
-	return 0;
+	return -1;
 }
 
 /**
@@ -156,7 +168,7 @@ void netemu_list_free(struct netemu_list* list) {
  * @return the pointer to the element in the list or null.
  */
 void* netemu_list_get(struct netemu_list* list, int index) {
-	if (index > list->count - 1) {
+	if (index > list->count - 1 || index < 0) {
 		return NULL;
 	}
 	return list->elements[index];
@@ -164,9 +176,14 @@ void* netemu_list_get(struct netemu_list* list, int index) {
 
 int netemu_list_clear(struct netemu_list* list) {
 	int error = 0;
-	free(list->elements);
-	if((list->elements = malloc(sizeof(void*)*20)) == NULL)
+	void **new_buffer;
+
+	if((new_buffer = malloc(sizeof(void*)*20)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		error = -1;
+	}
+	free(list->elements);
+	list->elements = new_buffer;
 	list->count = 0;
 	list->_intern->size = 20;
 	return error;

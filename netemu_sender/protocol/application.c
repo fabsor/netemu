@@ -28,7 +28,8 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	struct application_instruction *app_instruction;
 	char *data;
 
-	app_instruction = malloc(sizeof(struct application_instruction));
+	if((app_instruction = malloc(sizeof(struct application_instruction))) == NULL)
+		return NULL;
 	app_instruction->timestamp = time(NULL);
 
 	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
