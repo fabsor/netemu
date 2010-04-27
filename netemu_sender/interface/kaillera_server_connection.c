@@ -333,6 +333,17 @@ void server_connection_respond_to_user_join(struct netemu_packet_buffer* buffer,
 
 int server_connection_join_game(struct server_connection *connection, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
+	time_t timestamp;
+	message = netemu_application_create_message();
+	timestamp = time(NULL);
+	netemu_application_join_game_add(message,gameid,1);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,message);
+	netemu_packet_buffer_wait_for_instruction(connection->_internal->receive_buffer, PLAYER_JOINED, timestamp);
+	return 1;
+}
+
+int server_connection_join_game_async(struct server_connection *connection, NETEMU_DWORD gameid) {
+	struct application_instruction* message;
 
 	message = netemu_application_create_message();
 	netemu_application_join_game_add(message,gameid,1);
@@ -340,6 +351,7 @@ int server_connection_join_game(struct server_connection *connection, NETEMU_DWO
 
 	return 1;
 }
+
 
 void server_connection_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct login_success *accepted;
