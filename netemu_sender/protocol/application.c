@@ -44,17 +44,18 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	}
 	app_instruction->timestamp = time(NULL);
 
-	memcpy(&app_instruction->id,instruction->instruction,sizeof(char));
-
 	data = (char*)instruction->instruction;
-	if((app_instruction->user = parse_string(++data)) == NULL) {
+	memcpy(&app_instruction->id,data,sizeof(char));
+	data += sizeof(char);
+	if((app_instruction->user = parse_string(data)) == NULL) {
 		/* Error code already set in parse_string */
 		free(app_instruction);
 		return NULL;
 	}
 	data += strlen(app_instruction->user) + 1;
 
-	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user));
+	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user)+1);
+	app_instruction->body = NULL;
 
 	switch(app_instruction->id) {
 		case PING:
@@ -798,7 +799,13 @@ void netemu_application_player_ready_add(struct application_instruction* instruc
 struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction) {
 	struct application_instruction *copy;
 	copy = malloc(sizeof(struct application_instruction));
-	copy->body = malloc(sizeof(instruction->body_size));
+	if(instruction->body_size > 0 && instruction->body != NULL) {
+		copy->body = malloc(sizeof(instruction->body_size));
+		memcpy(copy->body, instruction->body, instruction->body_size);
+	}
+	else {
+		copy->body = NULL;
+	}
 	copy->user = malloc(sizeof(char)*(strlen(instruction->user)+1));
 	copy->id = instruction->id;
 	copy->important = instruction->important;
@@ -807,8 +814,6 @@ struct application_instruction* netemu_application_instruction_copy(struct appli
 	copy->body_size = instruction->body_size;
 
 	strcpy(copy->user,instruction->user);
-	memcpy(copy->body, instruction->body, instruction->body_size);
-
 	return copy;
 
 }

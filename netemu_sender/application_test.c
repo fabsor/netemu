@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "netemu_util.h"
 #include "network/netemu_receiver.h"
-#include "network/netemu_sender.h"
+#include "network/netemu_sender_udp.h"
 #include "protocol/application.h"
 #include "protocol/transport.h"
 #include "protocol/communication.h"

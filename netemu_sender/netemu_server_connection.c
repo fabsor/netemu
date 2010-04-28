@@ -5,7 +5,7 @@
 #include "netemu_resources.h"
 #include "network/netemu_packet_buffer.h"
 #include "network/netemu_sender_buffer.h"
-#include "network/netemu_sender.h"
+#include "network/netemu_sender_udp.h"
 #include "network/netemu_receiver.h"
 #include "structures/netemu_hashtbl.h"
 #include "netemu_list.h"
@@ -107,7 +107,7 @@ int server_connection_start_game(struct server_connection *connection) {
 }
 
 
-struct server_connection *netemu_server_connection_new(char* user, char* emulator_name) {
+struct server_connection *netemu_server_connection_new(char* user, char* emulator_name, struct netemu_sender_buffer* buffer) {
 	struct server_connection *connection;
 
 	connection = (struct server_connection*)malloc(sizeof(struct server_connection));
@@ -125,7 +125,7 @@ struct server_connection *netemu_server_connection_new(char* user, char* emulato
 	connection->_internal->leave_callback = netemu_list_new(3);
 	connection->_internal->play_values_callback = netemu_list_new(3);
 	connection->_internal->receive_buffer = netemu_packet_buffer_new(100);
-	connection->_internal->send_buffer = netemu_sender_buffer_new(5,10);
+	connection->_internal->send_buffer = buffer;
 	connection->_internal->buffered_values = malloc(sizeof(struct buffered_play_values));
 	connection->_internal->buffered_values->values = NULL;
 	connection->_internal->game_create_requested = 1;
@@ -133,6 +133,7 @@ struct server_connection *netemu_server_connection_new(char* user, char* emulato
 	netemu_list_register_sort_fn(connection->_internal->users,_server_connection_user_comparator);
 	connection->_internal->games = netemu_list_new(10);
 	netemu_list_register_sort_fn(connection->_internal->games,_server_connection_game_comparator);
+
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,PING,_netemu_respond_to_ping, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,USER_JOINED,_netemu_respond_to_user_join, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,LOGIN_SUCCESS,_netemu_respond_to_login_success, connection);
@@ -141,18 +142,13 @@ struct server_connection *netemu_server_connection_new(char* user, char* emulato
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,BUFFERED_PLAY_VALUES,_netemu_respond_to_buffered_values, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,EXISTING_PLAYERS_LIST,_netemu_respond_to_player_list, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,GAME_STATUS_UPDATE,_netemu_respond_to_game_status_update, connection);
-	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), netemu_udp_connection_receive, connection);
-	server_connection_login(connection);
 	return connection;
 }
 
 int server_connection_login(struct server_connection* connection) {
 	struct application_instruction *message;
 	struct application_instruction *success;
-	struct netemu_sender_udp *sender;
 	time_t timestamp;
-
-	sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 
 	netemu_application_login_request_add(message,connection->emulator_name,connection->user,1);

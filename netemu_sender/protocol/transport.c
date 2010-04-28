@@ -62,9 +62,10 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 	char count;
 	int i, j;
 	unsigned int pos;
+	static int foo = 0;
 	struct transport_packet* packet;
 	struct transport_instruction* instruction;
-
+	foo++;
 	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;

@@ -5,7 +5,7 @@
  *      Author: fabian
  */
 #include <stdlib.h>
-#include "network/netemu_sender.h"
+#include "network/netemu_sender_udp.h"
 #include "network/netemu_receiver.h"
 #include "netemu_resources.h"
 

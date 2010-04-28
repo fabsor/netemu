@@ -84,8 +84,6 @@ int netemu_game_created_callback(struct server_connection *connection, gameCreat
 
 int netemu_join_game(struct server_connection *connection, NETEMU_DWORD gameid);
 
-struct server_connection *netemu_server_connection_new(char* username, char* emulator_name);
-
 struct game** netemu_get_game_list(struct server_connection* connection, int *count);
 
 int netemu_send_player_ready(struct server_connection *connection);

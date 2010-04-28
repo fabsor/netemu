@@ -9,7 +9,7 @@
 #define TEST_UTIL_H_
 
 #include "network/netemu_receiver.h"
-#include "network/netemu_sender.h"
+#include "network/netemu_sender_udp.h"
 #include "netemu_socket.h"
 
 #define INTERNAL_PORT	27999

@@ -11,6 +11,8 @@
 void _netemu_listener_listen(void* params);
 void _netemu_tcp_connection_recv(void* params);
 void _netemu_tcp_connection_notify(struct netemu_tcp_connection* receiver, char* data, size_t size);
+void _netemu_tcp_listener_notify(struct netemu_tcp_listener *listener, struct netemu_tcp_connection *connection);
+void netemu_tcp_listener_listen(void* params);
 
 struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, size_t addr_len) {
 	NETEMU_SOCKET socket;
@@ -24,7 +26,19 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	sender->addr = addr;
 	sender->socket = socket;
 	sender->listening = 0;
+	sender->receiver_fn = NULL;
+	return sender;
+}
 
+struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET socket, netemu_sockaddr* addr, size_t addr_len) {
+	struct netemu_tcp_connection* sender;
+	sender = malloc(sizeof(struct netemu_tcp_connection));
+	sender->addr_len = addr_len;
+	sender->addr = addr;
+	sender->socket = socket;
+	sender->listening = 0;
+	sender->receiver_fn = NULL;
+	sender->socket = socket;
 	return sender;
 }
 
@@ -78,6 +92,26 @@ void netemu_tcp_connection_register_recv_fn(struct netemu_tcp_connection* receiv
 	}
 	else {
 		receiver_iter = receiver->receiver_fn;
+		while (receiver_iter->next != NULL) {
+			receiver_iter = receiver_iter->next;
+		}
+		receiver_iter->next = receiver_fn;
+	}
+}
+
+void netemu_tcp_listener_register_new_connection_fn(struct netemu_tcp_listener* receiver, void (* listenerFn)(struct netemu_tcp_listener*, struct netemu_tcp_connection*, void*), void* params) {
+	struct netemu_tcp_new_connection_fn *receiver_fn;
+	struct netemu_tcp_new_connection_fn *receiver_iter;
+	receiver_fn = malloc(sizeof(struct netemu_tcp_new_connection_fn));
+	receiver_fn->listenerFn = listenerFn;
+	receiver_fn->next = NULL;
+	receiver_fn->params = params;
+
+	if (receiver->listener_fn == NULL) {
+		receiver->listener_fn = receiver_fn;
+	}
+	else {
+		receiver_iter = receiver->listener_fn;
 		while (receiver_iter->next != NULL) {
 			receiver_iter = receiver_iter->next;
 		}
@@ -152,6 +186,41 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 	sender->addr = bind_addr;
 	sender->socket = socket;
 	sender->listening = 0;
-
 	return sender;
+}
+
+
+void netemu_tcp_listener_listen(void* params) {
+	struct netemu_tcp_listener *receiver;
+	int error;
+	socklen_t addr_len;
+	struct netemu_tcp_connection *connection;
+	NETEMU_SOCKET socket;
+	netemu_sockaddr *addr;
+
+	receiver = (struct netemu_tcp_listener*)params;
+	error = netemu_listen(receiver->socket,30);
+	while (1) {
+		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
+		addr = malloc(sizeof(netemu_sockaddr));
+		socket = netemu_accept(socket,addr,&addr_len);
+		if (socket == -1) {
+			//receiver->error = netemu_get_last_error();
+			/*Do something interesting here.*/
+		}
+		else {
+			connection = netemu_tcp_connection_new_on_socket(socket,addr,addr_len);
+			_netemu_tcp_listener_notify(receiver,connection);
+		}
+
+	}
+}
+
+void _netemu_tcp_listener_notify(struct netemu_tcp_listener *listener, struct netemu_tcp_connection *connection) {
+	struct netemu_tcp_new_connection_fn* listener_fn;
+	listener_fn = listener->listener_fn;
+	while(listener_fn != NULL) {
+		listener_fn->listenerFn(listener,connection,listener_fn->params);
+		listener_fn = listener_fn->next;
+	}
 }

@@ -14,6 +14,7 @@ extern "C" {
 #include "netemu_socket.h"
 #include "netemu_kaillera.h"
 
+typedef struct netemu_p2p_internal* netemu_p2p_internal;
 
 struct p2p_player {
 	struct netemu_sockaddr_in *addr;
@@ -24,9 +25,10 @@ struct netemu_p2p {
 	struct netemu_tcp_listener *host;
 	struct netemu_tcp_connection **connections;
 	struct server_connection *connection;
+	netemu_p2p_internal _internal;
 };
 
-struct netemu_p2p* netemu_p2p_new(struct netemu_sockaddr_in *addr, int addr_size);
+struct netemu_p2p* netemu_p2p_new(struct netemu_sockaddr_in *addr, int addr_size, char* username, char* emulatorname);
 
 int netemu_p2p_connect(struct netemu_p2p* p2p, struct netemu_sockaddr_in *addr, int addr_size);
 

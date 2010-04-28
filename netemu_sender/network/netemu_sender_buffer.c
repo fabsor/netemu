@@ -6,12 +6,14 @@
  */
 #include "../protocol/application.h"
 #include "../protocol/transport.h"
-#include "../netemu_resources.h"
-#include "netemu_sender.h"
+#include "netemu_tcp.h"
+#include "netemu_sender_udp.h"
+#include "netemu_sender_collection.h"
+
 #include "netemu_sender_buffer.h"
 void _netemu_sender_buffer_update(void* arg);
 
-struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_packets,
+struct netemu_sender_buffer* netemu_sender_buffer_new(netemu_sender_buffer_types type, union netemu_sender_buffer_type *sender, const short preferred_no_packets,
 		const short preferred_delay_time) {
 	struct netemu_sender_buffer *buffer;
 	buffer = (struct netemu_sender_buffer*) malloc(
@@ -22,6 +24,8 @@ struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_p
 	buffer->send_lock = netemu_thread_mutex_create();
 	buffer->running = 1;
 	buffer->event = netemu_thread_event_create();
+	buffer->sender = sender;
+	buffer->type = type;
 	/* Start a new thread. */
 	netemu_thread_new(_netemu_sender_buffer_update,buffer);
 	return buffer;
@@ -68,11 +72,25 @@ void _netemu_sender_buffer_update(void* arg) {
 			netemu_list_clear(itemsToSend);
 			netemu_thread_mutex_release(buffer->send_lock);
 			packet_buffer = netemu_transport_pack(instructions, count);
-			netemu_sender_udp_send(sender, packet_buffer.data,
+			netemu_sender_buffer_send(buffer, packet_buffer.data,
 					packet_buffer.size);
 
 			buffer->send = 0;
 			buffer->last_send = current_time;
 		}
+	}
+}
+
+void netemu_sender_buffer_send(struct netemu_sender_buffer *buffer, char* data, int size) {
+	switch(buffer->type) {
+		case BUFFER_UDP_SENDER:
+			netemu_sender_udp_send(buffer->sender->udp_sender,data,size);
+			break;
+		case BUFFER_TCP_SENDER:
+			netemu_tcp_connection_send(buffer->sender->connection, data, size);
+			break;
+		case BUFFER_SENDER_COLLECTION:
+			netemu_sender_collection_send_data(buffer->sender->collection, data, size);
+			break;
 	}
 }

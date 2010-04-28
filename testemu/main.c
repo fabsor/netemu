@@ -11,11 +11,14 @@
 //#include <crtdbg.h>
 #include <stdio.h>
 #include <mcheck.h>
+#include "netemu_p2p.h"
 #include "netemu_kaillera.h"
 
 #define EMUNAME		"testemu"
 #define PLAYERNAME	"foobar"
 
+
+#define BIND_ADDR	netemu_inet_addr("127.0.0.1")
 
 #define ADDR	netemu_inet_addr("127.0.0.1")
 #define PORT	netemu_htons(27888)
@@ -41,6 +44,8 @@ void login_success(int status, struct server_connection* connection);
 void connect_async(struct netemu_sockaddr_in addr);
 void server_connect(struct netemu_sockaddr_in addr);
 void game_created(struct game* game);
+
+void connect_p2p(struct netemu_sockaddr_in addr);
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
@@ -54,7 +59,7 @@ int main() {
 	//kaillera_communication_get_server_list(&servers, &games);
 	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
-	printf("1. Connect Async\n2. Connect\n");
+	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n");
 	choice = getchar();
 	switch(choice) {
 		case '1':
@@ -63,11 +68,23 @@ int main() {
 		case '2':
 			server_connect(addr);
 		break;
+		case '3':
+			connect_p2p(addr);
+		break;
 	}
 	netemu_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
 	muntrace();
 	return 0;
+}
+
+void connect_p2p(struct netemu_sockaddr_in addr) {
+	int port;
+	printf("Enter Port Number:\n");
+	scanf("%d",&port);
+	addr.port = port;
+	printf("\n");
+	netemu_p2p_new(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 }
 
 void connect_async(struct netemu_sockaddr_in addr) {
