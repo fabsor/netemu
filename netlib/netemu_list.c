@@ -2,7 +2,7 @@
 #include "headers/netemu_list.h"
 #include <string.h>
 #include "headers/netlib_util.h"
-#include "netlib_error.h"
+#include "headers/netlib_error.h"
 
 struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
@@ -56,14 +56,16 @@ int netemu_list_add(struct netemu_list* list, void* element) {
 }
 
 int _netemu_enlarge_list(struct netemu_list* list, int size) {
+	void** elements;
 	list->_intern->size += size;
-	/* TODO: Should we really use realloc here? */
-	if((list->elements = realloc(list->elements,list->_intern->size * sizeof(void*))) == NULL) {
+	elements = list->elements;
+	if((list->elements = malloc(sizeof(void*)*list->_intern->size)) == NULL) {
 		netlib_set_last_mapped_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
-	else
-		return 0;
+	memcpy(list->elements,elements,sizeof(void*)*list->count);
+	free(elements);
+	return 0;
 }
 
 int netemu_list_contains(struct netemu_list* list, void* element) {
