@@ -8,6 +8,8 @@
 #ifndef _NETEMU_LIST_H
 #define	_NETEMU_LIST_H
 
+#include "netlib_util.h"
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -18,10 +20,11 @@ extern "C" {
         void** elements;
         int count;
         int sorted;
+		NETEMU_BOOL thread_safe;
         netemu_list_internal _intern;
     };
 
-    struct netemu_list* netemu_list_new(int count);
+    struct netemu_list* netemu_list_new(int count, NETEMU_BOOL thread_safe);
 
     int netemu_list_add(struct netemu_list* list, void* element);
 

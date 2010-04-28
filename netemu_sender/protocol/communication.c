@@ -113,7 +113,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		return -1;
 	}
 
-	game_list = netemu_list_new(128);
+	game_list = netemu_list_new(128, FALSE);
 	response_body += strlen(HTTP_HEADER_END);
 
 	response_body = _netemu_parse_game_list(response_body, game_list);
@@ -124,7 +124,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 	}
 
 
-	server_list = netemu_list_new(128);
+	server_list = netemu_list_new(128, FALSE);
 
 	response_body = _netemu_parse_server_list(response_body, server_list);
 	if(response_body == NULL) {
