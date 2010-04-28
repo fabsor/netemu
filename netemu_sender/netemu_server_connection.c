@@ -12,7 +12,7 @@
 #include "netemu_thread.h"
 #include "responses.h"
 
-int server_connection_login(struct server_connection* connection);
+
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp);
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username);
 void server_connection_add_game(struct server_connection *connection, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count);
