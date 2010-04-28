@@ -12,7 +12,6 @@
 #include "netemu_thread.h"
 #include "responses.h"
 
-void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);
 int server_connection_login(struct server_connection* connection);
 int server_connection_wait_for_instruction(struct server_connection* connection, int instruction_id, time_t timestamp);
 void server_connection_add_user(struct server_connection* connection, NETEMU_WORD user_id, char connection_type, char* username);
@@ -142,7 +141,7 @@ struct server_connection *netemu_server_connection_new(char* user, char* emulato
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,BUFFERED_PLAY_VALUES,_netemu_respond_to_buffered_values, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,EXISTING_PLAYERS_LIST,_netemu_respond_to_player_list, connection);
 	netemu_packet_buffer_add_instruction_received_fn(connection->_internal->receive_buffer,GAME_STATUS_UPDATE,_netemu_respond_to_game_status_update, connection);
-	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), _server_connection_receive, connection);
+	netemu_receiver_udp_register_recv_fn(netemu_resources_get_receiver(), netemu_udp_connection_receive, connection);
 	server_connection_login(connection);
 	return connection;
 }
@@ -252,7 +251,7 @@ struct user** server_connection_get_user_list(struct server_connection* connecti
 	return users;
 }
 
-void _server_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
+void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
 	struct server_connection* connection;
 	struct transport_packet* packet;
 	struct application_instruction* instruction;
@@ -268,6 +267,21 @@ void _server_connection_receive(char* data, size_t size, struct netemu_receiver_
 	}
 }
 
+void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_connection *receiver, void* params) {
+	struct server_connection* connection;
+	struct transport_packet* packet;
+	struct application_instruction* instruction;
+	int i;
+	connection = (struct server_connection*) params;
+	packet = netemu_transport_unpack(data);
+	for (i = 0; i < packet->count; i++) {
+		instruction = netemu_application_parse_message(packet->instructions[i]);
+		if(instruction->id == CREATE_GAME) {
+			printf("GAME CREATED");
+		}
+		netemu_packet_buffer_add(connection->_internal->receive_buffer,instruction);
+	}
+}
 /**
  * Compare users.
  */

@@ -35,6 +35,10 @@
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.653736431" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="_NIX"/>
 </option>
+<option id="gnu.c.compiler.option.warnings.pedantic.1253583925" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.debugging.gprof.728733249" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.debugging.prof.483592507" name="Generate prof information (-p)" superClass="gnu.c.compiler.option.debugging.prof" value="true" valueType="boolean"/>
+<option id="gnu.c.compiler.option.debugging.other.393752981" name="Other debugging flags" superClass="gnu.c.compiler.option.debugging.other" value="" valueType="string"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.336596034" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1546787165" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
@@ -47,6 +51,8 @@
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/netemu/Debug}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/Debug}&quot;"/>
 </option>
+<option id="gnu.c.link.option.debugging.gprof.173116452" name="Generate gprof information (-pg)" superClass="gnu.c.link.option.debugging.gprof" value="true" valueType="boolean"/>
+<option id="gnu.c.link.option.debugging.prof.979946750" name="Generate prof information (-p)" superClass="gnu.c.link.option.debugging.prof" value="true" valueType="boolean"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.428278026" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>

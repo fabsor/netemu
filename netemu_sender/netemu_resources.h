@@ -1,7 +1,6 @@
 /**
  * @file
  * This file defines global resources used by the whole library.
- * @author Fabian Sörqvist <fabian.sorqvist@gmail.com>
  */
 
 #ifndef NETEMU_RESOURCES_H_
@@ -19,6 +18,8 @@
 struct netemu_client {
 	struct netemu_receiver_udp *receiver;
 	struct netemu_sender_udp *sender;
+	struct netemu_tcp_connection *host;
+	struct netemu_tcp_connection **clients;
 };
 
 
@@ -31,6 +32,10 @@ struct netemu_client* netemu_resources_get_client();
 struct netemu_receiver_udp* netemu_resources_get_receiver();
 
 struct netemu_sender_udp* netemu_resources_get_sender();
+
+struct netemu_tcp_connection* netemu_resources_get_host();
+
+struct netemu_tcp_connection** netemu_resources_get_clients();
 
 /**
  * Free the client memory. This will free the memory of the

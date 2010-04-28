@@ -1,0 +1,10 @@
+<?php
+/*
+ * UnInstall - Delete all variables for content type menu settings.
+ */
+function ctm_uninstall() {
+  $types = node_get_types();
+  foreach ($types as $type => $values) {
+    variable_del($type.'_menu_settings');
+  }
+}

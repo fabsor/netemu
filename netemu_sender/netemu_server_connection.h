@@ -16,7 +16,8 @@ extern "C" {
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "protocol/application.h"
-
+#include "network/netemu_receiver.h"
+#include "network/netemu_tcp.h"
 struct _server_connection_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
@@ -32,6 +33,8 @@ struct _server_connection_internal {
 
 };
 
+void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);
+void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_connection* receiver, void* params);
 
 
 #ifdef	__cplusplus

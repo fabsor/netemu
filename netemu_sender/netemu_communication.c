@@ -32,7 +32,6 @@ struct communication_callback {
 	char* username;
 };
 
-
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void _kaillera_communication_login(struct communication_callback *callback);

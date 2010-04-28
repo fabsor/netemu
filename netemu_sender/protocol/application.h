@@ -9,6 +9,7 @@
 #define APPLICATION_H_
 #include "transport.h"
 #include "netlib_util.h"
+#include "netemu_socket.h"
 #include <time.h>
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;
@@ -186,13 +187,13 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 
 void netemu_application_buffered_play_values_parse(struct application_instruction *instruction, char *data);
 
-void netemu_application_chat_game_add(struct application_instruction *instruction, char *data, char *user);
+int netemu_application_chat_game_add(struct application_instruction *instruction, char *data, char *user);
 
-void netemu_application_chat_partyline_add(struct application_instruction *instruction, char *data, char *user);
+int netemu_application_chat_partyline_add(struct application_instruction *instruction, char *data, char *user);
 
 void netemu_application_chat_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_chat_parse(struct application_instruction *instruction, char *data);
+int netemu_application_chat_parse(struct application_instruction *instruction, char *data);
 
 void netemu_application_create_game_add(struct application_instruction *instruction, char* gamename);
 
@@ -230,7 +231,7 @@ void netemu_application_login_request_add(struct application_instruction* instru
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_login_success_parse(struct application_instruction *instruction, char* buffer);
+int netemu_application_login_success_parse(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_player_dropped_pack(struct application_instruction *instruction, char *data);
 

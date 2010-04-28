@@ -50,6 +50,8 @@ struct server_connection {
 typedef struct server kaillera_server;
 typedef struct existing_game kaillera_existing_game;
 
+void netemu_kaillera_network_init(struct netemu_sockaddr_in *addr, int addr_size);
+
 int kaillera_communication_get_server_list(struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount);
 
 void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct netemu_communication_server *server)));

@@ -71,7 +71,7 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 	}
 	memcpy(&count,data,sizeof(char));
 	packet->count = count;
-	if((packet->instructions = malloc(sizeof(struct transport_instruction)*count)) == NULL) {
+	if((packet->instructions = malloc(sizeof(struct transport_instruction*)*count)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		free(packet);
 		return NULL;

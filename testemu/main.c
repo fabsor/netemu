@@ -10,6 +10,7 @@
 
 //#include <crtdbg.h>
 #include <stdio.h>
+#include <mcheck.h>
 #include "netemu_kaillera.h"
 
 #define EMUNAME		"testemu"
@@ -43,6 +44,7 @@ void game_created(struct game* game);
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
+	mtrace();
 	connection = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
@@ -64,6 +66,7 @@ int main() {
 	}
 	netemu_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
+	muntrace();
 	return 0;
 }
 
