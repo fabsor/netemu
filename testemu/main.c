@@ -10,7 +10,6 @@
 
 //#include <crtdbg.h>
 #include <stdio.h>
-#include <mcheck.h>
 #include "netemu_p2p.h"
 #include "netemu_kaillera.h"
 
@@ -49,7 +48,7 @@ void connect_p2p(struct netemu_sockaddr_in addr);
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
-	mtrace();
+	//mtrace();
 	connection = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
@@ -74,7 +73,7 @@ int main() {
 	}
 	netemu_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
-	muntrace();
+	//muntrace();
 	return 0;
 }
 

@@ -24,7 +24,7 @@ struct netemu_sender {
 struct netemu_sender_collection* netemu_sender_collection_new() {
 	struct netemu_sender_collection *collection;
 	collection = malloc(sizeof(struct netemu_collection*));
-	collection->senders = netemu_list_new(10);
+	collection->senders = netemu_list_new(10,1);
 
 	return collection;
 }

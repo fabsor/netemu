@@ -1,22 +1,22 @@
 #include <stdlib.h>
 #include "headers/netemu_list.h"
 #include <string.h>
-#include "headers/netlib_util.h"
 #include "headers/netlib_error.h"
+#include "headers/netemu_thread.h"
 
 struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
 	int size;
 	int FOO;
+	netemu_mutex list_mutex;
 };
 
 int _netemu_enlarge_list(struct netemu_list* list, int size);
 int _netemu_list_search_linear(struct netemu_list* list, void* element);
 
-struct netemu_list* netemu_list_new(int count) {
+struct netemu_list* netemu_list_new(int count, NETEMU_BOOL thread_safe) {
 	struct netemu_list* list;
 	struct _netemu_list_internal* intern;
-
 	if((intern = malloc(sizeof(struct _netemu_list_internal))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
@@ -26,6 +26,11 @@ struct netemu_list* netemu_list_new(int count) {
 		free(intern);
 		return NULL;
 	}
+
+	list->thread_safe = thread_safe;
+	if(list->thread_safe)
+		intern->list_mutex = netemu_thread_mutex_create();
+
 	intern->size = count;
 	if((list->elements = malloc(sizeof(void*) * intern->size)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
@@ -43,6 +48,10 @@ struct netemu_list* netemu_list_new(int count) {
 
 int netemu_list_add(struct netemu_list* list, void* element) {
 	int error;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+
 	/* Enlarge the array if necessary. */
 	if (list->_intern->size <= list->count) {
 		error = _netemu_enlarge_list(list, 10);
@@ -53,11 +62,18 @@ int netemu_list_add(struct netemu_list* list, void* element) {
 	list->count++;
 	list->sorted = 0;
 
+	if(list->thread_safe)
+		netemu_thread_mutex_release(list->_intern->list_mutex);
+
 	return 0;
 }
 
 int _netemu_enlarge_list(struct netemu_list* list, int size) {
 	void** elements;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+
 	list->_intern->size += size;
 	elements = list->elements;
 	if((list->elements = malloc(sizeof(void*)*list->_intern->size)) == NULL) {
@@ -66,6 +82,10 @@ int _netemu_enlarge_list(struct netemu_list* list, int size) {
 	}
 	memcpy(list->elements,elements,sizeof(void*)*list->count);
 	free(elements);
+
+	if(list->thread_safe)
+		netemu_thread_mutex_release(list->_intern->list_mutex);
+
 	return 0;
 }
 
@@ -76,26 +96,41 @@ int netemu_list_contains(struct netemu_list* list, void* element) {
 int _netemu_list_search_linear(struct netemu_list* list, void* element) {
 	int i;
 	int index = -1;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+
+	
 	for (i = 0; i < list->count; i++) {
 		if (list->elements[i] == element) {
 			return index;
 		}
 	}
+
+	if(list->thread_safe)
+		netemu_thread_mutex_release(list->_intern->list_mutex);
+
 	return -1;
 }
 
 int netemu_list_remove(struct netemu_list* list, void* element) {
 	int index;
+
 	/*TODO: Add binary search when sorting is available. */
 	index = _netemu_list_search_linear(list, element);
 	if (index == -1) {
 		return index;
 	}
+
 	return netemu_list_remove_at(list, index);
 }
 
 int netemu_list_remove_at(struct netemu_list* list, int index) {
 	int i;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+
 	if (list->count < index) {
 		return -1;
 	}
@@ -103,6 +138,10 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 		list->elements[i] = list->elements[i + 1];
 	}
 	list->count--;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_release(list->_intern->list_mutex);
+
 	return 0;
 }
 
@@ -135,18 +174,28 @@ void netemu_list_register_sort_fn(struct netemu_list* list, int(* comparator)(
  * @return 1 if the sorting was successful, 0 if you haven't registered a sorting function.
  */
 int netemu_list_sort(struct netemu_list* list) {
+	int return_value;
+
+	return_value = -1;
 	/* If this list is sorted, then there's nothing to be done. */
 	if (list->sorted)
 		return 0;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
 
 	/* We can't sort if we don't have a comparator. */
 	if (list->_intern->comparator != 0) {
 		qsort(list->elements[0], list->count, sizeof(void*),
 				list->_intern->comparator);
 		list->sorted = 1;
-		return 0;
+		return_value = 0;
 	}
-	return -1;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_release(list->_intern->list_mutex);
+
+	return return_value;
 }
 
 /**
@@ -161,8 +210,11 @@ void netemu_list_trim(struct netemu_list* list) {
  * takes up, since the items might be used in other parts of the program.
  */
 void netemu_list_free(struct netemu_list* list) {
-	free(list->_intern);
 	free(list->elements);
+	if(list->thread_safe) {
+		netemu_thread_mutex_destroy(list->_intern->list_mutex);
+	}
+	free(list->_intern);
 	free(list);
 }
 
@@ -181,6 +233,9 @@ int netemu_list_clear(struct netemu_list* list) {
 	int error = 0;
 	void **new_buffer;
 
+	if(list->thread_safe)
+		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+
 	if((new_buffer = malloc(sizeof(void*)*20)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		error = -1;
@@ -189,5 +244,9 @@ int netemu_list_clear(struct netemu_list* list) {
 	list->elements = new_buffer;
 	list->count = 0;
 	list->_intern->size = 20;
+
+	if(list->thread_safe)
+		netemu_thread_mutex_release(list->_intern->list_mutex);
+
 	return error;
 }

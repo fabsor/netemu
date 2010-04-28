@@ -7,6 +7,7 @@
 
 #include "netemu_receiver.h"
 #include "netemu_thread.h"
+#include "netlib_error.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -63,7 +64,7 @@ void netemu_receiver_recv(void* params) {
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error == -1) {
 			//receiver->error = netemu_get_last_error();
-			printf("Receive error: %i\n", receiver->error);
+			printf("Receive error: %i\n", netlib_get_last_error());
 			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}

@@ -18,7 +18,7 @@ struct netemu_sender_buffer* netemu_sender_buffer_new(netemu_sender_buffer_types
 	struct netemu_sender_buffer *buffer;
 	buffer = (struct netemu_sender_buffer*) malloc(
 			sizeof(struct netemu_sender_buffer));
-	buffer->instructions = netemu_list_new(LIST_START_SIZE);
+	buffer->instructions = netemu_list_new(LIST_START_SIZE, TRUE);
 	buffer->preferred_no_packets = preferred_no_packets;
 	buffer->preferred_delay_time = preferred_delay_time;
 	buffer->send_lock = netemu_thread_mutex_create();

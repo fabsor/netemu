@@ -44,7 +44,7 @@ struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	buffer->_internal->add_mutex = netemu_thread_mutex_create();
 	buffer->_internal->wakeup_mutex = netemu_thread_mutex_create();
 	buffer->_internal->fn_mutex = netemu_thread_mutex_create();
-	buffer->_internal->instructions_to_add = netemu_list_new(20);
+	buffer->_internal->instructions_to_add = netemu_list_new(20, TRUE);
 	netemu_thread_new(_netemu_packet_buffer_update,buffer);
 	return buffer;
 }
@@ -86,7 +86,7 @@ void _netemu_packet_buffer_update(void* args) {
 	int i;
 	buffer = (struct netemu_packet_buffer*)args;
 	itemsToAdd = buffer->_internal->instructions_to_add;
-	itemsToNotify = netemu_list_new(10);
+	itemsToNotify = netemu_list_new(10, TRUE);
 	lock = buffer->_internal->add_mutex;
 
 	while(1) {

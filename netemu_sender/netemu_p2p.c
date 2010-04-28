@@ -37,7 +37,7 @@ struct netemu_p2p* netemu_p2p_new(struct netemu_sockaddr_in *addr, int addr_size
 
 	p2p->connection = netemu_server_connection_new(username,emulatorname,buffer);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
-	p2p->_internal->peers = netemu_list_new(10);
+	p2p->_internal->peers = netemu_list_new(10,1);
 	netemu_tcp_listener_register_new_connection_fn(p2p->host,netemu_p2p_new_connection,p2p);
 	return p2p;
 }

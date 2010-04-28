@@ -170,6 +170,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\callbacks.c"
+				>
+			</File>
+			<File
 				RelativePath=".\protocol\communication.c"
 				>
 			</File>
@@ -178,19 +182,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\kaillera_communication.c"
-				>
-			</File>
-			<File
-				RelativePath=".\interface\kaillera_server_connection.c"
-				>
-			</File>
-			<File
 				RelativePath=".\main.c"
 				>
 			</File>
 			<File
+				RelativePath=".\netemu_communication.c"
+				>
+			</File>
+			<File
 				RelativePath=".\structures\netemu_hashtbl.c"
+				>
+			</File>
+			<File
+				RelativePath=".\netemu_p2p.c"
 				>
 			</File>
 			<File
@@ -214,6 +218,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\netemu_server_connection.c"
+				>
+			</File>
+			<File
 				RelativePath=".\structures\netemu_stringbuilder.c"
 				>
 			</File>
@@ -227,6 +235,10 @@
 			</File>
 			<File
 				RelativePath=".\network_test.c"
+				>
+			</File>
+			<File
+				RelativePath=".\responses.c"
 				>
 			</File>
 			<File
@@ -256,19 +268,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\interface\kaillera_communication.h"
-				>
-			</File>
-			<File
-				RelativePath=".\interface\kaillera_server_connection.h"
-				>
-			</File>
-			<File
 				RelativePath=".\kailleraclient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\interface\netemu_client.h"
 				>
 			</File>
 			<File
@@ -296,6 +296,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\netemu_server_connection.h"
+				>
+			</File>
+			<File
 				RelativePath=".\structures\netemu_stringbuilder.h"
 				>
 			</File>
@@ -309,6 +313,10 @@
 			</File>
 			<File
 				RelativePath=".\network_test.h"
+				>
+			</File>
+			<File
+				RelativePath=".\responses.h"
 				>
 			</File>
 			<File
