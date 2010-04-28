@@ -12,3 +12,4 @@ Release/*
 *.o
 *.d
 *.ncb
+netemu.org/*
