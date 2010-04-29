@@ -1,0 +1,19 @@
+<ui version="4.0" >
+ <class>netemu_uiClass</class>
+ <widget class="QWidget" name="netemu_uiClass" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>netemu_ui</string>
+  </property>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <resources/>
+ <connections/>
+</ui>
