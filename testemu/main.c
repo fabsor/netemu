@@ -23,6 +23,7 @@
 #define PORT	netemu_htons(27888)
 #define VALUE	"0x0x0xff"
 
+#define CLOUD_NAME	"the_cloud"
 
 
 char* games[] = {"Foo", "Bar"};
@@ -43,7 +44,7 @@ void login_success(int status, struct server_connection* connection);
 void connect_async(struct netemu_sockaddr_in addr);
 void server_connect(struct netemu_sockaddr_in addr);
 void game_created(struct game* game);
-
+void host_p2p(struct netemu_sockaddr_in addr);
 void connect_p2p(struct netemu_sockaddr_in addr);
 int main() {
 	struct netemu_sockaddr_in addr;
@@ -58,7 +59,7 @@ int main() {
 	//kaillera_communication_get_server_list(&servers, &games);
 	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
-	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n");
+	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n");
 	choice = getchar();
 	switch(choice) {
 		case '1':
@@ -70,6 +71,9 @@ int main() {
 		case '3':
 			connect_p2p(addr);
 		break;
+		case '4':
+			host_p2p(addr);
+		break;
 	}
 	netemu_register_play_values_received_callback(connection, receive_values);
 	menu(connection);
@@ -77,13 +81,28 @@ int main() {
 	return 0;
 }
 
-void connect_p2p(struct netemu_sockaddr_in addr) {
+void host_p2p(struct netemu_sockaddr_in addr) {
 	int port;
+	struct netemu_p2p *p2p;
 	printf("Enter Port Number:\n");
 	scanf("%d",&port);
 	addr.port = port;
 	printf("\n");
-	netemu_p2p_new(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	netemu_p2p_host(p2p, &addr,sizeof(addr),CLOUD_NAME);
+	connection = p2p->connection;
+}
+
+void connect_p2p(struct netemu_sockaddr_in addr) {
+	int port;
+	struct netemu_p2p *p2p;
+	printf("Enter Port Number:\n");
+	scanf("%d",&port);
+	addr.port = port;
+	printf("\n");
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	netemu_p2p_connect(p2p,&addr,sizeof(addr));
+	connection = p2p->connection;
 }
 
 void connect_async(struct netemu_sockaddr_in addr) {

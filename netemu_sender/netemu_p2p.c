@@ -21,24 +21,18 @@ void netemu_p2p_new_connection(struct netemu_tcp_listener* listener, struct nete
 /**
  * Create a host connection.
  */
-struct netemu_p2p* netemu_p2p_new(struct netemu_sockaddr_in *addr, int addr_size, char* username, char* emulatorname) {
+struct netemu_p2p* netemu_p2p_new(char* username, char* emulatorname) {
 	struct netemu_p2p *p2p;
 	struct netemu_sender_buffer *buffer;
 	union netemu_sender_buffer_type *type;
 
 	type = malloc(sizeof(union netemu_sender_buffer_type));
 	type->collection = netemu_sender_collection_new();
-
 	buffer = netemu_sender_buffer_new(BUFFER_SENDER_COLLECTION,type,5,20);
-
 	p2p = malloc(sizeof(struct netemu_p2p));
-	p2p->host = malloc(sizeof(struct netemu_tcp_listener));
-	p2p->host = netemu_tcp_listener_new(netemu_prepare_net_addr(addr),addr_size);
-
 	p2p->connection = netemu_server_connection_new(username,emulatorname,buffer);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
 	p2p->_internal->peers = netemu_list_new(10,1);
-	netemu_tcp_listener_register_new_connection_fn(p2p->host,netemu_p2p_new_connection,p2p);
 	return p2p;
 }
 
@@ -46,8 +40,14 @@ void netemu_p2p_new_connection(struct netemu_tcp_listener* listener, struct nete
 	struct netemu_p2p *p2p;
 	p2p = (struct netemu_p2p*)params;
 	netemu_list_add(p2p->_internal->peers, connection);
+
 }
 
+void netemu_p2p_host(struct netemu_p2p* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname) {
+	p2p->host = netemu_tcp_listener_new(netemu_prepare_net_addr(addr),addr_size);
+	p2p->cloud_name = cloudname;
+	netemu_tcp_listener_register_new_connection_fn(p2p->host,netemu_p2p_new_connection,p2p);
+}
 /**
  * Connect to a host.
  */

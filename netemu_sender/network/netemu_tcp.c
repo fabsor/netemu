@@ -8,7 +8,7 @@
 #define LISTEN_BACKLOG	1024
 #define BUFFER_SIZE		512
 
-void _netemu_listener_listen(void* params);
+void _netemu_tcp_listener_listen(void* params);
 void _netemu_tcp_connection_recv(void* params);
 void _netemu_tcp_connection_notify(struct netemu_tcp_connection* receiver, char* data, size_t size);
 void _netemu_tcp_listener_notify(struct netemu_tcp_listener *listener, struct netemu_tcp_connection *connection);
@@ -45,39 +45,10 @@ struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET 
 /**
  * This function creates a new threads and starts listening for incoming connections.
  */
-void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener, void (*conAcceptedFn)(struct netemu_tcp_listener*, struct netemu_tcp_connection*)) {
-	listener->conAcceptedFn = conAcceptedFn;
-	netemu_thread_new(_netemu_listener_listen, (void*)listener);
+void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener) {
+	netemu_thread_new(_netemu_tcp_listener_listen, (void*)listener);
 }
 
-
-void _netemu_listener_listen(void* params) {
-	struct netemu_tcp_listener *listener;
-	struct netemu_tcp_connection *connection;
-	netemu_sockaddr *addr;
-	int addr_len, error;
-	NETEMU_SOCKET socket;
-
-	addr_len = 0;
-	listener = (struct netemu_tcp_listener*)params;
-	listener->listening  = 1;
-
-	error = netemu_listen(listener->socket,LISTEN_BACKLOG);
-	if(error == -1) {
-		//listener->error = netemu_get_last_error();
-		return;
-	}
-	while (1) {
-		addr = malloc(sizeof(netemu_sockaddr));
-		socket = netemu_accept(listener->socket,addr,&addr_len);
-		connection = malloc(sizeof(struct netemu_tcp_connection));
-		connection->addr = addr;
-		connection->addr_len = addr_len;
-		connection->socket = socket;
-		connection->buffer_size = BUFFER_SIZE;
-		listener->conAcceptedFn(listener,connection);
-	}
-}
 
 void netemu_tcp_connection_register_recv_fn(struct netemu_tcp_connection* receiver, void (* listenerFn)(char*, size_t, struct netemu_tcp_connection*, void*), void* params) {
 	struct netemu_tcp_connection_fn *receiver_fn;
@@ -190,7 +161,7 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 }
 
 
-void netemu_tcp_listener_listen(void* params) {
+void _netemu_tcp_listener_listen(void* params) {
 	struct netemu_tcp_listener *receiver;
 	int error;
 	socklen_t addr_len;

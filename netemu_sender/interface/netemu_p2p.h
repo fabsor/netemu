@@ -26,12 +26,14 @@ struct netemu_p2p {
 	struct netemu_tcp_connection **connections;
 	struct server_connection *connection;
 	netemu_p2p_internal _internal;
+	char* cloud_name;
 };
 
-struct netemu_p2p* netemu_p2p_new(struct netemu_sockaddr_in *addr, int addr_size, char* username, char* emulatorname);
+struct netemu_p2p* netemu_p2p_new(char* username, char* emulatorname);
 
 int netemu_p2p_connect(struct netemu_p2p* p2p, struct netemu_sockaddr_in *addr, int addr_size);
 
+void netemu_p2p_host(struct netemu_p2p* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname);
 
 #ifdef	__cplusplus
 }

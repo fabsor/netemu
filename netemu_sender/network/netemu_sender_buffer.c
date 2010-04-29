@@ -46,14 +46,12 @@ void _netemu_sender_buffer_update(void* arg) {
 	struct netemu_sender_buffer *buffer;
 	struct application_instruction** instructions;
 	struct netemu_list* itemsToSend;
-	struct netemu_sender_udp *sender;
 	struct transport_packet_buffer packet_buffer;
 	int i;
 	int count;
 	time_t current_time;
 	buffer = (struct netemu_sender_buffer*) arg;
 	itemsToSend = buffer->instructions;
-	sender = netemu_resources_get_sender();
 
 	while (buffer->running) {
 		if(buffer->instructions->count == 0) {

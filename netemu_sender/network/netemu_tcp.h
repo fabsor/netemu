@@ -34,7 +34,6 @@ struct netemu_tcp_listener {
 	int listening;
 	struct netemu_tcp_new_connection_fn *listener_fn;
 	int error;
-	void (*conAcceptedFn)(struct netemu_tcp_listener*, struct netemu_tcp_connection*);
 };
 
 struct netemu_tcp_new_connection_fn {
@@ -54,7 +53,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 
 struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET socket, netemu_sockaddr* addr, size_t addr_len);
 
-void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener, void (*conAcceptedFn)(struct netemu_tcp_listener*, struct netemu_tcp_connection*));
+void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener);
 
 void netemu_tcp_connection_register_recv_fn(struct netemu_tcp_connection* receiver, void (* listenerFn)(char*, size_t, struct netemu_tcp_connection*, void*), void* params);
 
