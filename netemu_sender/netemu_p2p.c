@@ -30,7 +30,7 @@ struct netemu_p2p* netemu_p2p_new(char* username, char* emulatorname) {
 	type->collection = netemu_sender_collection_new();
 	buffer = netemu_sender_buffer_new(BUFFER_SENDER_COLLECTION,type,5,20);
 	p2p = malloc(sizeof(struct netemu_p2p));
-	p2p->connection = netemu_server_connection_new(username,emulatorname,buffer);
+	p2p->info = netemu_server_connection_new(username,emulatorname,buffer);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
 	p2p->_internal->peers = netemu_list_new(10,1);
 	return p2p;
@@ -55,8 +55,20 @@ int netemu_p2p_connect(struct netemu_p2p* p2p, struct netemu_sockaddr_in *addr, 
 	int error;
 	struct netemu_tcp_connection *connection;
 	connection = netemu_tcp_connection_new(netemu_prepare_net_addr(addr),addr_size);
-	netemu_tcp_connection_register_recv_fn(connection, netemu_tcp_connection_receive, p2p->connection);
+	netemu_tcp_connection_register_recv_fn(connection, netemu_tcp_connection_receive, p2p->info);
 	error = netemu_tcp_connection_connect(connection);
 
 	return error;
+}
+
+int netemu_p2p_create_game(struct netemu_info *connection, char *gamename, struct game** result) {
+	struct game* game;
+	struct application_instruction* instruction;
+
+	instruction = netemu_application_create_message();
+	netemu_application_create_game_add(instruction,gamename);
+	game = (struct game*)instruction->body;
+	game->player_count = 1;
+	game->id = 0;
+	server_connection_add_player(game, connection->user);
 }

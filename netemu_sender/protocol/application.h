@@ -98,12 +98,14 @@ struct user_joined {
 
 struct game {
 	char* name;
-	NETEMU_DWORD id;
 	char* app_name;
 	char* users_count;
 	char status;
 	int player_count;
+	struct user *creator;
 	struct existing_player_list *players;
+	/* Used in kaillera */
+	NETEMU_DWORD id;
 };
 
 struct user_left {

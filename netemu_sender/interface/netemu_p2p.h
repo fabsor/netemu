@@ -24,7 +24,7 @@ struct p2p_player {
 struct netemu_p2p {
 	struct netemu_tcp_listener *host;
 	struct netemu_tcp_connection **connections;
-	struct server_connection *connection;
+	struct netemu_info *info;
 	netemu_p2p_internal _internal;
 	char* cloud_name;
 };
@@ -34,6 +34,8 @@ struct netemu_p2p* netemu_p2p_new(char* username, char* emulatorname);
 int netemu_p2p_connect(struct netemu_p2p* p2p, struct netemu_sockaddr_in *addr, int addr_size);
 
 void netemu_p2p_host(struct netemu_p2p* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname);
+
+int netemu_p2p_create_game(struct netemu_info *connection, char *gamename, struct game** result);
 
 #ifdef	__cplusplus
 }

@@ -28,7 +28,7 @@
 struct communication_callback {
 	int async;
 	int port;
-	void (*ConnectionReceivedFn)(int status, struct server_connection*);
+	void (*ConnectionReceivedFn)(int status, struct netemu_info*);
 	struct netemu_sockaddr_in *addr;
 	char* emulatorname;
 	char* username;
@@ -53,9 +53,9 @@ int kaillera_communication_get_server_list(struct server ***servers, int *server
 	return 0;
 }
 
-struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulatorname, char* username) {
+struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulatorname, char* username) {
 	struct netemu_client *client;
-	struct server_connection *connection;
+	struct netemu_info *connection;
 	char* hello;
 	struct communication_callback callback;
 	struct netemu_sender_buffer *buffer;
@@ -82,7 +82,7 @@ struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_
 	return connection;
 }
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct server_connection*)) {
+void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*)) {
 	struct netemu_client *client;
 	char* hello;
 	struct communication_callback *callback;
@@ -117,7 +117,7 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int a
 
 void _kaillera_communication_login(struct communication_callback *callback) {
 	struct netemu_client *client;
-	struct server_connection* connection;
+	struct netemu_info* connection;
 	client = netemu_resources_get_client();
 	netemu_receiver_udp_clear_listeners(client->receiver);
 	callback->addr->port = netemu_htons(callback->port);

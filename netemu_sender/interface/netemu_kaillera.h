@@ -35,9 +35,9 @@ struct callback {
 	union callback_fn *fn;
 };
 
-struct server_connection {
+struct netemu_info {
 	struct netemu_sockaddr_in *addr;
-	char *user;
+	struct user* user;
 	int game_count;
 	int user_count;
 	char *emulator_name;
@@ -56,43 +56,43 @@ int kaillera_communication_get_server_list(struct server ***servers, int *server
 
 void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct netemu_communication_server *server)));
 
-struct server_connection* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username);
+struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username);
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct server_connection*));
+void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*));
 
-int netemu_send_chat_message(struct server_connection *connection, char *message);
+int netemu_send_chat_message(struct netemu_info *connection, char *message);
 
-int netemu_register_chat_callback(struct server_connection *connection, chatFn);
+int netemu_register_chat_callback(struct netemu_info *connection, chatFn);
 
-int netemu_unregister_chat_callback(struct server_connection *connection, chatFn);
+int netemu_unregister_chat_callback(struct netemu_info *connection, chatFn);
 
-int netemu_register_user_join_callback(struct server_connection *connection, joinFn);
+int netemu_register_user_join_callback(struct netemu_info *connection, joinFn);
 
-int netemu_unregister_user_join_callback(struct server_connection *connection, joinFn);
+int netemu_unregister_user_join_callback(struct netemu_info *connection, joinFn);
 
-int netemu_register_user_leave_callback(struct server_connection *connection, leaveFn);
+int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn);
 
-int netmeu_unregister_user_leave_callback(struct server_connection *connection, leaveFn);
+int netmeu_unregister_user_leave_callback(struct netemu_info *connection, leaveFn);
 
-int netemu_disconnect(struct server_connection *connection, char *message);
+int netemu_disconnect(struct netemu_info *connection, char *message);
 
-int netemu_create_game(struct server_connection *connection, char *gamename, struct game** result);
+int netemu_create_game(struct netemu_info *connection, char *gamename, struct game** result);
 
-void netemu_create_game_async(struct server_connection *connection, char *gamename, gameCreatedFn fn);
+void netemu_create_game_async(struct netemu_info *connection, char *gamename, gameCreatedFn fn);
 
-int netemu_game_created_callback(struct server_connection *connection, gameCreatedFn);
+int netemu_game_created_callback(struct netemu_info *connection, gameCreatedFn);
 
-int netemu_join_game(struct server_connection *connection, NETEMU_DWORD gameid);
+int netemu_join_game(struct netemu_info *connection, NETEMU_DWORD gameid);
 
-struct game** netemu_get_game_list(struct server_connection* connection, int *count);
+struct game** netemu_get_game_list(struct netemu_info* connection, int *count);
 
-int netemu_send_player_ready(struct server_connection *connection);
+int netemu_send_player_ready(struct netemu_info *connection);
 
-int netemu_register_play_values_received_callback(struct server_connection *connection, valuesReceivedFn fn);
+int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn);
 
-int netemu_unregister_play_values_received_callback(struct server_connection *connection, valuesReceivedFn fn);
+int netemu_unregister_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn);
 
-void netemu_send_play_values(struct server_connection* connection, int size, void* data);
+void netemu_send_play_values(struct netemu_info* connection, int size, void* data);
 
 
 #ifdef	__cplusplus

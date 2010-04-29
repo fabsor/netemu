@@ -27,20 +27,20 @@
 
 
 char* games[] = {"Foo", "Bar"};
-struct server_connection *connection;
+struct netemu_info *info;
 #define NO_GAMES	2
 
-void menu(struct server_connection* connection);
-void create_game(struct server_connection *connection);
-void show_game_list(struct server_connection *connection);
-void join_game(struct server_connection* connection);
-void start_game(struct server_connection *connection);
+void menu(struct netemu_info* connection);
+void create_game(struct netemu_info *connection);
+void show_game_list(struct netemu_info *connection);
+void join_game(struct netemu_info* connection);
+void start_game(struct netemu_info *connection);
 
-void send_play_values(struct server_connection *connection);
-void show_user_list(struct server_connection* connection);
-void player_ready(struct server_connection *connection);
+void send_play_values(struct netemu_info *connection);
+void show_user_list(struct netemu_info* connection);
+void player_ready(struct netemu_info *connection);
 void receive_values(struct buffered_play_values *result);
-void login_success(int status, struct server_connection* connection);
+void login_success(int status, struct netemu_info* connection);
 void connect_async(struct netemu_sockaddr_in addr);
 void server_connect(struct netemu_sockaddr_in addr);
 void game_created(struct game* game);
@@ -50,7 +50,7 @@ int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
 	//mtrace();
-	connection = NULL;
+	info = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
 	addr.family = NETEMU_AF_INET;
@@ -75,8 +75,8 @@ int main() {
 			host_p2p(addr);
 		break;
 	}
-	netemu_register_play_values_received_callback(connection, receive_values);
-	menu(connection);
+	netemu_register_play_values_received_callback(info, receive_values);
+	menu(info);
 	//muntrace();
 	return 0;
 }
@@ -90,7 +90,7 @@ void host_p2p(struct netemu_sockaddr_in addr) {
 	printf("\n");
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	netemu_p2p_host(p2p, &addr,sizeof(addr),CLOUD_NAME);
-	connection = p2p->connection;
+	info = p2p->info;
 }
 
 void connect_p2p(struct netemu_sockaddr_in addr) {
@@ -102,27 +102,27 @@ void connect_p2p(struct netemu_sockaddr_in addr) {
 	printf("\n");
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	netemu_p2p_connect(p2p,&addr,sizeof(addr));
-	connection = p2p->connection;
+	info = p2p->info;
 }
 
 void connect_async(struct netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success);
-	while(connection == NULL);
+	while(info == NULL);
 }
 
 void server_connect(struct netemu_sockaddr_in addr) {
-	connection = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+	info = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 }
 
-void login_success(int status, struct server_connection* server_connection) {
-	connection = server_connection;
+void login_success(int status, struct netemu_info* server_connection) {
+	info = server_connection;
 }
 
 void receive_values(struct buffered_play_values *result) {
 	printf("%s",result->values);
 }
 
-void menu(struct server_connection* connection) {
+void menu(struct netemu_info* connection) {
 	char val;
 	val = 'n';
 
@@ -157,18 +157,18 @@ void menu(struct server_connection* connection) {
 	//_CrtDumpMemoryLeaks();
 }
 
-void send_play_values(struct server_connection *connection) {
+void send_play_values(struct netemu_info *connection) {
 	char* data = VALUE;
 	netemu_send_play_values(connection, strlen(data)+1, data);
 }
 
-void create_game(struct server_connection* connection) {
+void create_game(struct netemu_info* connection) {
 	struct game *result;
 	printf("Creating game\n");
 	netemu_create_game_async(connection,games[0],game_created);
 }
 
-void show_game_list(struct server_connection* connection) {
+void show_game_list(struct netemu_info* connection) {
 	int no_games, i;
 	struct game **games;
 	games = netemu_get_game_list(connection, &no_games);
@@ -184,7 +184,7 @@ void show_game_list(struct server_connection* connection) {
 
 }
 
-void show_user_list(struct server_connection* connection) {
+void show_user_list(struct netemu_info* connection) {
 	int no_users, i;
 	struct user** users;
 	users = server_connection_get_user_list(connection, &no_users);
@@ -198,17 +198,17 @@ void game_created(struct game* game) {
 	printf("%s", game->name);
 }
 
-void start_game(struct server_connection *connection) {
+void start_game(struct netemu_info *connection) {
 	printf("Starting game\n");
 	server_connection_start_game(connection);
 }
 
-void player_ready(struct server_connection *connection) {
+void player_ready(struct netemu_info *connection) {
 	netemu_send_player_ready(connection);
 }
 
 
-void join_game(struct server_connection* connection) {
+void join_game(struct netemu_info* connection) {
 	struct game** list;
 	int count;
 	list = netemu_get_game_list(connection,&count);
