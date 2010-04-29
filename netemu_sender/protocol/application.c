@@ -12,7 +12,6 @@
 #include "application.h"
 #include "netlib_error.h"
 
-int _netemu_application_copy_string(char** dest, char* src);
 char* parse_string(char* data);
 int _netemu_application_pack_str(char* buffer, char* str);
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
@@ -125,12 +124,12 @@ int netemu_application_chat_game_add(struct application_instruction *instruction
 		return -1;
 	}
 
-	if((size += _netemu_application_copy_string(&partyline_chat->message, data)) == NULL) {
+	if((size += netemu_util_copy_string(&partyline_chat->message, data)) == NULL) {
 		/* Error code already set in _netemu_application_copy_string */
 		free(partyline_chat);
 		return -1;
 	}
-	if((size += _netemu_application_copy_string(&instruction->user, user)) == NULL) {
+	if((size += netemu_util_copy_string(&instruction->user, user)) == NULL) {
 		/* Error code already set in _netemu_application_copy_string */
 		free(partyline_chat->message);
 		free(partyline_chat);
@@ -153,12 +152,12 @@ int netemu_application_chat_partyline_add(struct application_instruction *instru
 		return -1;
 	}
 
-	if((size += _netemu_application_copy_string(&partyline_chat->message, data)) == NULL) {
+	if((size += netemu_util_copy_string(&partyline_chat->message, data)) == NULL) {
 		/* Error code already set in _netemu_application_copy_string */
 		free(partyline_chat);
 		return -1;
 	}
-	if((size += _netemu_application_copy_string(&instruction->user, user)) == NULL) {
+	if((size += netemu_util_copy_string(&instruction->user, user)) == NULL) {
 		/* Error code already set in _netemu_application_copy_string */
 		free(partyline_chat->message);
 		free(partyline_chat);
@@ -459,8 +458,8 @@ void netemu_application_login_request_add(struct application_instruction* instru
 	struct login_request* request;
 	int size;
 	request = malloc(sizeof(struct login_request));
-	size = _netemu_application_copy_string(&request->name,appName);
-	_netemu_application_copy_string(&instruction->user,user);
+	size = netemu_util_copy_string(&request->name,appName);
+	netemu_util_copy_string(&instruction->user,user);
 	request->connection = connection;
 	instruction->body_size = size + sizeof(char);
 	instruction->body = request;
@@ -506,24 +505,13 @@ void netemu_application_user_leave_add(struct application_instruction* instructi
 	struct user_left *left_msg;
 	int size;
 	left_msg = malloc(sizeof(struct user_left));
-	size = _netemu_application_copy_string(&left_msg->exit_message,exit_message);
+	size = netemu_util_copy_string(&left_msg->exit_message,exit_message);
 	left_msg->id = 0xFFFF;
 	size += sizeof(NETEMU_WORD);
 	instruction->body_size = size;
 	instruction->body = left_msg;
 	instruction->id = USER_LEAVE;
 	instruction->packBodyFn = netemu_application_user_leave_pack;
-}
-
-int _netemu_application_copy_string(char** dest, char* src) {
-	int size;
-	size = sizeof(char)*strlen(src) + 1;
-	if((*dest = malloc(size)) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-		return -1;
-	}
-	strncpy(*dest, src, size);
-	return size;
 }
 
 void netemu_application_user_leave_pack(struct application_instruction *instruction, char *buffer) {
@@ -546,8 +534,8 @@ void netemu_application_create_game_add(struct application_instruction *instruct
 	struct game_created *game;
 	int size;
 	game = malloc(sizeof(struct game));
-	size = _netemu_application_copy_string(&game->gameName,gamename);
-	size += _netemu_application_copy_string(&game->appName,"");
+	size = netemu_util_copy_string(&game->gameName,gamename);
+	size += netemu_util_copy_string(&game->appName,"");
 	game->id = 0xFFFF;
 	game->wtf = 0xFFFF;
 	size += sizeof(NETEMU_WORD)*2;
@@ -557,6 +545,7 @@ void netemu_application_create_game_add(struct application_instruction *instruct
 	instruction->packBodyFn = netemu_application_create_game_pack;
 }
 
+
 void netemu_application_join_game_add(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection) {
 	struct player_joined *join;
 	int size;
@@ -565,7 +554,7 @@ void netemu_application_join_game_add(struct application_instruction *instructio
 	join->game_id = game_id;
 	join->ping = 0;
 	join->connection = connection;
-	size = _netemu_application_copy_string(&join->username,"");
+	size = netemu_util_copy_string(&join->username,"");
 
 	instruction->id = PLAYER_JOINED;
 	instruction->body = join;
@@ -582,7 +571,7 @@ void netemu_application_add_join_game_total(struct application_instruction *inst
 	join->game_id = game_id;
 	join->ping = ping;
 	join->connection = connection;
-	size = _netemu_application_copy_string(&join->username,username);
+	size = netemu_util_copy_string(&join->username,username);
 
 	instruction->id = PLAYER_JOINED;
 	instruction->body = join;
@@ -610,7 +599,7 @@ void netemu_application_join_game_parse(struct application_instruction *instruct
 	join = malloc(sizeof(struct player_joined));
 	memcpy(&join->game_id,data,sizeof(NETEMU_DWORD));
 	data += sizeof(NETEMU_DWORD);
-	data += _netemu_application_copy_string(&join->username,data);
+	data += netemu_util_copy_string(&join->username,data);
 	memcpy(&join->ping,data,sizeof(NETEMU_DWORD));
 	data += sizeof(NETEMU_DWORD);
 	memcpy(&join->user_id,data,sizeof(NETEMU_WORD));
@@ -635,8 +624,8 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 	struct game_created *game;
 
 	game = malloc(sizeof(struct game_created));
-	buffer += _netemu_application_copy_string(&game->gameName,buffer);
-	buffer += _netemu_application_copy_string(&game->appName,buffer);
+	buffer += netemu_util_copy_string(&game->gameName,buffer);
+	buffer += netemu_util_copy_string(&game->appName,buffer);
 	memcpy(&game->id,buffer,sizeof(NETEMU_DWORD));
 	buffer += sizeof(NETEMU_DWORD);
 	memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD));

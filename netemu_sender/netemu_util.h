@@ -15,7 +15,7 @@
 #define INTERNAL_PORT	27999
 #define SERVER_PORT		27888
 #define CLIENT_PORT 	35888
-
+int netemu_util_copy_string(char** dest, char* src);
 struct netemu_receiver_udp* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* args);
 struct netemu_sender_udp* netemu_util_prepare_sender(int port);
 struct netemu_sender_udp* netemu_util_prepare_sender_on_socket(NETEMU_SOCKET socket, int port);

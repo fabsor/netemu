@@ -5,6 +5,7 @@
  *      Author: fabian
  */
 #include "netemu_util.h"
+#include "netlib_error.h"
 #include <stdio.h>
 /**
  * @file
@@ -68,4 +69,15 @@ void netemu_util_send_data(struct netemu_sender_udp* sender, char* data) {
 	if(error < 0) {
 		//printf("Send Error: %d\n", netemu_get_last_error());
 	}
+}
+
+int netemu_util_copy_string(char** dest, char* src) {
+	int size;
+	size = sizeof(char)*strlen(src) + 1;
+	if((*dest = malloc(size)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+	strncpy(*dest, src, size);
+	return size;
 }
