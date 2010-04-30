@@ -117,6 +117,7 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 	info->user = user;
 	info->emulator_name = emulator_name;
 	info->current_game = NULL;
+	info->username = user;
 	info->_internal = malloc(sizeof(struct _netemu_info_internal));
 	info->_internal->chat_callback = netemu_list_new(3, FALSE);
 	info->_internal->game_created_callback = netemu_list_new(3, FALSE);

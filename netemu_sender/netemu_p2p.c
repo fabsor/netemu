@@ -44,6 +44,8 @@ void netemu_p2p_new_connection(struct netemu_tcp_listener* listener, struct nete
 	struct netemu_p2p_connection *p2p;
 	p2p = (struct netemu_p2p_connection*)params;
 	netemu_sender_collection_add_tcp_sender(p2p->_internal->peers, connection);
+	netemu_tcp_connection_start_receiving(connection);
+	netemu_tcp_connection_register_recv_fn(connection,netemu_tcp_connection_receive,p2p->info);
 
 }
 
@@ -51,6 +53,7 @@ void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in
 	p2p->_internal->host = netemu_tcp_listener_new(netemu_prepare_net_addr(addr),addr_size);
 	p2p->cloud_name = cloudname;
 	netemu_tcp_listener_register_new_connection_fn(p2p->_internal->host,netemu_p2p_new_connection,p2p);
+	netemu_tcp_listener_start_listening(p2p->_internal->host);
 }
 /**
  * Connect to a host.

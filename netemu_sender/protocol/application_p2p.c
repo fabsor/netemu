@@ -142,7 +142,7 @@ int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETEMU_BOOL parse_user) {
 	int pos;
 	memcpy(&user->addr_size, buffer, sizeof(size_t));
-	pos += sizeof(size_t);
+	pos = sizeof(size_t);
 	memcpy(user->addr, buffer, user->addr_size);
 	pos = sizeof(netemu_sockaddr);
 	memcpy(&user->connection, buffer+pos, sizeof(char));
@@ -172,10 +172,11 @@ void netemu_application_p2p_login_request_add(struct application_instruction *in
 	struct p2p_user *user;
 	int size;
 	user = malloc(sizeof(struct p2p_user));
-	user->addr = memcpy(&user->addr,addr,addr_size);
-	size += sizeof(struct p2p_user) + sizeof(size_t);
+	user->addr = malloc(addr_size);
+	memcpy(user->addr,addr,addr_size);
+	size = addr_size + sizeof(size_t);
 	netemu_util_copy_string(&instruction->user,username);
-	user->addr_size = addr;
+	user->addr_size = addr_size;
 	user->name = NULL;
 	user->connection = connection;
 	size += netemu_util_copy_string(&user->app_name,appname);
@@ -184,7 +185,7 @@ void netemu_application_p2p_login_request_add(struct application_instruction *in
 	instruction->body = user;
 	instruction->id = P2P_LOGIN_REQUEST;
 	instruction->body_size = size;
-	instruction->packBodyFn = NULL;
+	instruction->packBodyFn = netemu_application_p2p_login_request_pack;
 }
 
 void netemu_application_p2p_login_request_pack(struct application_instruction *instruction, char* buffer) {

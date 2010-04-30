@@ -11,6 +11,7 @@
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application.h"
+#include "application_p2p.h"
 #include "netlib_error.h"
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
@@ -93,6 +94,9 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			break;
 		case START_GAME:
 			netemu_application_start_game_parse(app_instruction, data);
+			break;
+		case P2P_LOGIN_REQUEST:
+			netemu_application_p2p_login_request_parse(app_instruction, data);
 			break;
 			
 	}
