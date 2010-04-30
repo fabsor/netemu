@@ -4,8 +4,9 @@
  *  Created on: 27 apr 2010
  *      Author: fabian
  */
-
-#include "netemu_server_connection.h"
+#include "interface/netemu_kaillera.h"
+#include "interface/netemu.h"
+#include "netemu_info.h"
 #include "netemu_list.h"
 
 int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable);
@@ -62,7 +63,8 @@ int netemu_register_play_values_received_callback(struct netemu_info *connection
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
 		return -1;
 	}
-	fn->valuesReceivedFn = callback;
+
+	fn->values_received_fn = callback;
 	netemu_register_callback(connection->_internal->play_values_callback, fn, 0);
 	return 0;
 }
