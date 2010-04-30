@@ -128,7 +128,7 @@ int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 	int pos;
 	memcpy(buffer,&user->addr_size, sizeof(size_t));
 	pos = sizeof(size_t);
-	memcpy(buffer, &user->addr, sizeof(netemu_sockaddr));
+	memcpy(buffer+pos, &user->addr, sizeof(netemu_sockaddr));
 	pos = sizeof(netemu_sockaddr);
 	memcpy(buffer+pos, &user->connection, sizeof(char));
 	pos++;
@@ -144,7 +144,7 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 	int pos;
 	memcpy(&user->addr_size, buffer, sizeof(size_t));
 	pos = sizeof(size_t);
-	memcpy(user->addr, buffer, user->addr_size);
+	memcpy(user->addr, buffer+pos, user->addr_size);
 	pos = sizeof(netemu_sockaddr);
 	memcpy(&user->connection, buffer+pos, sizeof(char));
 	pos++;
