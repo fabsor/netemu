@@ -1,0 +1,9 @@
+#!/bin/bash
+cd netlib/Debug/
+make clean && make
+cd ../../netemu_sender/Debug/
+make clean && make
+cd ../../testemu/Debug/
+make clean && make
+cd ../../netemu_ui/Debug/
+make clean && make

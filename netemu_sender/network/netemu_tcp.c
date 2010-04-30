@@ -157,6 +157,7 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 	sender->addr = bind_addr;
 	sender->socket = socket;
 	sender->listening = 0;
+	sender->listener_fn = NULL;
 	return sender;
 }
 

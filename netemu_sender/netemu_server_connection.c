@@ -1,6 +1,7 @@
 ﻿
 #include <stdio.h>
-#include "netemu_server_connection.h"
+#include "netemu_info.h"
+#include "interface/netemu_kaillera.h"
 #include "protocol/application.h"
 #include "netemu_resources.h"
 #include "network/netemu_packet_buffer.h"
@@ -25,7 +26,7 @@ void _server_connection_add_user_struct(struct netemu_info* info, struct user *u
 
 
 int netemu_send_chat_message(struct netemu_info *info, char *message) {
-	/*TODO: Implemen chat message! */
+	/*TODO: Implement chat message! */
 	/*
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
@@ -39,7 +40,6 @@ int netemu_disconnect(struct netemu_info *info, char *message) {
 	struct application_instruction *messages[1];
 
 	client = netemu_resources_get_client();
-	client->sender->addr = info->addr;
 	messages[0] = netemu_application_create_message();
 	netemu_application_user_leave_add(messages[0], message);
 	buffer = netemu_transport_pack(messages,1);
@@ -47,7 +47,7 @@ int netemu_disconnect(struct netemu_info *info, char *message) {
 }
 
 
-int netemu_create_game(struct netemu_info *info, char *gamename, struct game** result) {
+int netemu_kaillera_create_game(struct netemu_info *info, char *gamename, struct game** result) {
 	time_t timestamp;
 	struct application_instruction *message, *reply;
 
@@ -61,7 +61,7 @@ int netemu_create_game(struct netemu_info *info, char *gamename, struct game** r
 	return 1;
 }
 
-void netemu_create_game_async(struct netemu_info *info, char *gamename, gameCreatedFn callback) {
+void netemu_kaillera_create_game_async(struct netemu_info *info, char *gamename, kailleraGameCreatedFn callback) {
 	time_t timestamp;
 	struct application_instruction *message;
 	union callback_fn *fn;
@@ -117,8 +117,7 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 	info->user = user;
 	info->emulator_name = emulator_name;
 	info->current_game = NULL;
-	info->has_id = 0;
-	info->_internal = malloc(sizeof(struct _server_connection_internal));
+	info->_internal = malloc(sizeof(struct _netemu_info_internal));
 	info->_internal->chat_callback = netemu_list_new(3, FALSE);
 	info->_internal->game_created_callback = netemu_list_new(3, FALSE);
 	info->_internal->join_callback = netemu_list_new(3, FALSE);
@@ -161,7 +160,7 @@ int server_connection_login(struct netemu_info* info) {
 }
 
 
-int netemu_join_game(struct netemu_info *info, NETEMU_DWORD gameid) {
+int netemu_kaillera_join_game(struct netemu_info *info, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
 	time_t timestamp;
 	message = netemu_application_create_message();
@@ -233,7 +232,7 @@ void _server_connection_add_user_struct(struct netemu_info* info, struct user *u
 	}
 }
 
-struct game** netemu_get_game_list(struct netemu_info* info, int *count) {
+struct game** netemu_kaillera_get_game_list(struct netemu_info* info, int *count) {
 	struct game** games;
 	netemu_list_copy(info->_internal->games,&games);
 	*count = info->_internal->games->count;

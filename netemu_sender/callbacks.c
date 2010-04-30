@@ -4,8 +4,9 @@
  *  Created on: 27 apr 2010
  *      Author: fabian
  */
-
-#include "netemu_server_connection.h"
+#include "interface/netemu_kaillera.h"
+#include "interface/netemu.h"
+#include "netemu_info.h"
 #include "netemu_list.h"
 
 int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable);

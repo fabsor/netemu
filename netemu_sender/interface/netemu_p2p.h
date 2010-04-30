@@ -21,21 +21,21 @@ struct p2p_player {
 	struct player* player_info;
 };
 
-struct netemu_p2p {
-	struct netemu_tcp_listener *host;
-	struct netemu_tcp_connection **connections;
-	struct netemu_info *info;
+struct netemu_p2p_connection {
+	struct netemu_info* info;
 	netemu_p2p_internal _internal;
 	char* cloud_name;
 };
 
-struct netemu_p2p* netemu_p2p_new(char* username, char* emulatorname);
+struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname);
 
-int netemu_p2p_connect(struct netemu_p2p* p2p, struct netemu_sockaddr_in *addr, int addr_size);
+int netemu_p2p_connect(struct netemu_p2p_connection* p2p, struct netemu_sockaddr_in *in_addr, int in_addr_size,  struct netemu_sockaddr_in *connect_addr, int connect_addr_size);
 
-void netemu_p2p_host(struct netemu_p2p* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname);
+void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname);
 
 int netemu_p2p_create_game(struct netemu_info *connection, char *gamename, struct game** result);
+
+void netemu_p2p_login(struct netemu_p2p_connection *p2p);
 
 #ifdef	__cplusplus
 }
