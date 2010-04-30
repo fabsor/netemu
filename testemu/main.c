@@ -87,7 +87,7 @@ void host_p2p(struct netemu_sockaddr_in addr) {
 	struct netemu_p2p_connection *p2p;
 	printf("Enter Port Number:\n");
 	scanf("%d",&port);
-	addr.port = port;
+	addr.port = netemu_htons(port);
 	printf("\n");
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	netemu_p2p_host(p2p, &addr,sizeof(addr),CLOUD_NAME);
@@ -108,12 +108,12 @@ void connect_p2p() {
 
 	printf("Enter Port Number for you:\n");
 	scanf("%d",&port);
-	in_addr.port = port;
+	in_addr.port = netemu_htons(port);
 	printf("\n");
 
 	printf("Enter Port Number to the host:\n");
 	scanf("%d",&port);
-	out_addr.port = port;
+	out_addr.port = netemu_htons(port);
 	printf("\n");
 
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);

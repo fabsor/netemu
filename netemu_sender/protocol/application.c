@@ -98,7 +98,6 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case P2P_LOGIN_REQUEST:
 			netemu_application_p2p_login_request_parse(app_instruction, data);
 			break;
-			
 	}
 
 	return app_instruction;

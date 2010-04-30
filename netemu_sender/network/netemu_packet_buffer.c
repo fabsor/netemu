@@ -26,6 +26,7 @@ struct _netemu_packet_buffer_internal {
 	netemu_mutex fn_mutex;
 	NETEMU_HASHTBL *registered_wakeups;
 	NETEMU_HASHTBL *registered_fns;
+	netemu_event event;
 };
 
 
@@ -45,6 +46,7 @@ struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 	buffer->_internal->wakeup_mutex = netemu_thread_mutex_create();
 	buffer->_internal->fn_mutex = netemu_thread_mutex_create();
 	buffer->_internal->instructions_to_add = netemu_list_new(20, TRUE);
+	buffer->_internal->event = netemu_thread_event_create();
 	netemu_thread_new(_netemu_packet_buffer_update,buffer);
 	return buffer;
 }
@@ -53,9 +55,9 @@ struct netemu_packet_buffer *netemu_packet_buffer_new(hash_size size) {
 void netemu_packet_buffer_add(struct netemu_packet_buffer *buffer, struct application_instruction *instruction) {
 	netemu_thread_mutex_lock(buffer->_internal->add_mutex, NETEMU_INFINITE);
 	netemu_list_add(buffer->_internal->instructions_to_add, instruction);
+	netemu_thread_event_signal(buffer->_internal->event);
 	netemu_thread_mutex_release(buffer->_internal->add_mutex);
 }
-
 
 void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffer *buffer, char instruction, bufferListenerFn fn, void* arg) {
 	struct _netemu_packet_buffer_notify_info *info, *existing_info;
@@ -90,6 +92,9 @@ void _netemu_packet_buffer_update(void* args) {
 	lock = buffer->_internal->add_mutex;
 
 	while(1) {
+		if(itemsToAdd->count == 0) {
+			netemu_thread_event_wait(buffer->_internal->event);
+		}
 		if(itemsToAdd->count > 0) {
 			netemu_thread_mutex_lock(lock,NETEMU_INFINITE);
 			/* We copy the contents of the array here in order to not lock the list longer than necessary. */

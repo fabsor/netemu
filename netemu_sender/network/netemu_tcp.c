@@ -19,14 +19,15 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	struct netemu_tcp_connection* sender;
 	sender = malloc(sizeof(struct netemu_tcp_connection));
 	socket = netemu_socket(NETEMU_AF_INET, NETEMU_SOCK_STREAM);
-	if (socket == INVALID_SOCKET) {
-		//sender->error = netemu_get_last_error();
+	if (socket == NETEMU_INVALID_SOCKET) {
+		sender->error = netlib_get_last_error();
 	}
 	sender->addr_len = addr_len;
 	sender->addr = addr;
 	sender->socket = socket;
 	sender->listening = 0;
 	sender->receiver_fn = NULL;
+	sender->buffer_size = 512;
 	return sender;
 }
 
@@ -39,6 +40,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET 
 	sender->listening = 0;
 	sender->receiver_fn = NULL;
 	sender->socket = socket;
+	sender->buffer_size = 512;
 	return sender;
 }
 
@@ -106,10 +108,13 @@ void _netemu_tcp_connection_recv(void* params) {
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
-		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
+		error = netemu_recv(receiver->socket, buffer, receiver->buffer_size, 0);
 		if (error == -1) {
 			//receiver->error = netemu_get_last_error();
 			netemu_thread_mutex_release(receiver->lock);
+			break;
+		}
+		else if (error == 0) {
 			break;
 		}
 		_netemu_tcp_connection_notify(receiver, buffer, error);
@@ -150,7 +155,7 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 	struct netemu_tcp_listener* sender;
 	sender = malloc(sizeof(struct netemu_tcp_listener));
 	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_STREAM);
-	if (socket == INVALID_SOCKET) {
+	if (socket == NETEMU_INVALID_SOCKET) {
 		//sender->error = netemu_get_last_error();
 	}
 	sender->addr_len = addr_len;
@@ -169,7 +174,6 @@ void _netemu_tcp_listener_listen(void* params) {
 	struct netemu_tcp_connection *connection;
 	NETEMU_SOCKET socket;
 	netemu_sockaddr *addr;
-
 	receiver = (struct netemu_tcp_listener*)params;
 	error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if(error == -1) {
@@ -180,10 +184,7 @@ void _netemu_tcp_listener_listen(void* params) {
 		error = netlib_get_last_error();
 	}
 	while (1) {
-		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
-		addr = malloc(sizeof(netemu_sockaddr));
-		addr_len = sizeof(netemu_sockaddr);
-		socket = netemu_accept(receiver->socket,addr,&addr_len);
+		socket = netemu_accept_inet(receiver->socket,&addr,&addr_len);
 		if (socket == NETEMU_INVALID_SOCKET) {
 			free(addr);
 			//receiver->error = netemu_get_last_error();

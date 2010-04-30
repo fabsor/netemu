@@ -31,7 +31,7 @@ struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int a
 	receiver->addr_len = addr_len;
 	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
 	receiver->receiver_fn = NULL;
-	if(receiver->socket == INVALID_SOCKET) {
+	if(receiver->socket == NETEMU_INVALID_SOCKET) {
 		//receiver->error = netemu_get_last_error();
 
 	}

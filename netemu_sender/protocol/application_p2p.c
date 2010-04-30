@@ -204,6 +204,13 @@ void netemu_application_p2p_user_join_add(struct application_instruction *instru
 
 }
 
+void netemu_application_p2p_ready_add(struct application_instruction *instruction) {
+	instruction->body = NULL;
+	instruction->id = P2P_READY;
+	instruction->body_size = 0;
+	instruction->packBodyFn = NULL;
+}
+
 void netemu_application_p2p_kick_player_add(struct application_instruction *instruction, char* player_name) {
 	struct p2p_kick_player *kick;
 	int size;

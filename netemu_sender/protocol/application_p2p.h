@@ -17,7 +17,7 @@ extern "C" {
 #define KICK_P2P_PLAYER 	27
 #define P2P_LOGIN_SUCCESS	28
 #define P2P_LOGIN_REQUEST	29
-
+#define P2P_READY			30
 #include "application.h"
 #include "../netemu_util.h"
 
@@ -74,6 +74,8 @@ void netemu_application_p2p_login_request_pack(struct application_instruction *i
 void netemu_application_p2p_login_request_parse(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_p2p_login_request_add(struct application_instruction *instruction, netemu_sockaddr *addr, size_t addr_size, char* username, char* appname, int connection);
+
+void netemu_application_p2p_ready_add(struct application_instruction *instruction);
 #ifdef	__cplusplus
 }
 #endif
