@@ -11,7 +11,9 @@ extern "C" {
 #endif
 
 #include "../protocol/application.h"
+#include "../protocol/communication.h"
 #include "netemu_socket.h"
+
 typedef struct _server_connection_internal *server_connection_internal;
 typedef void (* chatFn)(char *user, char *message);
 typedef void (* joinFn)(char *user);

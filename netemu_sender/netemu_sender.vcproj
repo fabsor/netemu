@@ -49,6 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				EnablePREfast="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -210,11 +211,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_sender.c"
+				RelativePath=".\network\netemu_sender_buffer.c"
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_sender_buffer.c"
+				RelativePath=".\network\netemu_sender_collection.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_sender_udp.c"
 				>
 			</File>
 			<File
@@ -276,6 +281,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\interface\netemu_kaillera.h"
+				>
+			</File>
+			<File
+				RelativePath=".\interface\netemu_p2p.h"
+				>
+			</File>
+			<File
 				RelativePath=".\network\netemu_packet_buffer.h"
 				>
 			</File>
@@ -288,11 +301,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_sender.h"
+				RelativePath=".\network\netemu_sender_buffer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_sender_buffer.h"
+				RelativePath=".\network\netemu_sender_collection.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_sender_udp.h"
 				>
 			</File>
 			<File
