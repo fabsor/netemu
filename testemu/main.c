@@ -45,11 +45,12 @@ void connect_async(struct netemu_sockaddr_in addr);
 void server_connect(struct netemu_sockaddr_in addr);
 void game_created(struct game* game);
 void host_p2p(struct netemu_sockaddr_in addr);
-void connect_p2p(struct netemu_sockaddr_in addr);
+void connect_p2p();
+
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
-	//mtrace();
+	  //mtrace();
 	info = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
@@ -69,7 +70,7 @@ int main() {
 			server_connect(addr);
 		break;
 		case '3':
-			connect_p2p(addr);
+			connect_p2p();
 		break;
 		case '4':
 			host_p2p(addr);
@@ -83,7 +84,7 @@ int main() {
 
 void host_p2p(struct netemu_sockaddr_in addr) {
 	int port;
-	struct netemu_p2p *p2p;
+	struct netemu_p2p_connection *p2p;
 	printf("Enter Port Number:\n");
 	scanf("%d",&port);
 	addr.port = port;
@@ -93,15 +94,31 @@ void host_p2p(struct netemu_sockaddr_in addr) {
 	info = p2p->info;
 }
 
-void connect_p2p(struct netemu_sockaddr_in addr) {
+void connect_p2p() {
 	int port;
-	struct netemu_p2p *p2p;
-	printf("Enter Port Number:\n");
+	struct netemu_sockaddr_in in_addr;
+	struct netemu_sockaddr_in out_addr;
+	struct netemu_p2p_connection *p2p;
+
+	in_addr.addr = ADDR;
+	in_addr.family = NETEMU_AF_INET;
+
+	out_addr.addr = ADDR;
+	out_addr.family = NETEMU_AF_INET;
+
+	printf("Enter Port Number for you:\n");
 	scanf("%d",&port);
-	addr.port = port;
+	in_addr.port = port;
 	printf("\n");
+
+	printf("Enter Port Number to the host:\n");
+	scanf("%d",&port);
+	out_addr.port = port;
+	printf("\n");
+
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
-	netemu_p2p_connect(p2p,&addr,sizeof(addr));
+	netemu_p2p_connect(p2p,&in_addr,sizeof(in_addr),&out_addr,sizeof(out_addr));
+	//struct netemu_p2p_connection* p2p, struct netemu_sockaddr_in *in_addr, int in_addr_size,  struct netemu_sockaddr_in *connect_addr, int connect_addr_size
 	info = p2p->info;
 }
 
@@ -165,13 +182,13 @@ void send_play_values(struct netemu_info *connection) {
 void create_game(struct netemu_info* connection) {
 	struct game *result;
 	printf("Creating game\n");
-	netemu_create_game_async(connection,games[0],game_created);
+	netemu_kaillera_create_game_async(connection,games[0],game_created);
 }
 
 void show_game_list(struct netemu_info* connection) {
 	int no_games, i;
 	struct game **games;
-	games = netemu_get_game_list(connection, &no_games);
+	games = netemu_kaillera_get_game_list(connection, &no_games);
 
 	for(i = 0; i < no_games; i++) {
 		if(games[i]->name != NULL) {
@@ -211,8 +228,8 @@ void player_ready(struct netemu_info *connection) {
 void join_game(struct netemu_info* connection) {
 	struct game** list;
 	int count;
-	list = netemu_get_game_list(connection,&count);
+	list = netemu_kaillera_get_game_list(connection,&count);
 	if(count > 0) {
-		netemu_join_game(connection,list[0]->id);
+		netemu_kaillera_join_game(connection,list[0]->id);
 	}
 }

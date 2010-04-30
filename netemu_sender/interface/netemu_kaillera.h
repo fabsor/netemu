@@ -12,24 +12,23 @@ extern "C" {
 
 #include "../protocol/application.h"
 #include "../protocol/communication.h"
+#include "netemu.h"
 #include "netemu_socket.h"
 
-typedef struct _server_connection_internal *server_connection_internal;
-typedef void (* chatFn)(char *user, char *message);
-typedef void (* joinFn)(char *user);
-typedef void (* leaveFn)(char *user);
+typedef void (* kailleraGameCreatedFn)(struct game* new_game);
+typedef void (* kailleraPlayerJoinFn)(struct player_joined *result);
+
 typedef void (* gameCreatedFn)(struct game* new_game);
 typedef void (* playerJoinFn)(struct player_joined *result);
-typedef void (* valuesReceivedFn)(struct buffered_play_values *result);
 
 /* We must store the function pointers in structs since ISO C99 does not allow void* to be typecasted to function pointers. */
 union callback_fn {
 	chatFn chat_fn;
 	joinFn join_fn;
 	leaveFn leave_fn;
-	gameCreatedFn game_created_fn;
-	playerJoinFn player_join_fn;
-	valuesReceivedFn valuesReceivedFn;
+	kailleraGameCreatedFn game_created_fn;
+	kailleraPlayerJoinFn player_join_fn;
+	valuesReceivedFn values_received_fn;
 };
 
 struct callback {
@@ -37,16 +36,8 @@ struct callback {
 	union callback_fn *fn;
 };
 
-struct netemu_info {
-	struct netemu_sockaddr_in *addr;
-	struct user* user;
-	int game_count;
-	int user_count;
-	char *emulator_name;
-	struct game *current_game;
-	char has_id;
-	NETEMU_WORD player_id;
-	server_connection_internal _internal;
+struct netemu_kaillera_connection {
+	struct netemu_info *info;
 };
 
 typedef struct server kaillera_server;
@@ -78,15 +69,15 @@ int netmeu_unregister_user_leave_callback(struct netemu_info *connection, leaveF
 
 int netemu_disconnect(struct netemu_info *connection, char *message);
 
-int netemu_create_game(struct netemu_info *connection, char *gamename, struct game** result);
+int netemu_kaillera_create_game(struct netemu_info *connection, char *gamename, struct game** result);
 
-void netemu_create_game_async(struct netemu_info *connection, char *gamename, gameCreatedFn fn);
+void netemu_kaillera_create_game_async(struct netemu_info *connection, char *gamename, kailleraGameCreatedFn fn);
 
-int netemu_game_created_callback(struct netemu_info *connection, gameCreatedFn);
+int netemu_kaillera_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn);
 
-int netemu_join_game(struct netemu_info *connection, NETEMU_DWORD gameid);
+int netemu_kaillera_join_game(struct netemu_info *connection, NETEMU_DWORD gameid);
 
-struct game** netemu_get_game_list(struct netemu_info* connection, int *count);
+struct game** netemu_kaillera_get_game_list(struct netemu_info* connection, int *count);
 
 int netemu_send_player_ready(struct netemu_info *connection);
 

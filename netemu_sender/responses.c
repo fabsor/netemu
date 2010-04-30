@@ -5,9 +5,10 @@
  *      Author: fabian
  */
 
-#include "netemu_server_connection.h"
+#include "netemu_info.h"
 #include "responses.h"
 #include "netemu_list.h"
+#include "interface/netemu_kaillera.h"
 
 void _netemu_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
 	struct login_success *accepted;
@@ -100,9 +101,9 @@ void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct ap
 
 	/* If signed_in is 0, we have just logged on to the server and
 	 * have to assume that this user_joined instruction refers to our local player */
-	if(!connection->has_id) {
+	if(!connection->_internal->has_id) {
 		connection->player_id = joined->id;
-		connection->has_id = 1;
+		connection->_internal->has_id = 1;
 	}
 
 	server_connection_add_user(connection, joined->id, joined->connection, instruction->user);
@@ -170,7 +171,7 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
 	for(i = 0; i < callbacks->count; i++) {
-		((struct callback*)callbacks->elements[i])->fn->valuesReceivedFn(values);
+		((struct callback*)callbacks->elements[i])->fn->values_received_fn(values);
 	}
 }
 

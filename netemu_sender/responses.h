@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#include "netemu_server_connection.h"
+#include "netemu_info.h"
 
 void _netemu_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 void _netemu_respond_to_ping(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);

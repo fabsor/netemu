@@ -46,7 +46,7 @@ void mainwindow::refreshServerList()
 		
 		portchars = servers[i]->address + strlen(address);
 		//netemu_sender_udp *sender = netemu_sender_udp_new
-		netemu_communication_ping_server(servers[i], NULL);
+		//netemu_communication_ping_server(servers[i], NULL);
 	}
 }
 

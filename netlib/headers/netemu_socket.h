@@ -173,7 +173,7 @@ typedef unsigned int NETEMU_SOCKET;
 		int ai_protocol;    /* 0 or IPPROTO_xxx for IPv4 and IPv6 */
 		size_t addrlen;
 		char* hostname;
-		struct netemu_sockaddr* addr;
+		netemu_sockaddr* addr;
 		struct netemu_addrinfo* next;
 	};
 

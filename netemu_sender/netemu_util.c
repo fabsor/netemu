@@ -81,3 +81,24 @@ int netemu_util_copy_string(char** dest, char* src) {
 	strncpy(*dest, src, size);
 	return size;
 }
+
+char* netemu_util_parse_string(char* data) {
+	int str_len;
+	char* string;
+
+	str_len = strlen(data)+1;
+	if((string = malloc(str_len)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
+	strncpy(string, data, str_len);
+
+	return string;
+}
+
+int netemu_util_pack_str(char* buffer, char* str) {
+	int size;
+	size = sizeof(char)*(strlen(str)+1);
+	memcpy(buffer,(void*)str,size);
+	return size;
+}
