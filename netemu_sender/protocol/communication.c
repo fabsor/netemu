@@ -18,6 +18,7 @@
 #define HTTP_BUFFER_SIZE			512
 #define HTTP_HEADER_END				"\r\n\r\n"
 #define GAME_STRING_SEPARATOR		'|'
+#define PARSE_STRING_MAX_LENGTH		512
 
 struct _server_internal {
 	struct netemu_sender_udp *sender;
@@ -328,11 +329,21 @@ char *_netemu_parse_response_string(char *input, char **output, char terminator)
 	char *string;
 
 	string_length = 0;
-	while(input[string_length] != terminator)
-		string_length++;
+	/* Search forward in the memory block for the terminator string
+	 * The loop will break if we have reached the end of the string, denoted by a null byte.*/
+	while(input[string_length] != terminator && 
+		input[string_length] != '\0') {
+			string_length++;
+	}
+
+	/* If we reached the end of the string instead of the terminating character,
+	 * the master server returned an invalid response and we need to return NULL */
+	if(input[string_length] == '\0')
+		return NULL;
+		
 
 	if((*output = (char*)malloc(string_length + 1)) == NULL) {
-		return -1;
+		return NULL;
 	}
 
 	memcpy(*output, input, string_length);
