@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 #include "protocol/communication.h"
-#include "netemu_server_connection.h"
+#include "netemu_info.h"
 #include "network/netemu_tcp.h"
 #include "netemu_resources.h"
 #include "network/netemu_sender_udp.h"

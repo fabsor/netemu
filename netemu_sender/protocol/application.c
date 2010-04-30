@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "../netemu_util.h"
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application.h"
