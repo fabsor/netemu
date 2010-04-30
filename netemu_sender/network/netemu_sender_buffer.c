@@ -12,6 +12,7 @@
 
 #include "netemu_sender_buffer.h"
 void _netemu_sender_buffer_update(void* arg);
+void netemu_sender_buffer_send(struct netemu_sender_buffer *buffer, char* data, int size);
 
 struct netemu_sender_buffer* netemu_sender_buffer_new(netemu_sender_buffer_types type, union netemu_sender_buffer_type *sender, const short preferred_no_packets,
 		const short preferred_delay_time) {

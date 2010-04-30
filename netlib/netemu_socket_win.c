@@ -146,7 +146,6 @@ int netemu_closesocket(NETEMU_SOCKET socket) {
 int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
 	PADDRINFOA addrinfo = NULL;
 	int errcode;
-	int wsa_error_code;
 	struct netemu_addrinfo *result_addrinfo;
 	struct addrinfo info_hints;
 
@@ -164,10 +163,10 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	if(errcode != 0) {
 		/* If a memory error occured, we map it to our general out-of-memory error code for consistency, 
 		 * otherwise, we just use the WSA error code directly */
-		if(wsa_error_code == WSA_NOT_ENOUGH_MEMORY) 
+		if(errcode == WSA_NOT_ENOUGH_MEMORY) 
 			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		else
-			netlib_set_last_error(wsa_error_code);
+			netlib_set_last_error(errcode);
 		
 		return -1;
 	}

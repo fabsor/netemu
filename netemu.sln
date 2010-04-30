@@ -14,6 +14,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testemu", "testemu\testemu.
 		{499FDDFB-DBAD-4BD4-8AD5-23C5D91C0E95} = {499FDDFB-DBAD-4BD4-8AD5-23C5D91C0E95}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "netemu_ui", "netemu_ui\netemu_ui.vcproj", "{6BE836B5-644A-30EF-8924-9C5CC359FB50}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B2DF332F-DC5E-4525-B881-56B9899E74EF} = {B2DF332F-DC5E-4525-B881-56B9899E74EF}
+		{499FDDFB-DBAD-4BD4-8AD5-23C5D91C0E95} = {499FDDFB-DBAD-4BD4-8AD5-23C5D91C0E95}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -32,6 +38,10 @@ Global
 		{45574F3A-85E8-4787-B376-FA8F8B7FE4C3}.Debug|Win32.Build.0 = Debug|Win32
 		{45574F3A-85E8-4787-B376-FA8F8B7FE4C3}.Release|Win32.ActiveCfg = Release|Win32
 		{45574F3A-85E8-4787-B376-FA8F8B7FE4C3}.Release|Win32.Build.0 = Release|Win32
+		{6BE836B5-644A-30EF-8924-9C5CC359FB50}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6BE836B5-644A-30EF-8924-9C5CC359FB50}.Debug|Win32.Build.0 = Debug|Win32
+		{6BE836B5-644A-30EF-8924-9C5CC359FB50}.Release|Win32.ActiveCfg = Release|Win32
+		{6BE836B5-644A-30EF-8924-9C5CC359FB50}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,7 @@
 #define COMMUNICATION_H_
 
 #include "netemu_socket.h"
+#include "netlib_util.h"
 
 enum {
 	CONNECTION_ACCEPTED,
@@ -27,14 +28,20 @@ struct existing_game {
 	char *location;
 };
 
+typedef struct _server_internal* server_internal;
+
 struct server {
 	char *name;
 	char *address;
 	char *players;
 	int games;
+	NETEMU_DWORD ping;
 	char *version;
 	char *location;
+	server_internal _internal;
 };
+
+int netemu_communication_ping_server(struct server *server, void (* pingReceivedCallback)(struct server *server));
 
 /**
  * Create an hello message that can be sent to the server.

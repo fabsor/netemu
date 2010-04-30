@@ -11,11 +11,15 @@ extern "C" {
 #endif
 
 #include "../protocol/application.h"
+#include "../protocol/communication.h"
 #include "netemu.h"
 #include "netemu_socket.h"
 
 typedef void (* kailleraGameCreatedFn)(struct game* new_game);
 typedef void (* kailleraPlayerJoinFn)(struct player_joined *result);
+
+typedef void (* gameCreatedFn)(struct game* new_game);
+typedef void (* playerJoinFn)(struct player_joined *result);
 
 /* We must store the function pointers in structs since ISO C99 does not allow void* to be typecasted to function pointers. */
 union callback_fn {

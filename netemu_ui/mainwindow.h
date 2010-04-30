@@ -11,8 +11,13 @@ class mainwindow : public QMainWindow
 public:
     mainwindow(QWidget *parent = 0);
     ~mainwindow();
+	
+private slots:
+	void refreshServerList();
+
 
 private:
+	void createActions();
     Ui::mainwindowClass ui;
 };
 

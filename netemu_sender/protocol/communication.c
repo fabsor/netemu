@@ -13,15 +13,56 @@
 #include "netemu_socket.h"
 #include "netemu_list.h"
 #include "../structures/netemu_stringbuilder.h"
+#include <time.h>
 
 #define HTTP_BUFFER_SIZE			512
 #define HTTP_HEADER_END				"\r\n\r\n"
 #define GAME_STRING_SEPARATOR		'|'
 
+struct _server_internal {
+	struct netemu_sender_udp *sender;
+	time_t ping_timestamp;
+	void (* pingReceivedCallback)(struct server *server);
+	struct netemu_receiver *receiver;
+};
+
 int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder *builder);
 char *_netemu_parse_game_list(char *input, struct netemu_list *games);
 char *_netemu_parse_response_string(char *input, char **output, char terminator);
 char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers);
+
+int netemu_communication_ping_server(struct server *server, void (* pingReceivedCallback)(struct server *server)) {
+	struct netemu_sockaddr_in addr;
+	struct netemu_sockaddr *saddr;
+	char *address, *ip, *ping;
+	int ip_len, port_len;
+	short port;
+	/* Parse the address string into one IP string and a port int */
+	address = server->address;
+	ip_len = 0;
+	while(*address++ != ':')
+		ip_len++;
+
+	port_len = strlen(server->address) - ip_len;
+
+	ip = malloc(ip_len + 1);
+	memcpy(ip, server->address, ip_len);
+	ip[ip_len] = '\0';
+
+	port = atoi(address);
+
+	/* Connect */
+	addr.addr = netemu_inet_addr(ip);
+	addr.port = netemu_htons(port);
+	addr.family = NETEMU_AF_INET;
+	saddr = netemu_prepare_net_addr(&addr);
+	server->_internal->sender = netemu_sender_udp_new(saddr, sizeof(addr));
+
+	ping = netemu_communication_create_ping_message();
+	/* Store current time, so we can calculate roundtrip time when we receive the pong. */
+	server->_internal->ping_timestamp = time(NULL);
+	netemu_sender_udp_send(server->_internal->sender, ping, strlen(ping)+1);
+}
 
 
 char* netemu_communication_create_hello_message(char* version) {
