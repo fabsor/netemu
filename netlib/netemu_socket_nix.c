@@ -78,7 +78,6 @@ int netemu_get_last_error() {
 
 int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
 	struct addrinfo* info;
-
 	struct addrinfo info_hints;
 	struct addrinfo* info_hints_ptr;
 	struct netemu_addrinfo *addr_result, *iter;
@@ -93,7 +92,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		info_hints_ptr = &info_hints;
 	}
 	error = getaddrinfo(nodename,servicetype,info_hints_ptr,&info);
-	if(error == -1) {
+	if(error < 0) {
 		return error;
 	}
 	addr_result = malloc(sizeof(struct netemu_addrinfo));
