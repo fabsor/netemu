@@ -135,6 +135,7 @@ int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 	if(user->name != NULL)
 		pos += netemu_util_pack_str(buffer,user->name);
 
+	pos += netemu_util_pack_str(buffer+pos,user->app_name);
 	memcpy(buffer+pos,&user->ping,sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	return pos;
@@ -144,14 +145,17 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 	int pos;
 	memcpy(&user->addr_size, buffer, sizeof(size_t));
 	pos = sizeof(size_t);
+	user->addr = malloc(sizeof(user->addr_size));
 	memcpy(user->addr, buffer+pos, user->addr_size);
 	pos = sizeof(netemu_sockaddr);
 	memcpy(&user->connection, buffer+pos, sizeof(char));
 	pos++;
 	if(parse_user) {
-		user->name= netemu_util_parse_string(buffer);
+		user->name= netemu_util_parse_string(buffer+pos);
 		pos += strlen(user->name)+1;
 	}
+	user->app_name = netemu_util_parse_string(buffer+pos);
+	pos += strlen(user->app_name)+1;
 	memcpy(&user->ping, buffer+pos, sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	return pos;
