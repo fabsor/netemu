@@ -29,7 +29,7 @@ union callback_fn {
 	leaveFn leave_fn;
 	gameCreatedFn game_created_fn;
 	playerJoinFn player_join_fn;
-	valuesReceivedFn valuesReceivedFn;
+	valuesReceivedFn values_received_fn;
 };
 
 struct callback {
