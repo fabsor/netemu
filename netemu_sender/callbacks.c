@@ -63,7 +63,8 @@ int netemu_register_play_values_received_callback(struct netemu_info *connection
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
 		return -1;
 	}
-	fn->valuesReceivedFn = callback;
+
+	fn->values_received_fn = callback;
 	netemu_register_callback(connection->_internal->play_values_callback, fn, 0);
 	return 0;
 }

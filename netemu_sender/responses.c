@@ -171,7 +171,7 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
 	for(i = 0; i < callbacks->count; i++) {
-		((struct callback*)callbacks->elements[i])->fn->valuesReceivedFn(values);
+		((struct callback*)callbacks->elements[i])->fn->values_received_fn(values);
 	}
 }
 

@@ -28,7 +28,7 @@ union callback_fn {
 	leaveFn leave_fn;
 	kailleraGameCreatedFn game_created_fn;
 	kailleraPlayerJoinFn player_join_fn;
-	valuesReceivedFn valuesReceivedFn;
+	valuesReceivedFn values_received_fn;
 };
 
 struct callback {
