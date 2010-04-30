@@ -126,7 +126,8 @@ void netemu_application_p2p_login_success_pack(struct application_instruction *i
 
 int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 	int pos;
-
+	memcpy(buffer,&user->addr_size, sizeof(size_t));
+	pos = sizeof(size_t);
 	memcpy(buffer, &user->addr, sizeof(netemu_sockaddr));
 	pos = sizeof(netemu_sockaddr);
 	memcpy(buffer+pos, &user->connection, sizeof(char));
