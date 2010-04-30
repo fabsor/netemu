@@ -4,7 +4,7 @@
  */
 
 #include "netemu_tcp.h"
-
+#include "netlib_error.h"
 #define LISTEN_BACKLOG	1024
 #define BUFFER_SIZE		512
 
@@ -171,14 +171,24 @@ void _netemu_tcp_listener_listen(void* params) {
 	netemu_sockaddr *addr;
 
 	receiver = (struct netemu_tcp_listener*)params;
-	error = netemu_listen(receiver->socket,30);
+	error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
+	if(error == -1) {
+		error = netlib_get_last_error();
+	}
+	error = netemu_listen(receiver->socket,5);
+	if(error == -1) {
+		error = netlib_get_last_error();
+	}
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		addr = malloc(sizeof(netemu_sockaddr));
-		socket = netemu_accept(socket,addr,&addr_len);
-		if (socket == -1) {
+		addr_len = sizeof(netemu_sockaddr);
+		socket = netemu_accept(receiver->socket,addr,&addr_len);
+		if (socket == NETEMU_INVALID_SOCKET) {
+			free(addr);
 			//receiver->error = netemu_get_last_error();
 			/*Do something interesting here.*/
+			error = netlib_get_last_error();
 		}
 		else {
 			connection = netemu_tcp_connection_new_on_socket(socket,addr,addr_len);
