@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../emu32.png</normaloff>
+    <normalon>../../../emu32.png</normalon>../../../emu32.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
@@ -112,7 +117,17 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="buttonConnectServerIP">
+            <property name="text">
+             <string>Connect to IP ...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="buttonServerConnect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Connect</string>
             </property>
@@ -128,7 +143,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QTableWidget" name="tableServers_2">
+         <widget class="QTableWidget" name="tableClouds">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
@@ -198,7 +213,17 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="buttonConnectCloudIP">
+            <property name="text">
+             <string>Connect to IP ...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="buttonCloudConnect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Connect</string>
             </property>
@@ -214,7 +239,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QTableWidget" name="tableServers_3">
+         <widget class="QTableWidget" name="tableRecent">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
@@ -261,6 +286,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="buttonRecentConnect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Connect</string>
             </property>
@@ -276,7 +304,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QTableWidget" name="tableServers_4">
+         <widget class="QTableWidget" name="tableFavorites">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
@@ -330,6 +358,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="buttonFavoritesRemove">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Remove</string>
             </property>
@@ -337,6 +368,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="buttonFavoritesConnect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Connect</string>
             </property>
@@ -352,7 +386,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
-         <widget class="QTableWidget" name="tableServers_5">
+         <widget class="QTableWidget" name="tableGames">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
@@ -463,13 +497,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="buttonConnectIP">
-          <property name="text">
-           <string>Connect to IP...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="buttonAbout">
           <property name="text">
            <string>About</string>
@@ -514,7 +541,7 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionSettings_2"/>
+    <addaction name="actionSettings_1"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -536,7 +563,7 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionSettings_2">
+  <action name="actionSettings_1">
    <property name="text">
     <string>Settings...</string>
    </property>

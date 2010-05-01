@@ -38,12 +38,12 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void _kaillera_communication_login(struct communication_callback *callback);
 
-int kaillera_communication_get_server_list(struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount) {
+int kaillera_communication_get_server_list(const char *address, struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount) {
 	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
 	char* request;
 
-	netemu_get_addr_info(DOMAIN,"80",NULL,&info);
+	netemu_get_addr_info(address,"80",NULL,&info);
 	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
 	netemu_tcp_connection_connect(sender);
 	request = netemu_communication_http_get(SERVER,PATH);
