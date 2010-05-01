@@ -1,10 +1,10 @@
 #include "mainwindow.h"
-#include "preferencesdialog.h"
+#include "settingsdialog.h"
 #include "netemu_kaillera.h"
 
 using namespace std;
 
-mainwindow::mainwindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
 	ui.setupUi(this);
@@ -17,7 +17,7 @@ mainwindow::mainwindow(QWidget *parent)
 }
 
 
-void mainwindow::refreshServerList()
+void MainWindow::refreshServerList()
 {
 	struct server mo;
 	struct server **servers;
@@ -54,36 +54,36 @@ void mainwindow::refreshServerList()
 	}
 }
 
-void mainwindow::showPreferences()
+void MainWindow::showPreferences()
 {
-	preferencesdialog dialog(this);
+	SettingsDialog dialog(this);
 	//dialog.show();
 	dialog.exec();
 }
 
-void mainwindow::tableServersItemChanged()
+void MainWindow::tableServersItemChanged()
 {
 	ui.buttonServerConnect->setEnabled(ui.tableServers->selectedItems().count() > 0);
 }
 
-void mainwindow::tableCloudsItemChanged()
+void MainWindow::tableCloudsItemChanged()
 {
 	ui.buttonCloudConnect->setEnabled(ui.tableClouds->selectedItems().count() > 0);
 }
 
-void mainwindow::tableRecentItemChanged()
+void MainWindow::tableRecentItemChanged()
 {
 	ui.buttonRecentConnect->setEnabled(ui.tableRecent->selectedItems().count() > 0);
 }
 
-void mainwindow::tableFavoritesItemChanged()
+void MainWindow::tableFavoritesItemChanged()
 {
 	bool itemsSelected = ui.tableFavorites->selectedItems().count() > 0;
 	ui.buttonFavoritesConnect->setEnabled(itemsSelected);
 	ui.buttonFavoritesRemove->setEnabled(itemsSelected);
 }
 
-void mainwindow::createActions()
+void MainWindow::createActions()
 {
 	connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
 	connect(ui.buttonServerRefresh, SIGNAL(clicked()), this, SLOT(refreshServerList()));
@@ -94,7 +94,7 @@ void mainwindow::createActions()
 	connect(ui.actionSettings_1, SIGNAL(triggered()), this, SLOT(showPreferences()));
 }
 
-mainwindow::~mainwindow()
+MainWindow::~MainWindow()
 {
 
 }

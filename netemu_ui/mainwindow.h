@@ -5,13 +5,13 @@
 #include <QSettings>
 #include "ui_mainwindow.h"
 
-class mainwindow : public QMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    mainwindow(QWidget *parent = 0);
-    ~mainwindow();
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 	
 private slots:
 	void refreshServerList();

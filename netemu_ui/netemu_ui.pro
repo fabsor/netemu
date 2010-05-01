@@ -2,15 +2,15 @@ TEMPLATE = app
 TARGET = netemu_ui
 QT += core \
     gui
-HEADERS += PreferencesWidgets/masterserverpreferences.h \
-    preferencesdialog.h \
+HEADERS += SettingsWidgets/masterserversettings.h \
+    settingsdialog.h \
     mainwindow.h
-SOURCES += PreferencesWidgets/masterserverpreferences.cpp \
-    preferencesdialog.cpp \
+SOURCES += SettingsWidgets/masterserversettings.cpp \
+    settingsdialog.cpp \
     mainwindow.cpp \
     main.cpp
-FORMS += PreferencesWidgets/masterserverpreferences.ui \
-    preferencesdialog.ui \
+FORMS += SettingsWidgets/masterserversettings.ui \
+    settingsdialog.ui \
     mainwindow.ui
 RESOURCES += 
 INCLUDEPATH = ../netemu_sender/interface/;../netlib/headers
