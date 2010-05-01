@@ -42,6 +42,24 @@ NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, sock
     return accept(socket,address,address_len);
 }
 
+/* We have to use this ugly function until we can decide to remove netemu_prepare_addr.*/
+NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address, socklen_t *address_len) {
+    struct sockaddr_in addr;
+    socklen_t size;
+    int error;
+    size = sizeof(addr);
+    error = accept(socket,(struct sockaddr*)&addr,&size);
+
+    if(error == -1) {
+    	return error;
+    }
+    *address = malloc(size);
+    memcpy(*address, &addr, size);
+    *address_len = size;
+
+    return error;
+}
+
 /* Sends data through a connected socket. */
 int netmu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
     return send(socket,buffer,len,flags);

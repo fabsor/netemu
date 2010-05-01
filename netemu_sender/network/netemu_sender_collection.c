@@ -43,6 +43,7 @@ void netemu_sender_collection_add_tcp_sender(struct netemu_sender_collection *co
 	sender->sender = malloc(sizeof(union netemu_sender_type));
 	sender->sender->tcp_sender = connection;
 	sender->type = SENDER_TCP;
+	netemu_list_add(collection->senders,sender);
 
 }
 

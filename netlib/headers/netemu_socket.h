@@ -22,8 +22,8 @@ extern "C" {
 #include <sys/un.h>
 #include <netdb.h>
 
-	typedef int NETEMU_SOCKET;
-#define INVALID_SOCKET  (NETEMU_SOCKET)(-1)
+typedef int NETEMU_SOCKET;
+#define NETEMU_INVALID_SOCKET  (NETEMU_SOCKET)(-1)
 
 	/* Error code constants */
 #define NETEMU_EINTR			EINTR
@@ -213,6 +213,8 @@ typedef unsigned int NETEMU_SOCKET;
 
 	/* Disables send or receive on a socket. */
 	int netemu_shutdown(NETEMU_SOCKET socket, int how);
+
+	NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address, socklen_t *address_len);
 
 	/* Close socket*/
 	int netemu_closesocket(NETEMU_SOCKET socket);
