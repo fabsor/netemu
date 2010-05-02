@@ -12,7 +12,7 @@
 #include "netemu_list.h"
 #include "netemu_thread.h"
 #include "responses.h"
-
+#include "protocol/application_p2p.h"
 
 int server_connection_wait_for_instruction(struct netemu_info* info, int instruction_id, time_t timestamp);
 void server_connection_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username);
@@ -272,9 +272,6 @@ void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_co
 	packet = netemu_transport_unpack(data);
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id == CREATE_GAME) {
-			printf("GAME CREATED");
-		}
 		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction);
 	}
 }

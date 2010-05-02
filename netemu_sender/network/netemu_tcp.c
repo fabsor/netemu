@@ -110,7 +110,7 @@ void _netemu_tcp_connection_recv(void* params) {
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
 		error = netemu_recv(receiver->socket, buffer, receiver->buffer_size, 0);
 		if (error == -1) {
-			//receiver->error = netemu_get_last_error();
+			receiver->error = netlib_get_last_error();
 			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}
