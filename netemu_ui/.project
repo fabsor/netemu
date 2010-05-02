@@ -3,6 +3,8 @@
 	<name>netemu_ui</name>
 	<comment></comment>
 	<projects>
+		<project>netemu</project>
+		<project>netlib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -29,6 +31,10 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.command</key>
 					<value>make</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.location</key>
+					<value></value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.target.auto</key>
@@ -60,7 +66,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.environment</key>
-					<value>PATH=/home/emil/apps/qtsdk/qt/bin:${env_var:PATH}|</value>
+					<value>PATH=/home/emil/apps/qtsdk/qt/bin:${env_var:PATH}:${env_var:PATH}|</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.stopOnError</key>

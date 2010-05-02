@@ -6,7 +6,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    mainwindow w;
+    QCoreApplication::setOrganizationName("NetEmu");
+    QCoreApplication::setOrganizationDomain("netemu.org");
+    QCoreApplication::setApplicationName("NetEmu");
+    MainWindow w;
     w.show();
     return a.exec();
 }

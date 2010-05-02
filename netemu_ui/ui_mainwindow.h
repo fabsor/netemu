@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Thu 29. Apr 17:24:00 2010
+** Created: Sat May 1 12:24:15 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -37,7 +37,7 @@ public:
     QAction *actionSettings;
     QAction *actionAbout;
     QAction *actionExit;
-    QAction *actionSettings_2;
+    QAction *actionSettings_1;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout_3;
     QTabWidget *tabWidget;
@@ -48,24 +48,26 @@ public:
     QHBoxLayout *horizontalLayout_3;
     QSpacerItem *horizontalSpacer;
     QPushButton *buttonServerRefresh;
+    QPushButton *buttonConnectServerIP;
     QPushButton *buttonServerConnect;
     QWidget *tab_6;
     QVBoxLayout *verticalLayout_4;
-    QTableWidget *tableServers_2;
+    QTableWidget *tableClouds;
     QLabel *labelCloudRefreshStatus;
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer_4;
     QPushButton *buttonCloudRefresh;
+    QPushButton *buttonConnectCloudIP;
     QPushButton *buttonCloudConnect;
     QWidget *tab_2;
     QVBoxLayout *verticalLayout_5;
-    QTableWidget *tableServers_3;
+    QTableWidget *tableRecent;
     QHBoxLayout *horizontalLayout_5;
     QSpacerItem *horizontalSpacer_5;
     QPushButton *buttonRecentConnect;
     QWidget *tab_3;
     QVBoxLayout *verticalLayout_6;
-    QTableWidget *tableServers_4;
+    QTableWidget *tableFavorites;
     QHBoxLayout *horizontalLayout_6;
     QSpacerItem *horizontalSpacer_6;
     QPushButton *buttonFavoritesAdd;
@@ -73,7 +75,7 @@ public:
     QPushButton *buttonFavoritesConnect;
     QWidget *tab_4;
     QVBoxLayout *verticalLayout_7;
-    QTableWidget *tableServers_5;
+    QTableWidget *tableGames;
     QHBoxLayout *horizontalLayout_7;
     QSpacerItem *horizontalSpacer_7;
     QPushButton *buttonGameConnect;
@@ -82,7 +84,6 @@ public:
     QLabel *labelUsername;
     QLineEdit *lineEditUsername;
     QSpacerItem *horizontalSpacer_2;
-    QPushButton *buttonConnectIP;
     QPushButton *buttonAbout;
     QPushButton *buttonCancel;
     QMenuBar *menubar;
@@ -96,14 +97,18 @@ public:
         if (mainwindowClass->objectName().isEmpty())
             mainwindowClass->setObjectName(QString::fromUtf8("mainwindowClass"));
         mainwindowClass->resize(1122, 706);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8("../../../emu32.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8("../../../emu32.png"), QSize(), QIcon::Normal, QIcon::On);
+        mainwindowClass->setWindowIcon(icon);
         actionSettings = new QAction(mainwindowClass);
         actionSettings->setObjectName(QString::fromUtf8("actionSettings"));
         actionAbout = new QAction(mainwindowClass);
         actionAbout->setObjectName(QString::fromUtf8("actionAbout"));
         actionExit = new QAction(mainwindowClass);
         actionExit->setObjectName(QString::fromUtf8("actionExit"));
-        actionSettings_2 = new QAction(mainwindowClass);
-        actionSettings_2->setObjectName(QString::fromUtf8("actionSettings_2"));
+        actionSettings_1 = new QAction(mainwindowClass);
+        actionSettings_1->setObjectName(QString::fromUtf8("actionSettings_1"));
         centralwidget = new QWidget(mainwindowClass);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout_3 = new QVBoxLayout(centralwidget);
@@ -157,8 +162,14 @@ public:
 
         horizontalLayout_3->addWidget(buttonServerRefresh);
 
+        buttonConnectServerIP = new QPushButton(tab);
+        buttonConnectServerIP->setObjectName(QString::fromUtf8("buttonConnectServerIP"));
+
+        horizontalLayout_3->addWidget(buttonConnectServerIP);
+
         buttonServerConnect = new QPushButton(tab);
         buttonServerConnect->setObjectName(QString::fromUtf8("buttonServerConnect"));
+        buttonServerConnect->setEnabled(false);
 
         horizontalLayout_3->addWidget(buttonServerConnect);
 
@@ -170,24 +181,24 @@ public:
         tab_6->setObjectName(QString::fromUtf8("tab_6"));
         verticalLayout_4 = new QVBoxLayout(tab_6);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        tableServers_2 = new QTableWidget(tab_6);
-        if (tableServers_2->columnCount() < 4)
-            tableServers_2->setColumnCount(4);
+        tableClouds = new QTableWidget(tab_6);
+        if (tableClouds->columnCount() < 4)
+            tableClouds->setColumnCount(4);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
         __qtablewidgetitem6->setFont(font);
-        tableServers_2->setHorizontalHeaderItem(0, __qtablewidgetitem6);
+        tableClouds->setHorizontalHeaderItem(0, __qtablewidgetitem6);
         QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
-        tableServers_2->setHorizontalHeaderItem(1, __qtablewidgetitem7);
+        tableClouds->setHorizontalHeaderItem(1, __qtablewidgetitem7);
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
-        tableServers_2->setHorizontalHeaderItem(2, __qtablewidgetitem8);
+        tableClouds->setHorizontalHeaderItem(2, __qtablewidgetitem8);
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
-        tableServers_2->setHorizontalHeaderItem(3, __qtablewidgetitem9);
-        tableServers_2->setObjectName(QString::fromUtf8("tableServers_2"));
-        tableServers_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableServers_2->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableServers_2->verticalHeader()->setVisible(false);
+        tableClouds->setHorizontalHeaderItem(3, __qtablewidgetitem9);
+        tableClouds->setObjectName(QString::fromUtf8("tableClouds"));
+        tableClouds->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableClouds->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableClouds->verticalHeader()->setVisible(false);
 
-        verticalLayout_4->addWidget(tableServers_2);
+        verticalLayout_4->addWidget(tableClouds);
 
         labelCloudRefreshStatus = new QLabel(tab_6);
         labelCloudRefreshStatus->setObjectName(QString::fromUtf8("labelCloudRefreshStatus"));
@@ -205,8 +216,14 @@ public:
 
         horizontalLayout->addWidget(buttonCloudRefresh);
 
+        buttonConnectCloudIP = new QPushButton(tab_6);
+        buttonConnectCloudIP->setObjectName(QString::fromUtf8("buttonConnectCloudIP"));
+
+        horizontalLayout->addWidget(buttonConnectCloudIP);
+
         buttonCloudConnect = new QPushButton(tab_6);
         buttonCloudConnect->setObjectName(QString::fromUtf8("buttonCloudConnect"));
+        buttonCloudConnect->setEnabled(false);
 
         horizontalLayout->addWidget(buttonCloudConnect);
 
@@ -218,20 +235,20 @@ public:
         tab_2->setObjectName(QString::fromUtf8("tab_2"));
         verticalLayout_5 = new QVBoxLayout(tab_2);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
-        tableServers_3 = new QTableWidget(tab_2);
-        if (tableServers_3->columnCount() < 2)
-            tableServers_3->setColumnCount(2);
+        tableRecent = new QTableWidget(tab_2);
+        if (tableRecent->columnCount() < 2)
+            tableRecent->setColumnCount(2);
         QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
         __qtablewidgetitem10->setFont(font);
-        tableServers_3->setHorizontalHeaderItem(0, __qtablewidgetitem10);
+        tableRecent->setHorizontalHeaderItem(0, __qtablewidgetitem10);
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
-        tableServers_3->setHorizontalHeaderItem(1, __qtablewidgetitem11);
-        tableServers_3->setObjectName(QString::fromUtf8("tableServers_3"));
-        tableServers_3->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableServers_3->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableServers_3->verticalHeader()->setVisible(false);
+        tableRecent->setHorizontalHeaderItem(1, __qtablewidgetitem11);
+        tableRecent->setObjectName(QString::fromUtf8("tableRecent"));
+        tableRecent->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableRecent->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableRecent->verticalHeader()->setVisible(false);
 
-        verticalLayout_5->addWidget(tableServers_3);
+        verticalLayout_5->addWidget(tableRecent);
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
@@ -241,6 +258,7 @@ public:
 
         buttonRecentConnect = new QPushButton(tab_2);
         buttonRecentConnect->setObjectName(QString::fromUtf8("buttonRecentConnect"));
+        buttonRecentConnect->setEnabled(false);
 
         horizontalLayout_5->addWidget(buttonRecentConnect);
 
@@ -252,20 +270,20 @@ public:
         tab_3->setObjectName(QString::fromUtf8("tab_3"));
         verticalLayout_6 = new QVBoxLayout(tab_3);
         verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
-        tableServers_4 = new QTableWidget(tab_3);
-        if (tableServers_4->columnCount() < 2)
-            tableServers_4->setColumnCount(2);
+        tableFavorites = new QTableWidget(tab_3);
+        if (tableFavorites->columnCount() < 2)
+            tableFavorites->setColumnCount(2);
         QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
         __qtablewidgetitem12->setFont(font);
-        tableServers_4->setHorizontalHeaderItem(0, __qtablewidgetitem12);
+        tableFavorites->setHorizontalHeaderItem(0, __qtablewidgetitem12);
         QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
-        tableServers_4->setHorizontalHeaderItem(1, __qtablewidgetitem13);
-        tableServers_4->setObjectName(QString::fromUtf8("tableServers_4"));
-        tableServers_4->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableServers_4->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableServers_4->verticalHeader()->setVisible(false);
+        tableFavorites->setHorizontalHeaderItem(1, __qtablewidgetitem13);
+        tableFavorites->setObjectName(QString::fromUtf8("tableFavorites"));
+        tableFavorites->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableFavorites->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableFavorites->verticalHeader()->setVisible(false);
 
-        verticalLayout_6->addWidget(tableServers_4);
+        verticalLayout_6->addWidget(tableFavorites);
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
@@ -280,11 +298,13 @@ public:
 
         buttonFavoritesRemove = new QPushButton(tab_3);
         buttonFavoritesRemove->setObjectName(QString::fromUtf8("buttonFavoritesRemove"));
+        buttonFavoritesRemove->setEnabled(false);
 
         horizontalLayout_6->addWidget(buttonFavoritesRemove);
 
         buttonFavoritesConnect = new QPushButton(tab_3);
         buttonFavoritesConnect->setObjectName(QString::fromUtf8("buttonFavoritesConnect"));
+        buttonFavoritesConnect->setEnabled(false);
 
         horizontalLayout_6->addWidget(buttonFavoritesConnect);
 
@@ -296,30 +316,30 @@ public:
         tab_4->setObjectName(QString::fromUtf8("tab_4"));
         verticalLayout_7 = new QVBoxLayout(tab_4);
         verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
-        tableServers_5 = new QTableWidget(tab_4);
-        if (tableServers_5->columnCount() < 7)
-            tableServers_5->setColumnCount(7);
+        tableGames = new QTableWidget(tab_4);
+        if (tableGames->columnCount() < 7)
+            tableGames->setColumnCount(7);
         QTableWidgetItem *__qtablewidgetitem14 = new QTableWidgetItem();
         __qtablewidgetitem14->setFont(font);
-        tableServers_5->setHorizontalHeaderItem(0, __qtablewidgetitem14);
+        tableGames->setHorizontalHeaderItem(0, __qtablewidgetitem14);
         QTableWidgetItem *__qtablewidgetitem15 = new QTableWidgetItem();
-        tableServers_5->setHorizontalHeaderItem(1, __qtablewidgetitem15);
+        tableGames->setHorizontalHeaderItem(1, __qtablewidgetitem15);
         QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
-        tableServers_5->setHorizontalHeaderItem(2, __qtablewidgetitem16);
+        tableGames->setHorizontalHeaderItem(2, __qtablewidgetitem16);
         QTableWidgetItem *__qtablewidgetitem17 = new QTableWidgetItem();
-        tableServers_5->setHorizontalHeaderItem(3, __qtablewidgetitem17);
+        tableGames->setHorizontalHeaderItem(3, __qtablewidgetitem17);
         QTableWidgetItem *__qtablewidgetitem18 = new QTableWidgetItem();
-        tableServers_5->setHorizontalHeaderItem(4, __qtablewidgetitem18);
+        tableGames->setHorizontalHeaderItem(4, __qtablewidgetitem18);
         QTableWidgetItem *__qtablewidgetitem19 = new QTableWidgetItem();
-        tableServers_5->setHorizontalHeaderItem(5, __qtablewidgetitem19);
+        tableGames->setHorizontalHeaderItem(5, __qtablewidgetitem19);
         QTableWidgetItem *__qtablewidgetitem20 = new QTableWidgetItem();
-        tableServers_5->setHorizontalHeaderItem(6, __qtablewidgetitem20);
-        tableServers_5->setObjectName(QString::fromUtf8("tableServers_5"));
-        tableServers_5->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableServers_5->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableServers_5->verticalHeader()->setVisible(false);
+        tableGames->setHorizontalHeaderItem(6, __qtablewidgetitem20);
+        tableGames->setObjectName(QString::fromUtf8("tableGames"));
+        tableGames->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableGames->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableGames->verticalHeader()->setVisible(false);
 
-        verticalLayout_7->addWidget(tableServers_5);
+        verticalLayout_7->addWidget(tableGames);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
@@ -357,11 +377,6 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
-        buttonConnectIP = new QPushButton(centralwidget);
-        buttonConnectIP->setObjectName(QString::fromUtf8("buttonConnectIP"));
-
-        horizontalLayout_2->addWidget(buttonConnectIP);
-
         buttonAbout = new QPushButton(centralwidget);
         buttonAbout->setObjectName(QString::fromUtf8("buttonAbout"));
 
@@ -398,7 +413,7 @@ public:
         menubar->addAction(menuHelp->menuAction());
         menuFile->addAction(actionExit);
         menuHelp->addAction(actionAbout);
-        menuEdit->addAction(actionSettings_2);
+        menuEdit->addAction(actionSettings_1);
 
         retranslateUi(mainwindowClass);
 
@@ -414,7 +429,7 @@ public:
         actionSettings->setText(QApplication::translate("mainwindowClass", "Settings...", 0, QApplication::UnicodeUTF8));
         actionAbout->setText(QApplication::translate("mainwindowClass", "About...", 0, QApplication::UnicodeUTF8));
         actionExit->setText(QApplication::translate("mainwindowClass", "Exit", 0, QApplication::UnicodeUTF8));
-        actionSettings_2->setText(QApplication::translate("mainwindowClass", "Settings...", 0, QApplication::UnicodeUTF8));
+        actionSettings_1->setText(QApplication::translate("mainwindowClass", "Settings...", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem = tableServers->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("mainwindowClass", "Name", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem1 = tableServers->horizontalHeaderItem(1);
@@ -429,52 +444,53 @@ public:
         ___qtablewidgetitem5->setText(QApplication::translate("mainwindowClass", "Games", 0, QApplication::UnicodeUTF8));
         labelServerRefreshStatus->setText(QApplication::translate("mainwindowClass", "TextLabel", 0, QApplication::UnicodeUTF8));
         buttonServerRefresh->setText(QApplication::translate("mainwindowClass", "Refresh", 0, QApplication::UnicodeUTF8));
+        buttonConnectServerIP->setText(QApplication::translate("mainwindowClass", "Connect to IP ...", 0, QApplication::UnicodeUTF8));
         buttonServerConnect->setText(QApplication::translate("mainwindowClass", "Connect", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("mainwindowClass", "Kaillera Servers", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem6 = tableServers_2->horizontalHeaderItem(0);
+        QTableWidgetItem *___qtablewidgetitem6 = tableClouds->horizontalHeaderItem(0);
         ___qtablewidgetitem6->setText(QApplication::translate("mainwindowClass", "Name", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem7 = tableServers_2->horizontalHeaderItem(1);
+        QTableWidgetItem *___qtablewidgetitem7 = tableClouds->horizontalHeaderItem(1);
         ___qtablewidgetitem7->setText(QApplication::translate("mainwindowClass", "Ping", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem8 = tableServers_2->horizontalHeaderItem(2);
+        QTableWidgetItem *___qtablewidgetitem8 = tableClouds->horizontalHeaderItem(2);
         ___qtablewidgetitem8->setText(QApplication::translate("mainwindowClass", "Users", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem9 = tableServers_2->horizontalHeaderItem(3);
+        QTableWidgetItem *___qtablewidgetitem9 = tableClouds->horizontalHeaderItem(3);
         ___qtablewidgetitem9->setText(QApplication::translate("mainwindowClass", "Games", 0, QApplication::UnicodeUTF8));
         labelCloudRefreshStatus->setText(QApplication::translate("mainwindowClass", "TextLabel", 0, QApplication::UnicodeUTF8));
         buttonCloudRefresh->setText(QApplication::translate("mainwindowClass", "Refresh", 0, QApplication::UnicodeUTF8));
+        buttonConnectCloudIP->setText(QApplication::translate("mainwindowClass", "Connect to IP ...", 0, QApplication::UnicodeUTF8));
         buttonCloudConnect->setText(QApplication::translate("mainwindowClass", "Connect", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("mainwindowClass", "NetEmu clouds", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem10 = tableServers_3->horizontalHeaderItem(0);
+        QTableWidgetItem *___qtablewidgetitem10 = tableRecent->horizontalHeaderItem(0);
         ___qtablewidgetitem10->setText(QApplication::translate("mainwindowClass", "Name", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem11 = tableServers_3->horizontalHeaderItem(1);
+        QTableWidgetItem *___qtablewidgetitem11 = tableRecent->horizontalHeaderItem(1);
         ___qtablewidgetitem11->setText(QApplication::translate("mainwindowClass", "Type", 0, QApplication::UnicodeUTF8));
         buttonRecentConnect->setText(QApplication::translate("mainwindowClass", "Connect", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("mainwindowClass", "Recent", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem12 = tableServers_4->horizontalHeaderItem(0);
+        QTableWidgetItem *___qtablewidgetitem12 = tableFavorites->horizontalHeaderItem(0);
         ___qtablewidgetitem12->setText(QApplication::translate("mainwindowClass", "Name", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem13 = tableServers_4->horizontalHeaderItem(1);
+        QTableWidgetItem *___qtablewidgetitem13 = tableFavorites->horizontalHeaderItem(1);
         ___qtablewidgetitem13->setText(QApplication::translate("mainwindowClass", "Type", 0, QApplication::UnicodeUTF8));
         buttonFavoritesAdd->setText(QApplication::translate("mainwindowClass", "Add...", 0, QApplication::UnicodeUTF8));
         buttonFavoritesRemove->setText(QApplication::translate("mainwindowClass", "Remove", 0, QApplication::UnicodeUTF8));
         buttonFavoritesConnect->setText(QApplication::translate("mainwindowClass", "Connect", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("mainwindowClass", "Favorites", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem14 = tableServers_5->horizontalHeaderItem(0);
+        QTableWidgetItem *___qtablewidgetitem14 = tableGames->horizontalHeaderItem(0);
         ___qtablewidgetitem14->setText(QApplication::translate("mainwindowClass", "Game name", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem15 = tableServers_5->horizontalHeaderItem(1);
+        QTableWidgetItem *___qtablewidgetitem15 = tableGames->horizontalHeaderItem(1);
         ___qtablewidgetitem15->setText(QApplication::translate("mainwindowClass", "Emulator", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem16 = tableServers_5->horizontalHeaderItem(2);
+        QTableWidgetItem *___qtablewidgetitem16 = tableGames->horizontalHeaderItem(2);
         ___qtablewidgetitem16->setText(QApplication::translate("mainwindowClass", "Username", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem17 = tableServers_5->horizontalHeaderItem(3);
+        QTableWidgetItem *___qtablewidgetitem17 = tableGames->horizontalHeaderItem(3);
         ___qtablewidgetitem17->setText(QApplication::translate("mainwindowClass", "Server name", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem18 = tableServers_5->horizontalHeaderItem(4);
+        QTableWidgetItem *___qtablewidgetitem18 = tableGames->horizontalHeaderItem(4);
         ___qtablewidgetitem18->setText(QApplication::translate("mainwindowClass", "Location", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem19 = tableServers_5->horizontalHeaderItem(5);
+        QTableWidgetItem *___qtablewidgetitem19 = tableGames->horizontalHeaderItem(5);
         ___qtablewidgetitem19->setText(QApplication::translate("mainwindowClass", "# Players", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem20 = tableServers_5->horizontalHeaderItem(6);
+        QTableWidgetItem *___qtablewidgetitem20 = tableGames->horizontalHeaderItem(6);
         ___qtablewidgetitem20->setText(QApplication::translate("mainwindowClass", "Ping", 0, QApplication::UnicodeUTF8));
         buttonGameConnect->setText(QApplication::translate("mainwindowClass", "Connect", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("mainwindowClass", "Waiting games", 0, QApplication::UnicodeUTF8));
         labelUsername->setText(QApplication::translate("mainwindowClass", "Username:", 0, QApplication::UnicodeUTF8));
-        buttonConnectIP->setText(QApplication::translate("mainwindowClass", "Connect to IP...", 0, QApplication::UnicodeUTF8));
         buttonAbout->setText(QApplication::translate("mainwindowClass", "About", 0, QApplication::UnicodeUTF8));
         buttonCancel->setText(QApplication::translate("mainwindowClass", "Cancel", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("mainwindowClass", "File", 0, QApplication::UnicodeUTF8));
