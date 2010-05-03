@@ -43,6 +43,7 @@ void netemu_application_p2p_create_game_parse(struct application_instruction *in
 	pos = _netemu_application_p2p_parse_game(buffer,game);
 	instruction->body = game;
 	instruction->body_size = pos;
+	instruction->packBodyFn = netemu_application_p2p_create_game_parse;
 }
 
 int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
@@ -63,16 +64,19 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 
 int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	int i, pos;
-
+	struct p2p_user *user;
 	game->name = netemu_util_parse_string(buffer);
 	pos = strlen(game->name)+1;
 	game->app_name = netemu_util_parse_string(buffer+pos);
 	pos += strlen(game->app_name)+1;
 	memcpy(&game->user_count, buffer+pos, sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
+	game->creator = malloc(sizeof(struct p2p_user));
 	pos += _netemu_application_p2p_parse_user(buffer+pos,game->creator, 1);
 
-	if(game->players != NULL) {
+
+	if (game->user_count > 1) {
+		game->players = malloc(sizeof(struct p2p_user)*game->user_count);
 		for(i = 0; i < game->user_count; i++) {
 			pos += _netemu_application_p2p_parse_user(buffer+pos, &game->players[i], 1);
 		}

@@ -18,6 +18,7 @@ extern "C" {
 #define P2P_LOGIN_SUCCESS	28
 #define P2P_LOGIN_REQUEST	29
 #define P2P_READY			30
+#define P2P_USER_JOIN		31
 #include "application.h"
 #include "../netemu_util.h"
 
