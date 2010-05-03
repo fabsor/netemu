@@ -273,10 +273,9 @@ void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiv
 
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id == CREATE_GAME) {
-			printf("GAME CREATED");
+		if(instruction != NULL) {
+			netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, UDP_CONNECTION, type);
 		}
-		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, UDP_CONNECTION, type);
 	}
 }
 
@@ -293,7 +292,9 @@ void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_co
 
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, TCP_CONNECTION, type);
+		if(instruction != NULL) {
+			netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, TCP_CONNECTION, type);
+		}
 	}
 }
 /**

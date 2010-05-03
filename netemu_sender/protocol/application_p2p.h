@@ -39,10 +39,6 @@ struct p2p_game {
 	struct p2p_user* players;
 };
 
-struct p2p_join_game {
-	char *name;
-};
-
 struct p2p_kick_player {
 	char *name;
 };
@@ -56,7 +52,7 @@ struct p2p_login_success {
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator);
 
-void netemu_application_p2p_join_game_add(struct application_instruction* instruction, char* name);
+void netemu_application_p2p_join_game_add(struct application_instruction* instruction, struct p2p_user *creator);
 
 void netemu_application_p2p_leave_game_add(struct application_instruction* instruction);
 

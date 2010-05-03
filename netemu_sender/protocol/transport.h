@@ -14,6 +14,7 @@ struct transport_instruction {
 	/* ? */
 	NETEMU_WORD serial;
 	NETEMU_WORD length;
+	long p2p_id;
 	void* instruction;
 };
 

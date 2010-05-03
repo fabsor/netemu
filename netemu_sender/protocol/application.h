@@ -47,6 +47,7 @@ struct application_instruction {
 	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
 	int important; /**< Set this to > 0 and it will cause the buffer containing it to pack all buffered packets up and send them directly.*/
 	time_t timestamp;
+	long p2p_id;
 };
 
 struct login_request {

@@ -18,6 +18,8 @@ void netemu_application_player_left_pack(struct application_instruction* instruc
 int _netemu_application_login_success_games_parse(struct login_success *success, char **data);
 int _netemu_application_login_success_users_parse(struct login_success *success, char **data);
 
+long passed_id = 0;
+
 struct application_instruction* netemu_application_create_message() {
 	struct application_instruction* message;
 	if((message = malloc(sizeof(struct application_instruction))) == NULL) {
@@ -29,6 +31,7 @@ struct application_instruction* netemu_application_create_message() {
 		free(message);
 		return NULL;
 	}
+	message->p2p_id = 0;
 	*message->user = '\0';
 	return message;
 }
@@ -46,6 +49,18 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	data = (char*)instruction->instruction;
 	memcpy(&app_instruction->id,data,sizeof(char));
 	data += sizeof(char);
+
+	/* We're dealing with p2p*/
+	if(app_instruction->id > 24) {
+		memcpy(&app_instruction->p2p_id,data,sizeof(long));
+		data += sizeof(long);
+		if(app_instruction->p2p_id < passed_id) {
+			free(app_instruction);
+			return NULL;
+		}
+		passed_id = instruction->p2p_id;
+	}
+
 	if((app_instruction->user = netemu_util_parse_string(data)) == NULL) {
 		/* Error code already set in parse_string */
 		free(app_instruction);
