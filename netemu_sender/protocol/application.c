@@ -50,20 +50,10 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	memcpy(&app_instruction->id,data,sizeof(char));
 	data += sizeof(char);
 
-	/* We're dealing with p2p*/
-	if(app_instruction->id > 24) {
-		memcpy(&app_instruction->p2p_id,data,sizeof(long));
-		data += sizeof(long);
-		if(app_instruction->p2p_id < passed_id) {
-			free(app_instruction);
-			return NULL;
-		}
-		passed_id = instruction->p2p_id;
-	}
-
 	if((app_instruction->user = netemu_util_parse_string(data)) == NULL) {
 		/* Error code already set in parse_string */
 		free(app_instruction);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 	data += strlen(app_instruction->user) + 1;
@@ -221,12 +211,14 @@ int netemu_application_login_success_parse(struct application_instruction *instr
 
 	if(_netemu_application_login_success_users_parse(success, &data) == -1) {
 		free(success);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 
 	if(_netemu_application_login_success_games_parse(success, &data) == -1) {
 		free(success->users);
 		free(success);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 

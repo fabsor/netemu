@@ -112,7 +112,7 @@ void _netemu_packet_buffer_update(void* args) {
 				/* wakeup and notify */
 				_netemu_packet_buffer_perform_notify(buffer,itemsToNotify->elements[i]);
 				_netemu_packet_buffer_perform_wakeup(buffer,itemsToNotify->elements[i]);
-				free(itemsToNotify->elements[i]);
+				 free(itemsToNotify->elements[i]);
 			}
 			/* Finally clear everything out. */
 			netemu_list_clear(itemsToNotify);

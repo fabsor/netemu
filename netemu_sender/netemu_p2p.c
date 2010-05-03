@@ -21,6 +21,9 @@ struct netemu_p2p_internal {
 	struct netemu_tcp_listener *host;
 	struct netemu_tcp_connection *connection;
 	struct netemu_sender_collection *peers;
+	/* We maintain lists of all addresses we have encountered, in order to not add unnecessary data. */
+	struct netemu_list *game_addresses;
+	struct netemu_list *user_addresses;
 };
 
 void _netemu_p2p_send_ready(struct netemu_sender_buffer *buffer, struct netemu_tcp_connection *connection);
@@ -31,7 +34,7 @@ void netemu_p2p_respond_to_login_success(struct netemu_packet_buffer* buffer, st
 void netemu_p2p_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
 void netemu_p2p_send_user_joined(struct netemu_p2p_connection *connection, struct p2p_user *user);
 void netemu_p2p_respond_to_game_created(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
-
+int _netemu_p2p_addr_compare(const void *arg1, const void *arg2);
 /**
  * Create a host connection.
  */
@@ -49,6 +52,10 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname)
 	p2p->user->app_name = emulatorname;
 	p2p->info = netemu_server_connection_new(username,emulatorname,buffer);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
+	p2p->_internal->game_addresses = netemu_list_new(10,1);
+	netemu_list_register_sort_fn(p2p->_internal->game_addresses, _netemu_p2p_addr_compare);
+	p2p->_internal->user_addresses = netemu_list_new(10,1);
+	netemu_list_register_sort_fn(p2p->_internal->user_addresses, _netemu_p2p_addr_compare);
 	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_REQUEST, netemu_p2p_respond_to_login_request, p2p);
 	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_SUCCESS, netemu_p2p_respond_to_login_success, p2p->info);
 	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_USER_JOIN, netemu_p2p_respond_to_user_join, p2p);
@@ -197,22 +204,48 @@ void netemu_p2p_respond_to_user_join(struct netemu_packet_buffer* buffer, struct
 
 	connection = (struct netemu_p2p_connection*)arg;
 	user = (struct p2p_user*)item->instruction->body;
-	type.collection = connection->_internal->peers;
-	connection->info->user_count++;
-	user->name = item->instruction->user;
-	netemu_list_add(connection->info->_internal->users,user);
-	netemu_sender_buffer_add(connection->info->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
+	if(!netemu_list_contains(connection->_internal->user_addresses,user->addr)) {
+		type.collection = connection->_internal->peers;
+		connection->info->user_count++;
+		user->name = item->instruction->user;
+		netemu_list_add(connection->_internal->game_addresses,user->addr);
+		netemu_list_add(connection->info->_internal->users,user);
+		netemu_sender_buffer_add(connection->info->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
+	}
 }
 
 void netemu_p2p_respond_to_game_created(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct p2p_game *game;
 	struct netemu_p2p_connection* connection;
 	union netemu_connection_type type;
-
 	connection = (struct netemu_p2p_connection*)arg;
 	game = (struct p2p_game*)item->instruction->body;
-	type.collection = connection->_internal->peers;
-	connection->info->game_count++;
-	netemu_list_add(connection->info->_internal->games,game);
-	netemu_sender_buffer_add(connection->info->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
+
+	if(!netemu_list_contains(connection->_internal->game_addresses,game->creator->addr)) {
+		type.collection = connection->_internal->peers;
+		connection->info->game_count++;
+		netemu_list_add(connection->_internal->game_addresses,game->creator->addr);
+		netemu_list_add(connection->info->_internal->games,game);
+		netemu_sender_buffer_add(connection->info->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
+	}
+}
+
+int _netemu_p2p_addr_compare(const void *arg1, const void *arg2) {
+	const netemu_sockaddr* addr1, *addr2;
+	int cmp, i;
+	addr1 = (const netemu_sockaddr*)arg1;
+	addr2 = (const netemu_sockaddr*)arg2;
+
+	cmp = addr1->sa_family-addr2->sa_family;
+
+	if(cmp != 0)
+		return cmp;
+
+	for(i = 0; i < 14; i++) {
+		cmp = addr1->sa_data[i]-addr2->sa_data[i];
+		if(cmp != 0)
+			return cmp;
+	}
+
+	return cmp;
 }

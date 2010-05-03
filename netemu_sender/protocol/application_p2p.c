@@ -245,8 +245,9 @@ int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *u
 	target->ping = user->ping;
 	size += sizeof(NETEMU_DWORD);
 	/* ? */
-	if(user->name != NULL)
+	if(user->name != NULL) {
 		size += netemu_util_copy_string(&target->name,user->name);
+	}
 
 	size += netemu_util_copy_string(&target->app_name,user->app_name);
 	return size;

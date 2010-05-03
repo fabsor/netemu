@@ -45,10 +45,6 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 		pos += sizeof(NETEMU_WORD);
 		memcpy((void *)(buffer+pos), (void *)&messages[i]->id, sizeof(char));
 		pos += sizeof(char);
-		if (messages[i]->id > 24) {
-			memcpy((void *)(buffer+pos),(void *)&messages[i]->p2p_id, sizeof(NETEMU_WORD));
-			pos += sizeof(long);
-		}
 		memcpy((void *)(buffer+pos), (void *)messages[i]->user, sizeof(char)*(strlen(messages[i]->user)+1));
 		pos += sizeof(char)*(strlen(messages[i]->user)+1);
 		if(messages[i]->body != NULL){

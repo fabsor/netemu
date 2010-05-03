@@ -37,12 +37,12 @@ int netemu_send_chat_message(struct netemu_info *info, char *message) {
 int netemu_disconnect(struct netemu_info *info, char *message) {
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
-	struct application_instruction *messages[1];
+	struct application_instruction *instruction;
 
 	client = netemu_resources_get_client();
-	messages[0] = netemu_application_create_message();
-	netemu_application_user_leave_add(messages[0], message);
-	buffer = netemu_transport_pack(messages,1);
+	instruction = netemu_application_create_message();
+	netemu_application_user_leave_add(instruction, message);
+	buffer = netemu_transport_pack(&instruction,1);
 	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
 }
 
@@ -119,7 +119,6 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 	if(info == NULL) {
 		return NULL;
 	}
-	info->user = user;
 	info->emulator_name = emulator_name;
 	info->current_game = NULL;
 	info->username = user;

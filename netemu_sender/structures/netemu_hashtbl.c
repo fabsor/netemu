@@ -97,6 +97,7 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 }
 
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl) {
+	netemu_list_clear(hashtbl->keys);
 	free(hashtbl->nodes);
 	hashtbl->nodes = calloc(hashtbl->size, sizeof(struct hashnode_s*));
 }

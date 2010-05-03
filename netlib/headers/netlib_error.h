@@ -15,10 +15,6 @@ extern "C" {
 /* *** SOCKET ERROR CODES *** */
 
 #ifdef _NIX
-//#include <netinet/in.h>
-//#include <sys/socket.h>
-//#include <sys/un.h>
-//#include <netdb.h>
 
 #define NETEMU_EINTR			EINTR
 #define NETEMU_EWOULDBLOCK		EWOULDBLOCK
