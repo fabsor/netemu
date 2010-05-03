@@ -28,10 +28,11 @@
 struct communication_callback {
 	int async;
 	int port;
-	void (*ConnectionReceivedFn)(int status, struct netemu_info*);
+	void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg);
 	struct netemu_sockaddr_in *addr;
 	char* emulatorname;
 	char* username;
+	void *arg;
 };
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
@@ -106,7 +107,7 @@ struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *ad
 	return connection;
 }
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*)) {
+void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg) {
 	struct netemu_client *client;
 	char* hello;
 	struct communication_callback *callback;
@@ -131,6 +132,7 @@ void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int a
 	callback->emulatorname = emulator_cpy;
 	callback->username = user_cpy;
 	callback->ConnectionReceivedFn = ConnectionReceivedFn;
+	callback->arg = arg;
 	client = netemu_resources_get_client();
 	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,callback);
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
@@ -147,7 +149,7 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	callback->addr->port = netemu_htons(callback->port);
 	client->sender->addr = netemu_prepare_net_addr(callback->addr);
 	/*connection = netemu_server_connection_new(callback->username,callback->username);*/
-	callback->ConnectionReceivedFn(callback->port, connection);
+	callback->ConnectionReceivedFn(callback->port, connection, callback->arg);
 	free(callback);
 }
 

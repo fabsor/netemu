@@ -51,7 +51,7 @@ void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct n
 
 struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username);
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*));
+void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg);
 
 int netemu_send_chat_message(struct netemu_info *connection, char *message);
 
