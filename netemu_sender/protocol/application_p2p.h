@@ -76,7 +76,7 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 
 int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user);
 
-void netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game);
+int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game);
 
 void netemu_application_p2p_create_game_parse(struct application_instruction *instruction, char *buffer);
 

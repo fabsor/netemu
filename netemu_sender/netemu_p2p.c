@@ -178,9 +178,11 @@ void netemu_p2p_respond_to_login_request(struct netemu_packet_buffer* buffer, st
 
 	connection = (struct netemu_p2p_connection *)arg;
 	type.collection = connection->_internal->peers;
-	user = (struct p2p_user*)item->instruction->body;
-	connection->info->user_count++;
+	user = malloc(sizeof(struct p2p_user));
 	user->name = item->instruction->user;
+
+	netemu_application_p2p_copy_user(user,(struct p2p_user*)item->instruction->body);
+	connection->info->user_count++;
 	netemu_p2p_send_login_success(connection->info,item->connection.connection);
 	netemu_p2p_send_user_joined(connection, user);
 	netemu_list_add(connection->info->_internal->users,user);

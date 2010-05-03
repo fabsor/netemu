@@ -53,7 +53,6 @@ void create_p2p_game(struct netemu_p2p_connection* connection);
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
-	  //mtrace();
 	info = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;

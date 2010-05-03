@@ -194,7 +194,6 @@ int netemu_application_chat_parse(struct application_instruction *instruction, c
 
 int netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
 	struct login_success *success;
-	unsigned int i, j;
 
 	if((success = malloc(sizeof(struct login_success))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
