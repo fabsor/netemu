@@ -49,15 +49,17 @@ int netemu_disconnect(struct netemu_info *info, char *message) {
 
 int netemu_kaillera_create_game(struct netemu_info *info, char *gamename, struct game** result) {
 	time_t timestamp;
-	struct application_instruction *message, *reply;
-
+	struct application_instruction *message;
+	struct netemu_packet_buffer_item *item;
+	union netemu_connection_type type;
+	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_create_game_add(message, gamename);
 
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
-	reply = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, CREATE_GAME, timestamp);
-	*result = (struct game*)reply->body;
+	netemu_sender_buffer_add(info->_internal->send_buffer, message, UDP_CONNECTION, type);
+	item = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, CREATE_GAME, timestamp);
+	*result = (struct game*)item->instruction->body;
 	return 1;
 }
 
@@ -65,12 +67,14 @@ void netemu_kaillera_create_game_async(struct netemu_info *info, char *gamename,
 	time_t timestamp;
 	struct application_instruction *message;
 	union callback_fn *fn;
+	union netemu_connection_type type;
+	type.udp_sender = netemu_resources_get_sender();
 	fn = malloc(sizeof(union callback_fn));
 	fn->game_created_fn = callback;
 	message = netemu_application_create_message();
 	netemu_application_create_game_add(message, gamename);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message,UDP_CONNECTION, type);
 	netemu_register_callback(info->_internal->game_created_callback, fn, 1);
 }
 
@@ -95,14 +99,15 @@ void _server_connection_add_game_struct(struct netemu_info* info, struct game* g
 
 int server_connection_start_game(struct netemu_info *info) {
 	time_t timestamp;
-	struct application_instruction *message, *reply;
-
+	struct application_instruction *message;
+	union netemu_connection_type type;
+	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_start_game_add(message);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 	message->important = 1;
-	reply = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, START_GAME, timestamp);
+	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, START_GAME,timestamp);
 	return 1;
 }
 
@@ -147,16 +152,17 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 
 int server_connection_login(struct netemu_info* info) {
 	struct application_instruction *message;
-	struct application_instruction *success;
+	union netemu_connection_type type;
 	time_t timestamp;
+
 	message = netemu_application_create_message();
-
-	netemu_application_login_request_add(message,info->emulator_name,info->user,1);
+	type.udp_sender = netemu_resources_get_sender();
+	netemu_application_login_request_add(message,info->emulator_name,info->username,1);
 	message->important = 1;
-
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
-	success = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
+
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
 	return 1;
 }
 
@@ -164,20 +170,25 @@ int server_connection_login(struct netemu_info* info) {
 int netemu_kaillera_join_game(struct netemu_info *info, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
 	time_t timestamp;
+	union netemu_connection_type type;
+
+	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	timestamp = time(NULL);
 	netemu_application_join_game_add(message,gameid,1);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer,EXISTING_PLAYERS_LIST, timestamp);
 	return 1;
 }
 
 int server_connection_join_game_async(struct netemu_info *info, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
+	union netemu_connection_type type;
 
+	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_join_game_add(message,gameid,1);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 
 	return 1;
 }
@@ -188,7 +199,7 @@ void server_connection_add_player(struct game *game, struct player *player) {
 	int i;
 
 	game->players->players_count++;
-	if((game->players->players = realloc(game->players->players,game->players->players_count)) == NULL) {
+	if((game->players->players = realloc(game->players->players,game->players->players_count*sizeof(struct player))) == NULL) {
 		players = malloc(sizeof(struct player)*game->players->players_count);
 		for(i = 0; i < game->players->players_count-1; i++) {
 			players[i] = game->players->players[i];
@@ -251,15 +262,19 @@ void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiv
 	struct netemu_info* info;
 	struct transport_packet* packet;
 	struct application_instruction* instruction;
+	union netemu_connection_type type;
 	int i;
+
+	type.udp_sender = netemu_resources_get_sender();
 	info = (struct netemu_info*) params;
 	packet = netemu_transport_unpack(data);
+
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
 		if(instruction->id == CREATE_GAME) {
 			printf("GAME CREATED");
 		}
-		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction);
+		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, UDP_CONNECTION, type);
 	}
 }
 
@@ -267,12 +282,16 @@ void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_co
 	struct netemu_info* info;
 	struct transport_packet* packet;
 	struct application_instruction* instruction;
+	union netemu_connection_type type;
 	int i;
+
+	type.connection = receiver;
 	info = (struct netemu_info*) params;
 	packet = netemu_transport_unpack(data);
+
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction);
+		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, TCP_CONNECTION, type);
 	}
 }
 /**
@@ -295,19 +314,24 @@ struct buffered_play_values* server_connection_get_play_values(struct netemu_inf
 void netemu_send_play_values(struct netemu_info* info, int size, void* data) {
 	time_t timestamp;
 	struct application_instruction *message;
+	union netemu_connection_type type;
+
+	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_buffered_play_values_add(message,size,data);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 }
 
 int netemu_send_player_ready(struct netemu_info *info) {
 	time_t timestamp;
 	struct application_instruction *message;
+	union netemu_connection_type type;
 
+	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_player_ready_add(message);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 	return 1;
 }

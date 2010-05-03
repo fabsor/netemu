@@ -23,6 +23,7 @@ struct p2p_player {
 
 struct netemu_p2p_connection {
 	struct netemu_info* info;
+	struct p2p_user *user;
 	netemu_p2p_internal _internal;
 	char* cloud_name;
 };
@@ -33,7 +34,7 @@ int netemu_p2p_connect(struct netemu_p2p_connection* p2p, struct netemu_sockaddr
 
 void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname);
 
-int netemu_p2p_create_game(struct netemu_info *connection, char *gamename, struct game** result);
+int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct game** result);
 
 void netemu_p2p_login(struct netemu_p2p_connection *p2p);
 
