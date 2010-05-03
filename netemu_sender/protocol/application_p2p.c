@@ -9,6 +9,9 @@
 
 int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user);
 int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETEMU_BOOL parse_user);
+int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game);
+void netemu_application_p2p_create_game_pack(struct application_instruction *instruction, char *buffer);
+int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game);
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator) {
 	struct p2p_game *game;
@@ -16,11 +19,64 @@ void netemu_application_p2p_create_game_add(struct application_instruction *inst
 	game = malloc(sizeof(struct game));
 	size = netemu_util_copy_string(&game->name,gamename);
 	size += netemu_util_copy_string(&game->app_name,appname);
-	game->creator = creator;
+	game->creator = malloc(sizeof(struct p2p_user*));
+	size += netemu_application_p2p_copy_user(game->creator,creator);
+	game->user_count = 1;
+	size += sizeof(NETEMU_WORD);
 	instruction->body = game;
 	instruction->id = CREATE_P2P_GAME;
 	instruction->body_size = size;
-	instruction->packBodyFn = netemu_application_create_game_pack;
+	instruction->packBodyFn = netemu_application_p2p_create_game_pack;
+}
+
+void netemu_application_p2p_create_game_pack(struct application_instruction *instruction, char *buffer) {
+	struct p2p_game *game;
+	game = (struct p2p_game*)instruction->body;
+	_netemu_application_p2p_pack_game(buffer,game);
+}
+
+void netemu_application_p2p_create_game_parse(struct application_instruction *instruction, char *buffer) {
+	struct p2p_game *game;
+	int pos;
+	game = malloc(sizeof(struct p2p_game));
+	pos = _netemu_application_p2p_parse_game(buffer,game);
+	instruction->body = game;
+	instruction->body_size = pos;
+}
+
+int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
+	int i, pos;
+	pos = netemu_util_pack_str(buffer,game->name);
+	pos += netemu_util_pack_str(buffer+pos,game->app_name);
+	memcpy(buffer+pos, &game->user_count, sizeof(NETEMU_DWORD));
+	pos += sizeof(NETEMU_DWORD);
+	pos += _netemu_application_p2p_pack_user(buffer+pos,game->creator);
+
+	if(game->players != NULL) {
+		for(i = 0; i < game->user_count; i++) {
+			pos += _netemu_application_p2p_pack_user(buffer+pos,&game->players[i]);
+		}
+	}
+	return pos;
+}
+
+int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
+	int i, pos;
+
+	game->name = netemu_util_parse_string(buffer);
+	pos = strlen(game->name)+1;
+	game->app_name = netemu_util_parse_string(buffer+pos);
+	pos += strlen(game->app_name)+1;
+	memcpy(&game->user_count, buffer+pos, sizeof(NETEMU_DWORD));
+	pos += sizeof(NETEMU_DWORD);
+	pos += _netemu_application_p2p_parse_user(buffer+pos,game->creator, 1);
+
+	if(game->players != NULL) {
+		for(i = 0; i < game->user_count; i++) {
+			pos += _netemu_application_p2p_parse_user(buffer+pos, &game->players[i], 1);
+		}
+	}
+	return pos;
 }
 
 void netemu_application_p2p_join_game_add(struct application_instruction* instruction, char* name) {
@@ -65,15 +121,8 @@ void netemu_application_p2p_login_success_parse(struct application_instruction *
 	for(i = 0; i < success->users_count; i++) {
 		buffer += _netemu_application_p2p_parse_user(buffer,&success->users[i],1);
 	}
-
 	for(i = 0; i < success->games_count; i++) {
-		success->games[i].name = netemu_util_parse_string(buffer);
-		buffer += strlen(success->games[i].name)+1;
-		success->games[i].app_name = netemu_util_parse_string(buffer);
-		buffer += strlen(success->games[i].app_name)+1;
-		memcpy(&success->games[i].user_count, buffer, sizeof(NETEMU_DWORD));
-		buffer += sizeof(NETEMU_DWORD);
-		buffer += _netemu_application_p2p_parse_user(buffer,success->games[i].creator, 1);
+		buffer += _netemu_application_p2p_parse_game(buffer, &success->games[i]);
 	}
 	instruction->body = success;
 }
@@ -99,7 +148,7 @@ void netemu_application_p2p_login_success_add(struct application_instruction *in
 	struct p2p_login_success *success;
 	struct p2p_game *game;
 	struct p2p_user *user;
-	int size, game_size, user_size, i;
+	int size, i;
 
 	success = malloc(sizeof(struct p2p_login_success));
 	success->users = malloc(users->count*sizeof(struct p2p_user));
@@ -139,11 +188,7 @@ void netemu_application_p2p_login_success_pack(struct application_instruction *i
 	}
 
 	for(i = 0; i < success->games_count; i++) {
-		buffer += netemu_util_pack_str(buffer,success->games[i].name);
-		buffer += netemu_util_pack_str(buffer,success->games[i].app_name);
-		memcpy(buffer, &success->games[i].user_count, sizeof(NETEMU_DWORD));
-		buffer += sizeof(NETEMU_DWORD);
-		buffer += _netemu_application_p2p_pack_user(buffer,success->games[i].creator);
+		buffer += _netemu_application_p2p_pack_game(buffer,&success->games[i]);
 	}
 
 }
@@ -237,8 +282,23 @@ void netemu_application_p2p_login_request_parse(struct application_instruction *
 
 }
 
-void netemu_application_p2p_user_join_add(struct application_instruction *instruction) {
+void netemu_application_p2p_user_join_add(struct application_instruction *instruction, struct p2p_user *user) {
+	struct p2p_user *copy;
+	copy = malloc(sizeof(struct p2p_user));
+	instruction->body_size = netemu_application_p2p_copy_user(copy,user);
+	instruction->body = copy;
+	instruction->id = JOIN_P2P_GAME;
+}
 
+void netemu_application_p2p_user_join_pack(struct application_instruction *instruction, char *buffer) {
+	_netemu_application_p2p_pack_user(buffer,(struct p2p_user*) instruction->body);
+}
+
+void netemu_application_p2p_user_join_parse(struct application_instruction *instruction, char *buffer) {
+	struct p2p_user *user;
+	user = malloc(sizeof(struct p2p_user));
+	instruction->body_size = _netemu_application_p2p_parse_user(buffer,user,0);
+	instruction->body = user;
 }
 
 void netemu_application_p2p_ready_add(struct application_instruction *instruction) {

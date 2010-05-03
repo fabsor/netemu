@@ -84,7 +84,7 @@ struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *ad
 	char* hello;
 	struct communication_callback callback;
 	struct netemu_sender_buffer *buffer;
-	union netemu_sender_buffer_type *type;
+	union netemu_connection_type *type;
 	callback.port = -1;
 	callback.async = -1;
 	client = netemu_resources_get_client();
@@ -98,9 +98,9 @@ struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *ad
 	addr->port = netemu_htons(callback.port);
 	netemu_receiver_udp_clear_listeners(client->receiver);
 	client->sender->addr = netemu_prepare_net_addr(addr);
-	type = malloc(sizeof(union netemu_sender_buffer_type));
+	type = malloc(sizeof(union netemu_connection_type));
 	type->udp_sender = client->sender;
-	buffer = netemu_sender_buffer_new(BUFFER_UDP_SENDER,type,5,10);
+	buffer = netemu_sender_buffer_new(5,10);
 	connection = netemu_server_connection_new(username,emulatorname,buffer);
 	netemu_receiver_udp_register_recv_fn(client->receiver,netemu_udp_connection_receive,connection);
 	server_connection_login(connection);

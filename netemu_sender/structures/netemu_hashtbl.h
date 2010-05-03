@@ -28,6 +28,7 @@ Retrieved from: http://en.literateprograms.org/Hash_table_(C)?oldid=16632
 #define HASHTBL_H_INCLUDE_GUARD
 
 #include<stdlib.h>
+#include "netemu_list.h"
 
 typedef size_t hash_size;
 
@@ -42,6 +43,7 @@ struct hashnode_s {
 typedef struct netemu_hashtbl {
 	hash_size size;
 	int count;
+	struct netemu_list *keys;
 	struct hashnode_s **nodes;
 	int (*comparator)(const void* value1, const void* value2);
 	hash_size (*hashfunc)(const void *, size_t);
@@ -50,8 +52,6 @@ typedef struct netemu_hashtbl {
 struct netemu_hashtable_iter {
 	NETEMU_HASHTBL *table;
 	int hashindex;
-	struct hashnode_s *currentnode;
-
 };
 
 NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size (*hashfunc)(const void *, size_t), int (*comparator)(const void* value1, const void* value2));

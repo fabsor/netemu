@@ -76,7 +76,7 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 		free(hashtbl);
 		return NULL;
 	}
-
+	hashtbl->keys = netemu_list_new(size,0);
 	hashtbl->size = size;
 
 	if (hashfunc)
@@ -97,19 +97,8 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 }
 
 void netemu_hashtbl_clear(NETEMU_HASHTBL *hashtbl) {
-	hash_size n;
-	struct hashnode_s *node, *oldnode;
-
-	for (n = 0; n < hashtbl->size; ++n) {
-		node = hashtbl->nodes[n];
-		while (node) {
-			free(node->key);
-			oldnode = node;
-			node = node->next;
-			free(oldnode);
-		}
-	}
-	hashtbl->count = 0;
+	free(hashtbl->nodes);
+	hashtbl->nodes = calloc(hashtbl->size, sizeof(struct hashnode_s*));
 }
 
 struct netemu_hashtable_iter  *netemu_hashtbl_iterator_new(NETEMU_HASHTBL *hashtbl) {
@@ -117,31 +106,19 @@ struct netemu_hashtable_iter  *netemu_hashtbl_iterator_new(NETEMU_HASHTBL *hasht
 	iterator = (struct netemu_hashtable_iter*)malloc(sizeof(struct netemu_hashtable_iter));
 	iterator->table = hashtbl;
 	iterator->hashindex = 0;
-	iterator->currentnode = NULL;
 	return iterator;
 }
 
 void* netemu_hashtbl_iterator_next(struct netemu_hashtable_iter  *iterator) {
-	if (iterator->currentnode != NULL) {
-		iterator->currentnode = iterator->currentnode->next;
-		if(iterator->currentnode != NULL) {
-			return iterator->currentnode->data;
-		}
+	if(iterator->hashindex < iterator->table->keys->count) {
+		return NULL;
 	}
-	while (iterator->hashindex < iterator->table->size) {
-		iterator->currentnode = iterator->table->nodes[iterator->hashindex];
-		if(iterator->currentnode != NULL) {
-			return iterator->currentnode->data;
-		}
-		iterator->hashindex++;
-	}
-
-	return NULL;
+	//return netemu_hashtbl_get(iterator->table,iterator->table->keys[iterator->hashindex],iterator->table->count);
 }
 
 void* netemu_hashtbl_iterator_reset(struct netemu_hashtable_iter *iterator) {
 	iterator->hashindex = 0;
-	iterator->currentnode = iterator->table->nodes[0];
+	//iterator->currentnode = iterator->table->nodes[0];
 }
 
 void netemu_hashtbl_iterator_free(struct netemu_hashtable_iter* iterator) {
@@ -149,7 +126,6 @@ void netemu_hashtbl_iterator_free(struct netemu_hashtable_iter* iterator) {
 }
 
 void netemu_hashtbl_destroy(NETEMU_HASHTBL *hashtbl) {
-	netemu_hashtbl_clear(hashtbl);
 	free(hashtbl->nodes);
 	free(hashtbl);
 }
@@ -176,6 +152,7 @@ int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key,
 		free(node);
 		return -1;
 	}
+	netemu_list_add(hashtbl->keys, node->key);
 	node->data = data;
 	node->next = hashtbl->nodes[hash];
 	hashtbl->nodes[hash] = node;
@@ -187,7 +164,7 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key,
 		size_t key_len) {
 	struct hashnode_s *node, *prevnode = NULL;
 	hash_size hash = hashtbl->hashfunc(key, key_len) % hashtbl->size;
-
+	int index;
 	node = hashtbl->nodes[hash];
 	while (node) {
 		if (hashtbl->comparator(node->key, key) == 0) {
@@ -202,7 +179,8 @@ int netemu_hashtbl_remove(NETEMU_HASHTBL *hashtbl, const void *key,
 		prevnode = node;
 		node = node->next;
 	}
-
+	index = netemu_list_contains(hashtbl->keys,key);
+	netemu_list_remove_at(hashtbl->keys, index);
 
 	return -1;
 }

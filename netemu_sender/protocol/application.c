@@ -604,6 +604,7 @@ void netemu_application_create_game_pack(struct application_instruction *instruc
 	memcpy(buffer+pos,&game->wtf,sizeof(NETEMU_WORD));
 }
 
+
 void netemu_application_create_game_parse(struct application_instruction *instruction, char* buffer) {
 	struct game_created *game;
 
