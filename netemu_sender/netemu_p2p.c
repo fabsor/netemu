@@ -29,6 +29,7 @@ void netemu_p2p_new_connection(struct netemu_tcp_listener* listener, struct nete
 void netemu_p2p_respond_to_login_request(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
 void netemu_p2p_respond_to_login_success(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
 void netemu_p2p_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
+void netemu_p2p_send_user_joined(struct netemu_p2p_connection *connection, struct p2p_user *user);
 /**
  * Create a host connection.
  */
@@ -46,9 +47,9 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname)
 	p2p->user->app_name = emulatorname;
 	p2p->info = netemu_server_connection_new(username,emulatorname,buffer);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
-	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_REQUEST, netemu_p2p_respond_to_login_request, p2p->info);
+	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_REQUEST, netemu_p2p_respond_to_login_request, p2p);
 	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_SUCCESS, netemu_p2p_respond_to_login_success, p2p->info);
-	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_PLAYER_JOIN, netemu_p2p_respond_to_user_join, p2p->info);
+	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, JOIN_P2P_GAME, netemu_p2p_respond_to_user_join, p2p);
 	p2p->_internal->peers = type->collection;
 	return p2p;
 }
@@ -160,23 +161,39 @@ void netemu_p2p_respond_to_login_success(struct netemu_packet_buffer* buffer, st
 
 void netemu_p2p_respond_to_login_request(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct p2p_user *user;
-	struct netemu_info* connection;
-	connection = (struct netemu_info *)arg;
+	struct netemu_p2p_connection* connection;
+	union netemu_connection_type type;
+
+	connection = (struct netemu_p2p_connection *)arg;
+	type.collection = connection->_internal->peers;
 	user = (struct p2p_user*)item->instruction->body;
-	connection->user_count++;
+	connection->info->user_count++;
 	user->name = item->instruction->user;
-	netemu_list_add(connection->_internal->users,user);
-	netemu_p2p_send_login_success(connection,item->connection.connection);
+	netemu_p2p_send_login_success(connection->info,item->connection.connection);
+	netemu_p2p_send_user_joined(connection, user);
+	netemu_list_add(connection->info->_internal->users,user);
+}
+
+void netemu_p2p_send_user_joined(struct netemu_p2p_connection *connection, struct p2p_user *user) {
+	struct application_instruction *instruction;
+	union netemu_connection_type type;
+
+	type.collection = connection->_internal->peers;
+	instruction = netemu_application_create_message();
+	netemu_application_p2p_user_join_add(instruction, user);
+	netemu_sender_buffer_add(connection->info->_internal->send_buffer,instruction,CONNECTION_COLLECTION,type);
 }
 
 void netemu_p2p_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct p2p_user *user;
-	struct netemu_info* connection;
-	connection = (struct netemu_info *)arg;
-	user = (struct p2p_user*)item->instruction->body;
-	connection->user_count++;
-	user->name = item->instruction->user;
-	netemu_list_add(connection->_internal->users,user);
-	netemu_p2p_send_login_success(connection,item->connection.connection);
+	struct netemu_p2p_connection* connection;
+	union netemu_connection_type type;
 
+	connection = (struct netemu_p2p_connection*)arg;
+	user = (struct p2p_user*)item->instruction->body;
+	type.collection = connection->_internal->peers;
+	connection->info->user_count++;
+	user->name = item->instruction->user;
+	netemu_list_add(connection->info->_internal->users,user);
+	netemu_sender_buffer_add(connection->info->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
 }

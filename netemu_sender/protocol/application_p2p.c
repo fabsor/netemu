@@ -12,6 +12,7 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game);
 void netemu_application_p2p_create_game_pack(struct application_instruction *instruction, char *buffer);
 int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game);
+void netemu_application_p2p_user_join_pack(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator) {
 	struct p2p_game *game;
@@ -287,6 +288,7 @@ void netemu_application_p2p_user_join_add(struct application_instruction *instru
 	copy = malloc(sizeof(struct p2p_user));
 	instruction->body_size = netemu_application_p2p_copy_user(copy,user);
 	instruction->body = copy;
+	instruction->packBodyFn = netemu_application_p2p_user_join_pack;
 	instruction->id = JOIN_P2P_GAME;
 }
 

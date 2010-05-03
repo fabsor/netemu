@@ -18,7 +18,6 @@ extern "C" {
 #define P2P_LOGIN_SUCCESS	28
 #define P2P_LOGIN_REQUEST	29
 #define P2P_READY			30
-#define P2P_PLAYER_JOIN		31
 #include "application.h"
 #include "../netemu_util.h"
 
@@ -81,6 +80,8 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user);
 
 void netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game);
+
+void netemu_application_p2p_user_join_parse(struct application_instruction *instruction, char *buffer);
 #ifdef	__cplusplus
 }
 #endif
