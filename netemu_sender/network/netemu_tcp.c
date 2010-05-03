@@ -17,10 +17,17 @@ void netemu_tcp_listener_listen(void* params);
 struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, size_t addr_len) {
 	NETEMU_SOCKET socket;
 	struct netemu_tcp_connection* sender;
-	sender = malloc(sizeof(struct netemu_tcp_connection));
+	if((sender = malloc(sizeof(struct netemu_tcp_connection))) == NULL) {
+		//netlib_set_last_error(NETMEU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
+
 	socket = netemu_socket(NETEMU_AF_INET, NETEMU_SOCK_STREAM);
 	if (socket == NETEMU_INVALID_SOCKET) {
-		sender->error = netlib_get_last_error();
+		/* TODO: Need to retrieve the platforms last error here and set it as our last error. Will use NETEMU_UNKNOWNERROR in the meantime. */
+		//netlib_set_last_error(NETEMU_EUNKNOWNERROR);
+		/* sender->error = netlib_get_last_error(); */
+		return NULL;
 	}
 	sender->addr_len = addr_len;
 	sender->addr = addr;
@@ -135,18 +142,12 @@ void _netemu_tcp_connection_notify(struct netemu_tcp_connection* receiver, char*
 int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data, int size) {
 	int success;
 	success = netemu_sendto(sender->socket,data,size,0,sender->addr,sender->addr_len);
-	if(success == -1){
-		//sender->error = netemu_get_last_error();
-	}
 	return success;
 }
 
 int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender) {
 	int success;
 	success = netemu_connect(sender->socket,sender->addr,sender->addr_len);
-	if(success == -1){
-		//sender->error = netemu_get_last_error();
-	}
 	return success;
 }
 

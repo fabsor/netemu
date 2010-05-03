@@ -42,14 +42,38 @@ int kaillera_communication_get_server_list(const char *address, struct server **
 	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
 	char* request;
+	int errcode;
+	/* TODO: We need to write a function for destroying and freeing netemu_tcp_connections. */
+	errcode = netemu_get_addr_info(address,"80",NULL,&info);
+	if(errcode != 0)
+		return -1;
 
-	netemu_get_addr_info(address,"80",NULL,&info);
+	if((request = netemu_communication_http_get(SERVER,PATH)) == NULL)
+		return -1;
+
 	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
-	netemu_tcp_connection_connect(sender);
-	request = netemu_communication_http_get(SERVER,PATH);
+	if(sender == NULL) {
+		free(request);
+		return -1;
+	}
 
-	netemu_tcp_connection_send(sender,request,strlen(request));
-	netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
+	errcode = netemu_tcp_connection_connect(sender);
+	if(errcode != 0) {
+		free(request);
+		return -1;
+	}
+
+	errcode = netemu_tcp_connection_send(sender,request,strlen(request));
+	if(errcode < 0) {
+		free(request);
+		return -1;
+	}
+
+	errcode = netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
+	if(errcode != 0) {
+		free(request);
+		return -1;
+	}
 	return 0;
 }
 
