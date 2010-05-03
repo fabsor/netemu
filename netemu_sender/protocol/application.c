@@ -18,8 +18,6 @@ void netemu_application_player_left_pack(struct application_instruction* instruc
 int _netemu_application_login_success_games_parse(struct login_success *success, char **data);
 int _netemu_application_login_success_users_parse(struct login_success *success, char **data);
 
-long passed_id = 0;
-
 struct application_instruction* netemu_application_create_message() {
 	struct application_instruction* message;
 	if((message = malloc(sizeof(struct application_instruction))) == NULL) {
@@ -31,7 +29,6 @@ struct application_instruction* netemu_application_create_message() {
 		free(message);
 		return NULL;
 	}
-	message->p2p_id = 0;
 	*message->user = '\0';
 	return message;
 }

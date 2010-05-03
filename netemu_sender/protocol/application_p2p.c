@@ -87,7 +87,6 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 void netemu_application_p2p_join_game_add(struct application_instruction* instruction, struct p2p_user *creator) {
 	int size;
 	instruction->id = JOIN_P2P_GAME;
-	instruction->p2p_id = netlib_get_time_millis();
 }
 
 void netemu_application_p2p_leave_game_add(struct application_instruction* instruction) {
@@ -96,7 +95,6 @@ void netemu_application_p2p_leave_game_add(struct application_instruction* instr
 	instruction->body = NULL;
 	instruction->body_size = 0;
 	instruction->packBodyFn = NULL;
-	instruction->p2p_id = netlib_get_time_millis();
 }
 
 void netemu_application_p2p_login_success_parse(struct application_instruction *instruction, char *buffer) {
@@ -175,7 +173,6 @@ void netemu_application_p2p_login_success_add(struct application_instruction *in
 	instruction->id = P2P_LOGIN_SUCCESS;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_p2p_login_success_pack;
-	instruction->p2p_id = netlib_get_time_millis();
 }
 
 void netemu_application_p2p_login_success_pack(struct application_instruction *instruction, char *buffer) {
@@ -271,7 +268,6 @@ void netemu_application_p2p_login_request_add(struct application_instruction *in
 	instruction->id = P2P_LOGIN_REQUEST;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_p2p_login_request_pack;
-	instruction->p2p_id = netlib_get_time_millis();
 }
 
 void netemu_application_p2p_login_request_pack(struct application_instruction *instruction, char* buffer) {
@@ -295,7 +291,6 @@ void netemu_application_p2p_user_join_add(struct application_instruction *instru
 	instruction->body = copy;
 	instruction->packBodyFn = netemu_application_p2p_user_join_pack;
 	instruction->id = JOIN_P2P_GAME;
-	instruction->p2p_id = netlib_get_time_millis();
 }
 
 void netemu_application_p2p_user_join_pack(struct application_instruction *instruction, char *buffer) {
@@ -314,7 +309,6 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 	instruction->id = P2P_READY;
 	instruction->body_size = 0;
 	instruction->packBodyFn = NULL;
-	instruction->p2p_id = netlib_get_time_millis();
 }
 
 void netemu_application_p2p_kick_player_add(struct application_instruction *instruction, char* player_name) {
@@ -326,5 +320,4 @@ void netemu_application_p2p_kick_player_add(struct application_instruction *inst
 	instruction->id = KICK_P2P_PLAYER;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_create_game_pack;
-	instruction->p2p_id = netlib_get_time_millis();
 }
