@@ -9,7 +9,9 @@
 #include "network/netemu_sender_buffer.h"
 #include "network/netemu_packet_buffer.h"
 #include "network/netemu_sender_collection.h"
+#include "network/netemu_packet_buffer.h"
 #include "interface/netemu_p2p.h"
+#include "netemu_info.h"
 #include "protocol/application_p2p.h"
 #include "network/netemu_tcp.h"
 #include "netemu_list.h"
@@ -22,9 +24,10 @@ struct netemu_p2p_internal {
 };
 
 void _netemu_p2p_send_ready(struct netemu_sender_buffer *buffer);
-
+void netemu_p2p_send_login_success(struct netemu_info *info);
 void netemu_p2p_new_connection(struct netemu_tcp_listener* listener, struct netemu_tcp_connection* connection, void* params);
-
+void netemu_p2p_respond_to_login_request(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
+void netemu_p2p_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg);
 /**
  * Create a host connection.
  */
@@ -39,6 +42,8 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname)
 	p2p = malloc(sizeof(struct netemu_p2p_connection));
 	p2p->info = netemu_server_connection_new(username,emulatorname,buffer);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
+	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_REQUEST, netemu_p2p_respond_to_login_request, p2p->info);
+	netemu_packet_buffer_add_instruction_received_fn(p2p->info->_internal->receive_buffer, P2P_LOGIN_SUCCESS, netemu_p2p_respond_to_login_success, p2p->info);
 	p2p->_internal->peers = type->collection;
 	return p2p;
 }
@@ -95,6 +100,14 @@ void netemu_p2p_login(struct netemu_p2p_connection *p2p) {
 	success = netemu_packet_buffer_wait_for_instruction(p2p->info->_internal->receive_buffer, P2P_LOGIN_SUCCESS, timestamp);
 }
 
+void netemu_p2p_send_login_success(struct netemu_info *info) {
+	struct application_instruction *instruction;
+	instruction = netemu_application_create_message();
+	netemu_application_p2p_login_success_add(instruction,info->_internal->users,info->_internal->games);
+	netemu_sender_buffer_add(info->_internal->send_buffer,instruction);
+}
+
+
 int netemu_p2p_create_game(struct netemu_info *connection, char *gamename, struct game** result) {
 	struct game* game;
 	struct application_instruction* instruction;
@@ -105,4 +118,37 @@ int netemu_p2p_create_game(struct netemu_info *connection, char *gamename, struc
 	game->player_count = 1;
 	game->id = 0;
 	server_connection_add_player(game, connection->user);
+}
+
+void netemu_p2p_respond_to_login_success(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct netemu_info *info;
+	struct p2p_login_success *success;
+	struct p2p_user *user;
+	struct p2p_game *game;
+	int i;
+	info = (struct netemu_info *)arg;
+	success = (struct p2p_login_success*)instruction->body;
+	for(i = 0; i < success->users_count; i++) {
+		user = malloc(sizeof(struct p2p_user));
+		netemu_application_p2p_copy_user(user, &success->users[i]);
+		netemu_list_add(info->_internal->users,user);
+	}
+
+	for(i = 0; i < success->games_count; i++) {
+		game = malloc(sizeof(struct p2p_game));
+		netemu_application_p2p_copy_game(game, &success->games[i]);
+		netemu_list_add(info->_internal->users,user);
+	}
+	info = (struct netemu_info *)arg;
+}
+
+void netemu_p2p_respond_to_login_request(struct netemu_packet_buffer* buffer, struct application_instruction *instruction, void* arg) {
+	struct p2p_user *user;
+	struct netemu_info* connection;
+	connection = (struct netemu_info *)arg;
+	user = (struct p2p_user*)instruction->body;
+	connection->user_count++;
+	user->name = instruction->user;
+	netemu_list_add(connection->_internal->users,user);
+	netemu_p2p_send_login_success(connection);
 }

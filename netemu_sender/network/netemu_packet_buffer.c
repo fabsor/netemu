@@ -197,12 +197,10 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 
 void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, struct application_instruction *instruction) {
 	struct _netemu_packet_buffer_notify_info *notify, *nextnotify;
-	struct application_instruction* copy;
 	netemu_thread_mutex_lock(buffer->_internal->fn_mutex, NETEMU_INFINITE);
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
 				nextnotify = notify->next;
-				//copy = netemu_application_instruction_copy(instruction);
 				notify->fn(buffer,instruction,notify->arg);
 				notify = nextnotify;
 		}

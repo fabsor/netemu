@@ -61,7 +61,7 @@ void netemu_application_p2p_leave_game_add(struct application_instruction* instr
 
 void netemu_application_p2p_login_success_parse(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_p2p_login_success_add(struct application_instruction *instruction, const unsigned int noUsers, struct p2p_user *users, const unsigned int noGames, struct p2p_game *games);
+void netemu_application_p2p_login_success_add(struct application_instruction *instruction, struct netemu_list *users, struct netemu_list *games);
 
 void netemu_application_p2p_login_success_pack(struct application_instruction *instruction, char *buffer);
 
@@ -76,6 +76,10 @@ void netemu_application_p2p_login_request_parse(struct application_instruction *
 void netemu_application_p2p_login_request_add(struct application_instruction *instruction, netemu_sockaddr *addr, size_t addr_size, char* username, char* appname, int connection);
 
 void netemu_application_p2p_ready_add(struct application_instruction *instruction);
+
+int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user);
+
+void netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game);
 #ifdef	__cplusplus
 }
 #endif

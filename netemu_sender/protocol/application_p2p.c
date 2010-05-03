@@ -7,7 +7,6 @@
 #include "../netemu_util.h"
 #include "application_p2p.h"
 
-int _netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user);
 int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user);
 int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETEMU_BOOL parse_user);
 
@@ -50,9 +49,21 @@ void netemu_application_p2p_login_success_parse(struct application_instruction *
 	buffer += sizeof(NETEMU_WORD);
 	memcpy(&success->games_count,buffer,sizeof(NETEMU_WORD));
 	buffer += sizeof(NETEMU_WORD);
+	if (success->users_count > 0) {
+		success->users = malloc(sizeof(struct p2p_user)*success->users_count);
+	}
+	else {
+		success->users = NULL;
+	}
 
+	if (success->games_count) {
+		success->games = malloc(sizeof(struct p2p_game)*success->games_count);
+	}
+	else {
+		success->games = NULL;
+	}
 	for(i = 0; i < success->users_count; i++) {
-		buffer += _netemu_application_p2p_pack_user(buffer,&success->users[i]);
+		buffer += _netemu_application_p2p_parse_user(buffer,&success->users[i],1);
 	}
 
 	for(i = 0; i < success->games_count; i++) {
@@ -64,35 +75,48 @@ void netemu_application_p2p_login_success_parse(struct application_instruction *
 		buffer += sizeof(NETEMU_DWORD);
 		buffer += _netemu_application_p2p_parse_user(buffer,success->games[i].creator, 1);
 	}
+	instruction->body = success;
 }
 
-void netemu_application_p2p_login_success_add(struct application_instruction *instruction, const unsigned int noUsers, struct p2p_user *users, const unsigned int noGames, struct p2p_game *games) {
+void netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game) {
+	int size, i;
+	size = netemu_util_copy_string(&target->app_name,game->app_name);
+	size += netemu_util_copy_string(&target->name, game->name);
+	target->user_count = game->user_count;
+	size += sizeof(NETEMU_DWORD);
+	target->players = game->players;
+	if(target->players != NULL) {
+		target->players = malloc(sizeof(struct p2p_user)*game->user_count);
+		for(i = 0; i < game->user_count; i++) {
+
+			size += netemu_application_p2p_copy_user(&target->players[i],&game->players[i]);
+		}
+	}
+	size += netemu_application_p2p_copy_user(target->creator,game->creator);
+}
+
+void netemu_application_p2p_login_success_add(struct application_instruction *instruction, struct netemu_list *users, struct netemu_list *games) {
 	struct p2p_login_success *success;
 	struct p2p_game *game;
 	struct p2p_user *user;
 	int size, game_size, user_size, i;
 
 	success = malloc(sizeof(struct p2p_login_success));
-	game_size = sizeof(struct p2p_game)*noGames;
-	user_size = sizeof(struct p2p_user)*noUsers;
-	success->users = malloc(game_size);
+	success->users = malloc(users->count*sizeof(struct p2p_user));
 
-	success->games = malloc(user_size);
-	success->users_count = noUsers;
-	success->games_count = noGames;
+	success->games = malloc(games->count*sizeof(struct p2p_game));
+	success->users_count = users->count;
+	success->games_count = games->count;
 
-	for(i = 0; i < noUsers; i++) {
+	for(i = 0; i < users->count; i++) {
 		user = success->users+(sizeof(struct p2p_user)*i);
-		size += _netemu_application_p2p_copy_user(user,&users[i]) - sizeof(char*);
+		size += netemu_application_p2p_copy_user(user,users->elements[i]);
 	}
 
-	for(i = 0; i < noGames; i++) {
+	for(i = 0; i < games->count; i++) {
 		game = success->games+(sizeof(struct p2p_game)*i);
-		size += netemu_util_copy_string(&game->app_name, games[i].app_name);
-		size += netemu_util_copy_string(&game->name, games[i].name);
-		game->user_count = games[i].user_count;
-		game->players = NULL;
-		size += _netemu_application_p2p_copy_user(game->creator,games[i].creator) - sizeof(char*);
+		netemu_application_p2p_copy_game(game,games->elements[i]);
+
 	}
 
 	instruction->body = success;
@@ -133,8 +157,9 @@ int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 	memcpy(buffer+pos, &user->connection, sizeof(char));
 	pos++;
 	if(user->name != NULL)
-		pos += netemu_util_pack_str(buffer,user->name);
+		pos += netemu_util_pack_str(buffer+pos,user->name);
 
+	pos += netemu_util_pack_str(buffer+pos,user->app_name);
 	memcpy(buffer+pos,&user->ping,sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	return pos;
@@ -144,23 +169,32 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 	int pos;
 	memcpy(&user->addr_size, buffer, sizeof(size_t));
 	pos = sizeof(size_t);
+	user->addr = malloc(sizeof(user->addr_size));
 	memcpy(user->addr, buffer+pos, user->addr_size);
 	pos = sizeof(netemu_sockaddr);
 	memcpy(&user->connection, buffer+pos, sizeof(char));
 	pos++;
 	if(parse_user) {
-		user->name= netemu_util_parse_string(buffer);
+		user->name= netemu_util_parse_string(buffer+pos);
 		pos += strlen(user->name)+1;
 	}
+	user->app_name = netemu_util_parse_string(buffer+pos);
+	pos += strlen(user->app_name)+1;
 	memcpy(&user->ping, buffer+pos, sizeof(NETEMU_DWORD));
 	pos += sizeof(NETEMU_DWORD);
 	return pos;
 }
 
-int _netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user) {
+int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user) {
 	int size;
-	size = sizeof(struct p2p_user);
-	memcpy(target,user,size);
+
+	target->addr = malloc(sizeof(user->addr_size));
+	memcpy(target->addr,user->addr,user->addr_size);
+	target->addr_size = user->addr_size;
+
+	size = target->addr_size + sizeof(size_t);
+	target->ping = user->ping;
+	size += sizeof(NETEMU_DWORD);
 	/* ? */
 	if(user->name != NULL)
 		size += netemu_util_copy_string(&target->name,user->name);
@@ -198,7 +232,9 @@ void netemu_application_p2p_login_request_pack(struct application_instruction *i
 void netemu_application_p2p_login_request_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_user *user;
 	user = malloc(sizeof(struct p2p_user));
-	_netemu_application_p2p_parse_user(buffer,user,0);
+	instruction->body_size = _netemu_application_p2p_parse_user(buffer,user,0);
+	instruction->body = user;
+
 }
 
 void netemu_application_p2p_user_join_add(struct application_instruction *instruction) {
