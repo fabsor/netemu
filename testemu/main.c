@@ -55,10 +55,10 @@ int main() {
 			server_connect(addr);
 		break;
 		case '3':
-			connect_p2p();
+			/*connect_p2p();*/
 		break;
 		case '4':
-			host_p2p(addr);
+			/*host_p2p(addr);*/
 		break;
 	}
 
