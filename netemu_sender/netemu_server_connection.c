@@ -37,12 +37,12 @@ int netemu_send_chat_message(struct netemu_info *info, char *message) {
 int netemu_disconnect(struct netemu_info *info, char *message) {
 	struct netemu_client *client;
 	struct transport_packet_buffer buffer;
-	struct application_instruction *messages[1];
+	struct application_instruction *instruction;
 
 	client = netemu_resources_get_client();
-	messages[0] = netemu_application_create_message();
-	netemu_application_user_leave_add(messages[0], message);
-	buffer = netemu_transport_pack(messages,1);
+	instruction = netemu_application_create_message();
+	netemu_application_user_leave_add(instruction, message);
+	buffer = netemu_transport_pack(&instruction,1);
 	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
 }
 
@@ -119,10 +119,11 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 	if(info == NULL) {
 		return NULL;
 	}
-	info->user = user;
 	info->emulator_name = emulator_name;
 	info->current_game = NULL;
 	info->username = user;
+	info->user_count = 0;
+	info->game_count = 0;
 	info->_internal = malloc(sizeof(struct _netemu_info_internal));
 	info->_internal->chat_callback = netemu_list_new(3, FALSE);
 	info->_internal->game_created_callback = netemu_list_new(3, FALSE);
@@ -271,10 +272,9 @@ void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiv
 
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id == CREATE_GAME) {
-			printf("GAME CREATED");
+		if(instruction != NULL) {
+			netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, UDP_CONNECTION, type);
 		}
-		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, UDP_CONNECTION, type);
 	}
 }
 
@@ -291,7 +291,9 @@ void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_co
 
 	for (i = 0; i < packet->count; i++) {
 		instruction = netemu_application_parse_message(packet->instructions[i]);
-		netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, TCP_CONNECTION, type);
+		if(instruction != NULL) {
+			netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, TCP_CONNECTION, type);
+		}
 	}
 }
 /**

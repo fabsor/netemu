@@ -9,6 +9,7 @@
 #include "transport.h"
 #include "application.h"
 #include "netlib_error.h"
+
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count) {
 	static int current_index;
 	struct transport_packet_buffer packet_buffer;
@@ -89,6 +90,7 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 			free(packet);
 			return NULL;
 		}
+
 		memcpy(&instruction->serial, data + pos, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
 
@@ -98,6 +100,7 @@ struct transport_packet* netemu_transport_unpack(char* data) {
 		memcpy(instruction->instruction, data + pos,instruction->length);
 		pos += instruction->length;
 		packet->instructions[i] = instruction;
+
 	}
 	return packet;
 }

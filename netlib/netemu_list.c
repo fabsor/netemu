@@ -43,6 +43,7 @@ struct netemu_list* netemu_list_new(int count, NETEMU_BOOL thread_safe) {
 	list->count = 0;
 	list->sorted = 0;
 	list->_intern = intern;
+	list->_intern->comparator = NULL;
 	return list;
 }
 
@@ -95,15 +96,21 @@ int netemu_list_contains(struct netemu_list* list, void* element) {
 
 int _netemu_list_search_linear(struct netemu_list* list, void* element) {
 	int i;
-	int index = -1;
 
 	if(list->thread_safe)
 		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
 
 	
 	for (i = 0; i < list->count; i++) {
-		if (list->elements[i] == element) {
-			return index;
+		if(list->_intern->comparator != NULL) {
+			if(list->_intern->comparator(list->elements[i],element) == 0) {
+				return i;
+			}
+		}
+		else {
+			if (list->elements[i] == element) {
+				return i;
+			}
 		}
 	}
 

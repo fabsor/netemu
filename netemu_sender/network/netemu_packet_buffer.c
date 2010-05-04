@@ -112,7 +112,7 @@ void _netemu_packet_buffer_update(void* args) {
 				/* wakeup and notify */
 				_netemu_packet_buffer_perform_notify(buffer,itemsToNotify->elements[i]);
 				_netemu_packet_buffer_perform_wakeup(buffer,itemsToNotify->elements[i]);
-				free(itemsToNotify->elements[i]);
+				 //free(itemsToNotify->elements[i]);
 			}
 			/* Finally clear everything out. */
 			netemu_list_clear(itemsToNotify);
@@ -165,7 +165,6 @@ void _netemu_packet_buffer_perform_wakeup(struct netemu_packet_buffer* buffer, s
 		while(wakeup != NULL) {
 			if(wakeup->age <= item->instruction->timestamp) {
 				wakeup->item = item;
-				wakeup->item->instruction = netemu_application_instruction_copy(wakeup->item->instruction);
 				if(wakeup->prev != NULL)
 					wakeup->prev->next = wakeup->next;
 				if(wakeup->next != NULL) {

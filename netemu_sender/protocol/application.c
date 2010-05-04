@@ -46,9 +46,11 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	data = (char*)instruction->instruction;
 	memcpy(&app_instruction->id,data,sizeof(char));
 	data += sizeof(char);
+
 	if((app_instruction->user = netemu_util_parse_string(data)) == NULL) {
 		/* Error code already set in parse_string */
 		free(app_instruction);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 	data += strlen(app_instruction->user) + 1;
@@ -101,7 +103,13 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case P2P_LOGIN_SUCCESS:
 			netemu_application_p2p_login_success_parse(app_instruction, data);
 			break;
+		case P2P_USER_JOIN:
+			netemu_application_p2p_user_join_parse(app_instruction, data);
+			break;
+		case CREATE_P2P_GAME:
+			netemu_application_p2p_create_game_parse(app_instruction,data);
 	}
+
 
 	return app_instruction;
 }
@@ -186,7 +194,6 @@ int netemu_application_chat_parse(struct application_instruction *instruction, c
 
 int netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
 	struct login_success *success;
-	unsigned int i, j;
 
 	if((success = malloc(sizeof(struct login_success))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
@@ -200,12 +207,14 @@ int netemu_application_login_success_parse(struct application_instruction *instr
 
 	if(_netemu_application_login_success_users_parse(success, &data) == -1) {
 		free(success);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 
 	if(_netemu_application_login_success_games_parse(success, &data) == -1) {
 		free(success->users);
 		free(success);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 

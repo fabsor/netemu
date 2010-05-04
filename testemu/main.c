@@ -7,28 +7,14 @@
 //#define _CRTDBG_MAP_ALLOC
 //#define _CRTDBG_MAPALLOC
 #include <stdlib.h>
-
+#include "constants.h"
 //#include <crtdbg.h>
 #include <stdio.h>
 #include "netemu_p2p.h"
 #include "netemu_kaillera.h"
-
-#define EMUNAME		"testemu"
-#define PLAYERNAME	"foobar"
-
-
-#define BIND_ADDR	netemu_inet_addr("127.0.0.1")
-
-#define ADDR	netemu_inet_addr("127.0.0.1")
-#define PORT	netemu_htons(27888)
-#define VALUE	"0x0x0xff"
-
-#define CLOUD_NAME	"the_cloud"
-
-
+#include "p2ptest.h"
 char* games[] = {"Foo", "Bar"};
 struct netemu_info *info;
-#define NO_GAMES	2
 
 void menu(struct netemu_info* connection);
 void create_game(struct netemu_info *connection);
@@ -50,7 +36,6 @@ void connect_p2p();
 int main() {
 	struct netemu_sockaddr_in addr;
 	char choice;
-	  //mtrace();
 	info = NULL;
 	addr.addr = ADDR;
 	addr.port = PORT;
@@ -76,59 +61,23 @@ int main() {
 			host_p2p(addr);
 		break;
 	}
-	netemu_register_play_values_received_callback(info, receive_values);
-	menu(info);
+
 	//muntrace();
 	return 0;
 }
 
-void host_p2p(struct netemu_sockaddr_in addr) {
-	int port;
-	struct netemu_p2p_connection *p2p;
-	printf("Enter Port Number:\n");
-	scanf("%d",&port);
-	addr.port = netemu_htons(port);
-	printf("\n");
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
-	netemu_p2p_host(p2p, &addr,sizeof(addr),CLOUD_NAME);
-	info = p2p->info;
-}
-
-void connect_p2p() {
-	int port;
-	struct netemu_sockaddr_in in_addr;
-	struct netemu_sockaddr_in out_addr;
-	struct netemu_p2p_connection *p2p;
-
-	in_addr.addr = ADDR;
-	in_addr.family = NETEMU_AF_INET;
-
-	out_addr.addr = ADDR;
-	out_addr.family = NETEMU_AF_INET;
-
-	printf("Enter Port Number for you:\n");
-	scanf("%d",&port);
-	in_addr.port = netemu_htons(port);
-	printf("\n");
-
-	printf("Enter Port Number to the host:\n");
-	scanf("%d",&port);
-	out_addr.port = netemu_htons(port);
-	printf("\n");
-
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
-	netemu_p2p_connect(p2p,&in_addr,sizeof(in_addr),&out_addr,sizeof(out_addr));
-	//struct netemu_p2p_connection* p2p, struct netemu_sockaddr_in *in_addr, int in_addr_size,  struct netemu_sockaddr_in *connect_addr, int connect_addr_size
-	info = p2p->info;
-}
 
 void connect_async(struct netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success, NULL);
 	while(info == NULL);
+	netemu_register_play_values_received_callback(info, receive_values);
+	menu(info);
 }
 
 void server_connect(struct netemu_sockaddr_in addr) {
 	info = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
+	netemu_register_play_values_received_callback(info, receive_values);
+	menu(info);
 }
 
 void login_success(int status, struct netemu_info* server_connection, void *arg) {
@@ -173,6 +122,7 @@ void menu(struct netemu_info* connection) {
 	}
 	//_CrtDumpMemoryLeaks();
 }
+
 
 void send_play_values(struct netemu_info *connection) {
 	char* data = VALUE;

@@ -26,6 +26,6 @@ typedef char NETEMU_BOOL;
 
 void netemu_snprintf(char* dest,size_t size, char* format, void* data);
 
-
+long netlib_get_time_millis();
 #endif /* NETEMU_UTIL_H_ */
 

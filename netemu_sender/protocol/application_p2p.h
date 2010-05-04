@@ -18,7 +18,7 @@ extern "C" {
 #define P2P_LOGIN_SUCCESS	28
 #define P2P_LOGIN_REQUEST	29
 #define P2P_READY			30
-#define P2P_PLAYER_JOIN		31
+#define P2P_USER_JOIN		31
 #include "application.h"
 #include "../netemu_util.h"
 
@@ -39,10 +39,6 @@ struct p2p_game {
 	struct p2p_user* players;
 };
 
-struct p2p_join_game {
-	char *name;
-};
-
 struct p2p_kick_player {
 	char *name;
 };
@@ -55,8 +51,6 @@ struct p2p_login_success {
 };
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator);
-
-void netemu_application_p2p_join_game_add(struct application_instruction* instruction, char* name);
 
 void netemu_application_p2p_leave_game_add(struct application_instruction* instruction);
 
@@ -80,7 +74,13 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 
 int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user);
 
-void netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game);
+int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game);
+
+void netemu_application_p2p_create_game_parse(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_p2p_user_join_parse(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_p2p_player_join_add(struct application_instruction *instruction, struct p2p_user *user);
 #ifdef	__cplusplus
 }
 #endif

@@ -32,7 +32,7 @@ struct netemu_receiver_udp* netemu_util_prepare_receiver(int port,void (* listen
 
 struct netemu_sender_udp* netemu_util_prepare_sender(int port) {
 	struct netemu_sockaddr_in addr_in;
-	struct netemu_sender* sender;
+	struct netemu_sender_udp* sender;
 	netemu_sockaddr *addr;
 	addr_in.addr = SERVER_ADDRESS;
 	addr_in.family = NETEMU_AF_INET;
