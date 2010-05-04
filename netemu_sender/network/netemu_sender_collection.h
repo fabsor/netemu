@@ -15,6 +15,7 @@ extern "C" {
 
 struct netemu_sender_collection {
 	struct netemu_list *senders;
+	struct netemu_list *sender_listeners;
 };
 
 struct netemu_sender_collection* netemu_sender_collection_new();

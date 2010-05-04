@@ -11,6 +11,8 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+
+#include "../protocol/application_p2p.h"
 #include "netemu_socket.h"
 #include "netemu_kaillera.h"
 
@@ -24,6 +26,7 @@ struct p2p_player {
 struct netemu_p2p_connection {
 	struct netemu_info* info;
 	struct p2p_user *user;
+	struct p2p_game *current_game;
 	netemu_p2p_internal _internal;
 	char* cloud_name;
 };
@@ -37,6 +40,12 @@ void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in
 int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct game** result);
 
 void netemu_p2p_login(struct netemu_p2p_connection *p2p);
+
+int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_user *creator);
+
+struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p_connection* info, int *count);
+
+struct p2p_user** netemu_p2p_get_user_list(struct netemu_p2p_connection* info, int *count);
 
 #ifdef	__cplusplus
 }
