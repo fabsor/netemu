@@ -28,8 +28,8 @@
 struct communication_callback {
 	int async;
 	int port;
+	netemu_sockaddr_in *addr;
 	void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg);
-	struct netemu_sockaddr_in *addr;
 	char* emulatorname;
 	char* username;
 	void *arg;
@@ -78,7 +78,7 @@ int kaillera_communication_get_server_list(const char *address, struct server **
 	return 0;
 }
 
-struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulatorname, char* username) {
+struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int addr_size, char* emulatorname, char* username) {
 	struct netemu_client *client;
 	struct netemu_info *connection;
 	char* hello;
@@ -95,9 +95,9 @@ struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *ad
 	free(hello);
 	while(callback.port == -1);
 
-	addr->port = netemu_htons(callback.port);
+	addr->sin_port = netemu_htons(callback.port);
 	netemu_receiver_udp_clear_listeners(client->receiver);
-	client->sender->addr = netemu_prepare_net_addr(addr);
+	client->sender->addr = (struct sockaddr*)addr;
 	type = malloc(sizeof(union netemu_connection_type));
 	type->udp_sender = client->sender;
 	buffer = netemu_sender_buffer_new(5,10);
@@ -107,17 +107,17 @@ struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *ad
 	return connection;
 }
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg) {
+void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg) {
 	struct netemu_client *client;
 	char* hello;
 	struct communication_callback *callback;
 
-	struct netemu_sockaddr_in *addr_cpy;
+	netemu_sockaddr_in *addr_cpy;
 	char* user_cpy;
 	char* emulator_cpy;
 
 	/* Copy data, so the paramaters can be freed by the calling thread. */
-	addr_cpy = malloc(sizeof(struct netemu_sockaddr_in));
+	addr_cpy = malloc(sizeof(netemu_sockaddr_in));
 	emulator_cpy = malloc(sizeof(char)*(strlen(emulator_name)+1));
 	user_cpy = malloc(sizeof(char)*(strlen(username)+1));
 
@@ -146,8 +146,8 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	struct netemu_info* connection;
 	client = netemu_resources_get_client();
 	netemu_receiver_udp_clear_listeners(client->receiver);
-	callback->addr->port = netemu_htons(callback->port);
-	client->sender->addr = netemu_prepare_net_addr(callback->addr);
+	callback->addr = netemu_htons(callback->port);
+	client->sender->addr = (netemu_sockaddr*)callback->addr;
 	/*connection = netemu_server_connection_new(callback->username,callback->username);*/
 	callback->ConnectionReceivedFn(callback->port, connection, callback->arg);
 	free(callback);

@@ -18,11 +18,6 @@ extern "C" {
 
 typedef struct netemu_p2p_internal* netemu_p2p_internal;
 
-struct p2p_player {
-	struct netemu_sockaddr_in *addr;
-	struct player* player_info;
-};
-
 struct netemu_p2p_connection {
 	struct netemu_info* info;
 	struct p2p_user *user;
@@ -33,9 +28,9 @@ struct netemu_p2p_connection {
 
 struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname);
 
-int netemu_p2p_connect(struct netemu_p2p_connection* p2p, struct netemu_sockaddr_in *in_addr, int in_addr_size,  struct netemu_sockaddr_in *connect_addr, int connect_addr_size);
+int netemu_p2p_connect(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in_addr, int in_addr_size,  netemu_sockaddr_in *connect_addr, int connect_addr_size);
 
-void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname);
+void netemu_p2p_host(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *addr, int addr_size, char* cloudname);
 
 int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct game** result);
 

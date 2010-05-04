@@ -7,8 +7,8 @@
 
 #ifndef P2PTEST_H_
 #define P2PTEST_H_
-
-void host_p2p(struct netemu_sockaddr_in addr);
+#include "netemu_socket.h"
+void host_p2p(netemu_sockaddr_in addr);
 
 void connect_p2p();
 

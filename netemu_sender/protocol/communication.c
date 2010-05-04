@@ -34,8 +34,7 @@ char *_netemu_parse_response_string(char *input, char **output, char terminator)
 char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers);
 
 int netemu_communication_ping_server(struct server *server, void (* pingReceivedCallback)(struct server *server)) {
-	struct netemu_sockaddr_in addr;
-	struct netemu_sockaddr *saddr;
+	netemu_sockaddr_in addr;
 	char *address, *ip, *ping;
 	int ip_len, port_len;
 	short port;
@@ -54,16 +53,17 @@ int netemu_communication_ping_server(struct server *server, void (* pingReceived
 	port = atoi(address);
 
 	/* Connect */
-	addr.addr = netemu_inet_addr(ip);
-	addr.port = netemu_htons(port);
-	addr.family = NETEMU_AF_INET;
-	saddr = netemu_prepare_net_addr(&addr);
-	server->_internal->sender = netemu_sender_udp_new(saddr, sizeof(addr));
+	addr.sin_addr.s_addr = netemu_inet_addr(ip);
+	addr.sin_port = netemu_htons(port);
+	addr.sin_family = NETEMU_AF_INET;
+
+	server->_internal->sender = netemu_sender_udp_new(netemu_util_copy_addr((struct sockaddr*)&addr,sizeof(addr)), sizeof(addr));
 
 	ping = netemu_communication_create_ping_message();
 	/* Store current time, so we can calculate roundtrip time when we receive the pong. */
 	server->_internal->ping_timestamp = time(NULL);
 	netemu_sender_udp_send(server->_internal->sender, ping, strlen(ping)+1);
+	return 1;
 }
 
 

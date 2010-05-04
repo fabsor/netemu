@@ -43,15 +43,16 @@ struct netemu_kaillera_connection {
 typedef struct server kaillera_server;
 typedef struct existing_game kaillera_existing_game;
 
-void netemu_kaillera_network_init(struct netemu_sockaddr_in *addr, int addr_size);
+void netemu_kaillera_network_init(netemu_sockaddr_in *addr, int addr_size);
 
 int kaillera_communication_get_server_list(const char *address, struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount);
 
 void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct netemu_communication_server *server)));
 
-struct netemu_info* kaillera_communication_connect(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username);
+struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username);
 
-void kaillera_communication_connect_async(struct netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg);
+
+void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void* arg);
 
 int netemu_send_chat_message(struct netemu_info *connection, char *message);
 

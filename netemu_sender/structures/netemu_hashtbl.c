@@ -77,6 +77,7 @@ NETEMU_HASHTBL *netemu_hashtbl_create(hash_size size, hash_size(*hashfunc)(
 		return NULL;
 	}
 	hashtbl->keys = netemu_list_new(size,0);
+	hashtbl->count = 0;
 	hashtbl->size = size;
 
 	if (hashfunc)

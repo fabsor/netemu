@@ -13,12 +13,12 @@
 void p2p_menu(struct netemu_p2p_connection *connection);
 void create_p2p_game(struct netemu_p2p_connection* connection);
 
-void host_p2p(struct netemu_sockaddr_in addr) {
+void host_p2p(netemu_sockaddr_in addr) {
 	int port;
 	struct netemu_p2p_connection *p2p;
 	printf("Enter Port Number:\n");
 	scanf("%d",&port);
-	addr.port = netemu_htons(port);
+	addr.sin_port = netemu_htons(port);
 	printf("\n");
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	netemu_p2p_host(p2p, &addr,sizeof(addr),CLOUD_NAME);
@@ -27,24 +27,24 @@ void host_p2p(struct netemu_sockaddr_in addr) {
 
 void connect_p2p() {
 	int port;
-	struct netemu_sockaddr_in in_addr;
-	struct netemu_sockaddr_in out_addr;
+	netemu_sockaddr_in in_addr;
+	netemu_sockaddr_in out_addr;
 	struct netemu_p2p_connection *p2p;
 
-	in_addr.addr = ADDR;
-	in_addr.family = NETEMU_AF_INET;
+	in_addr.sin_addr.s_addr = ADDR;
+	in_addr.sin_family = NETEMU_AF_INET;
 
-	out_addr.addr = ADDR;
-	out_addr.family = NETEMU_AF_INET;
+	out_addr.sin_addr.s_addr = ADDR;
+	out_addr.sin_family = NETEMU_AF_INET;
 
 	printf("Enter Port Number for you:\n");
 	scanf("%d",&port);
-	in_addr.port = netemu_htons(port);
+	in_addr.sin_port = netemu_htons(port);
 	printf("\n");
 
 	printf("Enter Port Number to the host:\n");
 	scanf("%d",&port);
-	out_addr.port = netemu_htons(port);
+	out_addr.sin_port = netemu_htons(port);
 	printf("\n");
 
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
