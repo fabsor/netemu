@@ -45,6 +45,8 @@ struct application_instruction {
 	int body_size;
 	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
 	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
+	void* (*copyBodyFn)(struct application_instruction* instruction);
+	void (*freeBodyFn)(struct application_instruction* instruction);
 	int important; /**< Set this to > 0 and it will cause the buffer containing it to pack all buffered packets up and send them directly.*/
 	time_t timestamp;
 };

@@ -1,4 +1,4 @@
-#Tue May 04 00:51:17 CEST 2010
+#Tue May 04 14:06:22 CEST 2010
 eclipse.preferences.version=1
-environment/project/cdt.managedbuild.config.gnu.exe.debug.2095794475=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\="\:" name\="_MALLOC_CHECK" operation\="append" value\="2"/>\n</environment>\n
+environment/project/cdt.managedbuild.config.gnu.exe.debug.2095794475=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true"/>\n
 environment/project/cdt.managedbuild.config.gnu.exe.release.828396622=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\="\:" name\="MALLOC_CHECK_" operation\="append" value\="1"/>\n</environment>\n

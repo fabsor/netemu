@@ -16,50 +16,44 @@
 #define SERVER_ADDRESS	netemu_htonl(INADDR_LOOPBACK);
 
 struct netemu_receiver_udp* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* args) {
-	struct netemu_sockaddr_in addr_in;
-	netemu_sockaddr *addr;
+	netemu_sockaddr_in *addr_in;
 	struct netemu_receiver_udp *receiver;
-	addr_in.addr = netemu_htonl(INADDR_ANY);
-	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = netemu_htons(port);
+	addr_in = malloc(sizeof(netemu_sockaddr_in));
+	addr_in->sin_addr.s_addr = netemu_htonl(INADDR_ANY);
+	addr_in->sin_family = NETEMU_AF_INET;
+	addr_in->sin_port = netemu_htons(port);
 
-	addr = netemu_prepare_net_addr(&addr_in);
-	receiver = netemu_receiver_udp_new(addr,sizeof(addr_in), 256);
+	receiver = netemu_receiver_udp_new((netemu_sockaddr*)addr_in,sizeof(addr_in), 256);
 	netemu_receiver_udp_register_recv_fn(receiver, listenerFn, args);
 	netemu_receiver_udp_start_receiving(receiver);
 	return receiver;
 }
 
 struct netemu_sender_udp* netemu_util_prepare_sender(int port) {
-	struct netemu_sockaddr_in addr_in;
+	netemu_sockaddr_in *addr_in;
 	struct netemu_sender_udp* sender;
-	netemu_sockaddr *addr;
-	addr_in.addr = SERVER_ADDRESS;
-	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = netemu_htons(port);
-
-	addr = netemu_prepare_net_addr(&addr_in);
-	sender = netemu_sender_udp_new(addr,sizeof(addr_in));
+	addr_in = malloc(sizeof(netemu_sockaddr_in));
+	addr_in->sin_addr.s_addr = SERVER_ADDRESS;
+	addr_in->sin_family = NETEMU_AF_INET;
+	addr_in->sin_port = netemu_htons(port);
+	sender = netemu_sender_udp_new((netemu_sockaddr*)addr_in,sizeof(addr_in));
 	return sender;
 }
 
 struct netemu_sender_udp* netemu_util_prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
-	struct netemu_sockaddr_in addr_in;
+	netemu_sockaddr_in* addr_in;
 	struct netemu_sender_udp* sender;
-	netemu_sockaddr *addr;
-	addr_in.addr = SERVER_ADDRESS;
-	addr_in.family = NETEMU_AF_INET;
-	addr_in.port = netemu_htons(port);
-	addr = netemu_prepare_net_addr(&addr_in);
-	sender = netemu_sender_udp_new_on_socket(addr,socket,sizeof(addr_in));
+	addr_in = malloc(sizeof(netemu_sockaddr_in));
+	addr_in->sin_addr.s_addr = SERVER_ADDRESS;
+	addr_in->sin_family = NETEMU_AF_INET;
+	addr_in->sin_port = netemu_htons(port);
+	sender = netemu_sender_udp_new_on_socket((netemu_sockaddr*)addr_in,socket,sizeof(addr_in));
 	return sender;
 }
 
-struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, struct netemu_sockaddr_in *addr_in, int size) {
-	netemu_sockaddr *addr;
+struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, netemu_sockaddr_in *addr_in, int size) {
 	struct netemu_sender_udp* sender;
-	addr = netemu_prepare_net_addr(addr_in);
-	sender = netemu_sender_udp_new_on_socket(addr,socket,size);
+	sender = netemu_sender_udp_new_on_socket(netemu_util_copy_addr((struct sockaddr*)addr_in,size),socket,size);
 	return sender;
 }
 
@@ -94,6 +88,13 @@ char* netemu_util_parse_string(char* data) {
 	strncpy(string, data, str_len);
 
 	return string;
+}
+
+netemu_sockaddr* netemu_util_copy_addr(netemu_sockaddr *addr, int addr_size) {
+	netemu_sockaddr* copy;
+	copy = malloc(addr_size);
+	memcpy(copy,addr,addr_size);
+	return copy;
 }
 
 int netemu_util_pack_str(char* buffer, char* str) {

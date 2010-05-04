@@ -139,15 +139,6 @@ unsigned long netemu_inet_addr(char* addr) {
 	return inet_addr(addr);
 }
 
-netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr){
-    struct sockaddr_in* addr;
-    addr = malloc(sizeof(struct sockaddr_in));
-    addr->sin_port = netaddr->port;
-    addr->sin_family = netaddr->family;
-    addr->sin_addr.s_addr = netaddr->addr;
-    
-    return (netemu_sockaddr*) addr;
-}
 
 int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
 	return connect(socket,address,address_len);

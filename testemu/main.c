@@ -27,19 +27,19 @@ void show_user_list(struct netemu_info* connection);
 void player_ready(struct netemu_info *connection);
 void receive_values(struct buffered_play_values *result);
 void login_success(int status, struct netemu_info* connection);
-void connect_async(struct netemu_sockaddr_in addr);
-void server_connect(struct netemu_sockaddr_in addr);
+void connect_async(netemu_sockaddr_in addr);
+void server_connect(netemu_sockaddr_in addr);
 void game_created(struct game* game);
-void host_p2p(struct netemu_sockaddr_in addr);
+void host_p2p(netemu_sockaddr_in addr);
 void connect_p2p();
 
 int main() {
-	struct netemu_sockaddr_in addr;
+	netemu_sockaddr_in addr;
 	char choice;
 	info = NULL;
-	addr.addr = ADDR;
-	addr.port = PORT;
-	addr.family = NETEMU_AF_INET;
+	addr.sin_addr.s_addr = ADDR;
+	addr.sin_port = PORT;
+	addr.sin_family = NETEMU_AF_INET;
 	netemu_init_network();
 	//info = netemu_client_new(EMUNAME,games);
 	//kaillera_communication_get_server_list(&servers, &games);
@@ -67,14 +67,14 @@ int main() {
 }
 
 
-void connect_async(struct netemu_sockaddr_in addr) {
+void connect_async(netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success);
 	while(info == NULL);
 	netemu_register_play_values_received_callback(info, receive_values);
 	menu(info);
 }
 
-void server_connect(struct netemu_sockaddr_in addr) {
+void server_connect(netemu_sockaddr_in addr) {
 	info = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
 	netemu_register_play_values_received_callback(info, receive_values);
 	menu(info);

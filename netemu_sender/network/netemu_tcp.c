@@ -156,7 +156,7 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 	sender = malloc(sizeof(struct netemu_tcp_listener));
 	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_STREAM);
 	if (socket == NETEMU_INVALID_SOCKET) {
-		//sender->error = netemu_get_last_error();
+		sender->error = netlib_get_last_error();
 	}
 	sender->addr_len = addr_len;
 	sender->addr = bind_addr;
@@ -178,10 +178,12 @@ void _netemu_tcp_listener_listen(void* params) {
 	error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if(error == -1) {
 		error = netlib_get_last_error();
+		return;
 	}
 	error = netemu_listen(receiver->socket,5);
 	if(error == -1) {
 		error = netlib_get_last_error();
+		return;
 	}
 	while (1) {
 		socket = netemu_accept_inet(receiver->socket,&addr,&addr_len);

@@ -154,12 +154,7 @@ typedef unsigned int NETEMU_SOCKET;
 	*/
 	typedef struct sockaddr netemu_sockaddr;
 
-	struct netemu_sockaddr_in{
-		unsigned short family;
-		char sa_data[14];
-		unsigned int addr;
-		short port;
-	};
+	typedef struct sockaddr_in netemu_sockaddr_in;
 
 	typedef struct sockaddr_in6 netemu_sockaddr_in6;
 
@@ -222,8 +217,6 @@ typedef unsigned int NETEMU_SOCKET;
 	int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result);
 
 	void netemu_free_addr_info(struct netemu_addrinfo *info);
-
-	netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr);
 
 	/* Converts a string containing a dotted IPv4 address to a network order unsigned long. */
 	unsigned long netemu_inet_addr(char* addr);

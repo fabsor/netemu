@@ -222,39 +222,6 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	return errcode;
 }
 
-//int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
-//	PADDRINFOA addrinfo = NULL;
-//	struct netemu_addrinfo *result_addrinfo;
-//	getaddrinfo(nodename, servicetype, hints, &addrinfo);
-//
-//	*result = malloc(sizeof(struct netemu_addrinfo));
-//
-//	result_addrinfo = *result;
-//	while(addrinfo != NULL) {
-//		result_addrinfo->addr = addrinfo->ai_addr;
-//		result_addrinfo->hostname = addrinfo->ai_canonname;
-//		result_addrinfo->addrlen = addrinfo->ai_addrlen;
-//		addrinfo = addrinfo->ai_next;
-//		if(addrinfo != NULL) {
-//			result_addrinfo->next = malloc(sizeof(struct netemu_addrinfo));
-//			result_addrinfo = result_addrinfo->next;
-//		}
-//	}
-//	
-//}
-
-netemu_sockaddr* netemu_prepare_net_addr(struct netemu_sockaddr_in *netaddr) {
-	struct sockaddr_in* in_addr;
-	if((in_addr = malloc(sizeof(struct sockaddr_in))) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-		return NULL;
-	}
-    in_addr->sin_port = netaddr->port;
-    in_addr->sin_family = netaddr->family;
-    in_addr->sin_addr.s_addr = netaddr->addr;
-    return (netemu_sockaddr*) in_addr;
-}
-
 unsigned long netemu_inet_addr(char* addr) {
 	return inet_addr(addr);
 }

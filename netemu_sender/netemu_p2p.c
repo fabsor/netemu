@@ -88,8 +88,8 @@ void _netemu_p2p_send_ready(struct netemu_sender_buffer *buffer, struct netemu_t
 	netemu_sender_buffer_add(buffer, instruction,TCP_CONNECTION, type);
 }
 
-void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in *addr, int addr_size, char* cloudname) {
-	p2p->_internal->host = netemu_tcp_listener_new(netemu_prepare_net_addr(addr),addr_size);
+void netemu_p2p_host(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *addr, int addr_size, char* cloudname) {
+	p2p->_internal->host = netemu_tcp_listener_new(netemu_util_copy_addr((struct sockaddr*)addr,addr_size),addr_size);
 	p2p->cloud_name = cloudname;
 	p2p->user->addr = p2p->_internal->host->addr;
 	p2p->user->addr_size = p2p->_internal->host->addr_len;
@@ -100,13 +100,13 @@ void netemu_p2p_host(struct netemu_p2p_connection* p2p,struct netemu_sockaddr_in
 /**
  * Connect to a host.
  */
-int netemu_p2p_connect(struct netemu_p2p_connection* p2p, struct netemu_sockaddr_in *in_addr, int in_addr_size,  struct netemu_sockaddr_in *connect_addr, int connect_addr_size) {
+int netemu_p2p_connect(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in_addr, int in_addr_size,  netemu_sockaddr_in *connect_addr, int connect_addr_size) {
 	int error;
 	error = 0;
-	p2p->_internal->host = netemu_tcp_listener_new(netemu_prepare_net_addr(in_addr),in_addr_size);
+	p2p->_internal->host = netemu_tcp_listener_new(netemu_util_copy_addr((netemu_sockaddr*)in_addr,in_addr_size),in_addr_size);
 	p2p->user->addr = p2p->_internal->host->addr;
 	p2p->user->addr_size = p2p->_internal->host->addr_len;
-	netemu_p2p_connect_to(p2p, netemu_prepare_net_addr(connect_addr), connect_addr_size);
+	netemu_p2p_connect_to(p2p, netemu_util_copy_addr((netemu_sockaddr*)connect_addr,connect_addr_size), connect_addr_size);
 	netemu_p2p_login(p2p);
 	return error;
 }
