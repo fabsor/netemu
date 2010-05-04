@@ -17,12 +17,12 @@ void MasterServerSettings::createActions()
 {
 	connect(ui.textMasterAddress, SIGNAL(editingFinished()), this, SLOT(OnMasterServerAddressChanged()));
 }
-
+//
 void MasterServerSettings::OnMasterServerAddressChanged()
 {
 	this->masterServerAddressChanged = true;
 }
-
+//
 void MasterServerSettings::LoadPreferences()
 {
 	QSettings *settings = new QSettings;

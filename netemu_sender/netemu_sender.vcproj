@@ -167,6 +167,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\protocol\application_p2p.c"
+				>
+			</File>
+			<File
 				RelativePath=".\application_test.c"
 				>
 			</File>
@@ -258,6 +262,10 @@
 			>
 			<File
 				RelativePath=".\protocol\application.h"
+				>
+			</File>
+			<File
+				RelativePath=".\protocol\application_p2p.h"
 				>
 			</File>
 			<File

@@ -2,7 +2,8 @@
 #define PREFERENCESDIALOG_H
 
 #include <QtGui/QDialog>
-#include "ui_preferencesdialog.h"
+#include "ui_settingsdialog.h"
+#include <QSettings>
 #include "SettingsWidgets/masterserversettings.h"
 
 class SettingsDialog : public QDialog
@@ -12,9 +13,9 @@ class SettingsDialog : public QDialog
 public:
     SettingsDialog(QWidget *parent = 0, QSettings *settings = NULL);
     ~SettingsDialog();
-
-private slots:
-	void changePreferencePage(QListWidgetItem *current, QListWidgetItem *previous);
+//
+//private slots:
+//	void changePreferencePage(QListWidgetItem *current, QListWidgetItem *previous);
 	void OnButtonOkClicked();
 
 private:

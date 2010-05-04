@@ -214,6 +214,14 @@
 				RelativePath="mainwindow.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\SettingsWidgets\masterserversettings.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Dialogs\settingsdialog.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -246,24 +254,20 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\SettingsWidgets\masterserversettings.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Dialogs\settingsdialog.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Generated Files"
 			Filter="cpp;c;cxx;moc;h;def;odl;idl;res;"
 			UniqueIdentifier="{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}"
 			>
-			<File
-				RelativePath="release\moc_mainwindow.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
 			<File
 				RelativePath="debug\moc_mainwindow.cpp"
 				>
@@ -277,6 +281,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\debug\moc_masterserversettings.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\debug\moc_settingsdialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath="ui_mainwindow.h"
 				>
 			</File>
@@ -287,6 +299,10 @@
 			UniqueIdentifier="{99349809-55BA-4b9d-BF79-8FDBB0286EB3}"
 			ParseFiles="false"
 			>
+			<File
+				RelativePath=".\Dialogs\connectdialog.ui"
+				>
+			</File>
 			<File
 				RelativePath="mainwindow.ui"
 				>
@@ -312,6 +328,14 @@
 						Outputs="ui_mainwindow.h"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\SettingsWidgets\masterserversettings.ui"
+				>
+			</File>
+			<File
+				RelativePath=".\Dialogs\settingsdialog.ui"
+				>
 			</File>
 		</Filter>
 	</Files>
