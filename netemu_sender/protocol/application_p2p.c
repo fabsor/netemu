@@ -112,8 +112,8 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	pos = strlen(game->name)+1;
 	game->app_name = netemu_util_parse_string(buffer+pos);
 	pos += strlen(game->app_name)+1;
-	memcpy(&game->user_count, buffer+pos, sizeof(NETEMU_DWORD));
-	pos += sizeof(NETEMU_DWORD);
+	memcpy(&game->user_count, buffer+pos, sizeof(NETEMU_WORD));
+	pos += sizeof(NETEMU_WORD);
 	game->creator = malloc(sizeof(struct p2p_user));
 	pos += _netemu_application_p2p_parse_user(buffer+pos,game->creator, 1);
 
@@ -315,6 +315,9 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 	if(parse_user) {
 		user->name= netemu_util_parse_string(buffer+pos);
 		pos += strlen(user->name)+1;
+	}
+	else {
+		user->name = NULL;
 	}
 	user->app_name = netemu_util_parse_string(buffer+pos);
 	pos += strlen(user->app_name)+1;
