@@ -32,6 +32,7 @@ struct application_instruction* netemu_application_create_message() {
 	message->packBodyFn = NULL;
 	message->copyBodyFn = NULL;
 	message->freeBodyFn = NULL;
+	message->important = 0;
 	*message->user = '\0';
 	return message;
 }
