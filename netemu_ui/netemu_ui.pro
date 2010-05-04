@@ -17,7 +17,9 @@ FORMS += Dialogs/connectdialog.ui \
     mainwindow.ui
 RESOURCES += 
 INCLUDEPATH = ../netemu_sender/interface/;../netlib/headers
+unix {
 DEFINES += _NIX
+}
 LIBS += -L../netemu_sender/Debug/ \
     -lnetemu
 LIBS += -L../netlib/Debug/ \
