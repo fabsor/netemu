@@ -257,6 +257,7 @@ void netemu_p2p_respond_to_login_request(struct netemu_packet_buffer* buffer, st
 	netemu_p2p_send_login_success(connection->info,item->connection.connection);
 	netemu_p2p_send_user_joined(connection, user);
 	netemu_list_add(connection->info->_internal->users,user);
+	netemu_list_add(connection->_internal->user_addresses, user->addr);
 }
 
 void netemu_p2p_send_user_joined(struct netemu_p2p_connection *connection, struct p2p_user *user) {
