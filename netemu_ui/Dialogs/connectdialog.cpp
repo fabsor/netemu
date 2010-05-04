@@ -7,6 +7,7 @@ ConnectDialog::ConnectDialog(QWidget *parent, QString name, QString address, Hos
 {
 	QString connectingString;
 	ui.setupUi(this);
+	this->createActions();
 	this->name = name;
 	this->address = address;
 	this->type = type;
@@ -20,10 +21,30 @@ ConnectDialog::ConnectDialog(QWidget *parent, QString name, QString address, Hos
 	this->Connect();
 }
 
-void foo(int status, struct netemu_info* server_connection) {
-	int i;
-	i = 5;
-	i++;
+void ConnectResponse(int status, struct netemu_info* server_connection, void *arg) {
+	ConnectDialog* dialog = (ConnectDialog*)arg;
+	if(dialog != NULL && !dialog->canceled()) {
+		dialog->accept();
+	}
+	else {
+		dialog->reject();
+	}
+}
+
+bool ConnectDialog::canceled()
+{
+	return this->isCanceled;
+}
+
+void ConnectDialog::onCancelClicked()
+{
+	this->isCanceled = true;
+	this->reject();
+}
+
+void ConnectDialog::createActions()
+{
+	connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(onCancelClicked()));
 }
 
 void ConnectDialog::Connect()
@@ -45,7 +66,7 @@ void ConnectDialog::Connect()
 	addr.family = NETEMU_AF_INET;
 	if(this->type == KailleraServer)
 	{
-		kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", "Emil", this->ConnectSuccess);
+		kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", "Emil", ConnectResponse, this);
 	}
 	//kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success);
 }
