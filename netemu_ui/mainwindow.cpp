@@ -1,5 +1,6 @@
 #include "mainwindow.h"
-#include "settingsdialog.h"
+#include "Dialogs/settingsdialog.h"
+#include "Dialogs/connectdialog.h"
 #include "netemu_kaillera.h"
 
 using namespace std;
@@ -11,8 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
 	this->settings = new QSettings;
 	this->setWindowTitle("NetEmu");
 	netemu_init_network();
-	ui.tableServers->setRowCount(2);
-	ui.tableServers->setItem(0, 0, new QTableWidgetItem("Hello"));
 	createActions();
 }
 
@@ -34,16 +33,17 @@ void MainWindow::refreshServerList()
 	for(int i = 0; i < server_count; i++)
 	{
 		ui.tableServers->setItem(i, 0,
-			new QTableWidgetItem(servers[i]->name, 0));
+				new QTableWidgetItem(servers[i]->name, 0));
 		ui.tableServers->setItem(i, 1,
-			new QTableWidgetItem(servers[i]->location, 0));
+				new QTableWidgetItem(servers[i]->location, 0));
 		ui.tableServers->setItem(i, 3,
-			new QTableWidgetItem(servers[i]->version, 0));
+				new QTableWidgetItem(servers[i]->version, 0));
 		ui.tableServers->setItem(i, 4,
-			new QTableWidgetItem(servers[i]->players, 0));
+				new QTableWidgetItem(servers[i]->players, 0));
 		ui.tableServers->setItem(i, 5,
-			new QTableWidgetItem("FOO", 0));
-		
+				new QTableWidgetItem(QString::number(servers[i]->games, 10), 0));
+		ui.tableServers->setItem(i, 6,
+				new QTableWidgetItem(servers[i]->address, 0));
 		//struct netemu_sockaddr_in addr;
 		//portchars = strstr(servers[i]->address, ":");
 		//portchars = strpbrk(servers[i]->address, ":");
@@ -52,6 +52,16 @@ void MainWindow::refreshServerList()
 		//netemu_sender_udp *sender = netemu_sender_udp_new
 		//netemu_communication_ping_server(servers[i], NULL);
 	}
+}
+
+void MainWindow::OnButtonServerConnectClicked()
+{
+	QList<QTableWidgetItem*> row = ui.tableServers->selectedItems();
+
+	QString serverName = row.value(5)->text();
+	ConnectDialog dialog(this, row.value(0)->text(), row.value(5)->text(), KailleraServer);
+
+	dialog.exec();
 }
 
 void MainWindow::showPreferences()
@@ -88,7 +98,8 @@ void MainWindow::createActions()
 	connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
 	connect(ui.buttonServerRefresh, SIGNAL(clicked()), this, SLOT(refreshServerList()));
 	connect(ui.tableServers, SIGNAL(itemSelectionChanged()), this, SLOT(tableServersItemChanged()));
-	connect(ui.tableServers, SIGNAL(LOL), this, SLOT(tableServersItemChanged));
+	connect(ui.buttonServerConnect, SIGNAL(clicked()), this, SLOT(OnButtonServerConnectClicked()));
+
 	// Menu items.
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui.actionSettings_1, SIGNAL(triggered()), this, SLOT(showPreferences()));
@@ -96,5 +107,5 @@ void MainWindow::createActions()
 
 MainWindow::~MainWindow()
 {
-
+	delete this->settings;
 }

@@ -2,19 +2,24 @@ TEMPLATE = app
 TARGET = netemu_ui
 QT += core \
     gui
-HEADERS += SettingsWidgets/masterserversettings.h \
-    settingsdialog.h \
+HEADERS += Dialogs/connectdialog.h \
+    Dialogs/settingsdialog.h \
+    SettingsWidgets/masterserversettings.h \
     mainwindow.h
-SOURCES += SettingsWidgets/masterserversettings.cpp \
-    settingsdialog.cpp \
+SOURCES += Dialogs/connectdialog.cpp \
+    Dialogs/settingsdialog.cpp \
+    SettingsWidgets/masterserversettings.cpp \
     mainwindow.cpp \
     main.cpp
-FORMS += SettingsWidgets/masterserversettings.ui \
-    settingsdialog.ui \
+FORMS += Dialogs/connectdialog.ui \
+    Dialogs/settingsdialog.ui \
+    SettingsWidgets/masterserversettings.ui \
     mainwindow.ui
 RESOURCES += 
 INCLUDEPATH = ../netemu_sender/interface/;../netlib/headers
+unix {
 DEFINES += _NIX
+}
 LIBS += -L../netemu_sender/Debug/ \
     -lnetemu
 LIBS += -L../netlib/Debug/ \

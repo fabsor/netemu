@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Sat May 1 12:32:21 2010
+** Created: Sat May 1 12:52:50 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_MainWindow[] = {
        4,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -37,6 +37,7 @@ static const uint qt_meta_data_MainWindow[] = {
       76,   11,   11,   11, 0x08,
      101,   11,   11,   11, 0x08,
      126,   11,   11,   11, 0x08,
+     154,   11,   11,   11, 0x08,
 
        0        // eod
 };
@@ -47,6 +48,7 @@ static const char qt_meta_stringdata_MainWindow[] = {
     "tableCloudsItemChanged()\0"
     "tableRecentItemChanged()\0"
     "tableFavoritesItemChanged()\0"
+    "OnButtonServerConnectClicked()\0"
 };
 
 const QMetaObject MainWindow::staticMetaObject = {
@@ -84,9 +86,10 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 3: tableCloudsItemChanged(); break;
         case 4: tableRecentItemChanged(); break;
         case 5: tableFavoritesItemChanged(); break;
+        case 6: OnButtonServerConnectClicked(); break;
         default: ;
         }
-        _id -= 6;
+        _id -= 7;
     }
     return _id;
 }

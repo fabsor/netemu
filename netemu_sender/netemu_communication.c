@@ -28,10 +28,11 @@
 struct communication_callback {
 	int async;
 	int port;
-	void (*ConnectionReceivedFn)(int status, struct netemu_info*);
 	netemu_sockaddr_in *addr;
+	void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg);
 	char* emulatorname;
 	char* username;
+	void *arg;
 };
 
 void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
@@ -42,14 +43,38 @@ int kaillera_communication_get_server_list(const char *address, struct server **
 	struct netemu_tcp_connection *sender;
 	struct netemu_addrinfo *info;
 	char* request;
+	int errcode;
+	/* TODO: We need to write a function for destroying and freeing netemu_tcp_connections. */
+	errcode = netemu_get_addr_info(address,"80",NULL,&info);
+	if(errcode != 0)
+		return -1;
 
-	netemu_get_addr_info(address,"80",NULL,&info);
+	if((request = netemu_communication_http_get(SERVER,PATH)) == NULL)
+		return -1;
+
 	sender = netemu_tcp_connection_new(info->addr,info->addrlen);
-	netemu_tcp_connection_connect(sender);
-	request = netemu_communication_http_get(SERVER,PATH);
+	if(sender == NULL) {
+		free(request);
+		return -1;
+	}
 
-	netemu_tcp_connection_send(sender,request,strlen(request));
-	netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
+	errcode = netemu_tcp_connection_connect(sender);
+	if(errcode != 0) {
+		free(request);
+		return -1;
+	}
+
+	errcode = netemu_tcp_connection_send(sender,request,strlen(request));
+	if(errcode < 0) {
+		free(request);
+		return -1;
+	}
+
+	errcode = netemu_communication_parse_http(sender->socket, games, gamecount, servers, servercount);
+	if(errcode != 0) {
+		free(request);
+		return -1;
+	}
 	return 0;
 }
 
@@ -82,7 +107,7 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	return connection;
 }
 
-void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*)) {
+void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg) {
 	struct netemu_client *client;
 	char* hello;
 	struct communication_callback *callback;
@@ -107,6 +132,7 @@ void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_siz
 	callback->emulatorname = emulator_cpy;
 	callback->username = user_cpy;
 	callback->ConnectionReceivedFn = ConnectionReceivedFn;
+	callback->arg = arg;
 	client = netemu_resources_get_client();
 	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,callback);
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
@@ -123,7 +149,7 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	callback->addr = netemu_htons(callback->port);
 	client->sender->addr = (netemu_sockaddr*)callback->addr;
 	/*connection = netemu_server_connection_new(callback->username,callback->username);*/
-	callback->ConnectionReceivedFn(callback->port, connection);
+	callback->ConnectionReceivedFn(callback->port, connection, callback->arg);
 	free(callback);
 }
 

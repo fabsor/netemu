@@ -12,6 +12,7 @@
 #include <string.h>
 #include "netemu_socket.h"
 #include "netemu_list.h"
+#include "netlib_error.h"
 #include "../structures/netemu_stringbuilder.h"
 #include <time.h>
 
@@ -128,7 +129,10 @@ char* netemu_communication_http_get(char* host, char* path) {
 	size = strlen(format) - 4 + 
 		strlen(host) + 
 		strlen(path);
-	buffer = (char*)malloc(size);
+	if((buffer = (char*)malloc(size)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	sprintf(buffer, format, path, host);
 
 	return buffer;

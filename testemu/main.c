@@ -26,7 +26,8 @@ void send_play_values(struct netemu_info *connection);
 void show_user_list(struct netemu_info* connection);
 void player_ready(struct netemu_info *connection);
 void receive_values(struct buffered_play_values *result);
-void login_success(int status, struct netemu_info* connection);
+
+void login_success(int status, struct netemu_info* server_connection, void *arg);
 void connect_async(netemu_sockaddr_in addr);
 void server_connect(netemu_sockaddr_in addr);
 void game_created(struct game* game);
@@ -68,7 +69,7 @@ int main() {
 
 
 void connect_async(netemu_sockaddr_in addr) {
-	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success);
+	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success, NULL);
 	while(info == NULL);
 	netemu_register_play_values_received_callback(info, receive_values);
 	menu(info);
@@ -80,7 +81,7 @@ void server_connect(netemu_sockaddr_in addr) {
 	menu(info);
 }
 
-void login_success(int status, struct netemu_info* server_connection) {
+void login_success(int status, struct netemu_info* server_connection, void *arg) {
 	info = server_connection;
 }
 

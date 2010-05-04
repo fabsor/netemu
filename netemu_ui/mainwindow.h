@@ -20,6 +20,7 @@ private slots:
 	void tableCloudsItemChanged();
 	void tableRecentItemChanged();
 	void tableFavoritesItemChanged();
+	void OnButtonServerConnectClicked();
 
 
 private:

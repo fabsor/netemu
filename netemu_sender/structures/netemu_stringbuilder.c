@@ -1,4 +1,5 @@
 #include "netemu_stringbuilder.h"
+#include "netlib_error.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -15,8 +16,10 @@ struct netemu_stringbuilder *netemu_stringbuilder_new(NETEMU_DWORD capacity) {
 	else if(capacity == 0)
 		capacity = DEFAULT_CAPACITY;
 
-	if((builder = (struct netemu_stringbuilder*)malloc(sizeof(struct netemu_stringbuilder))) == NULL)
+	if((builder = (struct netemu_stringbuilder*)malloc(sizeof(struct netemu_stringbuilder))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
+	}
 
 	builder->capacity = capacity;
 	builder->count = 0;

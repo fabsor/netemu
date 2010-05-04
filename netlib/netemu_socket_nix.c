@@ -1,4 +1,5 @@
 #include "headers/netemu_socket.h"
+#include "headers/netlib_error.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <errno.h>
@@ -111,13 +112,19 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	}
 	error = getaddrinfo(nodename,servicetype,info_hints_ptr,&info);
 	if(error < 0) {
-		return error;
+		netlib_set_last_error(error);
+		return -1;
 	}
-	addr_result = malloc(sizeof(struct netemu_addrinfo));
+
+	if((addr_result = malloc(sizeof(struct netemu_addrinfo))) == NULL) {
+		//netlib_set_last_error(0);
+		return -1;
+	}
 	_fill_netemu_addrinfo(info,addr_result);
 	info = info->ai_next;
 	iter = addr_result->next;
 	while(info != NULL) {
+		/* TODO: Check for out-of-memory errors here */
 		iter = malloc(sizeof(struct netemu_addrinfo));
 		_fill_netemu_addrinfo(info, iter);
 		iter = iter->next;
@@ -125,7 +132,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	}
 
 	*result = addr_result;
-	return error;
+	return 0;
 }
 
 void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *netemuinfo) {

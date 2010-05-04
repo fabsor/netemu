@@ -1,13 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'settingsdialog.h'
 **
-** Created: Sat May 1 12:32:20 2010
+** Created: Sun May 2 12:35:56 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../settingsdialog.h"
+#include "../Dialogs/settingsdialog.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'settingsdialog.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 62
