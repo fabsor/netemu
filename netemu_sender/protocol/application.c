@@ -112,6 +112,10 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 			break;
 		case CREATE_P2P_GAME:
 			netemu_application_p2p_create_game_parse(app_instruction,data);
+			break;
+		case JOIN_P2P_GAME:
+			netemu_application_p2p_player_join_parse(app_instruction,data);
+			break;
 	}
 
 
