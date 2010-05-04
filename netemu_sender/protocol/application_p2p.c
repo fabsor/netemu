@@ -359,7 +359,8 @@ void netemu_application_p2p_login_request_add(struct application_instruction *in
 	user->connection = connection;
 	size += 1;
 	size += netemu_util_copy_string(&user->app_name,appname);
-
+	user->ping = 0;
+	size += sizeof(NETEMU_DWORD);
 	instruction->body = user;
 	instruction->id = P2P_LOGIN_REQUEST;
 	instruction->body_size = size;
