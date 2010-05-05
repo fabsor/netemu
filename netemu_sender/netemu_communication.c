@@ -101,9 +101,9 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	type = malloc(sizeof(union netemu_connection_type));
 	type->udp_sender = client->sender;
 	buffer = netemu_sender_buffer_new(5,10);
-	connection = netemu_server_connection_new(username,emulatorname,buffer);
+	connection = netemu_info_new(username,emulatorname,buffer);
 	netemu_receiver_udp_register_recv_fn(client->receiver,netemu_udp_connection_receive,connection);
-	server_connection_login(connection);
+	netemu_kaillera_login(connection);
 	return connection;
 }
 

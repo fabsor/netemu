@@ -9,7 +9,7 @@
 #define TRANSPORT_H_
 
 #include "netlib_util.h"
-#include "application.h"
+#include "application_kaillera.h"
 struct transport_instruction {
 	/* ? */
 	NETEMU_WORD serial;

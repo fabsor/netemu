@@ -17,10 +17,10 @@ void _netemu_respond_to_login_success(struct netemu_packet_buffer* buffer, struc
 	connection = (struct netemu_info*)arg;
 	accepted = (struct login_success*)item->instruction->body;
 	for(i = 0; i < accepted->users_count; i++) {
-		_server_connection_add_user_struct(connection,accepted->users[i]);
+		_netemu_kaillera_add_user_struct(connection,accepted->users[i]);
 	}
 	for(i = 0; i < accepted->games_count; i++) {
-		_server_connection_add_game_struct(connection,accepted->games[i]);
+		_netemu_kaillera_add_game_struct(connection,accepted->games[i]);
 	}
 }
 
@@ -43,7 +43,7 @@ void _netemu_respond_to_player_joined(struct netemu_packet_buffer* buffer, struc
 
 	if(connection->current_game != NULL) {
 		if(connection->current_game->id == joined->game_id) {
-			server_connection_add_player(connection->current_game, player);
+			netemu_kaillera_add_player(connection->current_game, player);
 			return;
 		}
 	}
@@ -51,7 +51,7 @@ void _netemu_respond_to_player_joined(struct netemu_packet_buffer* buffer, struc
 		/* TODO: Better solution for this. */
 		for(i = 0; i < connection->_internal->games->count; i++) {
 			if(((struct game*)connection->_internal->games->elements[i])->id == joined->game_id) {
-				server_connection_add_player((struct game*)(connection->_internal->games->elements[i]),player);
+				netemu_kaillera_add_player((struct game*)(connection->_internal->games->elements[i]),player);
 				return;
 			}
 		}
@@ -69,7 +69,7 @@ void _netemu_respond_to_game_created(struct netemu_packet_buffer* buffer, struct
 	connection = (struct netemu_info*)arg;
 	itemsToRemove = malloc(sizeof(int)*connection->_internal->game_created_callback->count);
 	created = (struct game_created*)item->instruction->body;
-	server_connection_add_game(connection, created->appName, created->gameName, created->id, 0, 0);
+	netemu_kaillera_add_game(connection, created->appName, created->gameName, created->id, 0, 0);
 	for(i = 0; i < connection->_internal->game_created_callback->count; i++) {
 		((struct callback*)connection->_internal->game_created_callback->elements[i])->fn->game_created_fn(connection->_internal->games->elements[connection->_internal->games->count-1]);
 		if(((struct callback*)connection->_internal->game_created_callback->elements[i])->disposable) {
@@ -108,7 +108,7 @@ void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct ne
 		connection->_internal->has_id = 1;
 	}
 
-	server_connection_add_user(connection, joined->id, joined->connection, item->instruction->user);
+	netemu_kaillera_add_user(connection, joined->id, joined->connection, item->instruction->user);
 
 }
 

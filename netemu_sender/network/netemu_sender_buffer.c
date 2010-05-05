@@ -4,7 +4,7 @@
  *  Created on: 16 apr 2010
  *      Author: fabian
  */
-#include "../protocol/application.h"
+#include "../protocol/application_kaillera.h"
 #include "../protocol/transport.h"
 #include "netemu_tcp.h"
 #include "../structures/netemu_hashtbl.h"

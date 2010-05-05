@@ -6,6 +6,7 @@
 #include "netlib_util.h"
 #include "../netemu_util.h"
 #include "application_p2p.h"
+#include "application_p2p_internal.h"
 #include "../network/netemu_net.h"
 #include "../network/netemu_sender_udp.h"
 #include "../network/netemu_tcp.h"

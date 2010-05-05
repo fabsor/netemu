@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#include "../protocol/application.h"
+#include "../protocol/application_kaillera.h"
 #include "../protocol/communication.h"
 #include "netemu.h"
 #include "netemu_socket.h"
@@ -80,13 +80,17 @@ int netemu_kaillera_join_game(struct netemu_info *connection, NETEMU_DWORD gamei
 
 struct game** netemu_kaillera_get_game_list(struct netemu_info* connection, int *count);
 
-int netemu_send_player_ready(struct netemu_info *connection);
+struct user** netemu_kaillera_get_user_list(struct netemu_info* info, int *count);
+
+int netemu_kaillera_send_player_ready(struct netemu_info *connection);
 
 int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn);
 
 int netemu_unregister_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn);
 
-void netemu_send_play_values(struct netemu_info* connection, int size, void* data);
+void netemu_kaillera_send_play_values(struct netemu_info* connection, int size, void* data);
+
+int netemu_kaillera_start_game(struct netemu_info *info);
 
 
 #ifdef	__cplusplus

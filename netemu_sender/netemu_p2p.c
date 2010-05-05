@@ -15,7 +15,7 @@
 #include "protocol/application_p2p.h"
 #include "network/netemu_tcp.h"
 #include "netemu_list.h"
-
+#include "protocol/application_p2p_internal.h"
 
 struct netemu_p2p_internal {
 	struct netemu_tcp_listener *host;
@@ -61,7 +61,7 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname)
 	p2p->user->ping = 0;
 	p2p->user->_internal = malloc(sizeof(struct p2p_user_internal));
 	p2p->current_game = NULL;
-	p2p->info = netemu_server_connection_new(username,emulatorname,buffer);
+	p2p->info = netemu_info_new(username,emulatorname,buffer);
 	netemu_list_add(p2p->info->_internal->users, p2p->user);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
 	netemu_list_register_sort_fn(p2p->info->_internal->games, _netemu_p2p_game_compare);
