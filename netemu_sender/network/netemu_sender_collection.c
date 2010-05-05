@@ -20,6 +20,7 @@ void netemu_sender_collection_add_udp_sender(struct netemu_sender_collection *co
 	sender->sender = malloc(sizeof(union netemu_sender_type));
 	sender->sender->udp_sender = connection;
 	sender->type = SENDER_UDP;
+	netemu_list_add(collection->senders, sender);
 }
 
 void netemu_sender_collection_add_tcp_sender(struct netemu_sender_collection *collection, struct netemu_tcp_connection* connection) {

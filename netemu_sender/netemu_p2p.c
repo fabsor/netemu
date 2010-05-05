@@ -179,6 +179,21 @@ void netemu_p2p_send_peer_connected(struct netemu_p2p_connection *info, struct n
 	netemu_sender_buffer_add(info->info->_internal->send_buffer,instruction,TCP_CONNECTION,type);
 }
 
+int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, int size, void* data) {
+	time_t timestamp;
+	struct application_instruction *message;
+	union netemu_connection_type type;
+	if(info->current_game != NULL && info->current_game->started == 1) {
+		type.collection = info->current_game->_internal->udp_collection;
+		message = netemu_application_create_message();
+		netemu_application_buffered_play_values_add(message,size,data);
+		timestamp = time(NULL);
+		netemu_sender_buffer_add(info->info->_internal->send_buffer,message, CONNECTION_COLLECTION, type);
+		return 1;
+	}
+	return -1;
+}
+
 
 int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct p2p_game** result) {
 	struct p2p_game* game;

@@ -44,6 +44,8 @@ struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p_connection* info, i
 
 struct p2p_user** netemu_p2p_get_user_list(struct netemu_p2p_connection* info, int *count);
 
+int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, int size, void* data);
+
 #ifdef	__cplusplus
 }
 #endif
