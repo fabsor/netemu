@@ -19,15 +19,26 @@ extern "C" {
 #define P2P_LOGIN_REQUEST	35
 #define P2P_READY			36
 #define P2P_USER_JOIN		37
+#define P2P_JOIN_HOST		38
+#define P2P_PLAYER_READY	39
+#define P2P_GAME_START		40
 #include "application.h"
 #include "../netemu_util.h"
 
 
 typedef struct p2p_user_internal* p2p_user_internal;
+typedef struct p2p_game_internal* p2p_game_internal;
+
 /* TODO: This can't be here but I don't have the time to play nice right now =)*/
 struct p2p_user_internal {
 	struct netemu_tcp_connection *connection;
-	struct netemu_sender_udp *sender;
+	struct netemu_sender_udp *sender; /**< The sender for udp packages */
+	struct netemu_receiver_udp *receiver; /**< The receiver for udp packages*/
+};
+
+struct p2p_game_internal {
+	struct netemu_sender_collection *tcp_collection; /**< This is used for status update messages */
+	struct netemu_sender_collection *udp_collection; /**< This is used for play values */
 };
 
 
@@ -47,10 +58,17 @@ struct p2p_game {
 	NETEMU_WORD user_count;
 	struct p2p_user* creator;
 	struct p2p_user* players;
+	NETEMU_BOOL started;
+	p2p_game_internal _internal;
 };
 
 struct p2p_kick_player {
 	char *name;
+};
+
+struct p2p_start_game {
+	netemu_sockaddr* addr;
+	size_t addr_size;
 };
 
 struct p2p_login_success {
@@ -93,6 +111,18 @@ void netemu_application_p2p_user_join_parse(struct application_instruction *inst
 void netemu_application_p2p_player_join_parse(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_p2p_player_join_add(struct application_instruction *instruction, struct p2p_user *user);
+
+void netemu_application_p2p_join_host_add(struct application_instruction *instruction, struct p2p_user *user);
+
+void netemu_application_p2p_join_host_parse(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_p2p_start_game_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size);
+
+void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size);
+
+struct p2p_game_internal *netemu_application_p2p_create_game_internal();
 
 struct p2p_user_internal* netemu_application_p2p_create_user_internal();
 #ifdef	__cplusplus
