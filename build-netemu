@@ -5,5 +5,5 @@ cd ../../netemu_sender/Debug/
 make clean && make
 cd ../../testemu/Debug/
 make clean && make
-cd ../../netemu_ui/Debug/
+cd ../../netemu_ui/
 make clean && make
