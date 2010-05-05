@@ -71,10 +71,22 @@ void p2p_menu(struct netemu_p2p_connection *connection) {
 				show_p2p_user_list(connection);
 				break;
 			case '4':
-				show_p2p_user_list(connection);
+				join_p2p_game(connection);
 				break;
 		}
 
+	}
+}
+
+void join_p2p_game(struct netemu_p2p_connection *connection) {
+	struct p2p_game **p2p_games;
+	int no_games;
+	p2p_games = netemu_p2p_get_game_list(connection, &no_games);
+	if(no_games > 0) {
+		netemu_p2p_join_game(connection, p2p_games[0]->creator);
+	}
+	else {
+		printf("No games to Join!");
 	}
 }
 

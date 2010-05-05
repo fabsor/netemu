@@ -13,9 +13,24 @@ extern "C" {
 #include "netemu_tcp.h"
 #include "netemu_list.h"
 
+typedef enum {
+	SENDER_UDP,
+	SENDER_TCP
+} sender_type;
+
+struct netemu_sender_collection_item {
+	union netemu_sender_type *sender;
+	sender_type type;
+};
+
 struct netemu_sender_collection {
 	struct netemu_list *senders;
 	struct netemu_list *sender_listeners;
+};
+
+union netemu_sender_type {
+	struct netemu_sender_udp *udp_sender;
+	struct netemu_tcp_connection *tcp_sender;
 };
 
 struct netemu_sender_collection* netemu_sender_collection_new();
