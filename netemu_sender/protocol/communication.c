@@ -74,7 +74,8 @@ char* netemu_communication_create_hello_message(char* version) {
 	hello = "HELLO";
 
 	hello_message_size = strlen(hello) + strlen(version) + 1;
-	hello_message = malloc(hello_message_size);
+	if((hello_message = malloc(hello_message_size)) == NULL)
+		return NULL;
 	memcpy(hello_message, hello, strlen(hello));
 	memcpy(hello_message + strlen(hello), version, strlen(version));
 	
@@ -143,9 +144,11 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 	struct netemu_list *game_list, *server_list;
 	char *response_body, *serverlist;
 	struct existing_game **eg;
-	int return_value;
+	int return_value, i;
 
 	builder = netemu_stringbuilder_new(1024);
+	if(builder == NULL)
+		return -1;
 
 	return_value = _netemu_get_http_response(socket, builder);
 	if(return_value != 0) {
@@ -155,15 +158,22 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 
 	response_body = strstr(builder->string, HTTP_HEADER_END);
 	if(response_body == NULL) {
+		netlib_set_last_error(NETEMU_EINVALIDSERVERLIST);
 		netemu_stringbuilder_free(builder);
 		return -1;
 	}
 
 	game_list = netemu_list_new(128, FALSE);
-	response_body += strlen(HTTP_HEADER_END);
+	if(game_list == NULL) {
+		netemu_stringbuilder_free(builder);
+		return -1;
+	}
 
+	response_body += strlen(HTTP_HEADER_END);
 	response_body = _netemu_parse_game_list(response_body, game_list);
 	if(response_body == NULL) {
+		for(i = 0; i < game_list->count; i++)
+			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
 		netemu_list_free(game_list);
 		return -1;
@@ -171,9 +181,20 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 
 
 	server_list = netemu_list_new(128, FALSE);
+	if(server_list == NULL) {
+		for(i = 0; i < game_list->count; i++)
+			free(netemu_list_get(game_list, i));
+		netemu_stringbuilder_free(builder);
+		netemu_list_free(game_list);
+	}
 
 	response_body = _netemu_parse_server_list(response_body, server_list);
 	if(response_body == NULL) {
+		/* TODO: The strings inside the game and server structs are not being freed! */
+		for(i = 0; i < server_list->count; i++)
+			free(netemu_list_get(server_list, i));
+		for(i = 0; i < game_list->count; i++)
+			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
 		netemu_list_free(game_list);
 		netemu_list_free(server_list);
@@ -182,6 +203,10 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 
 	return_value = netemu_list_copy(game_list, (void***)games);
 	if(return_value != 0) {
+		for(i = 0; i < server_list->count; i++)
+			free(netemu_list_get(server_list, i));
+		for(i = 0; i < game_list->count; i++)
+			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
 		netemu_list_free(game_list);
 		netemu_list_free(server_list);
@@ -190,6 +215,11 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 
 	return_value = netemu_list_copy(server_list, (void***)servers);
 	if(return_value != 0) {
+		for(i = 0; i < server_list->count; i++)
+			free(netemu_list_get(server_list, i));
+		for(i = 0; i < game_list->count; i++)
+			free(netemu_list_get(game_list, i));
+		free(*games);
 		netemu_stringbuilder_free(builder);
 		netemu_list_free(game_list);
 		netemu_list_free(server_list);
@@ -210,9 +240,12 @@ char *_netemu_parse_game_list(char* response_body, struct netemu_list *game_list
 	struct existing_game *game;
 	char *return_value;
 	char *player_int;
-	int gg;
+
 	while(*response_body != '\n') {
-		game = malloc(sizeof(struct existing_game));
+		if((game = malloc(sizeof(struct existing_game))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			return NULL;
+		}
 
 		/* Game name */
 		if((response_body = _netemu_parse_response_string(response_body, &game->gamename, GAME_STRING_SEPARATOR)) == NULL) {
@@ -223,9 +256,7 @@ char *_netemu_parse_game_list(char* response_body, struct netemu_list *game_list
 		if((response_body = _netemu_parse_response_string(response_body, &game->address, GAME_STRING_SEPARATOR)) == NULL) {
 			break;
 		}
-		if(strcmp(game->address, "194.177.99.213:27888") == 0) {
-gg = 4;
-		}
+
 		/* Player name */
 		if((response_body = _netemu_parse_response_string(response_body, &game->player, GAME_STRING_SEPARATOR)) == NULL) {
 			break;
@@ -254,7 +285,10 @@ gg = 4;
 			break;
 		}
 
-		netemu_list_add(game_list, game);
+		if(netemu_list_add(game_list, game) != 0) {
+			response_body = NULL;
+			break;
+		}
 	}
 	/* Move past the linebreak denoting the end of the game list */
 	if(response_body)
@@ -268,7 +302,10 @@ char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers
 	char *game_int;
 
 	while(*response_body != '\0') {
-		serv = (struct server*)malloc(sizeof(struct server));
+		if((serv = (struct server*)malloc(sizeof(struct server))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			return NULL;
+		}
 		
 		if((response_body = _netemu_parse_response_string(response_body, &serv->name, '\n')) == NULL) {
 			break;
@@ -297,7 +334,11 @@ char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers
 			break;
 		}
 
-		netemu_list_add(servers, serv);
+		if(netemu_list_add(servers, serv) != 0) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			response_body = NULL;
+			break;
+		}
 	}
 
 	return response_body;
@@ -308,11 +349,15 @@ int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder 
 	int received, error;
 	
 	error = 0;
-	receive_buffer = malloc(HTTP_BUFFER_SIZE);
+	if(receive_buffer = malloc(HTTP_BUFFER_SIZE)) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 	do{
 		received = netemu_recv(socket, receive_buffer, HTTP_BUFFER_SIZE, 0);
 		if(received < 0) {
-			//error = netemu_get_last_error();
+			free(receive_buffer);
+			error = -1;
 			break;
 		}
 		else if(received == 0) {
@@ -342,11 +387,14 @@ char *_netemu_parse_response_string(char *input, char **output, char terminator)
 
 	/* If we reached the end of the string instead of the terminating character,
 	 * the master server returned an invalid response and we need to return NULL */
-	if(input[string_length] == '\0')
+	if(input[string_length] == '\0') {
+		netlib_set_last_error(NETEMU_EINVALIDSERVERLIST);
 		return NULL;
+	}
 		
 
 	if((*output = (char*)malloc(string_length + 1)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 

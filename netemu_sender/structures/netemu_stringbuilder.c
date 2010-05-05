@@ -11,8 +11,10 @@ int _netemu_enlarge_stringbuilder(struct netemu_stringbuilder *builder);
 struct netemu_stringbuilder *netemu_stringbuilder_new(NETEMU_DWORD capacity) {
 	struct netemu_stringbuilder *builder;
 
-	if(capacity < 0)
+	if(capacity < 0) {
+		netlib_set_last_error(NETEMU_EINVAL);
 		return NULL;
+	}
 	else if(capacity == 0)
 		capacity = DEFAULT_CAPACITY;
 

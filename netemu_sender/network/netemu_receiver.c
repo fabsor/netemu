@@ -25,19 +25,24 @@ void free_receiver(struct netemu_receiver_udp*);
 struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int addr_len, int buffer_size) {
 	struct netemu_receiver_udp* receiver;
 	int bind_error;
-	receiver = malloc(sizeof(struct netemu_receiver_udp));
+	if((receiver = malloc(sizeof(struct netemu_receiver_udp))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	receiver->buffer_size = buffer_size;
 	receiver->addr = addr;
 	receiver->addr_len = addr_len;
 	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
 	receiver->receiver_fn = NULL;
 	if(receiver->socket == NETEMU_INVALID_SOCKET) {
-		//receiver->error = netemu_get_last_error();
-
+		free(receiver);
+		return NULL;
 	}
 	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if(bind_error == -1) {
-		//receiver->error = netemu_get_last_error();
+		netemu_closesocket(receiver->socket);
+		free(receiver);
+		return NULL;
 	}
 	return receiver;
 }

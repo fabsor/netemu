@@ -8,13 +8,17 @@
 #include "network/netemu_sender_udp.h"
 #include "network/netemu_receiver.h"
 #include "netemu_resources.h"
+#include "netlib_error.h"
 
 /*! Global variable containing the shared client. */
 struct netemu_client* _netemu_resources_client = NULL;
 
 struct netemu_client* netemu_resources_get_client() {
 	if (_netemu_resources_client == NULL) {
-		_netemu_resources_client = malloc(sizeof(struct netemu_client));
+		if((_netemu_resources_client = malloc(sizeof(struct netemu_client))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			return NULL;
+		}
 	}
 	return _netemu_resources_client;
 }

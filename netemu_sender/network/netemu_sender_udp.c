@@ -6,6 +6,7 @@
  */
 #include "netemu_sender_udp.h"
 #include <stdlib.h>
+#include "netlib_error.h"
 
 
 int netemu_sender_udp_send(struct netemu_sender_udp* sender, char* data, int size) {
@@ -34,9 +35,12 @@ struct netemu_sender_udp* netemu_sender_udp_new(netemu_sockaddr* addr, int addr_
 
 struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netemu_sockaddr* addr, NETEMU_SOCKET socket, int addr_len) {
 	struct netemu_sender_udp* sender;
-	sender = malloc(sizeof(struct netemu_sender_udp));
+	if((sender = malloc(sizeof(struct netemu_sender_udp))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	if (socket == NETEMU_INVALID_SOCKET) {
-		//sender->error = netemu_get_last_error();
+		return NULL;
 	}
 	sender->addr_len = addr_len;
 	sender->addr = addr;
