@@ -34,11 +34,13 @@ struct p2p_user_internal {
 	struct netemu_tcp_connection *connection;
 	struct netemu_sender_udp *sender; /**< The sender for udp packages */
 	struct netemu_receiver_udp *receiver; /**< The receiver for udp packages*/
+
 };
 
 struct p2p_game_internal {
 	struct netemu_sender_collection *tcp_collection; /**< This is used for status update messages */
 	struct netemu_sender_collection *udp_collection; /**< This is used for play values */
+	NETEMU_WORD ready_count;
 };
 
 

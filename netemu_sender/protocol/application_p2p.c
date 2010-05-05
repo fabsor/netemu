@@ -151,6 +151,8 @@ struct p2p_game_internal *netemu_application_p2p_create_game_internal() {
 	struct p2p_game_internal *internal;
 	internal = malloc(sizeof(struct p2p_game_internal));
 	internal->tcp_collection = NULL;
+	internal->udp_collection = NULL;
+	internal->ready_count = 0;
 	return internal;
 }
 
@@ -236,8 +238,9 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 
 	/*We never copy internal stuff.*/
 	if(game->_internal != NULL) {
-		game->_internal = netemu_application_p2p_create_game_internal();
-		game->_internal->tcp_collection = game->_internal->tcp_collection;
+		target->_internal = netemu_application_p2p_create_game_internal();
+		target->_internal->tcp_collection = game->_internal->tcp_collection;
+		target->_internal->ready_count = game->_internal->ready_count;
 	}
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
 	return size;

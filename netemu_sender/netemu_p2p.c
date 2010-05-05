@@ -193,7 +193,6 @@ int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamen
 	game->_internal = netemu_application_p2p_create_game_internal();
 	game->_internal->tcp_collection = netemu_sender_collection_new();
 	game->_internal->udp_collection = netemu_sender_collection_new();
-
 	netemu_sender_buffer_add(connection->info->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
 	return 1;
 }
@@ -237,7 +236,6 @@ int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_ga
 	netemu_application_p2p_player_join_add(instruction, connection->user);
 	netemu_sender_buffer_add(connection->info->_internal->send_buffer, instruction, TCP_CONNECTION, type);
 
-
 	return 1;
 }
 
@@ -259,6 +257,7 @@ int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_socka
 	netemu_application_p2p_start_game_add(instruction, addr, addr_size);
 	/* This instruction will be broadcasted to all, in order for all clients to register that the game has started. */
 	type.collection = connection->_internal->peers;
+	connection->current_game->_internal->ready_count++;
 	netemu_sender_buffer_add(connection->info->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
 	return 1;
 }
@@ -274,9 +273,13 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, netemu_soc
 
 	receiver = netemu_receiver_udp_new(addr,addr_size,512);
 	netemu_receiver_udp_register_recv_fn(receiver,netemu_udp_connection_receive,connection);
-	connection->current_game->creator->_internal->receiver = receiver;
+	connection->user->_internal->receiver = receiver;
 	instruction = netemu_application_create_message();
 	netemu_application_p2p_player_ready_add(instruction, addr, addr_size);
+	connection->current_game->_internal->ready_count++;
+	if(connection->current_game->_internal->ready_count >= connection->current_game->user_count) {
+		connection->current_game->started = 1;
+	}
 	/* This instruction will be broadcasted to all game members */
 	type.collection = connection->current_game->_internal->tcp_collection;
 	netemu_sender_buffer_add(connection->info->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
@@ -389,6 +392,10 @@ void netemu_p2p_respond_to_game_started(struct netemu_packet_buffer* buffer, str
 
 	game = (struct p2p_start_game*)item->instruction->body;
 	sender = netemu_sender_udp_new(game->addr,game->addr_size);
+	connection->current_game->_internal->ready_count++;
+	if(connection->current_game->_internal->ready_count >= connection->current_game->user_count) {
+		connection->current_game->started = 1;
+	}
 	netemu_sender_collection_add_udp_sender(connection->current_game->_internal->udp_collection, sender);
 }
 
@@ -434,7 +441,8 @@ void netemu_p2p_respond_to_player_join(struct netemu_packet_buffer* buffer, stru
 			user->_internal = netemu_application_p2p_create_user_internal();
 			user->_internal->connection = player_con;
 			netemu_sender_collection_add_tcp_sender(connection->_internal->peers, player_con);
-			/* TODO: Fix so that we can connect. (We need a new instruction) */
+
+			//netemu_p2p_send_user_joined(connection, connection->user);
 		}
 		netemu_sender_collection_add_tcp_sender(connection->current_game->_internal->tcp_collection, user->_internal->connection);
 		_netemu_p2p_add_player(connection->current_game,user);

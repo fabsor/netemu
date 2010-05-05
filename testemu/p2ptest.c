@@ -76,6 +76,9 @@ void p2p_menu(struct netemu_p2p_connection *connection) {
 			case '5':
 				start_p2p_game(connection);
 				break;
+			case '6':
+				start_p2p_game(connection);
+				break;
 		}
 
 	}
@@ -88,6 +91,15 @@ void start_p2p_game(struct netemu_p2p_connection *connection) {
 	addr.sin_port = netemu_htons(40000);
 
 	netemu_p2p_start_game(connection,(netemu_sockaddr*)&addr,sizeof(addr));
+}
+
+void p2p_player_ready(struct netemu_p2p_connection *connection) {
+	netemu_sockaddr_in addr;
+	addr.sin_family = NETEMU_AF_INET;
+	addr.sin_addr.s_addr = ADDR;
+	addr.sin_port = netemu_htons(40001);
+
+	netemu_p2p_player_ready(connection,(netemu_sockaddr*)&addr,sizeof(addr));
 }
 
 void join_p2p_game(struct netemu_p2p_connection *connection) {
