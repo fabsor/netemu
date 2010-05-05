@@ -10,7 +10,7 @@
 #include "netlib_error.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include "../netemu_util.h"
 
 /**
  * Create a new receiver. This will create a new socket and bind to the provided host and
@@ -27,17 +27,18 @@ struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int a
 	int bind_error;
 	receiver = malloc(sizeof(struct netemu_receiver_udp));
 	receiver->buffer_size = buffer_size;
-	receiver->addr = addr;
+	receiver->addr = netemu_util_copy_addr(addr,addr_len);
+
 	receiver->addr_len = addr_len;
 	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
 	receiver->receiver_fn = NULL;
 	if(receiver->socket == NETEMU_INVALID_SOCKET) {
-		//receiver->error = netemu_get_last_error();
+		receiver->error = netlib_get_last_error();
 
 	}
 	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if(bind_error == -1) {
-		//receiver->error = netemu_get_last_error();
+		receiver->error = netlib_get_last_error();
 	}
 	return receiver;
 }
@@ -63,7 +64,7 @@ void netemu_receiver_recv(void* params) {
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
 		error = netemu_recvfrom(receiver->socket, buffer, receiver->buffer_size, 0, NULL, 0);
 		if (error == -1) {
-			//receiver->error = netemu_get_last_error();
+			receiver->error = netlib_get_last_error();
 			printf("Receive error: %i\n", netlib_get_last_error());
 			netemu_thread_mutex_release(receiver->lock);
 			break;

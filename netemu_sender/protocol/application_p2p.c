@@ -516,7 +516,7 @@ void netemu_application_p2p_start_game_pack(struct application_instruction *inst
 	start_game = instruction->body;
 	memcpy(buffer, &start_game->addr_size, sizeof(size_t));
 	pos = sizeof(size_t);
-	memcpy(buffer+pos, &start_game->addr, start_game->addr_size);
+	memcpy(buffer+pos, start_game->addr, start_game->addr_size);
 	pos += start_game->addr_size;
 }
 
@@ -527,7 +527,7 @@ void netemu_application_p2p_start_game_parse(struct application_instruction *ins
 	memcpy(&start_game->addr_size, buffer, sizeof(size_t));
 	pos = sizeof(size_t);
 	start_game->addr = malloc(start_game->addr_size);
-	memcpy(&start_game->addr,buffer+pos, start_game->addr_size);
+	memcpy(start_game->addr,buffer+pos, start_game->addr_size);
 	pos += start_game->addr_size;
 	instruction->body = start_game;
 	instruction->packBodyFn = netemu_application_start_game_pack;
