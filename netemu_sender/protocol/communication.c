@@ -129,11 +129,12 @@ char* netemu_communication_http_get(char* host, char* path) {
 	/* Allocate enough memory. */
 	size = strlen(format) - 4 + 
 		strlen(host) + 
-		strlen(path);
+		strlen(path) + 1;
 	if((buffer = (char*)malloc(size)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
 	}
+
 	sprintf(buffer, format, path, host);
 
 	return buffer;
@@ -349,15 +350,16 @@ int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder 
 	int received, error;
 	
 	error = 0;
-	if((receive_buffer = malloc(HTTP_BUFFER_SIZE)) == NULL) {
+	if((receive_buffer = (char*)malloc(HTTP_BUFFER_SIZE)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 	do{
 		received = netemu_recv(socket, receive_buffer, HTTP_BUFFER_SIZE, 0);
 		if(received < 0) {
+			error = netlib_get_last_platform_error();
 			free(receive_buffer);
-			error = -1;
+
 			break;
 		}
 		else if(received == 0) {
