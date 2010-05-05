@@ -349,7 +349,7 @@ int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder 
 	int received, error;
 	
 	error = 0;
-	if(receive_buffer = malloc(HTTP_BUFFER_SIZE)) {
+	if((receive_buffer = malloc(HTTP_BUFFER_SIZE)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
