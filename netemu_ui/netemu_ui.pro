@@ -21,3 +21,11 @@ SOURCES += main.cpp \
            Dialogs/connectdialog.cpp \
            Dialogs/settingsdialog.cpp \
            SettingsWidgets/masterserversettings.cpp
+
+unix {
+DEFINES += _NIX
+LIBS += -L../netemu_sender/Debug/ \
+    -lnetemu
+LIBS += -L../netlib/Debug/ \
+    -lnetlib
+}
