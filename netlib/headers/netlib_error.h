@@ -16,6 +16,8 @@ extern "C" {
 
 #ifdef _NIX
 
+#include <errno.h>
+
 #define NETEMU_EINTR			EINTR
 #define NETEMU_EWOULDBLOCK		EWOULDBLOCK
 #define NETEMU_EACCES			EACCES
@@ -113,13 +115,15 @@ extern "C" {
 #endif
 
 /* *** GENERAL ERROR CODES *** */
-#define NETEMU_ENOTENOUGHMEMORY	40000
-#define NETEMU_EUNKOWNERROR		40001
-#define NETEMU_EPATHNOTFOUND	40002
-#define NETEMU_EINVALIDHANDLE	40003
+#define NETEMU_ENOTENOUGHMEMORY		40000
+#define NETEMU_EUNKOWNERROR			40001
+#define NETEMU_EPATHNOTFOUND		40002
+#define NETEMU_EINVALIDHANDLE		40003
+#define NETEMU_EINVALIDSERVERLIST 	40004
 
 
 int netlib_get_last_error();
+int netlib_get_last_platform_error();
 void netlib_set_last_mapped_error(int error);
 void netlib_set_last_error(int error);
 
