@@ -73,9 +73,41 @@ void p2p_menu(struct netemu_p2p_connection *connection) {
 			case '4':
 				join_p2p_game(connection);
 				break;
+			case '5':
+				start_p2p_game(connection);
+				break;
+			case '6':
+				p2p_player_ready(connection);
+				break;
+			case '7':
+				p2p_send_play_values(connection);
+
 		}
 
 	}
+}
+
+void start_p2p_game(struct netemu_p2p_connection *connection) {
+	netemu_sockaddr_in addr;
+	addr.sin_family = NETEMU_AF_INET;
+	addr.sin_addr.s_addr = ADDR;
+	addr.sin_port = netemu_htons(40000);
+
+	netemu_p2p_start_game(connection,(netemu_sockaddr*)&addr,sizeof(addr));
+}
+
+void p2p_send_play_values(struct netemu_p2p_connection *connection) {
+	char* data = VALUE;
+	netemu_p2p_send_play_values(connection, strlen(data)+1, data);
+}
+
+void p2p_player_ready(struct netemu_p2p_connection *connection) {
+	netemu_sockaddr_in addr;
+	addr.sin_family = NETEMU_AF_INET;
+	addr.sin_addr.s_addr = ADDR;
+	addr.sin_port = netemu_htons(40001);
+
+	netemu_p2p_player_ready(connection,(netemu_sockaddr*)&addr,sizeof(addr));
 }
 
 void join_p2p_game(struct netemu_p2p_connection *connection) {
@@ -83,7 +115,7 @@ void join_p2p_game(struct netemu_p2p_connection *connection) {
 	int no_games;
 	p2p_games = netemu_p2p_get_game_list(connection, &no_games);
 	if(no_games > 0) {
-		netemu_p2p_join_game(connection, p2p_games[0]->creator);
+		netemu_p2p_join_game(connection, p2p_games[0]);
 	}
 	else {
 		printf("No games to Join!");

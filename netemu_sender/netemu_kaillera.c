@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "netemu_info.h"
 #include "interface/netemu_kaillera.h"
-#include "protocol/application.h"
+#include "protocol/application_kaillera.h"
 #include "netemu_resources.h"
 #include "network/netemu_packet_buffer.h"
 #include "network/netemu_sender_buffer.h"
@@ -14,15 +14,14 @@
 #include "responses.h"
 #include "protocol/application_p2p.h"
 
-int server_connection_wait_for_instruction(struct netemu_info* info, int instruction_id, time_t timestamp);
-void server_connection_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username);
-void server_connection_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count);
-void server_connection_add_player(struct game *game, struct player *player);
+void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username);
+void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count);
+void netemu_kaillera_add_player(struct game *game, struct player *player);
 
-void _server_connection_add_game_struct(struct netemu_info* info, struct game* game);
-int _server_connection_user_comparator(const void* item1,const void* item2);
-int _server_connection_game_comparator(const void* item1, const void* item2);
-void _server_connection_add_user_struct(struct netemu_info* info, struct user *user);
+void _netemu_kaillera_add_game_struct(struct netemu_info* info, struct game* game);
+int _netemu_kaillera_user_comparator(const void* item1,const void* item2);
+int _netemu_kaillera_game_comparator(const void* item1, const void* item2);
+void _netemu_kaillera_add_user_struct(struct netemu_info* info, struct user *user);
 
 
 int netemu_send_chat_message(struct netemu_info *info, char *message) {
@@ -79,7 +78,7 @@ void netemu_kaillera_create_game_async(struct netemu_info *info, char *gamename,
 }
 
 
-void _server_connection_add_game_struct(struct netemu_info* info, struct game* game) {
+void _netemu_kaillera_add_game_struct(struct netemu_info* info, struct game* game) {
 	int index;
 
 	if(info->_internal->game_create_requested) {
@@ -97,7 +96,7 @@ void _server_connection_add_game_struct(struct netemu_info* info, struct game* g
 	}
 }
 
-int server_connection_start_game(struct netemu_info *info) {
+int netemu_kaillera_start_game(struct netemu_info *info) {
 	time_t timestamp;
 	struct application_instruction *message;
 	union netemu_connection_type type;
@@ -112,7 +111,7 @@ int server_connection_start_game(struct netemu_info *info) {
 }
 
 
-struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name, struct netemu_sender_buffer* buffer) {
+struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct netemu_sender_buffer* buffer) {
 	struct netemu_info *info;
 
 	info = (struct netemu_info*)malloc(sizeof(struct netemu_info));
@@ -136,9 +135,9 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 	info->_internal->buffered_values->values = NULL;
 	info->_internal->game_create_requested = 1;
 	info->_internal->users = netemu_list_new(10, FALSE);
-	netemu_list_register_sort_fn(info->_internal->users,_server_connection_user_comparator);
+	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
 	info->_internal->games = netemu_list_new(10, FALSE);
-	netemu_list_register_sort_fn(info->_internal->games,_server_connection_game_comparator);
+	netemu_list_register_sort_fn(info->_internal->games,_netemu_kaillera_game_comparator);
 
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,PING,_netemu_respond_to_ping, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,USER_JOINED,_netemu_respond_to_user_join, info);
@@ -151,7 +150,7 @@ struct netemu_info *netemu_server_connection_new(char* user, char* emulator_name
 	return info;
 }
 
-int server_connection_login(struct netemu_info* info) {
+int netemu_kaillera_login(struct netemu_info* info) {
 	struct application_instruction *message;
 	union netemu_connection_type type;
 	time_t timestamp;
@@ -182,7 +181,7 @@ int netemu_kaillera_join_game(struct netemu_info *info, NETEMU_DWORD gameid) {
 	return 1;
 }
 
-int server_connection_join_game_async(struct netemu_info *info, NETEMU_DWORD gameid) {
+int netemu_kaillera_join_game_async(struct netemu_info *info, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
 	union netemu_connection_type type;
 
@@ -195,7 +194,7 @@ int server_connection_join_game_async(struct netemu_info *info, NETEMU_DWORD gam
 }
 
 
-void server_connection_add_player(struct game *game, struct player *player) {
+void netemu_kaillera_add_player(struct game *game, struct player *player) {
 	struct player* players;
 	int i;
 
@@ -212,7 +211,7 @@ void server_connection_add_player(struct game *game, struct player *player) {
 
 }
 
-void server_connection_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count) {
+void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count) {
 	struct game* game;
 	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
@@ -220,19 +219,19 @@ void server_connection_add_game(struct netemu_info *info, char* app_name, char *
 	game->id = id;
 	game->status = status;
 	game->users_count = users_count;
-	_server_connection_add_game_struct(info, game);
+	_netemu_kaillera_add_game_struct(info, game);
 }
 
-void server_connection_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username) {
+void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username) {
 	struct user* user;
 	user = malloc(sizeof(struct user*));
 	user->id = user_id;
 	user->connection = connection_type;
 	user->username = username;
-	_server_connection_add_user_struct(info,user);
+	_netemu_kaillera_add_user_struct(info,user);
 }
 
-void _server_connection_add_user_struct(struct netemu_info* info, struct user *user) {
+void _netemu_kaillera_add_user_struct(struct netemu_info* info, struct user *user) {
 	int index;
 
 	index = netemu_list_contains(info->_internal->users,user);
@@ -252,7 +251,7 @@ struct game** netemu_kaillera_get_game_list(struct netemu_info* info, int *count
 	return games;
 }
 
-struct user** server_connection_get_user_list(struct netemu_info* info, int *count) {
+struct user** netemu_kaillera_get_user_list(struct netemu_info* info, int *count) {
 	struct user** users;
 	netemu_list_copy(info->_internal->users,&users);
 	*count = info->_internal->users->count;
@@ -299,21 +298,21 @@ void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_co
 /**
  * Compare users.
  */
-int _server_connection_user_comparator(const void* item1,const void* item2) {
+int _netemu_kaillera_user_comparator(const void* item1,const void* item2) {
 	return ((struct user*)item1)->id - ((struct user*)item2)->id;
 }
 /**
  * Compare games.
  */
-int _server_connection_game_comparator(const void* item1, const void* item2) {
+int _netemu_kaillera_game_comparator(const void* item1, const void* item2) {
 	return ((struct game*)item1)->id - ((struct game*)item2)->id;
 }
 
-struct buffered_play_values* server_connection_get_play_values(struct netemu_info *info) {
+struct buffered_play_values* netemu_kaillera_get_play_values(struct netemu_info *info) {
 	return info->_internal->buffered_values;
 }
 
-void netemu_send_play_values(struct netemu_info* info, int size, void* data) {
+void netemu_kaillera_send_play_values(struct netemu_info* info, int size, void* data) {
 	time_t timestamp;
 	struct application_instruction *message;
 	union netemu_connection_type type;
@@ -325,7 +324,7 @@ void netemu_send_play_values(struct netemu_info* info, int size, void* data) {
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 }
 
-int netemu_send_player_ready(struct netemu_info *info) {
+int netemu_kaillera_send_player_ready(struct netemu_info *info) {
 	time_t timestamp;
 	struct application_instruction *message;
 	union netemu_connection_type type;

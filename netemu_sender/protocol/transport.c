@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "transport.h"
-#include "application.h"
+#include "application_kaillera.h"
 #include "netlib_error.h"
 
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count) {

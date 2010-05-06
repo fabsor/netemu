@@ -32,15 +32,19 @@ int netemu_p2p_connect(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in
 
 void netemu_p2p_host(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *addr, int addr_size, char* cloudname);
 
-int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct game** result);
+int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct p2p_game** result);
 
 void netemu_p2p_login(struct netemu_p2p_connection *p2p);
 
-int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_user *creator);
+int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_game *game);
+
+int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_sockaddr* addr, size_t addr_size);
 
 struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p_connection* info, int *count);
 
 struct p2p_user** netemu_p2p_get_user_list(struct netemu_p2p_connection* info, int *count);
+
+int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, int size, void* data);
 
 #ifdef	__cplusplus
 }

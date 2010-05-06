@@ -6,12 +6,12 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "netemu_util.h"
-#include "network/netemu_receiver.h"
-#include "network/netemu_sender_udp.h"
-#include "protocol/application.h"
-#include "protocol/transport.h"
-#include "protocol/communication.h"
+#include "../netemu_util.h"
+#include "../network/netemu_receiver.h"
+#include "../network/netemu_sender_udp.h"
+#include "../protocol/application_kaillera.h"
+#include "../protocol/transport.h"
+#include "../protocol/communication.h"
 
 
 void application_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);

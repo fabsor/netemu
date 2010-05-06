@@ -6,6 +6,7 @@
 #include "netlib_util.h"
 #include "../netemu_util.h"
 #include "application_p2p.h"
+#include "application_p2p_internal.h"
 #include "../network/netemu_net.h"
 #include "../network/netemu_sender_udp.h"
 #include "../network/netemu_tcp.h"
@@ -23,6 +24,9 @@ void netemu_application_p2p_free_user(struct p2p_user *user, NETEMU_BOOL free_po
 void* netemu_application_p2p_login_request_copy(struct application_instruction *instruction);
 void netemu_application_p2p_login_success_free(struct application_instruction *instruction);
 void* netemu_application_p2p_login_success_copy(struct application_instruction *instruction);
+void netemu_application_p2p_join_host_pack(struct application_instruction *instruction, char *buffer);
+void netemu_application_p2p_start_game_pack(struct application_instruction *instruction, char *buffer);
+void netemu_application_add_start_game(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size);
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator) {
 	struct p2p_game *game;
@@ -35,12 +39,39 @@ void netemu_application_p2p_create_game_add(struct application_instruction *inst
 	game->user_count = 1;
 	game->players = NULL;
 	game->creator->_internal = NULL;
+	game->_internal = NULL;
 	size += sizeof(NETEMU_WORD);
 	instruction->body = game;
 	instruction->id = CREATE_P2P_GAME;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_p2p_create_game_pack;
 	instruction->copyBodyFn = netemu_application_p2p_create_game_copy;
+}
+
+void netemu_application_p2p_join_host_add(struct application_instruction *instruction, struct p2p_user *user) {
+	struct p2p_user *copy;
+	int size;
+	copy = malloc(sizeof(struct p2p_user));
+	size = netemu_application_p2p_copy_user(copy, user);
+	instruction->body = copy;
+	instruction->id = P2P_JOIN_HOST;
+	instruction->body_size = size;
+	instruction->packBodyFn = netemu_application_p2p_join_host_pack;
+
+}
+
+void netemu_application_p2p_join_host_pack(struct application_instruction *instruction, char *buffer) {
+	struct p2p_user *user;
+	user = (struct p2p_user*)instruction->body;
+	_netemu_application_p2p_pack_user(buffer,user);
+}
+
+void netemu_application_p2p_join_host_parse(struct application_instruction *instruction, char *buffer) {
+	struct p2p_user *user;
+	user = malloc(sizeof(struct p2p_user));
+	_netemu_application_p2p_parse_user(buffer,user, 1);
+	instruction->body = user;
+	instruction->packBodyFn = netemu_application_p2p_join_host_pack;
 }
 
 void netemu_application_p2p_create_game_pack(struct application_instruction *instruction, char *buffer) {
@@ -55,8 +86,7 @@ void netemu_application_p2p_create_game_parse(struct application_instruction *in
 	game = malloc(sizeof(struct p2p_game));
 	pos = _netemu_application_p2p_parse_game(buffer,game);
 	instruction->body = game;
-	instruction->body_size = pos;
-	instruction->packBodyFn = netemu_application_p2p_create_game_parse;
+	instruction->packBodyFn = netemu_application_p2p_create_game_pack;
 }
 
 void* netemu_application_p2p_create_game_copy(struct application_instruction *instruction) {
@@ -117,6 +147,16 @@ struct p2p_user_internal *netemu_application_p2p_create_user_internal() {
 	internal->sender = NULL;
 	return internal;
 }
+
+struct p2p_game_internal *netemu_application_p2p_create_game_internal() {
+	struct p2p_game_internal *internal;
+	internal = malloc(sizeof(struct p2p_game_internal));
+	internal->tcp_collection = NULL;
+	internal->udp_collection = NULL;
+	internal->ready_count = 0;
+	return internal;
+}
+
 
 int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	int i, pos;
@@ -196,6 +236,13 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 			size += netemu_application_p2p_copy_user(&target->players[i],&game->players[i]);
 		}
 	}
+
+	/*We never copy internal stuff.*/
+	if(game->_internal != NULL) {
+		target->_internal = netemu_application_p2p_create_game_internal();
+		target->_internal->tcp_collection = game->_internal->tcp_collection;
+		target->_internal->ready_count = game->_internal->ready_count;
+	}
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
 	return size;
 }
@@ -207,7 +254,7 @@ void netemu_application_p2p_login_success_add(struct application_instruction *in
 	success = malloc(sizeof(struct p2p_login_success));
 	success->users_count = users->count;
 	success->games_count = games->count;
-	size = sizeof(NETEMU_WORD);
+	size = sizeof(NETEMU_WORD) *2;
 	if(success->users_count == 0) {
 		success->users = NULL;
 	}
@@ -452,6 +499,54 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 	instruction->packBodyFn = NULL;
 }
 
+void netemu_application_p2p_start_game_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size) {
+	netemu_application_add_start_game(instruction, addr, addr_size);
+	instruction->id = P2P_GAME_START;
+	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
+}
+
+void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size) {
+	netemu_application_add_start_game(instruction, addr, addr_size);
+	instruction->id = P2P_PLAYER_READY;
+	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
+}
+
+void netemu_application_p2p_start_game_pack(struct application_instruction *instruction, char *buffer) {
+	struct p2p_start_game *start_game;
+	int pos;
+	start_game = instruction->body;
+	memcpy(buffer, &start_game->addr_size, sizeof(size_t));
+	pos = sizeof(size_t);
+	memcpy(buffer+pos, start_game->addr, start_game->addr_size);
+	pos += start_game->addr_size;
+}
+
+void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer) {
+	struct p2p_start_game *start_game;
+	int pos;
+	start_game = malloc(sizeof(struct p2p_start_game));
+	memcpy(&start_game->addr_size, buffer, sizeof(size_t));
+	pos = sizeof(size_t);
+	start_game->addr = malloc(start_game->addr_size);
+	memcpy(start_game->addr,buffer+pos, start_game->addr_size);
+	pos += start_game->addr_size;
+	instruction->body = start_game;
+	instruction->packBodyFn = netemu_application_start_game_pack;
+}
+
+void netemu_application_add_start_game(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size) {
+	struct p2p_start_game *start_game;
+
+	start_game = malloc(sizeof(struct p2p_start_game));
+
+	start_game->addr = malloc(addr_size);
+	memcpy(start_game->addr, addr, addr_size);
+	start_game->addr_size = addr_size;
+
+	instruction->body_size = sizeof(size_t)+addr_size;
+	instruction->body = start_game;
+}
+
 void netemu_application_p2p_player_join_add(struct application_instruction *instruction, struct p2p_user *user) {
 	instruction->body = malloc(sizeof(struct p2p_user));
 	instruction->body_size = netemu_application_p2p_copy_user(instruction->body, user);
@@ -468,6 +563,7 @@ void netemu_application_p2p_player_join_parse(struct application_instruction *in
 	user = malloc(sizeof(struct p2p_user));
 	instruction->body_size = _netemu_application_p2p_parse_user(buffer,user,0);
 	instruction->body = user;
+	instruction->packBodyFn = netemu_application_p2p_player_join_pack;
 }
 
 void netemu_application_p2p_kick_player_add(struct application_instruction *instruction, char* player_name) {

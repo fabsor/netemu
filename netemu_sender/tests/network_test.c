@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "netemu_util.h"
+#include "../netemu_util.h"
 
 void network_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void*);
 void send_network_data(struct netemu_sender_udp* sender);

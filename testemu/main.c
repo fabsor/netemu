@@ -56,10 +56,10 @@ int main() {
 			server_connect(addr);
 		break;
 		case '3':
-			/*connect_p2p();*/
+			connect_p2p();
 		break;
 		case '4':
-			/*host_p2p(addr);*/
+			host_p2p(addr);
 		break;
 	}
 
@@ -72,6 +72,7 @@ void connect_async(netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success, NULL);
 	while(info == NULL);
 	netemu_register_play_values_received_callback(info, receive_values);
+
 	menu(info);
 }
 
@@ -127,7 +128,7 @@ void menu(struct netemu_info* connection) {
 
 void send_play_values(struct netemu_info *connection) {
 	char* data = VALUE;
-	netemu_send_play_values(connection, strlen(data)+1, data);
+	netemu_kaillera_send_play_values(connection, strlen(data)+1, data);
 }
 
 void create_game(struct netemu_info* connection) {
@@ -155,7 +156,7 @@ void show_game_list(struct netemu_info* connection) {
 void show_user_list(struct netemu_info* connection) {
 	int no_users, i;
 	struct user** users;
-	users = server_connection_get_user_list(connection, &no_users);
+	users = netemu_kaillera_get_user_list(connection, &no_users);
 
 	for(i = 0; i < no_users; i++) {
 		printf("%s\n",users[i]->username);
@@ -168,11 +169,11 @@ void game_created(struct game* game) {
 
 void start_game(struct netemu_info *connection) {
 	printf("Starting game\n");
-	server_connection_start_game(connection);
+	netemu_kaillera_start_game(connection);
 }
 
 void player_ready(struct netemu_info *connection) {
-	netemu_send_player_ready(connection);
+	netemu_kaillera_send_player_ready(connection);
 }
 
 

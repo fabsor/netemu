@@ -10,7 +10,7 @@
 #include "../netemu_util.h"
 #include "netemu_socket.h"
 #include "netlib_util.h"
-#include "application.h"
+#include "application_kaillera.h"
 #include "application_p2p.h"
 #include "netlib_error.h"
 
@@ -116,6 +116,10 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case JOIN_P2P_GAME:
 			netemu_application_p2p_player_join_parse(app_instruction,data);
 			break;
+		case P2P_GAME_START: case P2P_PLAYER_READY:
+			netemu_application_p2p_start_game_parse(app_instruction, data);
+			break;
+
 	}
 
 
