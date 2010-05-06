@@ -13,6 +13,14 @@
 void p2p_menu(struct netemu_p2p_connection *connection);
 void create_p2p_game(struct netemu_p2p_connection* connection);
 
+void start_p2p_game(struct netemu_p2p_connection *connection);
+void p2p_send_play_values(struct netemu_p2p_connection *connection);
+void p2p_player_ready(struct netemu_p2p_connection *connection);
+void host_p2p(netemu_sockaddr_in addr);
+void join_p2p_game(struct netemu_p2p_connection *connection);
+void show_p2p_game_list(struct netemu_p2p_connection* connection);
+void show_p2p_user_list(struct netemu_info* connection);
+
 void host_p2p(netemu_sockaddr_in addr) {
 	int port;
 	struct netemu_p2p_connection *p2p;
