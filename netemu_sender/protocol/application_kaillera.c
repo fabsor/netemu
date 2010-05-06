@@ -502,9 +502,10 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer) {
 	struct pong* request;
 	NETEMU_DWORD dword;
+	int dword_size = sizeof(NETEMU_DWORD);
 	request = (struct pong*)instruction->body;
 	for (dword = 0; dword <= 3; dword++) {
-		memcpy(buffer+sizeof(NETEMU_DWORD)*dword,&dword,sizeof(unsigned long));
+		memcpy(buffer + (dword_size*dword), &dword, dword_size);
 	}
 }
 
