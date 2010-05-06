@@ -18,12 +18,20 @@
 struct netemu_receiver_udp* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* args) {
 	netemu_sockaddr_in *addr_in;
 	struct netemu_receiver_udp *receiver;
-	addr_in = malloc(sizeof(netemu_sockaddr_in));
+
+	if((addr_in = malloc(sizeof(netemu_sockaddr_in))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
+	}
 	addr_in->sin_addr.s_addr = netemu_htonl(INADDR_ANY);
 	addr_in->sin_family = NETEMU_AF_INET;
 	addr_in->sin_port = netemu_htons(port);
 
-	receiver = netemu_receiver_udp_new((netemu_sockaddr*)addr_in,sizeof(addr_in), 256);
+	receiver = netemu_receiver_udp_new((netemu_sockaddr*)addr_in,sizeof(netemu_sockaddr_in), 256);
+	if(receiver == NULL) {
+		free(addr_in);
+		return NULL;
+	}
 	netemu_receiver_udp_register_recv_fn(receiver, listenerFn, args);
 	netemu_receiver_udp_start_receiving(receiver);
 	return receiver;
