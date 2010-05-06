@@ -163,7 +163,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\protocol\application.c"
+				RelativePath=".\protocol\application_kaillera.c"
 				>
 			</File>
 			<File
@@ -171,7 +171,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\application_test.c"
+				RelativePath=".\tests\application_test.c"
 				>
 			</File>
 			<File
@@ -183,7 +183,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\communication_test.c"
+				RelativePath=".\tests\communication_test.c"
 				>
 			</File>
 			<File
@@ -196,6 +196,10 @@
 			</File>
 			<File
 				RelativePath=".\structures\netemu_hashtbl.c"
+				>
+			</File>
+			<File
+				RelativePath=".\netemu_kaillera.c"
 				>
 			</File>
 			<File
@@ -227,10 +231,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\netemu_server_connection.c"
-				>
-			</File>
-			<File
 				RelativePath=".\structures\netemu_stringbuilder.c"
 				>
 			</File>
@@ -243,7 +243,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network_test.c"
+				RelativePath=".\tests\network_test.c"
 				>
 			</File>
 			<File
@@ -261,7 +261,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\protocol\application.h"
+				RelativePath=".\protocol\application_kaillera.h"
 				>
 			</File>
 			<File
@@ -269,7 +269,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\application_test.h"
+				RelativePath=".\tests\application_test.h"
 				>
 			</File>
 			<File
@@ -277,11 +277,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\communication_test.h"
+				RelativePath=".\tests\communication_test.h"
 				>
 			</File>
 			<File
-				RelativePath=".\kailleraclient.h"
+				RelativePath=".\interface\netemu.h"
 				>
 			</File>
 			<File
@@ -289,7 +289,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\netemu_info.h"
+				>
+			</File>
+			<File
 				RelativePath=".\interface\netemu_kaillera.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\netemu_net.h"
 				>
 			</File>
 			<File
@@ -321,10 +329,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\netemu_server_connection.h"
-				>
-			</File>
-			<File
 				RelativePath=".\structures\netemu_stringbuilder.h"
 				>
 			</File>
@@ -337,7 +341,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network_test.h"
+				RelativePath=".\tests\network_test.h"
 				>
 			</File>
 			<File
