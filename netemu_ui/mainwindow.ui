@@ -486,7 +486,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEditUsername"/>
+         <widget class="QLineEdit" name="textUsername"/>
         </item>
         <item>
          <spacer name="horizontalSpacer_2">

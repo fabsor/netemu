@@ -40,6 +40,7 @@ struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int a
 	}
 	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if(bind_error == -1) {
+		bind_error = netlib_get_last_platform_error();
 		netemu_closesocket(receiver->socket);
 		free(receiver);
 		return NULL;
