@@ -208,7 +208,7 @@ void netemu_kaillera_add_player(struct game *game, struct player *player) {
 		free(game->players->players);
 		game->players->players = players;
 	}
-	game->players->players[game->players->players_count] = *player;
+	game->players->players[game->players->players_count-1] = *player;
 
 }
 
