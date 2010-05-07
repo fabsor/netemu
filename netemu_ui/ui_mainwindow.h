@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue 4. May 15:28:57 2010
+** Created: Thu May 6 11:51:27 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -82,7 +82,7 @@ public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
     QLabel *labelUsername;
-    QLineEdit *lineEditUsername;
+    QLineEdit *textUsername;
     QSpacerItem *horizontalSpacer_2;
     QPushButton *buttonAbout;
     QPushButton *buttonCancel;
@@ -370,10 +370,10 @@ public:
 
         horizontalLayout_2->addWidget(labelUsername);
 
-        lineEditUsername = new QLineEdit(centralwidget);
-        lineEditUsername->setObjectName(QString::fromUtf8("lineEditUsername"));
+        textUsername = new QLineEdit(centralwidget);
+        textUsername->setObjectName(QString::fromUtf8("textUsername"));
 
-        horizontalLayout_2->addWidget(lineEditUsername);
+        horizontalLayout_2->addWidget(textUsername);
 
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 

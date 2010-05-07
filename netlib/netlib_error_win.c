@@ -25,3 +25,7 @@ void netlib_set_last_mapped_error(int error) {
 			break;
 	}
 }
+
+int netlib_get_last_platform_error() {
+	return GetLastError();
+}

@@ -85,12 +85,23 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	struct communication_callback callback;
 	struct netemu_sender_buffer *buffer;
 	union netemu_connection_type *type;
+
 	callback.port = -1;
 	callback.async = -1;
 	client = netemu_resources_get_client();
+	if(client == NULL)
+		return NULL;
 	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&callback);
+	if(client->receiver == NULL)
+		return NULL;
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
-	hello = netemu_communication_create_hello_message(VERSION);
+	if(client->sender == NULL)
+		return NULL;
+	/* TODO: Free the receiver and sender incase of errors. Need new functions for this. */
+
+	if((hello = netemu_communication_create_hello_message(VERSION)) == NULL)
+		return NULL;
+
 	netemu_util_send_data(client->sender,hello);
 	free(hello);
 	while(callback.port == -1);

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'settingsdialog.h'
 **
-** Created: Wed May 5 20:44:24 2010
+** Created: Thu May 6 11:51:37 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -24,17 +24,17 @@ static const uint qt_meta_data_SettingsDialog[] = {
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
-       0,    0, // properties
-       0,    0, // enums/sets
-       0,    0, // constructors
-       0,       // flags
-       0,       // signalCount
-
+       2,   14, // methods
+ // slots: signature, parameters, type, tag, flags
+      33,   16,   15,   15, 0x08,
+      89,   15,   15,   15, 0x08,
        0        // eod
 };
 
 static const char qt_meta_stringdata_SettingsDialog[] = {
-    "SettingsDialog\0"
+    "SettingsDialog\0\0current,previous\0"
+    "changePreferencePage(QListWidgetItem*,QListWidgetItem*)\0"
+    "OnButtonOkClicked()\0"
 };
 
 const QMetaObject SettingsDialog::staticMetaObject = {
@@ -64,6 +64,14 @@ int SettingsDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QDialog::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: changePreferencePage((*reinterpret_cast< QListWidgetItem*(*)>(_a[1])),(*reinterpret_cast< QListWidgetItem*(*)>(_a[2]))); break;
+        case 1: OnButtonOkClicked(); break;
+        default: ;
+        }
+        _id -= 2;
+    }
     return _id;
 }
 QT_END_MOC_NAMESPACE

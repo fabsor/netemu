@@ -3,6 +3,7 @@
 
 #include <QtGui/QDialog>
 #include "ui_connectdialog.h"
+#include "netemu_kaillera.h"
 
 enum HostType {
 	KailleraServer,
@@ -14,18 +15,21 @@ class ConnectDialog : public QDialog
     Q_OBJECT
 
 public:
-    ConnectDialog(QWidget *parent = 0, QString name = QString::null, QString address = QString::null, HostType type = KailleraServer);
+    ConnectDialog(QWidget *parent = 0, QString serverName = QString::null, QString address = QString::null, HostType type = KailleraServer, QString userName = QString::null);
     ~ConnectDialog();
     bool canceled();
+    netemu_info *connectionInfo;
+
 
 private slots:
 	void onCancelClicked();
 
 private:
     Ui::WorkingDialogClass ui;
-    QString name;
+    QString serverName;
     QString address;
     HostType type;
+    QString userName;
     bool isCanceled;
     void createActions();
     void Connect();
