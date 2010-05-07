@@ -11,6 +11,7 @@
 #include "netemu_sender_udp.h"
 #include "netemu_sender_collection.h"
 #include "netemu_sender_buffer.h"
+#include "netlib_error.h"
 
 struct netemu_sender_buffer_item {
 	netemu_connection_types recipient_type;
@@ -83,13 +84,16 @@ void _netemu_sender_buffer_update(void* arg) {
 	}
 }
 
-void netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
+int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 		struct application_instruction* instruction, netemu_connection_types type, union netemu_connection_type recipient) {
 	struct netemu_sender_buffer_item *item;
 	struct netemu_list *list;
 	void* key;
 
-	item = malloc(sizeof(struct netemu_sender_buffer_item));
+	if((item = malloc(sizeof(struct netemu_sender_buffer_item))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 	item->recipient_type = type;
 	item->recipient = recipient;
 	item->instruction = instruction;
@@ -112,11 +116,24 @@ void netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 	netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
 	if((list = netemu_hashtbl_get(buffer->instructions,key,sizeof(void*))) == NULL) {
 		list = netemu_list_new(10,0);
-		netemu_hashtbl_insert(buffer->instructions,key,sizeof(void*),list);
+		if(list == NULL) {
+			free(item);
+			return -1;
+		}
+		if(netemu_hashtbl_insert(buffer->instructions,key,sizeof(void*),list) == -1) {
+			netemu_list_free(list);
+			free(item);
+			return -1;
+		}
 	}
-	netemu_list_add(list,item);
+	if(netemu_list_add(list,item) == -1) {
+		netemu_list_free(list);
+		free(item);
+		return -1;
+	}
 	netemu_thread_event_signal(buffer->event);
 	netemu_thread_mutex_release(buffer->send_lock);
+	return 0;
 }
 
 void netemu_sender_buffer_send(netemu_connection_types type, union netemu_connection_type recipient, char* data, int size) {

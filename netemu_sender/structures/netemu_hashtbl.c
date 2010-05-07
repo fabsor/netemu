@@ -155,7 +155,10 @@ int netemu_hashtbl_insert(NETEMU_HASHTBL *hashtbl, const void *key,
 		free(node);
 		return -1;
 	}
-	netemu_list_add(hashtbl->keys, node->key);
+	if(netemu_list_add(hashtbl->keys, node->key) == -1) {
+		free(node);
+		return -1;
+	}
 	node->data = data;
 	node->next = hashtbl->nodes[hash];
 	hashtbl->nodes[hash] = node;
