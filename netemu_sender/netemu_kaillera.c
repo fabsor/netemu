@@ -135,6 +135,7 @@ struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct nete
 	info->_internal->buffered_values->values = NULL;
 	info->_internal->game_create_requested = 1;
 	info->_internal->users = netemu_list_new(10, FALSE);
+	info->_internal->has_id = 0;
 	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
 	info->_internal->games = netemu_list_new(10, FALSE);
 	netemu_list_register_sort_fn(info->_internal->games,_netemu_kaillera_game_comparator);
