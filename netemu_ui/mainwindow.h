@@ -1,9 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "Dialogs/connectdialog.h"
 #include <QtGui/QMainWindow>
 #include <QSettings>
 #include "ui_mainwindow.h"
+
 
 class MainWindow : public QMainWindow
 {
@@ -21,10 +23,12 @@ private slots:
 	void tableRecentItemChanged();
 	void tableFavoritesItemChanged();
 	void OnButtonServerConnectClicked();
+	void OnButtonConnectServerIPClicked();
 
 
 private:
 	void createActions();
+	void ShowConnectDialog(QString name, QString address, HostType type);
     Ui::mainwindowClass ui;
     QSettings *settings;
 };

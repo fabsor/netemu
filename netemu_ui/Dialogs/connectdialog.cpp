@@ -19,7 +19,6 @@ ConnectDialog::ConnectDialog(QWidget *parent, QString serverName, QString addres
 	connectingString += "'" + this->serverName + "'";
 	ui.labelConnecting->setText(connectingString);
 	//ui.labelConnecting->setText("Connecting to " + (type == KailleraServer ? "server " : "cloud ") + name);
-	this->Connect();
 }
 
 void ConnectResponse(int status, struct netemu_info* server_connection, void *arg) {
@@ -48,25 +47,36 @@ void ConnectDialog::createActions()
 	connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(onCancelClicked()));
 }
 
-void ConnectDialog::Connect()
+int ConnectDialog::exec()
+{
+	this->show();
+	if(this->Connect())
+		return QDialog::Accepted;
+	else
+		return QDialog::Rejected;
+	return 0;
+}
+
+bool ConnectDialog::Connect()
 {
 	QByteArray addressBytes, usernameBytes;
 	char* address;
 	short port;
 	bool portConversionSuccess;
 	netemu_sockaddr_in addr;
+
 	QStringList stringList = this->address.split(':', QString::SkipEmptyParts);
 	if(stringList.length() != 2) {
 		qDebug("Error in address format. Address contained more than 1 colon.");
 		qDebug(this->address.toLatin1().data());
-		return;
+		return false;
 	}
 
 	addressBytes = stringList.value(0).toLatin1();
 	usernameBytes = this->userName.toLatin1();
 	address = addressBytes.data();
 	port = (short)stringList.value(1).toInt(&portConversionSuccess, 10);
-	addr.sin_addr.s_addr = netemu_inet_addr("74.208.145.9"); //netemu_inet_addr(address);
+	addr.sin_addr.s_addr = netemu_inet_addr(address);
 	addr.sin_port = netemu_htons(port);
 	addr.sin_family = NETEMU_AF_INET;
 	if(this->type == KailleraServer)
@@ -75,10 +85,13 @@ void ConnectDialog::Connect()
 		/*kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", this->userName.toLatin1().data(), ConnectResponse, this);*/
 
 		this->connectionInfo = kaillera_communication_connect(&addr, sizeof(addr), "W00t", usernameBytes.data());
-		if(this->connectionInfo == NULL)
+		if(this->connectionInfo == NULL) {
 			qDebug("Connection error");
-		this->accept();
+			return false;
+		}
+		return true;
 	}
+	return false;
 }
 
 void ConnectDialog::ConnectSuccess(int status, struct netemu_info* server_connection)
