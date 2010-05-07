@@ -635,7 +635,7 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 	buffer += netemu_util_copy_string(&game->appName,buffer);
 	memcpy(&game->id,buffer,sizeof(NETEMU_DWORD));
 	buffer += sizeof(NETEMU_DWORD);
-	memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD));
+	//memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD)); Maybe it isn't included?
 	instruction->body = game;
 }
 
