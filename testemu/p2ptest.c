@@ -12,6 +12,9 @@
 
 void p2p_menu(struct netemu_p2p_connection *connection);
 void create_p2p_game(struct netemu_p2p_connection* connection);
+void respond_to_login(struct netemu_p2p_connection *connection, int status);
+/* We love the ugly stuff ;) */
+int logged_in = 0;
 
 void start_p2p_game(struct netemu_p2p_connection *connection);
 void p2p_send_play_values(struct netemu_p2p_connection *connection);
@@ -59,6 +62,38 @@ void connect_p2p() {
 	netemu_p2p_connect(p2p,&in_addr,sizeof(in_addr),&out_addr,sizeof(out_addr));
 	//struct netemu_p2p_connection* p2p, struct netemu_sockaddr_in *in_addr, int in_addr_size,  struct netemu_sockaddr_in *connect_addr, int connect_addr_size
 	p2p_menu(p2p);
+}
+
+void connect_p2p_async() {
+	int port;
+	netemu_sockaddr_in in_addr;
+	netemu_sockaddr_in out_addr;
+	struct netemu_p2p_connection *p2p;
+
+	in_addr.sin_addr.s_addr = ADDR;
+	in_addr.sin_family = NETEMU_AF_INET;
+
+	out_addr.sin_addr.s_addr = ADDR;
+	out_addr.sin_family = NETEMU_AF_INET;
+
+	printf("Enter Port Number for you:\n");
+	scanf("%d",&port);
+	in_addr.sin_port = netemu_htons(port);
+	printf("\n");
+
+	printf("Enter Port Number to the host:\n");
+	scanf("%d",&port);
+	out_addr.sin_port = netemu_htons(port);
+	printf("\n");
+
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	netemu_p2p_connect_async(p2p,&in_addr,sizeof(in_addr),&out_addr,sizeof(out_addr), respond_to_login);
+	while(logged_in != 1);
+	p2p_menu(p2p);
+}
+
+void respond_to_login(struct netemu_p2p_connection *connection, int status) {
+	logged_in = status;
 }
 
 void p2p_menu(struct netemu_p2p_connection *connection) {

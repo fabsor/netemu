@@ -11,7 +11,7 @@
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application_kaillera.h"
-#include "application_p2p.h"
+#include "application_p2p_internal.h"
 #include "netlib_error.h"
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
@@ -497,8 +497,8 @@ int netemu_application_login_request_add(struct application_instruction* instruc
 void netemu_application_pong_add(struct application_instruction* instruction) {
 	struct pong* request;
 	int size;
-	size = sizeof(struct pong);
-	request = malloc(size);
+	size = sizeof(NETEMU_DWORD)*4;
+	request = malloc(sizeof(struct pong));
 	instruction->body = request;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_pong_pack;
@@ -517,10 +517,10 @@ void netemu_application_login_request_pack(struct application_instruction *instr
 void netemu_application_pong_pack(struct application_instruction *instruction, char *buffer) {
 	struct pong* request;
 	NETEMU_DWORD dword;
-	int dword_size = sizeof(NETEMU_DWORD);
 	request = (struct pong*)instruction->body;
 	for (dword = 0; dword <= 3; dword++) {
-		memcpy(buffer + (dword_size*dword), &dword, dword_size);
+		memcpy(buffer,&dword,sizeof(NETEMU_DWORD));
+		buffer += sizeof(NETEMU_DWORD);
 	}
 }
 
@@ -650,7 +650,7 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 	buffer += netemu_util_copy_string(&game->appName,buffer);
 	memcpy(&game->id,buffer,sizeof(NETEMU_DWORD));
 	buffer += sizeof(NETEMU_DWORD);
-	memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD));
+	//memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD)); Maybe it isn't included?
 	instruction->body = game;
 }
 

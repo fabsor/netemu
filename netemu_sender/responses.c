@@ -77,8 +77,8 @@ void _netemu_respond_to_game_created(struct netemu_packet_buffer* buffer, struct
 			j++;
 		}
 	}
-	for(i = 0; i < j+1; i++) {
-		netemu_list_remove(connection->_internal->game_created_callback, itemsToRemove[j]);
+	for(i = 0; i < j; i++) {
+		netemu_list_remove(connection->_internal->game_created_callback, itemsToRemove[i]);
 	}
 }
 

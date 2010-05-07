@@ -46,7 +46,7 @@ int main() {
 	//kaillera_communication_get_server_list(&servers, &games);
 	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
-	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n");
+	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n5. Connect p2p async\n");
 	choice = getchar();
 	switch(choice) {
 		case '1':
@@ -60,6 +60,8 @@ int main() {
 		break;
 		case '4':
 			host_p2p(addr);
+		case '5':
+			connect_p2p_async(addr);
 		break;
 	}
 

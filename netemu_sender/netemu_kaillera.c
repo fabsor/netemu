@@ -135,6 +135,7 @@ struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct nete
 	info->_internal->buffered_values->values = NULL;
 	info->_internal->game_create_requested = 1;
 	info->_internal->users = netemu_list_new(10, FALSE);
+	info->_internal->has_id = 0;
 	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
 	info->_internal->games = netemu_list_new(10, FALSE);
 	netemu_list_register_sort_fn(info->_internal->games,_netemu_kaillera_game_comparator);
@@ -217,7 +218,7 @@ void netemu_kaillera_add_player(struct game *game, struct player *player) {
 		free(game->players->players);
 		game->players->players = players;
 	}
-	game->players->players[game->players->players_count] = *player;
+	game->players->players[game->players->players_count-1] = *player;
 
 }
 
@@ -234,7 +235,7 @@ void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *ga
 
 void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username) {
 	struct user* user;
-	user = malloc(sizeof(struct user*));
+	user = malloc(sizeof(struct user));
 	user->id = user_id;
 	user->connection = connection_type;
 	user->username = username;
