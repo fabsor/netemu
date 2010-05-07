@@ -98,6 +98,7 @@ char* netemu_util_parse_string(char* data) {
 	return string;
 }
 
+
 netemu_sockaddr* netemu_util_copy_addr(netemu_sockaddr *addr, int addr_size) {
 	netemu_sockaddr* copy;
 	copy = malloc(addr_size);

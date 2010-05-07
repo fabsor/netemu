@@ -10,6 +10,7 @@
 #include "network/netemu_sender_buffer.h"
 #include "netemu_list.h"
 #include "interface/netemu_kaillera.h"
+
 void _netemu_respond_to_login_success(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct login_success *accepted;
 	struct netemu_info* connection;

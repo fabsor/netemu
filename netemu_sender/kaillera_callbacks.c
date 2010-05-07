@@ -9,13 +9,25 @@
 #include "netemu_info.h"
 #include "netemu_list.h"
 
-int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable);
+int netemu_kaillera_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable);
+
+int netemu_kaillera_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable) {
+	struct callback *callback;
+
+	if((callback = malloc(sizeof(struct callback))) == NULL ) {
+		return -1;
+	}
+	callback->fn = fn;
+	callback->disposable = disposable;
+	netemu_list_add(list,callback);
+	return 0;
+}
 
 int netemu_register_chat_callback(struct netemu_info *connection, chatFn callback) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->chat_fn = callback;
-	netemu_register_callback(connection->_internal->chat_callback, fn, 0);
+	netemu_kaillera_register_callback(connection->_internal->chat_callback, fn, 0);
 	return 0;
 }
 
@@ -30,19 +42,7 @@ int netemu_register_user_join_callback(struct netemu_info *connection, joinFn ca
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->join_fn = callback;
-	netemu_register_callback(connection->_internal->join_callback, fn, 0);
-	return 0;
-}
-
-int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable) {
-	struct callback *callback;
-
-	if((callback = malloc(sizeof(struct callback))) == NULL ) {
-		return -1;
-	}
-	callback->fn = fn;
-	callback->disposable = disposable;
-	netemu_list_add(list,callback);
+	netemu_kaillera_register_callback(connection->_internal->join_callback, fn, 0);
 	return 0;
 }
 
@@ -65,7 +65,7 @@ int netemu_register_play_values_received_callback(struct netemu_info *connection
 	}
 
 	fn->values_received_fn = callback;
-	netemu_register_callback(connection->_internal->play_values_callback, fn, 0);
+	netemu_kaillera_register_callback(connection->_internal->play_values_callback, fn, 0);
 	return 0;
 }
 
@@ -94,7 +94,7 @@ int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn 
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->leave_fn = callback;
-	netemu_register_callback(connection->_internal->leave_callback, fn, 0);
+	netemu_kaillera_register_callback(connection->_internal->leave_callback, fn, 0);
 	return 0;
 }
 
