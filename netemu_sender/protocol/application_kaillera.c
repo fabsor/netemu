@@ -482,8 +482,8 @@ void netemu_application_login_request_add(struct application_instruction* instru
 void netemu_application_pong_add(struct application_instruction* instruction) {
 	struct pong* request;
 	int size;
-	size = sizeof(struct pong);
-	request = malloc(size);
+	size = sizeof(NETEMU_DWORD)*4;
+	request = malloc(sizeof(struct pong));
 	instruction->body = request;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_pong_pack;
@@ -504,7 +504,8 @@ void netemu_application_pong_pack(struct application_instruction *instruction, c
 	NETEMU_DWORD dword;
 	request = (struct pong*)instruction->body;
 	for (dword = 0; dword <= 3; dword++) {
-		memcpy(buffer+sizeof(NETEMU_DWORD)*dword,&dword,sizeof(unsigned long));
+		memcpy(buffer,&dword,sizeof(NETEMU_DWORD));
+		buffer += sizeof(NETEMU_DWORD);
 	}
 }
 

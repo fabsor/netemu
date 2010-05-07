@@ -225,7 +225,7 @@ void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *ga
 
 void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username) {
 	struct user* user;
-	user = malloc(sizeof(struct user*));
+	user = malloc(sizeof(struct user));
 	user->id = user_id;
 	user->connection = connection_type;
 	user->username = username;
