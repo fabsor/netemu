@@ -11,7 +11,7 @@
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application_kaillera.h"
-#include "application_p2p.h"
+#include "application_p2p_internal.h"
 #include "netlib_error.h"
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
