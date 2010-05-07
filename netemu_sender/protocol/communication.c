@@ -242,7 +242,7 @@ char *_netemu_parse_game_list(char* response_body, struct netemu_list *game_list
 	char *return_value;
 	char *player_int;
 
-	while(*response_body != '\n') {
+	while(response_body && *response_body != '\n') {
 		if((game = malloc(sizeof(struct existing_game))) == NULL) {
 			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 			return NULL;
