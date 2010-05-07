@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Thu May 6 11:51:27 2010
+** Created: Fri May 7 12:54:36 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -398,7 +398,7 @@ public:
         mainwindowClass->setCentralWidget(centralwidget);
         menubar = new QMenuBar(mainwindowClass);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1122, 25));
+        menubar->setGeometry(QRect(0, 0, 1122, 23));
         menuFile = new QMenu(menubar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuHelp = new QMenu(menubar);
@@ -419,7 +419,7 @@ public:
 
         retranslateUi(mainwindowClass);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(mainwindowClass);
