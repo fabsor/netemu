@@ -37,7 +37,7 @@ struct netemu_sender_buffer {
 struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_packets,
 		const short preferred_delay_time);
 
-void netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
+int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 		struct application_instruction* instruction, netemu_connection_types type, union netemu_connection_type recipient);
 
 void netemu_sender_buffer_add_with_blacklist(struct netemu_sender_buffer* buffer,

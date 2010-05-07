@@ -231,7 +231,7 @@ void netemu_application_leave_add(struct application_instruction* instruction, c
 
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_login_request_add(struct application_instruction* instruction,char* username, char* appName, int connection);
+int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection);
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 

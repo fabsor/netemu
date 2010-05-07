@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
 	this->setWindowTitle("NetEmu");
 	netemu_init_network();
 	createActions();
+	ConnectDialog dialog(NULL, "Imagination","123:321", KailleraServer, "Foo");
 }
 
 void MainWindow::refreshServerList()

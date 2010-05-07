@@ -154,17 +154,27 @@ struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct nete
 int netemu_kaillera_login(struct netemu_info* info) {
 	struct application_instruction *message;
 	union netemu_connection_type type;
+	int error;
 	time_t timestamp;
 
 	message = netemu_application_create_message();
+	if(message == NULL) {
+		return -1;
+	}
 	type.udp_sender = netemu_resources_get_sender();
-	netemu_application_login_request_add(message,info->emulator_name,info->username,1);
+	error = netemu_application_login_request_add(message,info->emulator_name,info->username,1);
+	if(error == -1) {
+		netemu_application_free_message(message);
+		return -1;
+	}
 	message->important = 1;
 	timestamp = time(NULL);
 
-	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	if(netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type) == -1) {
+		netemu_application_free_login_request((struct login_request*)message->body);
+	}
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
-	return 1;
+	return 0;
 }
 
 

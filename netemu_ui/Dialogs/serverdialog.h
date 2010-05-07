@@ -16,6 +16,7 @@ public:
 private:
     Ui::ServerDialogClass ui;
     netemu_info *serverInfo;
+    void InitializeUserList();
 };
 
 #endif // SERVERDIALOG_H

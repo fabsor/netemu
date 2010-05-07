@@ -461,22 +461,37 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
+	/* TODO: Var inte detta ändrat redan? Så att vi inte frigör hela bodyn här, utan använder specifika free-metoder
+	 * beroende på body-typ. */
 	free(message->body);
 	free(message->user);
 	free(message);
 }
 
-void netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection) {
+int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection) {
 	struct login_request* request;
-	int size;
-	request = malloc(sizeof(struct login_request));
+	int size, strlength;
+	if((request = malloc(sizeof(struct login_request))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
 	size = netemu_util_copy_string(&request->name,appName);
-	netemu_util_copy_string(&instruction->user,user);
+	if(size == -1) {
+		free(request);
+		return -1;
+	}
+	strlength = netemu_util_copy_string(&instruction->user,user);
+	if(strlength == -1) {
+		free(request->name);
+		free(request);
+		return -1;
+	}
 	request->connection = connection;
 	instruction->body_size = size + sizeof(char);
 	instruction->body = request;
 	instruction->id = LOGIN_REQUEST;
 	instruction->packBodyFn = netemu_application_login_request_pack;
+	return 0;
 }
 
 void netemu_application_pong_add(struct application_instruction* instruction) {

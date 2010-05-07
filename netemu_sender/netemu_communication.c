@@ -85,7 +85,6 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	struct communication_callback callback;
 	struct netemu_sender_buffer *buffer;
 	union netemu_connection_type *type;
-
 	callback.port = -1;
 	callback.async = -1;
 	client = netemu_resources_get_client();
