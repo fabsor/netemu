@@ -162,6 +162,7 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	struct buffered_play_values* values;
 	struct netemu_list *callbacks;
 	int i;
+	struct callback *call;
 
 	connection = (struct netemu_info*)arg;
 	callbacks = connection->_internal->play_values_callback;
@@ -173,20 +174,22 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
 	for(i = 0; i < callbacks->count; i++) {
-		((struct callback*)callbacks->elements[i])->fn->values_received_fn(values);
+		call = (struct callback*)callbacks->elements[i];
+		call->fn->values_received_fn(values, call->user_data);
 	}
 }
 
 void _netemu_respond_to_chat(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct netemu_info* connection;
 	struct chat *chat;
-	union callback_fn* fn;
+	struct callback *call;
 	int i;
 	connection = (struct netemu_info*)arg;
 	chat = (struct chat*)item->instruction->body;
 	for(i = 0; i< connection->_internal->chat_callback->count; i++) {
-		fn = (union callback_fn*)connection->_internal->chat_callback->elements[i];
-		fn->chat_fn(item->instruction->user,chat->message);
+
+		call = (struct callback*)netemu_list_get(connection->_internal->chat_callback, i);
+		call->fn->chat_fn(item->instruction->user, chat->message, call->user_data);
 	}
 }
 

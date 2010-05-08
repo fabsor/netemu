@@ -9,13 +9,13 @@
 #include "netemu_info.h"
 #include "netemu_list.h"
 
-int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable);
+int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable, void *user_data);
 
-int netemu_register_chat_callback(struct netemu_info *connection, chatFn callback) {
+int netemu_register_chat_callback(struct netemu_info *connection, chatFn callback, void *user_data) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->chat_fn = callback;
-	netemu_register_callback(connection->_internal->chat_callback, fn, 0);
+	netemu_register_callback(connection->_internal->chat_callback, fn, 0, user_data);
 	return 0;
 }
 
@@ -26,15 +26,15 @@ int netemu_unregister_chat_callback(struct netemu_info *connection, chatFn callb
 	return netemu_list_remove(connection->_internal->chat_callback, fn);
 }
 
-int netemu_register_user_join_callback(struct netemu_info *connection, joinFn callback) {
+int netemu_register_user_join_callback(struct netemu_info *connection, joinFn callback, void *user_data) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->join_fn = callback;
-	netemu_register_callback(connection->_internal->join_callback, fn, 0);
+	netemu_register_callback(connection->_internal->join_callback, fn, 0, user_data);
 	return 0;
 }
 
-int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable) {
+int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable, void *user_data) {
 	struct callback *callback;
 
 	if((callback = malloc(sizeof(struct callback))) == NULL ) {
@@ -42,6 +42,7 @@ int netemu_register_callback(struct netemu_list *list, union callback_fn *fn, in
 	}
 	callback->fn = fn;
 	callback->disposable = disposable;
+	callback->user_data = user_data;
 	netemu_list_add(list,callback);
 	return 0;
 }
@@ -58,14 +59,14 @@ int _server_connection_unregister_callback(struct netemu_list *list, union callb
 
 }
 
-int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn callback) {
+int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn callback, void *user_data) {
 	union callback_fn *fn;
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
 		return -1;
 	}
 
 	fn->values_received_fn = callback;
-	netemu_register_callback(connection->_internal->play_values_callback, fn, 0);
+	netemu_register_callback(connection->_internal->play_values_callback, fn, 0, user_data);
 	return 0;
 }
 
@@ -90,11 +91,11 @@ int netemu_unregister_user_join_callback(struct netemu_info *connection, joinFn 
 	return _server_connection_unregister_callback(connection->_internal->join_callback, fn);
 }
 
-int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn callback) {
+int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn callback, void *user_data) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->leave_fn = callback;
-	netemu_register_callback(connection->_internal->leave_callback, fn, 0);
+	netemu_register_callback(connection->_internal->leave_callback, fn, 0, user_data);
 	return 0;
 }
 

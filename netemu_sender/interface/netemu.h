@@ -10,10 +10,10 @@
 extern "C" {
 #endif
 #include "netlib_util.h"
-typedef void (* chatFn)(char *user, char *message);
-typedef void (* joinFn)(char *user);
-typedef void (* leaveFn)(char *user);
-typedef void (* valuesReceivedFn)(struct buffered_play_values *result);
+typedef void (* chatFn)(char *user, char *message, void *user_data);
+typedef void (* joinFn)(char *user, void *user_data);
+typedef void (* leaveFn)(char *user, void *user_data);
+typedef void (* valuesReceivedFn)(struct buffered_play_values *result, void *user_data);
 
 typedef struct _netemu_info_internal *server_connection_internal;
 
