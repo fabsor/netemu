@@ -10,17 +10,20 @@ DEPENDPATH += . \
 INCLUDEPATH += ../netemu_sender/interface/;../netlib/headers
 
 # Input
-HEADERS += Dialogs/serverdialog.h \
+HEADERS += Dialogs/inputdialog.h \
+    Dialogs/serverdialog.h \
     mainwindow.h \
     Dialogs/connectdialog.h \
     Dialogs/settingsdialog.h \
     SettingsWidgets/masterserversettings.h
-FORMS += Dialogs/serverdialog.ui \
+FORMS += Dialogs/inputdialog.ui \
+    Dialogs/serverdialog.ui \
     mainwindow.ui \
     Dialogs/connectdialog.ui \
     Dialogs/settingsdialog.ui \
     SettingsWidgets/masterserversettings.ui
-SOURCES += Dialogs/serverdialog.cpp \
+SOURCES += Dialogs/inputdialog.cpp \
+    Dialogs/serverdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     Dialogs/connectdialog.cpp \

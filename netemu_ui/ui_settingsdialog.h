@@ -1,11 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settingsdialog.ui'
 **
-<<<<<<< HEAD
-** Created: Fri May 7 10:42:22 2010
-=======
-** Created: Fri May 7 03:48:05 2010
->>>>>>> 7651ce7f9124e0ae418d2309f86e0069af80e2f3
+** Created: Fri May 7 14:41:34 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

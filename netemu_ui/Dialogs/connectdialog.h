@@ -20,7 +20,8 @@ public:
     bool canceled();
     netemu_info *connectionInfo;
 
-
+public slots:
+	int exec();
 private slots:
 	void onCancelClicked();
 
@@ -32,7 +33,7 @@ private:
     QString userName;
     bool isCanceled;
     void createActions();
-    void Connect();
+    bool Connect();
     void ConnectSuccess(int status, struct netemu_info* server_connection);
 };
 

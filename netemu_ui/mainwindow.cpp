@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "Dialogs/settingsdialog.h"
-#include "Dialogs/connectdialog.h"
+#include "Dialogs/inputdialog.h"
 #include "netemu_kaillera.h"
 #include "netlib_error.h"
 #include "Dialogs/serverdialog.h"
@@ -84,16 +84,44 @@ void MainWindow::OnButtonServerConnectClicked()
 		QList<QTableWidgetItem*> row = ui.tableServers->selectedItems();
 
 		QString serverName = row.value(5)->text();
-		ConnectDialog dialog(this, row.value(0)->text(), row.value(5)->text(), KailleraServer);
+		this->ShowConnectDialog(row.value(0)->text(), row.value(5)->text(), KailleraServer);
+	}
 
-		if(dialog.exec() == QDialog::Accepted)
+}
+
+void MainWindow::ShowConnectDialog(QString name, QString address, HostType type)
+{
+	ConnectDialog dialog(this, name, address, type);
+	if(dialog.exec() == QDialog::Accepted)
+	{
+		if(type == KailleraServer)
 		{
 			this->hide();
 			ServerDialog serverDialog(this, dialog.connectionInfo);
 			serverDialog.show();
 		}
-	}
 
+	}
+}
+
+void MainWindow::OnButtonConnectServerIPClicked()
+{
+	QString username = ui.textUsername->text().trimmed();
+	if(username == "")
+	{
+		QMessageBox messageBox;
+		messageBox.setText("You must enter a username!");
+		messageBox.setWindowTitle("NetEmu");
+		messageBox.exec();
+	}
+	else
+	{
+		InputDialog dialog(this, "NetEmu - Enter IP", "Example: 92.105.23.43:27888");
+		if(dialog.exec() == QDialog::Accepted)
+		{
+			this->ShowConnectDialog(QString::null, dialog.GetText(), KailleraServer);
+		}
+	}
 }
 
 void MainWindow::showPreferences()
@@ -130,7 +158,7 @@ void MainWindow::createActions()
 	connect(ui.buttonServerRefresh, SIGNAL(clicked()), this, SLOT(refreshServerList()));
 	connect(ui.tableServers, SIGNAL(itemSelectionChanged()), this, SLOT(tableServersItemChanged()));
 	connect(ui.buttonServerConnect, SIGNAL(clicked()), this, SLOT(OnButtonServerConnectClicked()));
-
+	connect(ui.buttonConnectServerIP, SIGNAL(clicked()), this, SLOT(OnButtonConnectServerIPClicked()));
 	// Menu items.
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui.actionSettings_1, SIGNAL(triggered()), this, SLOT(showPreferences()));
