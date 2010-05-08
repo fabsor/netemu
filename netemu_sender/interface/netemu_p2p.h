@@ -28,12 +28,19 @@ struct netemu_p2p_connection {
 
 typedef void (*connectedFn)(struct netemu_p2p_connection *, int);
 typedef void (*joinHostFn)(struct netemu_p2p_connection *, int);
-
-
+typedef void (*p2pValuesReceivedFn)(struct netemu_p2p_connection *, char* values, int size);
 
 union p2p_callback_fn {
 	connectedFn connectFn;
+	p2pValuesReceivedFn valuesFn;
+
 };
+
+struct p2p_callback {
+	short disposable;
+	union p2p_callback_fn fn;
+};
+
 
 struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname);
 
@@ -56,6 +63,9 @@ struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p_connection* info, i
 struct p2p_user** netemu_p2p_get_user_list(struct netemu_p2p_connection* info, int *count);
 
 int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, int size, void* data);
+
+int netemu_p2p_register_play_values_received_callback(struct netemu_p2p_connection *connection, p2pValuesReceivedFn callback);
+
 
 #ifdef	__cplusplus
 }
