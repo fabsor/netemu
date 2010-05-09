@@ -13,7 +13,7 @@ public:
     ServerDialog(QWidget *parent = 0, netemu_info *serverInfo = NULL);
     ~ServerDialog();
     void ChatCallBack(char *user, char *message);
-    void UserJoinCallBack(char *user, NETEMU_DWORD ping, char connection);
+    void OnUserListChanged();
 
 private slots:
 	void OnButtonSendChatClick();
