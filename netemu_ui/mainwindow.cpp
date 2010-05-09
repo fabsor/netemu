@@ -3,7 +3,6 @@
 #include "Dialogs/inputdialog.h"
 #include "netemu_kaillera.h"
 #include "netlib_error.h"
-#include "Dialogs/serverdialog.h"
 #include <QMessageBox>
 
 using namespace std;
@@ -18,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 	this->setWindowTitle("NetEmu");
 	netemu_init_network();
 	createActions();
-	ConnectDialog dialog(NULL, "Imagination","123:321", KailleraServer, "Foo");
+	this->serverDialog = NULL;
 }
 
 void MainWindow::refreshServerList()
@@ -91,14 +90,13 @@ void MainWindow::OnButtonServerConnectClicked()
 
 void MainWindow::ShowConnectDialog(QString name, QString address, HostType type)
 {
-	ConnectDialog dialog(this, name, address, type);
+	ConnectDialog dialog(this, name, address, type, ui.textUsername->text());
 	if(dialog.exec() == QDialog::Accepted)
 	{
 		if(type == KailleraServer)
 		{
-			this->hide();
-			ServerDialog serverDialog(this, dialog.connectionInfo);
-			serverDialog.show();
+			this->serverDialog = new ServerDialog(this, dialog.connectionInfo);
+			this->serverDialog->show();
 		}
 
 	}
