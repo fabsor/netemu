@@ -56,11 +56,11 @@ struct p2p_callback {
 
 struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname);
 
-int netemu_p2p_connect(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in_addr, int in_addr_size,  netemu_sockaddr_in *connect_addr, int connect_addr_size);
+int netemu_p2p_connect(struct netemu_p2p_connection* p2p, NETEMU_DWORD in_addr, unsigned short port,  NETEMU_DWORD connect_addr, unsigned short connect_port);
 
 int netemu_p2p_connect_async(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in_addr, int in_addr_size,  netemu_sockaddr_in *connect_addr, int connect_addr_size, connectedFn callback);
 
-int netemu_p2p_host(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *addr, int addr_size, char* cloudname);
+int netemu_p2p_host(struct netemu_p2p_connection* p2p, NETEMU_DWORD address, unsigned short port, char* cloudname);
 
 int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct p2p_game** result);
 

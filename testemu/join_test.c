@@ -18,19 +18,13 @@ void run_p2p_join_test() {
 	netemu_sockaddr_in hostaddr, joinaddr;
 	struct netemu_p2p_connection *p2p;
 	struct p2p_game *game;
-	hostaddr.sin_family = NETEMU_AF_INET;
-	hostaddr.sin_addr.s_addr = P2P_JOIN_TEST_BIND_ADDR;
-	hostaddr.sin_port = P2P_JOIN_TEST_PORT;
-
-	joinaddr.sin_family = NETEMU_AF_INET;
-	joinaddr.sin_addr.s_addr = P2P_JOIN_TEST_CONNECT_ADDR;
-	joinaddr.sin_port = P2P_JOIN_TEST_CONNECT_PORT;
 
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	printf("Registering callbacks...");
 	p2p_join_register_callbacks(p2p);
 	printf("OK!\Hosting on %d and connecting to %d...", P2P_JOIN_TEST_PORT, P2P_JOIN_TEST_CONNECT_PORT);
-	if(netemu_p2p_connect(p2p,&hostaddr,sizeof(hostaddr),&joinaddr, sizeof(joinaddr))) {
+
+	if(netemu_p2p_connect(p2p,P2P_JOIN_TEST_BIND_ADDR,P2P_JOIN_TEST_PORT,P2P_JOIN_TEST_CONNECT_ADDR, P2P_JOIN_TEST_CONNECT_PORT)) {
 		printf("OK!\n Creating a game...");
 	}
 	else {

@@ -3,6 +3,8 @@
 	<name>testemu</name>
 	<comment></comment>
 	<projects>
+		<project>netemu</project>
+		<project>netlib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

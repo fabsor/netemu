@@ -40,7 +40,7 @@ void netemu_application_p2p_login_request_pack(struct application_instruction *i
 
 void netemu_application_p2p_login_request_parse(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_p2p_login_request_add(struct application_instruction *instruction, netemu_sockaddr *addr, size_t addr_size, char* username, char* appname, int connection);
+void netemu_application_p2p_login_request_add(struct application_instruction *instruction, unsigned long addr, unsigned short port, char* username, char* appname, int connection);
 
 void netemu_application_p2p_ready_add(struct application_instruction *instruction);
 
@@ -60,7 +60,7 @@ void netemu_application_p2p_join_host_add(struct application_instruction *instru
 
 void netemu_application_p2p_join_host_parse(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_p2p_start_game_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size);
+void netemu_application_add_start_game(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port);
 
 void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer);
 

@@ -18,16 +18,12 @@ void p2p_host_all_ready_callback(struct netemu_p2p_connection *connection, struc
 
 int p2p_host_test_ready = 0;
 void run_p2p_host_test() {
-	netemu_sockaddr_in addr;
 	struct netemu_p2p_connection *p2p;
-	addr.sin_family = NETEMU_AF_INET;
-	addr.sin_addr.s_addr = P2P_HOST_TEST_BIND_ADDR;
-	addr.sin_port = P2P_HOST_TEST_PORT;
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	printf("Registering callbacks...");
 	p2p_host_register_callbacks(p2p);
 	printf("OK!\nHosting cloud on %d...", P2P_HOST_TEST_PORT);
-	if(netemu_p2p_host(p2p, &addr,sizeof(addr),CLOUD_NAME)) {
+	if(netemu_p2p_host(p2p, P2P_HOST_TEST_BIND_ADDR,P2P_HOST_TEST_PORT,CLOUD_NAME)) {
 		printf("OK!\n Waiting for incoming connections...");
 	}
 	else {

@@ -32,8 +32,8 @@ typedef struct p2p_game_internal* p2p_game_internal;
 struct p2p_user {
 	char *name;
 	char *app_name;
-	netemu_sockaddr *addr;
-	size_t addr_size;
+	NETEMU_DWORD addr;
+	NETEMU_DWORD port;
 	NETEMU_DWORD ping;
 	char connection;
 	p2p_user_internal _internal; /**< Secret stuff =) */
@@ -54,8 +54,8 @@ struct p2p_kick_player {
 };
 
 struct p2p_start_game {
-	netemu_sockaddr* addr;
-	size_t addr_size;
+	NETEMU_DWORD addr;
+	unsigned short port;
 };
 
 struct p2p_login_success {
