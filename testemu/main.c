@@ -4,15 +4,13 @@
  *  Created on: 12 apr 2010
  *      Author: fabian
  */
-//#define _CRTDBG_MAP_ALLOC
-//#define _CRTDBG_MAPALLOC
 #include <stdlib.h>
 #include "constants.h"
-//#include <crtdbg.h>
 #include <stdio.h>
 #include "netemu_p2p.h"
 #include "netemu_kaillera.h"
 #include "p2ptest.h"
+
 char* games[] = {"Foo", "Bar"};
 struct netemu_info *info;
 
@@ -62,6 +60,13 @@ int main() {
 			host_p2p(addr);
 		case '5':
 			connect_p2p_async(addr);
+			break;
+		case '6':
+			run_p2p_host_test();
+			break;
+		case '7':
+			run_p2p_join_test();
+			break;
 		break;
 	}
 

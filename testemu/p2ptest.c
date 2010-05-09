@@ -13,8 +13,6 @@
 void p2p_menu(struct netemu_p2p_connection *connection);
 void create_p2p_game(struct netemu_p2p_connection* connection);
 void respond_to_login(struct netemu_p2p_connection *connection, int status);
-/* We love the ugly stuff ;) */
-int logged_in = 0;
 
 void start_p2p_game(struct netemu_p2p_connection *connection);
 void p2p_send_play_values(struct netemu_p2p_connection *connection);
@@ -23,6 +21,11 @@ void host_p2p(netemu_sockaddr_in addr);
 void join_p2p_game(struct netemu_p2p_connection *connection);
 void show_p2p_game_list(struct netemu_p2p_connection* connection);
 void show_p2p_user_list(struct netemu_info* connection);
+void p2p_player_joined_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user);
+
+/* We love the ugly stuff ;) */
+int logged_in = 0;
+
 
 void host_p2p(netemu_sockaddr_in addr) {
 	int port;

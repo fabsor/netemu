@@ -7,19 +7,19 @@
 #define APPLICATION_P2P_INTERNAL_H_
 
 #include "application_p2p.h"
-
+#include "netemu_thread.h"
 /* TODO: This can't be here but I don't have the time to play nice right now =)*/
 struct p2p_user_internal {
 	struct netemu_tcp_connection *connection;
 	struct netemu_sender_udp *sender; /**< The sender for udp packages */
 	struct netemu_receiver_udp *receiver; /**< The receiver for udp packages*/
-
 };
 
 struct p2p_game_internal {
 	struct netemu_sender_collection *tcp_collection; /**< This is used for status update messages */
 	struct netemu_sender_collection *udp_collection; /**< This is used for play values */
 	NETEMU_WORD ready_count;
+	netemu_mutex game_lock;
 };
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator);

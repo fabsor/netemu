@@ -30,6 +30,8 @@ struct netemu_receiver_udp* netemu_resources_get_receiver() {
 }
 
 struct netemu_sender_udp* netemu_resources_get_sender() {
+	if(_netemu_resources_client == NULL)
+		return NULL;
 	return _netemu_resources_client->sender;
 }
 
