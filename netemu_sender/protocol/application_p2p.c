@@ -126,16 +126,22 @@ void netemu_application_p2p_free_user(struct p2p_user *user, NETEMU_BOOL free_po
 
 int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	int i, pos;
+	/* Make sure that no one works with this game at the same time as us. */
+	if(game->_internal != NULL) {
+		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
+	}
 	pos = netemu_util_pack_str(buffer,game->name);
 	pos += netemu_util_pack_str(buffer+pos,game->app_name);
 	memcpy(buffer+pos, &game->user_count, sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
 	pos += _netemu_application_p2p_pack_user(buffer+pos,game->creator);
-
 	if(game->players != NULL) {
-		for(i = 0; i < game->user_count; i++) {
+		for(i = 0; i < game->user_count-1; i++) {
 			pos += _netemu_application_p2p_pack_user(buffer+pos,&game->players[i]);
 		}
+	}
+	if(game->_internal != NULL) {
+		netemu_thread_mutex_release(game->_internal->game_lock);
 	}
 	return pos;
 }
@@ -154,6 +160,7 @@ struct p2p_game_internal *netemu_application_p2p_create_game_internal() {
 	internal->tcp_collection = NULL;
 	internal->udp_collection = NULL;
 	internal->ready_count = 0;
+	internal->game_lock = netemu_thread_mutex_create();
 	return internal;
 }
 
@@ -225,6 +232,9 @@ void netemu_application_p2p_login_success_parse(struct application_instruction *
 
 int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game) {
 	int size, i;
+	if(game->_internal != NULL) {
+		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
+	}
 	size = netemu_util_copy_string(&target->app_name,game->app_name);
 	size += netemu_util_copy_string(&target->name, game->name);
 	target->user_count = game->user_count;
@@ -242,8 +252,12 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 		target->_internal = netemu_application_p2p_create_game_internal();
 		target->_internal->tcp_collection = game->_internal->tcp_collection;
 		target->_internal->ready_count = game->_internal->ready_count;
+		target->_internal->game_lock = game->_internal->game_lock;
 	}
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
+	if(game->_internal != NULL) {
+		netemu_thread_mutex_release(game->_internal->game_lock);
+	}
 	return size;
 }
 

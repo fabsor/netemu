@@ -27,4 +27,44 @@ int netemu_p2p_register_play_values_received_callback(struct netemu_p2p_connecti
 	return 0;
 }
 
+int netemu_p2p_register_user_joined_callback(struct netemu_p2p_connection *connection, p2pUserJoinedFn callback) {
+	union p2p_callback_fn fn;
+	fn.userJoinedFn = callback;
+	netemu_p2p_register_callback(connection->_internal->join_callbacks, fn, 0);
+	return 0;
+}
 
+int netemu_p2p_register_game_created_callback(struct netemu_p2p_connection *connection, p2pGameCreatedFn callback) {
+	union p2p_callback_fn fn;
+	fn.gameCreatedFn = callback;
+	netemu_p2p_register_callback(connection->_internal->game_created_callbacks, fn, 0);
+	return 0;
+}
+
+int netemu_p2p_register_game_started_callback(struct netemu_p2p_connection *connection, p2pGameStartedFn callback) {
+	union p2p_callback_fn fn;
+	fn.gameStartedFn = callback;
+	netemu_p2p_register_callback(connection->_internal->game_started_callbacks, fn, 0);
+	return 0;
+}
+
+int netemu_p2p_register_player_joined_callback(struct netemu_p2p_connection *connection, p2pPlayerJoinedFn callback) {
+	union p2p_callback_fn fn;
+	fn.playerJoinedFn = callback;
+	netemu_p2p_register_callback(connection->_internal->player_joined_callbacks, fn, 0);
+	return 0;
+}
+
+int netemu_p2p_register_player_ready_callback(struct netemu_p2p_connection *connection, p2pPlayerReadyFn callback) {
+	union p2p_callback_fn fn;
+	fn.playerReadyFn = callback;
+	netemu_p2p_register_callback(connection->_internal->player_ready_callbacks, fn, 0);
+	return 0;
+}
+
+int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p_connection *connection, p2pAllReadyFn callback) {
+	union p2p_callback_fn fn;
+	fn.gameStartedFn = callback;
+	netemu_p2p_register_callback(connection->_internal->game_started_callbacks, fn, 0);
+	return 0;
+}

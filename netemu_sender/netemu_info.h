@@ -41,6 +41,12 @@ struct netemu_p2p_internal {
 	struct netemu_sender_collection *peers;
 	struct netemu_list *login_callbacks;
 	struct netemu_list *play_values_callbacks;
+	struct netemu_list *game_created_callbacks;
+	struct netemu_list *join_callbacks;
+	struct netemu_list *player_joined_callbacks;
+	struct netemu_list *player_ready_callbacks;
+	struct netemu_list *game_started_callbacks;
+	struct netemu_list *all_ready_callbacks;
 	void (*continueFn)(struct netemu_p2p_connection *connection); /**< Function for continuing work after a ready instruction has been added */
 };
 

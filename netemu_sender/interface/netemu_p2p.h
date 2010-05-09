@@ -29,11 +29,23 @@ struct netemu_p2p_connection {
 typedef void (*connectedFn)(struct netemu_p2p_connection *, int);
 typedef void (*joinHostFn)(struct netemu_p2p_connection *, int);
 typedef void (*p2pValuesReceivedFn)(struct netemu_p2p_connection *, char* values, int size);
+typedef void (*p2pGameCreatedFn)(struct netemu_p2p_connection *, struct p2p_game *game);
+typedef void (*p2pGameStartedFn)(struct netemu_p2p_connection *, struct p2p_game *game);
+typedef void (*p2pUserJoinedFn)(struct netemu_p2p_connection *, struct p2p_user *user);
+typedef void (*p2pPlayerReadyFn)(struct netemu_p2p_connection *, struct p2p_game *game);
+typedef void (*p2pAllReadyFn)(struct netemu_p2p_connection *, struct p2p_game *game);
+typedef void (*p2pPlayerJoinedFn)(struct netemu_p2p_connection *, struct p2p_game *game, struct p2p_user*);
+
 
 union p2p_callback_fn {
 	connectedFn connectFn;
 	p2pValuesReceivedFn valuesFn;
-
+	p2pGameCreatedFn gameCreatedFn;
+	p2pUserJoinedFn userJoinedFn;
+	p2pGameStartedFn gameStartedFn;
+	p2pPlayerReadyFn playerReadyFn;
+	p2pAllReadyFn allReadyFn;
+	p2pPlayerJoinedFn playerJoinedFn;
 };
 
 struct p2p_callback {
@@ -48,11 +60,13 @@ int netemu_p2p_connect(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in
 
 int netemu_p2p_connect_async(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *in_addr, int in_addr_size,  netemu_sockaddr_in *connect_addr, int connect_addr_size, connectedFn callback);
 
-void netemu_p2p_host(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *addr, int addr_size, char* cloudname);
+int netemu_p2p_host(struct netemu_p2p_connection* p2p, netemu_sockaddr_in *addr, int addr_size, char* cloudname);
 
 int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct p2p_game** result);
 
 void netemu_p2p_login(struct netemu_p2p_connection *p2p);
+
+int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, netemu_sockaddr* addr, size_t addr_size);
 
 int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_game *game);
 
@@ -66,6 +80,17 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, int size, vo
 
 int netemu_p2p_register_play_values_received_callback(struct netemu_p2p_connection *connection, p2pValuesReceivedFn callback);
 
+int netemu_p2p_register_game_created_callback(struct netemu_p2p_connection *connection, p2pGameCreatedFn callback);
+
+int netemu_p2p_register_user_joined_callback(struct netemu_p2p_connection *connection, p2pUserJoinedFn callback);
+
+int netemu_p2p_register_game_started_callback(struct netemu_p2p_connection *connection, p2pGameStartedFn callback);
+
+int netemu_p2p_register_player_joined_callback(struct netemu_p2p_connection *connection, p2pPlayerJoinedFn callback);
+
+int netemu_p2p_register_player_ready_callback(struct netemu_p2p_connection *connection, p2pPlayerReadyFn callback);
+
+int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p_connection *connection, p2pAllReadyFn callback);
 
 #ifdef	__cplusplus
 }
