@@ -72,6 +72,9 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case USER_JOINED:
 			netemu_application_user_joined_parse(app_instruction,data);
 			break;
+		case USER_LEAVE:
+			netemu_application_user_leave_parse(app_instruction, data);
+			break;
 		case PARTYLINE_CHAT:
 		case GAME_CHAT:
 		case MOTD_CHAT:
@@ -551,6 +554,21 @@ void netemu_application_user_leave_pack(struct application_instruction *instruct
 	memcpy(buffer,&left_msg->id,sizeof(NETEMU_WORD));
 	pos = sizeof(NETEMU_WORD);
 	netemu_util_pack_str(buffer+pos, left_msg->exit_message);
+}
+
+void netemu_application_user_leave_parse(struct application_instruction *instruction, char *buffer) {
+	struct user_left *left;
+
+	if((left = malloc(sizeof(struct user_left))) == NULL) {
+		/* TODO: ALL functions really need to return an integer, so that we can return -1 when something goes wrong and 0 otherwise. */
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return;
+	}
+
+	left->id = *((NETEMU_WORD*)buffer);
+	buffer += sizeof(NETEMU_WORD);
+	left->exit_message = netemu_util_parse_string(buffer);
+	instruction->body = left;
 }
 
 void netemu_application_create_game_add(struct application_instruction *instruction, char* gamename) {

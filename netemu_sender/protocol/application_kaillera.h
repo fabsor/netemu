@@ -265,6 +265,8 @@ void netemu_application_user_leave_add(struct application_instruction* instructi
 
 void netemu_application_user_leave_pack(struct application_instruction *instruction, char *buffer);
 
+void netemu_application_user_leave_parse(struct application_instruction *instruction, char *buffer);
+
 void netemu_application_client_timeout_request_add(struct application_instruction* instruction);
 
 struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction);
