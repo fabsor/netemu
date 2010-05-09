@@ -15,6 +15,7 @@
 #include "protocol/application_p2p.h"
 
 void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username);
+void netemu_kaillera_remove_user(struct netemu_info *info, NETEMU_WORD user_id);
 void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count);
 void netemu_kaillera_add_player(struct game *game, struct player *player);
 
@@ -144,6 +145,7 @@ struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct nete
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,MOTD_CHAT, _netemu_respond_to_chat, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,PING,_netemu_respond_to_ping, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,USER_JOINED,_netemu_respond_to_user_join, info);
+	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer, USER_LEAVE, _netemu_respond_to_user_leave, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,LOGIN_SUCCESS,_netemu_respond_to_login_success, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer, PLAYER_JOINED, _netemu_respond_to_player_joined, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,CREATE_GAME,_netemu_respond_to_game_created, info);
@@ -242,6 +244,25 @@ void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, cha
 	user->connection = connection_type;
 	user->username = username;
 	_netemu_kaillera_add_user_struct(info,user);
+}
+
+void netemu_kaillera_remove_user(struct netemu_info *info, NETEMU_WORD user_id)
+{
+	int i;
+	int index_to_remove = -1;
+	struct user *user;
+	for(i = 0; i < info->_internal->users->count; i++) {
+		user = (struct user*)netemu_list_get(info->_internal->users, i);
+		if(user->id == user_id) {
+			index_to_remove = i;
+			break;
+		}
+	}
+
+	if(index_to_remove != -1) {
+		netemu_list_remove_at(info->_internal->users, index_to_remove);
+		free(user);
+	}
 }
 
 void _netemu_kaillera_add_user_struct(struct netemu_info* info, struct user *user) {

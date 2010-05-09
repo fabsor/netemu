@@ -114,13 +114,31 @@ void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct ne
 	}
 
 	netemu_kaillera_add_user(connection, joined->id, joined->connection, item->instruction->user);
-
 	for(i = 0; i < callbacks->count; i++)
 	{
 		call = netemu_list_get(callbacks, i);
 		call->fn->join_fn(item->instruction->user, joined->ping, joined->id, call->user_data);
 	}
 
+}
+
+void _netemu_respond_to_user_leave(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
+	struct user_left *left;
+	struct netemu_info* connection;
+	struct netemu_list *callbacks;
+	struct callback *call;
+	int i;
+
+	connection = (struct netemu_info*)arg;
+	left = (struct user_left*)item->instruction->body;
+	netemu_kaillera_remove_user(connection, left->id);
+
+	for(i = 0; i < connection->_internal->join_callback->count; i++)
+	{
+		call = netemu_list_get(connection->_internal->join_callback, i);
+		call->fn->leave_fn(left->id, item->instruction->user, left->exit_message, call->user_data);
+		//call->fn->leave_fn()
+	}
 }
 
 void _netemu_respond_to_game_status_update(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
