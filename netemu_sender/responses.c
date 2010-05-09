@@ -10,6 +10,7 @@
 #include "network/netemu_sender_buffer.h"
 #include "netemu_list.h"
 #include "interface/netemu_kaillera.h"
+
 void _netemu_respond_to_login_success(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct login_success *accepted;
 	struct netemu_info* connection;
@@ -97,9 +98,13 @@ void _netemu_respond_to_ping(struct netemu_packet_buffer* buffer, struct netemu_
 void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct user_joined *joined;
 	struct netemu_info* connection;
+	struct netemu_list *callbacks;
+	struct callback *call;
+	int i;
 
 	connection = (struct netemu_info*)arg;
 	joined = (struct user_joined*)item->instruction->body;
+	callbacks = connection->_internal->join_callback;
 
 	/* If signed_in is 0, we have just logged on to the server and
 	 * have to assume that this user_joined instruction refers to our local player */
@@ -109,6 +114,12 @@ void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct ne
 	}
 
 	netemu_kaillera_add_user(connection, joined->id, joined->connection, item->instruction->user);
+
+	for(i = 0; i < callbacks->count; i++)
+	{
+		call = netemu_list_get(callbacks, i);
+		call->fn->join_fn(item->instruction->user, joined->ping, joined->id, call->user_data);
+	}
 
 }
 
@@ -181,15 +192,16 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 
 void _netemu_respond_to_chat(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct netemu_info* connection;
-	struct chat *chat;
+	char *chat;
 	struct callback *call;
 	int i;
 	connection = (struct netemu_info*)arg;
-	chat = (struct chat*)item->instruction->body;
+	/* TODO: Apparently, the body here does not point to a struct chat as it should, but rather directly to the chat message. */
+	chat = (char*)item->instruction->body;
 	for(i = 0; i< connection->_internal->chat_callback->count; i++) {
 
 		call = (struct callback*)netemu_list_get(connection->_internal->chat_callback, i);
-		call->fn->chat_fn(item->instruction->user, chat->message, call->user_data);
+		call->fn->chat_fn(item->instruction->user, chat, call->user_data);
 	}
 }
 

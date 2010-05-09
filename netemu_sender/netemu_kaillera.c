@@ -74,7 +74,7 @@ void netemu_kaillera_create_game_async(struct netemu_info *info, char *gamename,
 	netemu_application_create_game_add(message, gamename);
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message,UDP_CONNECTION, type);
-	netemu_register_callback(info->_internal->game_created_callback, fn, 1);
+	netemu_kaillera_register_callback(info->_internal->game_created_callback, fn, 1);
 }
 
 

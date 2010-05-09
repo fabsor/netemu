@@ -21,6 +21,7 @@ typedef void (* kailleraPlayerJoinFn)(struct player_joined *result);
 typedef void (* gameCreatedFn)(struct game* new_game);
 typedef void (* playerJoinFn)(struct player_joined *result);
 
+
 /* We must store the function pointers in structs since ISO C99 does not allow void* to be typecasted to function pointers. */
 union callback_fn {
 	chatFn chat_fn;
@@ -36,6 +37,7 @@ struct callback {
 	short disposable;
 	union callback_fn *fn;
 };
+
 
 struct netemu_kaillera_connection {
 	struct netemu_info *info;

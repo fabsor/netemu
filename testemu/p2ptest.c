@@ -100,7 +100,7 @@ void p2p_menu(struct netemu_p2p_connection *connection) {
 	char val;
 	val = 10;
 	while(val != '0') {
-		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY");
+		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAYER_READY\n7. SEND PLAY VALUES");
 		val = getchar();
 
 		switch(val) {

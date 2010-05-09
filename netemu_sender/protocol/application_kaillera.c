@@ -201,6 +201,8 @@ int netemu_application_chat_parse(struct application_instruction *instruction, c
 		free(chat_msg);
 		return -1;
 	}
+	printf("Chat received!");
+	instruction->body = data;
 	return 0;
 }
 

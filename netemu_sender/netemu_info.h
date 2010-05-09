@@ -35,6 +35,15 @@ struct _netemu_info_internal {
 
 };
 
+struct netemu_p2p_internal {
+	struct netemu_tcp_listener *host;
+	struct netemu_tcp_connection *login_connection;
+	struct netemu_sender_collection *peers;
+	struct netemu_list *login_callbacks;
+	struct netemu_list *play_values_callbacks;
+	void (*continueFn)(struct netemu_p2p_connection *connection); /**< Function for continuing work after a ready instruction has been added */
+};
+
 
 struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct netemu_sender_buffer* buffer);
 void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);
