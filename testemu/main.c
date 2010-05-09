@@ -73,14 +73,13 @@ int main() {
 void connect_async(netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success, NULL);
 	while(info == NULL);
-	netemu_register_play_values_received_callback(info, receive_values);
-
+	netemu_register_play_values_received_callback(info, receive_values, NULL);
 	menu(info);
 }
 
 void server_connect(netemu_sockaddr_in addr) {
 	info = kaillera_communication_connect(&addr,sizeof(addr),EMUNAME,PLAYERNAME);
-	netemu_register_play_values_received_callback(info, receive_values);
+	netemu_register_play_values_received_callback(info, receive_values, NULL);
 	menu(info);
 }
 
