@@ -5,6 +5,7 @@
  *      Author: fabian
  */
 #include "netemu_socket.h"
+#include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "constants.h"
@@ -50,7 +51,6 @@ void connect_p2p() {
 	printf("Enter Port Number to the host:\n");
 	scanf("%d",&join_port);
 	printf("\n");
-
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
 	netemu_p2p_connect(p2p,BIND_ADDR,netemu_htons(host_port),ADDR,netemu_htons(join_port));
 	p2p_menu(p2p);

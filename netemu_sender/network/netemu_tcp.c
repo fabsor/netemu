@@ -141,7 +141,8 @@ void _netemu_tcp_connection_notify(struct netemu_tcp_connection* receiver, char*
 
 int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data, int size) {
 	int success;
-	success = netemu_sendto(sender->socket,data,size,0,sender->addr,sender->addr_len);
+	success = netemu_send(sender->socket,data,size,0);
+
 	return success;
 }
 
@@ -155,7 +156,9 @@ struct netemu_tcp_listener* netemu_tcp_listener_new(netemu_sockaddr* bind_addr, 
 	NETEMU_SOCKET socket;
 	struct netemu_tcp_listener* sender;
 	sender = malloc(sizeof(struct netemu_tcp_listener));
+	sender->error = 0;
 	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_STREAM);
+
 	if (socket == NETEMU_INVALID_SOCKET) {
 		sender->error = netlib_get_last_error();
 	}

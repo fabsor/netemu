@@ -64,6 +64,7 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname)
 	netemu_list_add(p2p->info->_internal->users, p2p->user);
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
 	p2p->_internal->login_connection = NULL;
+	p2p->_internal->continueFn = NULL;
 	p2p->_internal->login_callbacks = netemu_list_new(2,0);
 	p2p->_internal->play_values_callbacks = netemu_list_new(2,0);
 	p2p->_internal->game_created_callbacks = netemu_list_new(2,0);

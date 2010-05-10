@@ -37,7 +37,6 @@ void netemu_application_p2p_create_game_add(struct application_instruction *inst
 	size += netemu_application_p2p_copy_user(game->creator,creator);
 	game->user_count = 1;
 	game->players = NULL;
-	game->creator->_internal = NULL;
 	game->_internal = NULL;
 	size += sizeof(NETEMU_WORD);
 	instruction->body = game;
@@ -174,8 +173,7 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	pos += sizeof(NETEMU_WORD);
 	game->creator = malloc(sizeof(struct p2p_user));
 	pos += _netemu_application_p2p_parse_user(buffer+pos,game->creator, 1);
-
-
+	game->_internal = NULL;
 	if (game->user_count > 1) {
 		game->players = malloc(sizeof(struct p2p_user)*game->user_count);
 		for(i = 0; i < game->user_count-1; i++) {
@@ -405,8 +403,9 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user) {
 	int size;
 	target->addr = user->addr;
+	size = sizeof(NETEMU_DWORD);
 	target->port = user->port;
-	size = sizeof(NETEMU_DWORD) + sizeof(unsigned short);
+	size += sizeof(unsigned short);
 	target->ping = user->ping;
 	size += sizeof(NETEMU_DWORD);
 	/* ? */

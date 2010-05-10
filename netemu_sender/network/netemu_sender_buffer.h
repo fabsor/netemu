@@ -23,6 +23,7 @@ extern "C" {
 
 struct netemu_sender_buffer {
 	struct netemu_hashtbl* instructions;
+	struct netemu_list* itemsToAdd;
 	char preferred_no_packets;
 	char preferred_delay_time;
 	char send;
