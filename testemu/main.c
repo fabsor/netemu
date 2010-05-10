@@ -44,7 +44,7 @@ int main() {
 	//kaillera_communication_get_server_list(&servers, &games);
 	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
-	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n5. Connect p2p async\n");
+	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n5. Connect p2p async\n6. Run p2p host test\n7. Run p2p join test");
 	choice = getchar();
 	switch(choice) {
 		case '1':
