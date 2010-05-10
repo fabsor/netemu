@@ -5,12 +5,14 @@
 
 #include "netemu_tcp.h"
 #include "netlib_error.h"
+#include "../protocol/transport.h"
+#include "netemu_packet_buffer.h"
+#include "netemu_net.h"
 #define LISTEN_BACKLOG	1024
 #define BUFFER_SIZE		512
 
 void _netemu_tcp_listener_listen(void* params);
 void _netemu_tcp_connection_recv(void* params);
-void _netemu_tcp_connection_notify(struct netemu_tcp_connection* receiver, char* data, size_t size);
 void _netemu_tcp_listener_notify(struct netemu_tcp_listener *listener, struct netemu_tcp_connection *connection);
 void netemu_tcp_listener_listen(void* params);
 
@@ -34,7 +36,6 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	sender->socket = socket;
 	sender->listening = 0;
 	sender->receiver_fn = NULL;
-	sender->buffer_size = 512;
 	return sender;
 }
 
@@ -47,7 +48,6 @@ struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET 
 	sender->listening = 0;
 	sender->receiver_fn = NULL;
 	sender->socket = socket;
-	sender->buffer_size = 512;
 	return sender;
 }
 
@@ -58,26 +58,6 @@ void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener) {
 	netemu_thread_new(_netemu_tcp_listener_listen, (void*)listener);
 }
 
-
-void netemu_tcp_connection_register_recv_fn(struct netemu_tcp_connection* receiver, void (* listenerFn)(char*, size_t, struct netemu_tcp_connection*, void*), void* params) {
-	struct netemu_tcp_connection_fn *receiver_fn;
-	struct netemu_tcp_connection_fn *receiver_iter;
-	receiver_fn = malloc(sizeof(struct netemu_tcp_connection_fn));
-	receiver_fn->listenerFn = listenerFn;
-	receiver_fn->next = NULL;
-	receiver_fn->params = params;
-
-	if (receiver->receiver_fn == NULL) {
-		receiver->receiver_fn = receiver_fn;
-	}
-	else {
-		receiver_iter = receiver->receiver_fn;
-		while (receiver_iter->next != NULL) {
-			receiver_iter = receiver_iter->next;
-		}
-		receiver_iter->next = receiver_fn;
-	}
-}
 
 void netemu_tcp_listener_register_new_connection_fn(struct netemu_tcp_listener* receiver, void (* listenerFn)(struct netemu_tcp_listener*, struct netemu_tcp_connection*, void*), void* params) {
 	struct netemu_tcp_new_connection_fn *receiver_fn;
@@ -99,45 +79,86 @@ void netemu_tcp_listener_register_new_connection_fn(struct netemu_tcp_listener* 
 	}
 }
 
-void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con) {
+void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, struct netemu_packet_buffer *buffer) {
+	con->buffer = buffer;
 	netemu_thread_new(_netemu_tcp_connection_recv, (void*)con);
 }
 
 void _netemu_tcp_connection_recv(void* params) {
 	struct netemu_tcp_connection *receiver;
-	int error;
-	char *buffer;
+	struct transport_packet *packet;
+	union netemu_connection_type type;
+	struct application_instruction *instruction;
+	int error, i;
+	NETEMU_DWORD temp;
 
 	receiver = (struct netemu_tcp_connection*)params;
-	buffer = malloc(sizeof(char)*receiver->buffer_size);
-
+	type.connection = receiver;
 	receiver->lock = netemu_thread_mutex_create();
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
-		error = netemu_recv(receiver->socket, buffer, receiver->buffer_size, 0);
-		if (error == -1) {
+		packet = netemu_transport_unpack(receiver->socket);
+
+		if (packet == NULL) {
 			receiver->error = netlib_get_last_error();
 			netemu_thread_mutex_release(receiver->lock);
 			break;
 		}
-		else if (error == 0) {
-			break;
+		for(i = 0; i < packet->count; i++) {
+			instruction = netemu_application_parse_message(packet->instructions[i]);
+			netemu_packet_buffer_add(receiver->buffer, instruction,TCP_CONNECTION,type);
 		}
-		_netemu_tcp_connection_notify(receiver, buffer, error);
-		memset(buffer, 0, receiver->buffer_size);
 		netemu_thread_mutex_release(receiver->lock);
 	}
 }
 
-void _netemu_tcp_connection_notify(struct netemu_tcp_connection* receiver, char* data, size_t size) {
-	struct netemu_tcp_connection_fn* receiver_fn;
-	receiver_fn = receiver->receiver_fn;
-	while(receiver_fn != NULL) {
-		receiver_fn->listenerFn(data,size, receiver, receiver_fn->params);
-		receiver_fn = receiver_fn->next;
+/*
+ 	char count;
+	int i, j;
+	unsigned int pos;
+	static int foo = 0;
+	struct transport_packet* packet;
+	struct transport_instruction* instruction;
+	foo++;
+	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return NULL;
 	}
-}
+	memcpy(&count,data,sizeof(char));
+	packet->count = count;
+	if((packet->instructions = malloc(sizeof(struct transport_instruction*)*count)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		free(packet);
+		return NULL;
+	}
+	pos = sizeof(char);
+	for (i = 0; i < count; i++) {
+		if((instruction = malloc(sizeof(struct transport_instruction))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+
+			for(j = 0; j <= i; j++)
+				free(instruction);
+
+			free(packet->instructions);
+			free(packet);
+			return NULL;
+		}
+
+		memcpy(&instruction->serial, data + pos, sizeof(NETEMU_WORD));
+		pos += sizeof(NETEMU_WORD);
+
+		memcpy(&instruction->length, data + pos, sizeof(NETEMU_WORD));
+		pos += sizeof(NETEMU_WORD);
+		instruction->instruction = malloc(instruction->length);
+		memcpy(instruction->instruction, data + pos,instruction->length);
+		pos += instruction->length;
+		packet->instructions[i] = instruction;
+
+	}
+	return packet;
+ */
+
 
 int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data, int size) {
 	int success;

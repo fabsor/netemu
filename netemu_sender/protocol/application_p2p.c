@@ -84,6 +84,7 @@ void netemu_application_p2p_create_game_parse(struct application_instruction *in
 	game = malloc(sizeof(struct p2p_game));
 	pos = _netemu_application_p2p_parse_game(buffer,game);
 	instruction->body = game;
+	instruction->body_size = pos;
 	instruction->packBodyFn = netemu_application_p2p_create_game_pack;
 }
 
@@ -251,6 +252,7 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 		target->_internal->ready_count = game->_internal->ready_count;
 		target->_internal->game_lock = game->_internal->game_lock;
 	}
+	target->creator = malloc(sizeof(struct p2p_user));
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
 	if(game->_internal != NULL) {
 		netemu_thread_mutex_release(game->_internal->game_lock);

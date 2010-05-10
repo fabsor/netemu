@@ -15,7 +15,7 @@ extern "C" {
 #include "netemu.h"
 #include "netemu_socket.h"
 
-typedef void (* kailleraGameCreatedFn)(struct game* new_game);
+typedef void (* kailleraGameCreatedFn)(struct game* new_game, void *user_data);
 typedef void (* kailleraPlayerJoinFn)(struct player_joined *result);
 
 typedef void (* gameCreatedFn)(struct game* new_game);
@@ -70,6 +70,10 @@ int netemu_unregister_user_join_callback(struct netemu_info *connection, joinFn)
 int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn, void *user_data);
 
 int netmeu_unregister_user_leave_callback(struct netemu_info *connection, leaveFn);
+
+int netemu_register_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn, void *user_data);
+
+int netemu_unregister_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn);
 
 int netemu_disconnect(struct netemu_info *connection, char *message);
 

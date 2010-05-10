@@ -20,7 +20,7 @@ struct netemu_tcp_connection {
 	netemu_sockaddr* addr;
 	netemu_mutex lock;
 	struct netemu_tcp_connection_fn *receiver_fn;
-	int buffer_size;
+	struct netemu_packet_buffer *buffer;
 	int addr_len;
 	int fn_count;
 	int listening;
@@ -55,9 +55,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET 
 
 void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener);
 
-void netemu_tcp_connection_register_recv_fn(struct netemu_tcp_connection* receiver, void (* listenerFn)(char*, size_t, struct netemu_tcp_connection*, void*), void* params);
-
-void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con);
+void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, struct netemu_packet_buffer *buffer);
 
 int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data, int size);
 

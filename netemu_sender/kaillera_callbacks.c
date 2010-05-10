@@ -8,6 +8,7 @@
 #include "interface/netemu.h"
 #include "netemu_info.h"
 #include "netemu_list.h"
+#include "netlib_error.h"
 
 //<<<<<<< HEAD:netemu_sender/callbacks.c
 int netemu_kaillera_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable, void *user_data);
@@ -57,14 +58,19 @@ int netemu_register_user_join_callback(struct netemu_info *connection, joinFn ca
 
 int netemu_kaillera_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable, void *user_data) {
 	struct callback *callback;
-
+	int error;
 	if((callback = malloc(sizeof(struct callback))) == NULL ) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 	callback->fn = fn;
 	callback->disposable = disposable;
 	callback->user_data = user_data;
-	netemu_list_add(list,callback);
+	error = netemu_list_add(list,callback);
+	if(error != 0) {
+		free(callback);
+		return -1;
+	}
 //=======
 //	netemu_kaillera_register_callback(connection->_internal->join_callback, fn, 0);
 //>>>>>>> a7c1b7ed90953a796ad3d091682b9ee2fc2f19e2:netemu_sender/kaillera_callbacks.c
@@ -137,4 +143,37 @@ int netmeu_unregister_user_leave_callback(struct netemu_info *connection, leaveF
 	fn = malloc(sizeof(union callback_fn));
 	fn->leave_fn = callback;
 	return netemu_list_remove(connection->_internal->leave_callback, fn);
+}
+
+int netemu_register_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn callback, void *user_data) {
+	union callback_fn *fn;
+	int error;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	fn->game_created_fn = callback;
+
+	error = netemu_kaillera_register_callback(connection->_internal->game_created_callback, fn, 0, user_data);
+	if(error != 0) {
+		free(fn);
+		return -1;
+	}
+
+	return 0;
+}
+
+int netemu_unregister_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn callback) {
+	union callback_fn *fn;
+	int error;
+
+	if((fn = malloc(sizeof(union callback_fn)) == NULL)) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+	fn->game_created_fn = callback;
+	error = netemu_list_remove(connection->_internal->game_created_callback, fn);
+	free(fn);
+	return error;
 }

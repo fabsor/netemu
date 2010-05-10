@@ -46,7 +46,7 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		return NULL;
 	}
 	app_instruction->timestamp = time(NULL);
-
+	app_instruction->important = 0;
 	data = (char*)instruction->instruction;
 	memcpy(&app_instruction->id,data,sizeof(char));
 	data += sizeof(char);
