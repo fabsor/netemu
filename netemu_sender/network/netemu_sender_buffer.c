@@ -32,6 +32,7 @@ struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_p
 	buffer->preferred_delay_time = preferred_delay_time;
 	buffer->send_lock = netemu_thread_mutex_create();
 	buffer->running = 1;
+	buffer->itemsToAdd = netemu_list_new(10,1);
 	buffer->event = netemu_thread_event_create();
 	/* Start a new thread. */
 	netemu_thread_new(_netemu_sender_buffer_update,buffer);
@@ -70,6 +71,8 @@ void _netemu_sender_buffer_update(void* arg) {
 					for(j = 0; j < items->count; j++) {
 						item = (struct netemu_sender_buffer_item*)items->elements[j];
 						instructions[j] = item->instruction;
+						if(instructions[j]->id == 31)
+							printf("hej");
 					}
 					packet_buffer = netemu_transport_pack(instructions, items->count);
 					netemu_sender_buffer_send(type,connection, packet_buffer.data,

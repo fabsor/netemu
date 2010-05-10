@@ -26,7 +26,6 @@ void netemu_application_p2p_login_success_free(struct application_instruction *i
 void* netemu_application_p2p_login_success_copy(struct application_instruction *instruction);
 void netemu_application_p2p_join_host_pack(struct application_instruction *instruction, char *buffer);
 void netemu_application_p2p_start_game_pack(struct application_instruction *instruction, char *buffer);
-void netemu_application_add_start_game(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size);
 
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator) {
 	struct p2p_game *game;
@@ -38,7 +37,6 @@ void netemu_application_p2p_create_game_add(struct application_instruction *inst
 	size += netemu_application_p2p_copy_user(game->creator,creator);
 	game->user_count = 1;
 	game->players = NULL;
-	game->creator->_internal = NULL;
 	game->_internal = NULL;
 	size += sizeof(NETEMU_WORD);
 	instruction->body = game;
@@ -175,8 +173,7 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	pos += sizeof(NETEMU_WORD);
 	game->creator = malloc(sizeof(struct p2p_user));
 	pos += _netemu_application_p2p_parse_user(buffer+pos,game->creator, 1);
-
-
+	game->_internal = NULL;
 	if (game->user_count > 1) {
 		game->players = malloc(sizeof(struct p2p_user)*game->user_count);
 		for(i = 0; i < game->user_count-1; i++) {
@@ -365,10 +362,10 @@ void netemu_application_p2p_login_success_pack(struct application_instruction *i
 
 int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 	int pos;
-	memcpy(buffer,&user->addr_size, sizeof(size_t));
-	pos = sizeof(size_t);
-	memcpy(buffer+pos, &user->addr, user->addr_size);
-	pos += user->addr_size;
+	memcpy(buffer,&user->addr, sizeof(NETEMU_DWORD));
+	pos = sizeof(NETEMU_DWORD);
+	memcpy(buffer+pos, &user->port,sizeof(unsigned short));
+	pos += sizeof(unsigned short);
 	memcpy(buffer+pos, &user->connection, sizeof(char));
 	pos++;
 	if(user->name != NULL)
@@ -382,12 +379,11 @@ int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user) {
 
 int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETEMU_BOOL parse_user) {
 	int pos;
-	memcpy(&user->addr_size, buffer, sizeof(size_t));
-	pos = sizeof(size_t);
-	user->addr = malloc(user->addr_size);
-	memcpy(user->addr, buffer+pos, user->addr_size);
-	pos += user->addr_size;
-	memcpy(&user->connection, buffer+pos, sizeof(char));
+	memcpy(&user->addr, buffer, sizeof(NETEMU_DWORD));
+	pos = sizeof(NETEMU_DWORD);
+	memcpy(&user->port, buffer+pos, sizeof(unsigned short));
+	pos += sizeof(unsigned short);
+	memcpy(buffer+pos, &user->connection, sizeof(char));
 	pos++;
 	if(parse_user) {
 		user->name= netemu_util_parse_string(buffer+pos);
@@ -406,12 +402,10 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 
 int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user) {
 	int size;
-
-	target->addr = malloc(user->addr_size);
-	memcpy(target->addr,user->addr,user->addr_size);
-	target->addr_size = user->addr_size;
-
-	size = target->addr_size + sizeof(size_t);
+	target->addr = user->addr;
+	size = sizeof(NETEMU_DWORD);
+	target->port = user->port;
+	size += sizeof(unsigned short);
 	target->ping = user->ping;
 	size += sizeof(NETEMU_DWORD);
 	/* ? */
@@ -436,14 +430,13 @@ int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *u
 	return size;
 }
 
-void netemu_application_p2p_login_request_add(struct application_instruction *instruction, netemu_sockaddr *addr, size_t addr_size, char* username, char* appname, int connection) {
+void netemu_application_p2p_login_request_add(struct application_instruction *instruction, unsigned long addr, unsigned short port, char* username, char* appname, int connection) {
 	struct p2p_user *user;
 	int size;
 	user = malloc(sizeof(struct p2p_user));
-	user->addr = malloc(addr_size);
-	memcpy(user->addr,addr,addr_size);
-	user->addr_size = addr_size;
-	size = addr_size + sizeof(size_t);
+	user->addr = addr;
+	user->port = port;
+	size = sizeof(NETEMU_DWORD) + sizeof(unsigned short);
 	netemu_util_copy_string(&instruction->user,username);
 	user->name = NULL;
 	user->connection = connection;
@@ -529,35 +522,33 @@ void netemu_application_p2p_start_game_pack(struct application_instruction *inst
 	struct p2p_start_game *start_game;
 	int pos;
 	start_game = instruction->body;
-	memcpy(buffer, &start_game->addr_size, sizeof(size_t));
-	pos = sizeof(size_t);
-	memcpy(buffer+pos, start_game->addr, start_game->addr_size);
-	pos += start_game->addr_size;
+	memcpy(buffer, &start_game->port, sizeof(unsigned short));
+	pos = sizeof(unsigned short);
+	memcpy(buffer+pos, &start_game->addr, sizeof(NETEMU_DWORD));
+	pos += sizeof(NETEMU_DWORD);
 }
 
 void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_start_game *start_game;
 	int pos;
 	start_game = malloc(sizeof(struct p2p_start_game));
-	memcpy(&start_game->addr_size, buffer, sizeof(size_t));
-	pos = sizeof(size_t);
-	start_game->addr = malloc(start_game->addr_size);
-	memcpy(start_game->addr,buffer+pos, start_game->addr_size);
-	pos += start_game->addr_size;
+	memcpy(&start_game->port, buffer, sizeof(unsigned short));
+	pos = sizeof(unsigned short);
+	memcpy(&start_game->addr, buffer+pos, sizeof(NETEMU_DWORD));
+	pos += sizeof(NETEMU_DWORD);
 	instruction->body = start_game;
-	instruction->packBodyFn = netemu_application_start_game_pack;
+	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
 }
 
-void netemu_application_add_start_game(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size) {
+void netemu_application_add_start_game(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port) {
 	struct p2p_start_game *start_game;
 
 	start_game = malloc(sizeof(struct p2p_start_game));
 
-	start_game->addr = malloc(addr_size);
-	memcpy(start_game->addr, addr, addr_size);
-	start_game->addr_size = addr_size;
+	start_game->addr = addr;
+	start_game->port = port;
 
-	instruction->body_size = sizeof(size_t)+addr_size;
+	instruction->body_size = sizeof(NETEMU_DWORD)+sizeof(unsigned short);
 	instruction->body = start_game;
 }
 

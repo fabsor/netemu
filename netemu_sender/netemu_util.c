@@ -106,6 +106,16 @@ netemu_sockaddr* netemu_util_copy_addr(netemu_sockaddr *addr, int addr_size) {
 	return copy;
 }
 
+netemu_sockaddr_in* netemu_util_create_addr(NETEMU_DWORD address, unsigned short port, int *size) {
+	netemu_sockaddr_in *addr;
+	addr = malloc(sizeof(netemu_sockaddr_in));
+	addr->sin_addr.s_addr = address;
+	addr->sin_port = port;
+	addr->sin_family = NETEMU_AF_INET;
+	*size = sizeof(netemu_sockaddr_in);
+	return addr;
+}
+
 int netemu_util_pack_str(char* buffer, char* str) {
 	int size;
 	size = sizeof(char)*(strlen(str)+1);

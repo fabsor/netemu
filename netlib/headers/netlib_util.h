@@ -8,6 +8,7 @@
 #ifndef NETEMU_UTIL_H_
 #define NETEMU_UTIL_H_
 #include <stdlib.h>
+#include "inttypes.h"
 #ifdef _NIX
 typedef unsigned int NETEMU_DWORD;
 #else

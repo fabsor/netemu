@@ -203,8 +203,8 @@ void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, s
 	netemu_thread_mutex_lock(buffer->_internal->fn_mutex, NETEMU_INFINITE);
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &item->instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
-				if(notify->next != NULL) {
-					printf("Hej");
+				if(item->instruction->id == 0x12 || item->instruction == 31) {
+					printf("HEJ");
 				}
 				nextnotify = notify->next;
 				notify->fn(buffer,item,notify->arg);

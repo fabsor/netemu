@@ -52,6 +52,7 @@ NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address,
     error = accept(socket,(struct sockaddr*)&addr,&size);
 
     if(error == -1) {
+    	netlib_set_last_error(errno);
     	return error;
     }
     *address = malloc(size);
@@ -62,13 +63,23 @@ NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address,
 }
 
 /* Sends data through a connected socket. */
-int netmu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
-    return send(socket,buffer,len,flags);
+int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
+    int error;
+	error = send(socket,buffer,len,flags);
+	if(error == -1) {
+		netlib_set_last_error(error);
+	}
+	return error;
 }
 
 /* Sends data to a specific destination. */
 int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len){
-    return sendto(socket,buffer,len,flags,dest_address,address_len);
+    int error;
+	error = sendto(socket,buffer,len,flags,dest_address,address_len);
+	if(error == -1) {
+		netlib_set_last_error(error);
+	}
+	return error;
 }
 
 /* Receives data on a connected socket. */

@@ -4,7 +4,7 @@
 int last_error;
 
 int netlib_get_last_error() {
-	return errno;
+	return last_error;
 }
 
 void netlib_set_last_error(int error) {
