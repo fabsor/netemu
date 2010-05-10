@@ -11,17 +11,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-#define CREATE_P2P_GAME		30
-#define JOIN_P2P_GAME		31
-#define LEAVE_P2P_GAME 		32
-#define KICK_P2P_PLAYER 	33
-#define P2P_LOGIN_SUCCESS	34
-#define P2P_LOGIN_REQUEST	35
-#define P2P_READY			36
-#define P2P_USER_JOIN		37
-#define P2P_JOIN_HOST		38
-#define P2P_PLAYER_READY	39
-#define P2P_GAME_START		40
+
 #include "application_kaillera.h"
 #include "../netemu_util.h"
 

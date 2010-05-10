@@ -4,6 +4,7 @@
 void ChatCallBackWrapper(char *user, char *message, void *user_data);
 void UserJoinCallBackWrapper(char *user, NETEMU_DWORD ping, char connection, void *user_data);
 void UserLeaveCallBackWrapper(NETEMU_WORD id, char *user, char *exit_message, void *user_data);
+void GameCreatedCallBackWrapper(struct game *createdGame, void *user_data);
 
 ServerDialog::ServerDialog(QWidget *parent, netemu_info *serverInfo)
     : QMainWindow(parent)
@@ -15,7 +16,7 @@ ServerDialog::ServerDialog(QWidget *parent, netemu_info *serverInfo)
 	netemu_register_chat_callback(this->serverInfo, ChatCallBackWrapper, this);
 	netemu_register_user_join_callback(this->serverInfo, UserJoinCallBackWrapper, this);
 	netemu_register_user_leave_callback(this->serverInfo, UserLeaveCallBackWrapper, this);
-
+	netemu_register_game_created_callback(this->serverInfo, GameCreatedCallBackWrapper, this);
 }
 
 void UserJoinCallBackWrapper(char *user, NETEMU_DWORD ping, char connection, void *user_data)
@@ -30,12 +31,43 @@ void UserLeaveCallBackWrapper(NETEMU_WORD id, char *user, char *exit_message, vo
 	dialog->OnUserListChanged();
 }
 
+void GameCreatedCallBackWrapper(struct game *createdGame, void *user_data)
+{
+	ServerDialog *dialog = (ServerDialog*)user_data;
+	dialog->OnGameListChanged();
+}
+
+void ServerDialog::OnGameListChanged()
+{
+	struct game **games;
+	int gameCount;
+
+	games = netemu_kaillera_get_game_list(this->serverInfo, &gameCount);
+	ui.tableGames->setRowCount(gameCount);
+	ui.tableGames->clearContents();
+
+	for(int i = 0; i < gameCount; i++)
+	{
+		ui.tableGames->setItem(i, 0,
+				new QTableWidgetItem(games[i]->name, 0));
+		ui.tableGames->setItem(i, 0,
+				new QTableWidgetItem(games[i]->app_name, 0));
+		ui.tableGames->setItem(i, 0,
+				new QTableWidgetItem(games[i]->creator->username, 0));
+		ui.tableGames->setItem(i, 0,
+						new QTableWidgetItem(QString::number(games[i]->status, 10), 0));
+		ui.tableGames->setItem(i, 0,
+				new QTableWidgetItem(games[i]->users_count, 0));
+	}
+}
+
 
 void ServerDialog::OnUserListChanged()
 {
 	struct user **users;
 	int userCount;
 	int i;
+
 	users = netemu_kaillera_get_user_list(this->serverInfo, &userCount);
 	ui.groupPartyLine->setTitle(QString("Partyline (") + QString::number(userCount, 10) + QString(" users)"));
 	ui.tableUsers->setRowCount(userCount);
@@ -78,6 +110,8 @@ void ServerDialog::ChatCallBack(char *user, char *message)
 {
 	QString userString(user);
 	ui.plainTextChat->appendPlainText(QString(user) + QString(": ") + QString(message));
+	ui.plainTextChat->ensureCursorVisible();
+	/* moveToThread kanske?*/
 	ui.plainTextChat->update();
 }
 

@@ -59,55 +59,6 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 	return packet_buffer;
 }
 
-struct transport_packet* netemu_transport_unpack(NETEMU_SOCKET socket) {
-	int i, j;
-	unsigned int pos;
-	struct transport_packet* packet;
-	struct transport_instruction* instruction;
-	int error;
-	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-		return NULL;
-	}
-	error = netemu_recvfrom(socket, &packet->count, sizeof(char), 0, NULL, 0);
-	if(error == -1) {
-		return NULL;
-	}
-	if((packet->instructions = malloc(sizeof(struct transport_instruction*)*packet->count)) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-		free(packet);
-		return NULL;
-	}
-	for (i = 0; i < packet->count; i++) {
-		if((instruction = malloc(sizeof(struct transport_instruction))) == NULL) {
-			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-
-			for(j = 0; j <= i; j++)
-				free(instruction);
-
-			free(packet->instructions);
-			free(packet);
-			return NULL;
-		}
-
-		error = netemu_recvfrom(socket, (char*)&instruction->serial, sizeof(NETEMU_WORD), 0, NULL, 0);
-		if(error == -1) {
-			return NULL;
-		}
-
-		error = netemu_recvfrom(socket, (char*)&instruction->length, sizeof(NETEMU_WORD),0,  NULL, 0);
-		if(error == -1) {
-			return NULL;
-		}
-		instruction->instruction = malloc(instruction->length);
-		netemu_recvfrom(socket, instruction->instruction, instruction->length,0, NULL, 0);
-		if(error == -1) {
-			return NULL;
-		}
-		packet->instructions[i] = instruction;
-	}
-	return packet;
-}
 
 void netemu_transport_free_packet(struct transport_packet* packet) {
 	int i;

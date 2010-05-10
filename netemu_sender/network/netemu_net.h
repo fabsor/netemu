@@ -14,6 +14,8 @@ extern "C" {
 #include "netemu_sender_collection.h"
 #include "netemu_sender_udp.h"
 
+typedef int (*parseReceivedDataFn)(NETEMU_SOCKET socket, void* args);
+
 union netemu_connection_type{
 	struct netemu_sender_udp *udp_sender;
 	struct netemu_tcp_connection *connection;

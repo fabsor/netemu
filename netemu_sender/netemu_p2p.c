@@ -332,7 +332,7 @@ int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_socka
 
 	receiver = netemu_receiver_udp_new(addr,addr_size,512);
 	netemu_receiver_udp_register_recv_fn(receiver,netemu_udp_connection_receive,connection->info);
-	netemu_receiver_udp_start_receiving(receiver);
+	netemu_receiver_udp_start_receiving(receiver, connection->info->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	connection->current_game->creator->_internal = connection->user->_internal;
 	instruction = netemu_application_create_message();
@@ -354,8 +354,7 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, netemu_soc
 		return -1;
 
 	receiver = netemu_receiver_udp_new(addr,addr_size,512);
-	netemu_receiver_udp_register_recv_fn(receiver,netemu_udp_connection_receive,connection);
-	netemu_receiver_udp_start_receiving(receiver);
+	netemu_receiver_udp_start_receiving(receiver, connection->info->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	instruction = netemu_application_create_message();
 	netemu_application_p2p_player_ready_add(instruction, addr, addr_size);

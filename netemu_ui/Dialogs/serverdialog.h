@@ -14,6 +14,7 @@ public:
     ~ServerDialog();
     void ChatCallBack(char *user, char *message);
     void OnUserListChanged();
+    void OnGameListChanged();
 
 private slots:
 	void OnButtonSendChatClick();

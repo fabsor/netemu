@@ -42,8 +42,7 @@ int netemu_disconnect(struct netemu_info *info, char *message) {
 	client = netemu_resources_get_client();
 	instruction = netemu_application_create_message();
 	netemu_application_user_leave_add(instruction, message);
-	buffer = netemu_transport_pack(&instruction,1);
-	return netemu_sender_udp_send(client->sender ,buffer.data, buffer.size);
+	/* TODO: Fix this function.*/
 }
 
 

@@ -35,7 +35,7 @@ struct communication_callback {
 	void *arg;
 };
 
-void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
+void kaillera_communication_listener(NETEMU_SOCKET socket, void* args);
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void _kaillera_communication_login(struct communication_callback *callback);
 
@@ -163,7 +163,25 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	free(callback);
 }
 
-void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
+void kaillera_communication_listener(NETEMU_SOCKET socket, void* args) {
+	struct communication_callback *callback;
+	int result;
+	callback = (struct communication_callback*)args;
+	char* buffer = malloc(128);
+
+	result = netemu_recvfrom(socket, buffer, 128, 0, NULL, 0);
+	result = netemu_communication_parse_server_message(buffer);
+	if(result == CONNECTION_ACCEPTED) {
+		callback->port = netemu_communication_parse_server_accept_port(buffer);
+		if(callback->async != -1) {
+			_kaillera_communication_login(callback);
+		}
+	}
+}
+
+
+
+/*void kaillera_communication_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args) {
 	struct communication_callback *callback;
 	int result;
 	callback = (struct communication_callback*)args;
@@ -175,4 +193,4 @@ void kaillera_communication_listener(char* data, size_t size, struct netemu_rece
 			_kaillera_communication_login(callback);
 		}
 	}
-}
+}*/

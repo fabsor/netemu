@@ -10,6 +10,8 @@
 #include "netemu_socket.h"
 #include "netemu_thread.h"
 #include "netemu_list.h"
+#include "netemu_packet_buffer.h"
+#include "netemu_net.h"
 
 #define NETEMU_RECEIVER_DEFAULT_BUFFER_SIZE	128
 
@@ -18,8 +20,9 @@ struct netemu_receiver_udp{
 	NETEMU_SOCKET socket;
 	netemu_sockaddr* addr;
 	netemu_mutex lock;
-	struct netemu_receiver_udp_fn *receiver_fn;
-	int buffer_size;
+	struct netemu_packet_buffer *buffer;
+	parseReceivedDataFn fn;
+	void* received_data_param;
 	int addr_len;
 	int fn_count;
 	int error;
@@ -41,16 +44,13 @@ struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int a
  * This function creates a new thread and starts listening for incoming
  * datagrams on the specified address and port.
  */
-void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver);
+void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, struct netemu_packet_buffer *buffer);
 
 /**
  * Register a function that will act as a listener. The function will be called when data is received.
  * The function must be thread safe.
  */
-void netemu_receiver_udp_register_recv_fn(struct netemu_receiver_udp* receiver, void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* params);
 
 void netemu_receiver_udp_free(struct netemu_receiver_udp* receiver);
-
-void netemu_receiver_udp_clear_listeners(struct netemu_receiver_udp* receiver);
 
 #endif /* NETEMU_RECEIVER_H_ */
