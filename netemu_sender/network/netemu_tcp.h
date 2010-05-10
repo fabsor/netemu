@@ -14,15 +14,15 @@ extern "C" {
 
 #include "netemu_socket.h"
 #include "netemu_thread.h"
+#include "netemu_net.h"
 
 struct netemu_tcp_connection {
 	NETEMU_SOCKET socket;
 	netemu_sockaddr* addr;
 	netemu_mutex lock;
-	struct netemu_tcp_connection_fn *receiver_fn;
-	struct netemu_packet_buffer *buffer;
+	void* data_param;
 	int addr_len;
-	int fn_count;
+	parseReceivedDataFn fn;
 	int listening;
 	int error;
 };
@@ -42,20 +42,13 @@ struct netemu_tcp_new_connection_fn {
 	struct netemu_tcp_new_connection_fn *next;
 };
 
-
-struct netemu_tcp_connection_fn{
-	void (* listenerFn)(char*, size_t, struct netemu_tcp_connection*, void*);
-	void* params;
-	struct netemu_tcp_connection_fn *next;
-};
-
 struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, size_t addr_len);
 
 struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET socket, netemu_sockaddr* addr, size_t addr_len);
 
 void netemu_tcp_listener_start_listening(struct netemu_tcp_listener *listener);
 
-void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, struct netemu_packet_buffer *buffer);
+void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, parseReceivedDataFn parseFn, void *param);
 
 int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data, int size);
 

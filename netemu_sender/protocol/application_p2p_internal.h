@@ -64,7 +64,7 @@ void netemu_application_add_start_game(struct application_instruction *instructi
 
 void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer);
 
-void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size);
+void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port);
 
 struct p2p_game_internal *netemu_application_p2p_create_game_internal();
 

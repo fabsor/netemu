@@ -35,7 +35,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	sender->addr = addr;
 	sender->socket = socket;
 	sender->listening = 0;
-	sender->receiver_fn = NULL;
+	sender->fn = NULL;
 	return sender;
 }
 
@@ -46,7 +46,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETEMU_SOCKET 
 	sender->addr = addr;
 	sender->socket = socket;
 	sender->listening = 0;
-	sender->receiver_fn = NULL;
+	sender->fn = NULL;
 	sender->socket = socket;
 	return sender;
 }
@@ -79,14 +79,14 @@ void netemu_tcp_listener_register_new_connection_fn(struct netemu_tcp_listener* 
 	}
 }
 
-void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, struct netemu_packet_buffer *buffer) {
-	con->buffer = buffer;
+void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, parseReceivedDataFn fn, void *param) {
+	con->fn = fn;
+	con->data_param = param;
 	netemu_thread_new(_netemu_tcp_connection_recv, (void*)con);
 }
 
 void _netemu_tcp_connection_recv(void* params) {
 	struct netemu_tcp_connection *receiver;
-	struct transport_packet *packet;
 	union netemu_connection_type type;
 	struct application_instruction *instruction;
 	int error, i;
@@ -98,16 +98,11 @@ void _netemu_tcp_connection_recv(void* params) {
 	while (1) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
-		packet = netemu_transport_unpack(receiver->socket);
-
-		if (packet == NULL) {
+		error = receiver->fn(receiver->socket, TCP_CONNECTION, type, receiver->data_param);
+		if (error == -1) {
 			receiver->error = netlib_get_last_error();
 			netemu_thread_mutex_release(receiver->lock);
 			break;
-		}
-		for(i = 0; i < packet->count; i++) {
-			instruction = netemu_application_parse_message(packet->instructions[i]);
-			netemu_packet_buffer_add(receiver->buffer, instruction,TCP_CONNECTION,type);
 		}
 		netemu_thread_mutex_release(receiver->lock);
 	}

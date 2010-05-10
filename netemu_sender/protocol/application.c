@@ -5,27 +5,35 @@
  *      Author: emil
  */
 #include "transport.h"
+#include "application.h"
+#include <stdlib.h>
+#include "netlib_error.h"
+#include "application_kaillera.h"
+#include "application_p2p.h"
+#include "../network/netemu_packet_buffer.h"
+#include "../network/netemu_net.h"
 
-int netemu_application_parse(NETEMU_SOCKET socket, void* params) {
+int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param) {
 	int i, j;
 	unsigned int pos;
 	struct transport_packet* packet;
 	struct transport_instruction* instruction;
+	struct application_instruction *app_instruction;
 	struct netemu_packet_buffer *buffer;
 	int error;
-	buffer = (struct netemu_packet_buffer *)params;
+	buffer = (struct netemu_packet_buffer *)param;
 	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
-		return NULL;
+		return -1;
 	}
 	error = netemu_recvfrom(socket, &packet->count, sizeof(char), 0, NULL, 0);
 	if(error == -1) {
-		return NULL;
+		return -1;
 	}
 	if((packet->instructions = malloc(sizeof(struct transport_instruction*)*packet->count)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		free(packet);
-		return NULL;
+		return -1;
 	}
 	for (i = 0; i < packet->count; i++) {
 		if((instruction = malloc(sizeof(struct transport_instruction))) == NULL) {
@@ -36,30 +44,89 @@ int netemu_application_parse(NETEMU_SOCKET socket, void* params) {
 
 			free(packet->instructions);
 			free(packet);
-			return NULL;
+			return -1;
 		}
 
 		error = netemu_recvfrom(socket, (char*)&instruction->serial, sizeof(NETEMU_WORD), 0, NULL, 0);
 		if(error == -1) {
-			return NULL;
+			return -1;
 		}
 
 		error = netemu_recvfrom(socket, (char*)&instruction->length, sizeof(NETEMU_WORD),0,  NULL, 0);
 		if(error == -1) {
-			return NULL;
+			return -1;
 		}
 		instruction->instruction = malloc(instruction->length);
 		netemu_recvfrom(socket, instruction->instruction, instruction->length,0, NULL, 0);
 		if(error == -1) {
-			return NULL;
+			return -1;
 		}
 		packet->instructions[i] = instruction;
 	}
 	for(i = 0; i < packet->count; i++) {
-		instruction = netemu_application_parse_message(packet->instructions[i]);
-		netemu_packet_buffer_add(buffer, instruction,TCP_CONNECTION,type);
+		app_instruction = netemu_application_parse_message(packet->instructions[i]);
+		netemu_packet_buffer_add(buffer, app_instruction,type,connection);
+	}
+	return 1;
+}
+
+int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param) {
+	int i, j;
+	unsigned int pos;
+	struct transport_packet* packet;
+	struct application_instruction *app_instruction;
+	struct transport_instruction* instruction;
+	struct netemu_packet_buffer *buffer;
+	int error;
+	char* bytebuffer;
+
+	bytebuffer = malloc(512);
+	buffer = (struct netemu_packet_buffer *)param;
+
+	error = netemu_recvfrom(socket, bytebuffer, 512, 0, NULL, 0);
+	if(error == -1) {
+		return -1;
 	}
 
+	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	memcpy(&packet->count,bytebuffer, sizeof(char));
+	pos = sizeof(char);
+	if((packet->instructions = malloc(sizeof(struct transport_instruction*)*packet->count)) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		free(packet);
+		return -1;
+	}
+	for (i = 0; i < packet->count; i++) {
+		if((instruction = malloc(sizeof(struct transport_instruction))) == NULL) {
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+
+			for(j = 0; j <= i; j++)
+				free(instruction);
+
+			free(packet->instructions);
+			free(packet);
+			return -1;
+		}
+
+		memcpy(&instruction->serial,bytebuffer+pos,sizeof(NETEMU_WORD));
+		pos += sizeof(NETEMU_WORD);
+		memcpy(&instruction->length, bytebuffer+pos, sizeof(NETEMU_WORD));
+		pos += sizeof(NETEMU_WORD);
+		instruction->instruction = malloc(instruction->length);
+		memcpy(instruction->instruction, bytebuffer+pos, instruction->length);
+		pos += instruction->length;
+		packet->instructions[i] = instruction;
+	}
+
+	for(i = 0; i < packet->count; i++) {
+		app_instruction = netemu_application_parse_message(packet->instructions[i]);
+		netemu_packet_buffer_add(buffer, app_instruction,type,connection);
+	}
+	return 1;
 }
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {

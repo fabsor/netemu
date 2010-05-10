@@ -10,7 +10,6 @@ extern "C" {
 #endif
 
 #include "netemu_sender_udp.h"
-#include "netemu_tcp.h"
 #include "netemu_list.h"
 
 typedef enum {

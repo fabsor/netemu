@@ -8,6 +8,9 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
+#include "../network/netemu_net.h"
+
+
 /*! P2P defines */
 #define CREATE_P2P_GAME		30
 #define JOIN_P2P_GAME		31
@@ -45,9 +48,9 @@
 #define MOTD_CHAT										0x17
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
+int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
 
-
-int netemu_application_parse(NETEMU_SOCKET socket, void* params);
+int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 

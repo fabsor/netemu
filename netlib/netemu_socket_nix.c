@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
-
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/un.h>
@@ -80,6 +80,11 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
 		netlib_set_last_error(error);
 	}
 	return error;
+}
+
+/*! Sets the blocking status of the socket */
+int netemu_set_blocking(NETEMU_SOCKET socket, int blocking) {
+	return ioctl(socket, FIONBIO, &blocking);
 }
 
 /* Receives data on a connected socket. */

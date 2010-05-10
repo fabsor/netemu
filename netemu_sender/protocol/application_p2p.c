@@ -6,6 +6,7 @@
 #include "netlib_util.h"
 #include "../netemu_util.h"
 #include "application_p2p.h"
+#include "application.h"
 #include "application_p2p_internal.h"
 #include "../network/netemu_net.h"
 #include "../network/netemu_sender_udp.h"
@@ -508,14 +509,14 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 	instruction->packBodyFn = NULL;
 }
 
-void netemu_application_p2p_start_game_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size) {
-	netemu_application_add_start_game(instruction, addr, addr_size);
+void netemu_application_p2p_start_game_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port) {
+	netemu_application_add_start_game(instruction, addr, port);
 	instruction->id = P2P_GAME_START;
 	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
 }
 
-void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, netemu_sockaddr* addr, size_t addr_size) {
-	netemu_application_add_start_game(instruction, addr, addr_size);
+void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port) {
+	netemu_application_add_start_game(instruction, addr, port);
 	instruction->id = P2P_PLAYER_READY;
 	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
 }

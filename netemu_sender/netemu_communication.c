@@ -17,8 +17,9 @@
 #include "netemu_socket.h"
 #include "network/netemu_sender_buffer.h"
 #include "interface/netemu_kaillera.h"
+#include "network/netemu_net.h"
 #include "network/netemu_sender_buffer.h"
-
+#include "protocol/application.h"
 #define DOMAIN	"www.kaillera.com"
 #define SERVER	"kaillera.com"
 #define PATH	"/raw_server_list2.php?wg=1&version=0.9"
@@ -35,7 +36,7 @@ struct communication_callback {
 	void *arg;
 };
 
-void kaillera_communication_listener(NETEMU_SOCKET socket, void* args);
+int kaillera_communication_listener(NETEMU_SOCKET socket, netemu_connection_types type, union netemu_connection_type connection, void* args);
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void _kaillera_communication_login(struct communication_callback *callback);
 
@@ -85,14 +86,23 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	struct communication_callback callback;
 	struct netemu_sender_buffer *buffer;
 	union netemu_connection_type *type;
+	netemu_sockaddr_in in_addr;
 	callback.port = -1;
 	callback.async = -1;
 	client = netemu_resources_get_client();
+
+	/* TODO: This can't be hardcoded, it should rather be passed into the function. */
+	in_addr.sin_addr.s_addr = netemu_inet_addr("127.0.0.1");
+	in_addr.sin_port = netemu_htons(35000);
+	in_addr.sin_family = NETEMU_AF_INET;
+
 	if(client == NULL)
 		return NULL;
-	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,&callback);
+
+	client->receiver = netemu_receiver_udp_new((struct sockaddr*)&in_addr, sizeof(in_addr));
 	if(client->receiver == NULL)
 		return NULL;
+	netemu_receiver_udp_start_receiving(client->receiver, kaillera_communication_listener, &callback);
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
 	if(client->sender == NULL)
 		return NULL;
@@ -104,15 +114,14 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	netemu_util_send_data(client->sender,hello);
 	free(hello);
 	while(callback.port == -1);
-
+	netemu_receiver_udp_stop_receiving(client->receiver);
 	addr->sin_port = netemu_htons(callback.port);
-	netemu_receiver_udp_clear_listeners(client->receiver);
 	client->sender->addr = (struct sockaddr*)addr;
 	type = malloc(sizeof(union netemu_connection_type));
 	type->udp_sender = client->sender;
 	buffer = netemu_sender_buffer_new(5,10);
 	connection = netemu_info_new(username,emulatorname,buffer);
-	netemu_receiver_udp_register_recv_fn(client->receiver,netemu_udp_connection_receive,connection);
+	netemu_receiver_udp_start_receiving(client->receiver, netemu_application_parse_udp, connection->_internal->receive_buffer);
 	netemu_kaillera_login(connection);
 	return connection;
 }
@@ -144,7 +153,7 @@ void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_siz
 	callback->ConnectionReceivedFn = ConnectionReceivedFn;
 	callback->arg = arg;
 	client = netemu_resources_get_client();
-	client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,callback);
+	//client->receiver = netemu_util_prepare_receiver(CLIENT_PORT,kaillera_communication_listener,callback);
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
 
 	hello = netemu_communication_create_hello_message(VERSION);
@@ -155,7 +164,6 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	struct netemu_client *client;
 	struct netemu_info* connection;
 	client = netemu_resources_get_client();
-	netemu_receiver_udp_clear_listeners(client->receiver);
 	callback->addr = netemu_htons(callback->port);
 	client->sender->addr = (netemu_sockaddr*)callback->addr;
 	/*connection = netemu_server_connection_new(callback->username,callback->username);*/
@@ -163,20 +171,32 @@ void _kaillera_communication_login(struct communication_callback *callback) {
 	free(callback);
 }
 
-void kaillera_communication_listener(NETEMU_SOCKET socket, void* args) {
+int kaillera_communication_listener(NETEMU_SOCKET socket, netemu_connection_types type, union netemu_connection_type connection, void* args) {
 	struct communication_callback *callback;
 	int result;
+	int error;
 	callback = (struct communication_callback*)args;
-	char* buffer = malloc(128);
+	char* buffer;
 
-	result = netemu_recvfrom(socket, buffer, 128, 0, NULL, 0);
+	buffer = malloc(128);
+	/* We need to set this to nonblocking... */
+	error = netemu_recvfrom(socket, buffer, 128, 0, NULL, 0);
+	if(error == -1) {
+		error = netlib_get_last_platform_error();
+		if(error != 11) {
+			return -1;
+		}
+	}
 	result = netemu_communication_parse_server_message(buffer);
+
 	if(result == CONNECTION_ACCEPTED) {
 		callback->port = netemu_communication_parse_server_accept_port(buffer);
 		if(callback->async != -1) {
 			_kaillera_communication_login(callback);
 		}
+		return 0;
 	}
+	return 1;
 }
 
 

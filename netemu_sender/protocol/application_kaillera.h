@@ -5,8 +5,8 @@
  *      Author: fabian
  */
 
-#ifndef APPLICATION_H_
-#define APPLICATION_H_
+#ifndef APPLICATION_KAILLERA_H_
+#define APPLICATION_KAILLERA_H_
 #include "transport.h"
 #include "netlib_util.h"
 #include "netemu_socket.h"
@@ -183,8 +183,6 @@ struct application_instruction* netemu_application_create_message();
 
 void netemu_application_free_message(struct application_instruction* message);
 
-struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
-
 void netemu_application_buffered_play_values_add(struct application_instruction *instruction, NETEMU_WORD size, char *data);
 
 void netemu_application_buffered_play_values_pack(struct application_instruction *instruction, char *buffer);
@@ -270,4 +268,4 @@ void netemu_application_user_leave_parse(struct application_instruction *instruc
 void netemu_application_client_timeout_request_add(struct application_instruction* instruction);
 
 struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction);
-#endif /* APPLICATION_H_ */
+#endif /* APPLICATION_KAILLERA_H_ */

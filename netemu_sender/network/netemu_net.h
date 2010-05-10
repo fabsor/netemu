@@ -10,11 +10,9 @@
 extern "C" {
 #endif
 
-#include "netemu_tcp.h"
+#include "netemu_socket.h"
 #include "netemu_sender_collection.h"
 #include "netemu_sender_udp.h"
-
-typedef int (*parseReceivedDataFn)(NETEMU_SOCKET socket, void* args);
 
 union netemu_connection_type{
 	struct netemu_sender_udp *udp_sender;
@@ -27,6 +25,8 @@ typedef enum {
 	TCP_CONNECTION,
 	CONNECTION_COLLECTION
 } netemu_connection_types;
+
+typedef int (*parseReceivedDataFn)(NETEMU_SOCKET, netemu_connection_types, union netemu_connection_type, void*);
 
 #ifdef	__cplusplus
 }

@@ -12,7 +12,7 @@
 #include "netemu_list.h"
 #include "netemu_packet_buffer.h"
 #include "netemu_net.h"
-
+#include "netlib_util.h"
 #define NETEMU_RECEIVER_DEFAULT_BUFFER_SIZE	128
 
 /*! This struct describes a receiver. */
@@ -22,6 +22,7 @@ struct netemu_receiver_udp{
 	netemu_mutex lock;
 	struct netemu_packet_buffer *buffer;
 	parseReceivedDataFn fn;
+	NETEMU_BOOL listening;
 	void* received_data_param;
 	int addr_len;
 	int fn_count;
@@ -38,13 +39,15 @@ struct netemu_receiver_udp_fn{
  * Create a new receiver. This will create a new socket and bind to the provided host and
  * port.
  */
-struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int addr_len, int buffer_size);
+struct netemu_receiver_udp* netemu_receiver_udp_new(netemu_sockaddr* addr, int addr_len);
 
 /**
  * This function creates a new thread and starts listening for incoming
  * datagrams on the specified address and port.
  */
-void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, struct netemu_packet_buffer *buffer);
+void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, parseReceivedDataFn fn, void* param);
+
+void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver);
 
 /**
  * Register a function that will act as a listener. The function will be called when data is received.

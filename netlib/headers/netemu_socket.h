@@ -182,6 +182,8 @@ typedef unsigned int NETEMU_SOCKET;
 	/*! Creates a new NETEMU_SOCKET. */
 	NETEMU_SOCKET netemu_socket(int address_family, int socket_type);
 
+	int netemu_set_blocking(NETEMU_SOCKET socket, int blocking);
+
 	/*! Binds a given NETEMU_SOCKET to an address. */
 	int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len);
 

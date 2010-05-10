@@ -15,6 +15,7 @@
 #include "protocol/application_p2p.h"
 #include "network/netemu_tcp.h"
 #include "netemu_list.h"
+#include "protocol/application.h"
 #include "protocol/application_p2p_internal.h"
 
 void _netemu_p2p_send_ready(struct netemu_sender_buffer *buffer, struct netemu_tcp_connection *connection);
@@ -92,7 +93,7 @@ void netemu_p2p_new_connection(struct netemu_tcp_listener* listener, struct nete
 	struct netemu_p2p_connection *p2p;
 	p2p = (struct netemu_p2p_connection*)params;
 	netemu_sender_collection_add_tcp_sender(p2p->_internal->peers, connection);
-	netemu_tcp_connection_start_receiving(connection, p2p->info->_internal->receive_buffer);
+	netemu_tcp_connection_start_receiving(connection, netemu_application_parse_tcp ,p2p->info->_internal->receive_buffer);
 	_netemu_p2p_send_ready(p2p->info->_internal->send_buffer,connection);
 }
 
@@ -187,7 +188,7 @@ struct netemu_tcp_connection *netemu_p2p_connect_to(struct netemu_p2p_connection
 	connection = netemu_tcp_connection_new(connect_addr,connect_addr_size);
 	netemu_sender_collection_add_tcp_sender(p2p->_internal->peers,connection);
 	error = netemu_tcp_connection_connect(connection);
-	netemu_tcp_connection_start_receiving(connection, p2p->info->_internal->receive_buffer);
+	netemu_tcp_connection_start_receiving(connection, netemu_application_parse_tcp, p2p->info->_internal->receive_buffer);
 	timestamp = time(NULL);
 	netemu_packet_buffer_wait_for_instruction(p2p->info->_internal->receive_buffer, P2P_READY, timestamp);
 	return connection;
@@ -201,7 +202,7 @@ struct netemu_tcp_connection *netemu_p2p_connect_to_async(struct netemu_p2p_conn
 	connection = netemu_tcp_connection_new(connect_addr,connect_addr_size);
 	netemu_sender_collection_add_tcp_sender(p2p->_internal->peers,connection);
 	p2p->_internal->continueFn = netemu_p2p_send_login_request;
-	netemu_tcp_connection_start_receiving(connection, p2p->info->_internal->receive_buffer);
+	netemu_tcp_connection_start_receiving(connection, netemu_application_parse_tcp, p2p->info->_internal->receive_buffer);
 	error = netemu_tcp_connection_connect(connection);
 
 	timestamp = time(NULL);
@@ -330,9 +331,8 @@ int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_socka
 	if(connection->current_game == NULL || (cmp = _netemu_p2p_user_compare(connection->current_game->creator, connection->user)) != 0)
 		return -1;
 
-	receiver = netemu_receiver_udp_new(addr,addr_size,512);
-	netemu_receiver_udp_register_recv_fn(receiver,netemu_udp_connection_receive,connection->info);
-	netemu_receiver_udp_start_receiving(receiver, connection->info->_internal->receive_buffer);
+	receiver = netemu_receiver_udp_new(addr,addr_size);
+	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_tcp,connection->info->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	connection->current_game->creator->_internal = connection->user->_internal;
 	instruction = netemu_application_create_message();
@@ -353,8 +353,8 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, netemu_soc
 	if(connection->current_game == NULL || (_netemu_p2p_user_compare(connection->current_game->creator, connection->user)) == -1)
 		return -1;
 
-	receiver = netemu_receiver_udp_new(addr,addr_size,512);
-	netemu_receiver_udp_start_receiving(receiver, connection->info->_internal->receive_buffer);
+	receiver = netemu_receiver_udp_new(addr,addr_size);
+	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_tcp, connection->info->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	instruction = netemu_application_create_message();
 	netemu_application_p2p_player_ready_add(instruction, addr, addr_size);

@@ -63,6 +63,11 @@ int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen
 	return errcode;
 }
 
+/*! Sets the blocking status of the socket */
+int netemu_set_blocking(NETEMU_SOCKET socket, int blocking) {
+	return ioctlsocket(socket, FIONBIO, &blocking);
+}
+
 int netemu_listen(NETEMU_SOCKET socket, int backlog) {
 	int errcode;
 

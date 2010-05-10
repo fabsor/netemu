@@ -292,46 +292,6 @@ struct user** netemu_kaillera_get_user_list(struct netemu_info* info, int *count
 	return users;
 }
 
-void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params) {
-	struct netemu_info* info;
-	struct transport_packet* packet;
-	struct application_instruction* instruction;
-	union netemu_connection_type type;
-	int i;
-
-	type.udp_sender = netemu_resources_get_sender();
-	info = (struct netemu_info*) params;
-	packet = netemu_transport_unpack(data);
-
-	for (i = 0; i < packet->count; i++) {
-		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction != NULL) {
-			netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, UDP_CONNECTION, type);
-		}
-	}
-}
-
-void netemu_tcp_connection_receive(char* data, size_t size, struct netemu_tcp_connection *receiver, void* params) {
-	struct netemu_info* info;
-	struct transport_packet* packet;
-	struct application_instruction* instruction;
-	union netemu_connection_type type;
-	int i;
-
-	type.connection = receiver;
-	info = (struct netemu_info*) params;
-	packet = netemu_transport_unpack(data);
-
-	for (i = 0; i < packet->count; i++) {
-		instruction = netemu_application_parse_message(packet->instructions[i]);
-		if(instruction->id == 31) {
-			printf("hej");
-		}
-		if(instruction != NULL) {
-			netemu_packet_buffer_add(info->_internal->receive_buffer,instruction, TCP_CONNECTION, type);
-		}
-	}
-}
 /**
  * Compare users.
  */
