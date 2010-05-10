@@ -16,7 +16,7 @@
 
 void netemu_kaillera_add_user(struct netemu_info* info, NETEMU_WORD user_id, char connection_type, char* username);
 void netemu_kaillera_remove_user(struct netemu_info *info, NETEMU_WORD user_id);
-void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count);
+void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count, char *creator);
 void netemu_kaillera_add_player(struct game *game, struct player *player);
 
 void _netemu_kaillera_add_game_struct(struct netemu_info* info, struct game* game);
@@ -226,7 +226,7 @@ void netemu_kaillera_add_player(struct game *game, struct player *player) {
 
 }
 
-void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count) {
+void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *game_name, NETEMU_WORD id, char status, int users_count, char *creator) {
 	struct game* game;
 	game = malloc(sizeof(struct game));
 	game->app_name = app_name;
@@ -234,6 +234,7 @@ void netemu_kaillera_add_game(struct netemu_info *info, char* app_name, char *ga
 	game->id = id;
 	game->status = status;
 	game->users_count = users_count;
+	game->creator = creator;
 	_netemu_kaillera_add_game_struct(info, game);
 }
 
