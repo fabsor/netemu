@@ -13,7 +13,9 @@ int p2p_join_test_ready = 0;
 void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user);
 void p2p_join_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
 void p2p_join_register_callbacks(struct netemu_p2p_connection *connection);
+void p2p_join_play_values_received_callback(struct netemu_p2p_connection *, char* values, int size);
 netemu_event event;
+int join_n;
 void run_p2p_join_test() {
 	netemu_sockaddr_in hostaddr, joinaddr;
 	struct netemu_p2p_connection *p2p;
@@ -36,22 +38,21 @@ void run_p2p_join_test() {
 
 	netemu_thread_event_wait(event);
 
-	netemu_sockaddr_in addr;
-	addr.sin_family = NETEMU_AF_INET;
-	addr.sin_addr.s_addr = ADDR;
-	addr.sin_port = netemu_htons(40000);
 	printf("A new player has joined the game! OK!\n Starting the game...\n");
-	netemu_p2p_start_game(p2p,(netemu_sockaddr*)&addr,sizeof(addr));
+	netemu_p2p_start_game(p2p,ADDR,40000);
 
 	netemu_thread_event_wait(event);
 
 	printf("OK!\nNow let's have some fun shall we? Let's send some data to the other player...");
 	netemu_p2p_send_play_values(p2p, strlen("Right,Left And Right again")+1, "Right,Left And Right again");
+	while(p2p_join_test_ready != 1);
 }
 
 void p2p_join_register_callbacks(struct netemu_p2p_connection *connection) {
 	netemu_p2p_register_player_joined_callback(connection, p2p_join_player_join_callback);
 	netemu_p2p_register_all_players_ready_callback(connection, p2p_join_all_ready_callback);
+	netemu_p2p_register_play_values_received_callback(connection, p2p_join_play_values_received_callback);
+
 }
 
 void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user) {
@@ -60,4 +61,15 @@ void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, str
 
 void p2p_join_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {
 	netemu_thread_event_signal(event);
+}
+
+void p2p_join_play_values_received_callback(struct netemu_p2p_connection *connection, char* values, int size) {
+	if(join_n < 100) {
+		printf("A play value has been received. This is the value: %s",values);
+		netemu_p2p_send_play_values(connection, strlen("Left,Right And Left again")+1, "Left,Right And Left again");
+		join_n++;
+	}
+	else {
+		p2p_join_test_ready = 1;
+	}
 }

@@ -66,11 +66,11 @@ int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamen
 
 void netemu_p2p_login(struct netemu_p2p_connection *p2p);
 
-int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, netemu_sockaddr* addr, size_t addr_size);
+int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWORD listen_addr, unsigned short listen_port);
 
 int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_game *game);
 
-int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_sockaddr* addr, size_t addr_size);
+int netemu_p2p_start_game(struct netemu_p2p_connection *connection, NETEMU_DWORD listen_addr, unsigned short listen_port);
 
 struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p_connection* info, int *count);
 

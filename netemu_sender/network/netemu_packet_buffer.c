@@ -79,8 +79,8 @@ void netemu_packet_buffer_add_instruction_received_fn(struct netemu_packet_buffe
 		while(existing_info->next != NULL) {
 			existing_info = existing_info->next;
 		}
+		existing_info->next = info;
 		info->prev = existing_info;
-		info->next = info;
 	}
 	netemu_thread_mutex_release(buffer->_internal->fn_mutex);
 }
@@ -203,9 +203,6 @@ void _netemu_packet_buffer_perform_notify(struct netemu_packet_buffer* buffer, s
 	netemu_thread_mutex_lock(buffer->_internal->fn_mutex, NETEMU_INFINITE);
 	if((notify = netemu_hashtbl_get(buffer->_internal->registered_fns, &item->instruction->id, sizeof(char))) != NULL) {
 		while(notify != NULL) {
-				if(item->instruction->id == 0x12 || item->instruction == 31) {
-					printf("HEJ");
-				}
 				nextnotify = notify->next;
 				notify->fn(buffer,item,notify->arg);
 				notify = nextnotify;

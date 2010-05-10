@@ -322,21 +322,26 @@ int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_ga
 	return 1;
 }
 
-int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_sockaddr* addr, size_t addr_size) {
+int netemu_p2p_start_game(struct netemu_p2p_connection *connection, NETEMU_DWORD listen_addr, unsigned short listen_port) {
 	struct netemu_receiver_udp *receiver;
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
+	netemu_sockaddr_in addr;
 	int cmp;
 	/*We can't start a game if a game is not created first, and you are the owner of the game.*/
 	if(connection->current_game == NULL || (cmp = _netemu_p2p_user_compare(connection->current_game->creator, connection->user)) != 0)
 		return -1;
 
-	receiver = netemu_receiver_udp_new(addr,addr_size);
-	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_tcp,connection->info->_internal->receive_buffer);
+	addr.sin_addr.s_addr = listen_addr;
+	addr.sin_family = NETEMU_AF_INET;
+	addr.sin_port = listen_port;
+
+	receiver = netemu_receiver_udp_new((netemu_sockaddr*)&addr,sizeof(addr));
+	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_udp,connection->info->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	connection->current_game->creator->_internal = connection->user->_internal;
 	instruction = netemu_application_create_message();
-	netemu_application_p2p_start_game_add(instruction, addr, addr_size);
+	netemu_application_p2p_start_game_add(instruction, listen_addr, listen_port);
 	/* This instruction will be broadcasted to all, in order for all clients to register that the game has started. */
 	type.collection = connection->_internal->peers;
 	connection->current_game->_internal->ready_count++;
@@ -344,20 +349,24 @@ int netemu_p2p_start_game(struct netemu_p2p_connection *connection, netemu_socka
 	return 1;
 }
 
-int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, netemu_sockaddr* addr, size_t addr_size) {
+int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWORD listen_addr, unsigned short listen_port) {
 	struct netemu_receiver_udp *receiver;
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
-
+	netemu_sockaddr_in addr;
 	/*We can't join a game if a game is not created and started first, and you are not the owner of the game.*/
 	if(connection->current_game == NULL || (_netemu_p2p_user_compare(connection->current_game->creator, connection->user)) == -1)
 		return -1;
 
-	receiver = netemu_receiver_udp_new(addr,addr_size);
-	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_tcp, connection->info->_internal->receive_buffer);
+	addr.sin_addr.s_addr = listen_addr;
+	addr.sin_family = NETEMU_AF_INET;
+	addr.sin_port = listen_port;
+
+	receiver = netemu_receiver_udp_new((netemu_sockaddr*)&addr,sizeof(addr));
+	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_udp, connection->info->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	instruction = netemu_application_create_message();
-	netemu_application_p2p_player_ready_add(instruction, addr, addr_size);
+	netemu_application_p2p_player_ready_add(instruction, listen_addr, listen_port);
 	connection->current_game->_internal->ready_count++;
 	if(connection->current_game->_internal->ready_count >= connection->current_game->user_count) {
 		connection->current_game->started = 1;
@@ -501,6 +510,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_packet_buffer* buffer, str
 	game = (struct p2p_start_game*)item->instruction->body;
 	addr = (netemu_sockaddr*) netemu_util_create_addr(game->addr,game->port,&size);
 	sender = netemu_sender_udp_new(addr, size);
+	netemu_sender_collection_add_udp_sender(connection->current_game->_internal->udp_collection, sender);
 	connection->current_game->_internal->ready_count++;
 
 
@@ -510,7 +520,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_packet_buffer* buffer, str
 			((struct p2p_callback*)connection->_internal->all_ready_callbacks->elements[i])->fn.allReadyFn(connection, connection->current_game);
 		}
 	}
-	netemu_sender_collection_add_udp_sender(connection->current_game->_internal->udp_collection, sender);
+
 	for(i = 0; i < connection->current_game->user_count-1; i++) {
 		if(connection->current_game->players[i].addr == game->addr && connection->current_game->creator->port == game->port) {
 			if(_netemu_p2p_addr_compare(connection->current_game->players[i].addr, game->addr) == 0) {

@@ -31,7 +31,6 @@ void server_connect(netemu_sockaddr_in addr);
 void game_created(struct game* game);
 void host_p2p(netemu_sockaddr_in addr);
 void connect_p2p();
-
 int main() {
 	netemu_sockaddr_in addr;
 	char choice;
