@@ -20,6 +20,7 @@ void _netemu_respond_to_player_joined(struct netemu_packet_buffer* buffer, struc
 void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
 void _netemu_respond_to_player_list(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
 void _netemu_respond_to_game_status_update(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
+void _netemu_respond_to_chat(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg);
 
 #ifdef	__cplusplus
 }

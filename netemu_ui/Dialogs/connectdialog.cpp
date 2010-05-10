@@ -1,5 +1,6 @@
 #include "connectdialog.h"
 
+#define DEFAULT_PORT	27888
 //#include "netemu_p2p.h"
 
 ConnectDialog::ConnectDialog(QWidget *parent, QString serverName, QString address, HostType type, QString userName)
@@ -66,16 +67,25 @@ bool ConnectDialog::Connect()
 	netemu_sockaddr_in addr;
 
 	QStringList stringList = this->address.split(':', QString::SkipEmptyParts);
-	if(stringList.length() != 2) {
+	if(stringList.length() > 2)
+	{
 		qDebug("Error in address format. Address contained more than 1 colon.");
 		qDebug(this->address.toLatin1().data());
 		return false;
+	}
+	else if(stringList.length() == 1)
+	{
+		/* No port supplied, use default */
+		port = DEFAULT_PORT;
+	}
+	else
+	{
+		port = (short)stringList.value(1).toInt(&portConversionSuccess, 10);
 	}
 
 	addressBytes = stringList.value(0).toLatin1();
 	usernameBytes = this->userName.toLatin1();
 	address = addressBytes.data();
-	port = (short)stringList.value(1).toInt(&portConversionSuccess, 10);
 	addr.sin_addr.s_addr = netemu_inet_addr(address);
 	addr.sin_port = netemu_htons(port);
 	addr.sin_family = NETEMU_AF_INET;

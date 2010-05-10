@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "Dialogs/connectdialog.h"
+#include "Dialogs/serverdialog.h"
 #include <QtGui/QMainWindow>
 #include <QSettings>
 #include "ui_mainwindow.h"
@@ -29,6 +30,7 @@ private slots:
 private:
 	void createActions();
 	void ShowConnectDialog(QString name, QString address, HostType type);
+	ServerDialog *serverDialog;
     Ui::mainwindowClass ui;
     QSettings *settings;
 };

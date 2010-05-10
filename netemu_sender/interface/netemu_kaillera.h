@@ -33,6 +33,7 @@ union callback_fn {
 };
 
 struct callback {
+	void *user_data;
 	short disposable;
 	union callback_fn *fn;
 };
@@ -58,15 +59,15 @@ void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_siz
 
 int netemu_send_chat_message(struct netemu_info *connection, char *message);
 
-int netemu_register_chat_callback(struct netemu_info *connection, chatFn);
+int netemu_register_chat_callback(struct netemu_info *connection, chatFn, void *user_data);
 
 int netemu_unregister_chat_callback(struct netemu_info *connection, chatFn);
 
-int netemu_register_user_join_callback(struct netemu_info *connection, joinFn);
+int netemu_register_user_join_callback(struct netemu_info *connection, joinFn, void *user_data);
 
 int netemu_unregister_user_join_callback(struct netemu_info *connection, joinFn);
 
-int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn);
+int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn, void *user_data);
 
 int netmeu_unregister_user_leave_callback(struct netemu_info *connection, leaveFn);
 
@@ -86,7 +87,7 @@ struct user** netemu_kaillera_get_user_list(struct netemu_info* info, int *count
 
 int netemu_kaillera_send_player_ready(struct netemu_info *connection);
 
-int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn);
+int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn, void *user_data);
 
 int netemu_unregister_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn fn);
 

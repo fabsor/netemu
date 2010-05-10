@@ -98,9 +98,13 @@ void _netemu_respond_to_ping(struct netemu_packet_buffer* buffer, struct netemu_
 void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct user_joined *joined;
 	struct netemu_info* connection;
+	struct netemu_list *callbacks;
+	struct callback *call;
+	int i;
 
 	connection = (struct netemu_info*)arg;
 	joined = (struct user_joined*)item->instruction->body;
+	callbacks = connection->_internal->join_callback;
 
 	/* If signed_in is 0, we have just logged on to the server and
 	 * have to assume that this user_joined instruction refers to our local player */
@@ -110,6 +114,12 @@ void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct ne
 	}
 
 	netemu_kaillera_add_user(connection, joined->id, joined->connection, item->instruction->user);
+
+	for(i = 0; i < callbacks->count; i++)
+	{
+		call = netemu_list_get(callbacks, i);
+		call->fn->join_fn(item->instruction->user, joined->ping, joined->id, call->user_data);
+	}
 
 }
 
@@ -163,6 +173,7 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	struct buffered_play_values* values;
 	struct netemu_list *callbacks;
 	int i;
+	struct callback *call;
 
 	connection = (struct netemu_info*)arg;
 	callbacks = connection->_internal->play_values_callback;
@@ -174,20 +185,23 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
 	for(i = 0; i < callbacks->count; i++) {
-		((struct callback*)callbacks->elements[i])->fn->values_received_fn(values);
+		call = (struct callback*)callbacks->elements[i];
+		call->fn->values_received_fn(values, call->user_data);
 	}
 }
 
 void _netemu_respond_to_chat(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct netemu_info* connection;
-	struct chat *chat;
-	union callback_fn* fn;
+	char *chat;
+	struct callback *call;
 	int i;
 	connection = (struct netemu_info*)arg;
-	chat = (struct chat*)item->instruction->body;
+	/* TODO: Apparently, the body here does not point to a struct chat as it should, but rather directly to the chat message. */
+	chat = (char*)item->instruction->body;
 	for(i = 0; i< connection->_internal->chat_callback->count; i++) {
-		fn = (union callback_fn*)connection->_internal->chat_callback->elements[i];
-		fn->chat_fn(item->instruction->user,chat->message);
+
+		call = (struct callback*)netemu_list_get(connection->_internal->chat_callback, i);
+		call->fn->chat_fn(item->instruction->user, chat, call->user_data);
 	}
 }
 
