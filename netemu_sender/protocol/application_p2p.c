@@ -498,7 +498,8 @@ void netemu_application_p2p_user_join_pack(struct application_instruction *instr
 void netemu_application_p2p_user_join_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_user *user;
 	user = malloc(sizeof(struct p2p_user));
-	instruction->body_size = _netemu_application_p2p_parse_user(buffer,user,0);
+	instruction->body_size = _netemu_application_p2p_parse_user(buffer,user,1);
+	instruction->packBodyFn = netemu_application_p2p_user_join_pack;
 	instruction->body = user;
 }
 

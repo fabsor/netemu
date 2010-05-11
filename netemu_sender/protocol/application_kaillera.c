@@ -370,12 +370,12 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 	play_values = (struct buffered_play_values*)instruction->body;
 	memcpy(buffer, &play_values->size, sizeof(NETEMU_WORD));
 	buffer += sizeof(NETEMU_WORD);
-	memcpy(buffer, &play_values->values, play_values->size);
+	memcpy(buffer, play_values->values, play_values->size);
 }
 
 void netemu_application_free_message(struct application_instruction* message) {
 	/* TODO: Var inte detta ändrat redan? Så att vi inte frigör hela bodyn här, utan använder specifika free-metoder
-	 * beroende på body-typ. */
+	 * beroende på body-typ. Håll käften, jag gör vad jag vill! =) */
 	free(message->body);
 	free(message->user);
 	free(message);
