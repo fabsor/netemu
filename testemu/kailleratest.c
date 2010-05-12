@@ -21,6 +21,8 @@ netemu_event game_creator_event;
 void run_kaillera_game_creator_test() {
 	struct netemu_kaillera *info;
 	struct game* game;
+	int i;
+	char *data;
 	game_creator_event = netemu_thread_event_create();
 	printf("Trying to connect to server...");
 	info = netemu_kaillera_create(PLAYERNAME, EMUNAME, 1);
@@ -42,25 +44,19 @@ void run_kaillera_game_creator_test() {
 	printf("OK!\n Sending player ready...");
 	netemu_kaillera_send_player_ready(info);
 	printf("OK!\n We're ready for action!");
-	netemu_kaillera_send_play_values(info, strlen(VALUE)+1, VALUE);
-	while(kaillera_creator_test != 1);
+	data = malloc(512);
+	for (i = 0; i < 100; i++) {
+		data = VALUE;
+		netemu_kaillera_send_play_values(info, strlen(VALUE)+1, data);
+
+	}
 
 }
 
 void register_kaillera_game_creator_callbacks(struct netemu_kaillera *info) {
-	netemu_register_play_values_received_callback(info, kaillera_game_creator_values_received, NULL);
+	//netemu_register_play_values_received_callback(info, kaillera_game_creator_values_received, NULL);
 	netemu_register_user_join_callback(info, kaillera_game_creator_user_joined, NULL);
 	netemu_register_game_status_updated_callback(info, kaillera_game_creator_game_status, NULL);
-}
-
-void kaillera_game_creator_values_received(struct netemu_kaillera *info, struct buffered_play_values *result, void *user_data) {
-	if(n < 100) {
-		netemu_kaillera_send_play_values(info, strlen(VALUE)+1, VALUE);
-		n++;
-	}
-	else {
-		kaillera_creator_test = 1;
-	}
 }
 
 void kaillera_game_creator_user_joined(struct netemu_kaillera *info, char *user, NETEMU_DWORD ping, char connection, void *user_data) {

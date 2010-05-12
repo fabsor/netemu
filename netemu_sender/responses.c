@@ -102,6 +102,17 @@ void _netemu_respond_to_ping(struct netemu_packet_buffer* buffer, struct netemu_
 	netemu_sender_buffer_add(connection->_internal->send_buffer,pong,UDP_CONNECTION,type);
 }
 
+void _netemu_respond_to_game_started(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
+	struct application_instruction* pong;
+	struct netemu_kaillera* connection;
+	struct game_start *start;
+
+	connection = (struct netemu_kaillera*)arg;
+	start = item->instruction->body;
+	connection->_internal->time_band = start->time_band;
+	connection->_internal->player_no = start->player_no;
+}
+
 void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
 	struct user_joined *joined;
 	struct netemu_kaillera* connection;

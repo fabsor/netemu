@@ -15,6 +15,7 @@ extern "C" {
 #include "interface/netemu.h"
 #include "netemu_socket.h"
 #include "netlib_util.h"
+#include "netemu_thread.h"
 #include "protocol/application_kaillera.h"
 #include "network/netemu_receiver.h"
 #include "network/netemu_tcp.h"
@@ -39,7 +40,7 @@ struct _netemu_info_internal {
 	int connection_quality; /**< The quality of the connection, which determines how often we will send instuctions. */
 	int values_buffered; /**< The number of values that has been buffered for sending. */
 	int sent_values; /**< values sent since last value was received. */
-	struct buffered_play_values *cached_values; /**< a cache that will contains 255 cached values. */
+	struct buffered_play_values cached_values[256]; /**< a cache that will contain 256 cached values. */
 	short cached_count; /**< The current number of cached values.  */
 	int cache_index; /**< The index in the cache buffer. */
 	int frame_index; /**< The index of the frame to return to the user. */

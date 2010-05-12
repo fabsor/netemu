@@ -314,6 +314,11 @@ void netemu_application_buffered_play_values_parse(struct application_instructio
 	instruction->body = play_values;
 }
 
+void netemu_application_buffered_play_values_copy(struct buffered_play_values *target, struct buffered_play_values *values) {
+	target->size = values->size;
+	memcpy(target->values, values->values, values->size);
+}
+
 void netemu_application_intelligently_cached_play_values_parse(struct application_instruction *instruction, char *data) {
 	struct intelligently_cached_buffered_play_values *cache;
 
