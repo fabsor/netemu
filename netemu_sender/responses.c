@@ -225,12 +225,6 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	connection = (struct netemu_kaillera*)arg;
 	callbacks = connection->_internal->play_values_callback;
 	values = (struct buffered_play_values*)item->instruction->body;
-	connection->_internal->buffered_values->size = values->size;
-	if(connection->_internal->buffered_values->values !=NULL)
-		free(connection->_internal->buffered_values->values);
-	connection->_internal->buffered_values->values = malloc(values->size);
-	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
-
 	for(i = 0; i < callbacks->count; i++) {
 		call = (struct callback*)callbacks->elements[i];
 		call->fn->values_received_fn(connection, values, call->user_data);

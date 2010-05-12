@@ -50,9 +50,21 @@ struct _netemu_info_internal {
 	struct netemu_list *game_status_updated_callbacks;
 	struct netemu_list *users;
 	struct netemu_list *games;
+	struct netemu_list *waiting_values;
+
 	NETEMU_BOOL has_id;
 	short game_create_requested;
-	struct buffered_play_values *buffered_values;
+	char *values_to_send; /**< Contains cached values that should be sent the next time we send something. */
+	int time_band;	/**< Determines how many values we can send before we need to have received a value from the server. */
+	int connection_quality; /**< The quality of the connection, which determines how often we will send instuctions. */
+	int values_buffered; /**< The number of values that has been buffered for sending. */
+	int sent_values; /**< values sent since last value was received. */
+	struct buffered_play_values *cached_values; /**< a cache that will contains 255 cached values. */
+	short cached_count; /**< The current number of cached values.  */
+	int cache_index; /**< The index in the cache buffer. */
+	int frame_index; /**< The index of the frame to return to the user. */
+	netemu_event play_values_event;
+	int player_no;
 	struct netemu_packet_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
 

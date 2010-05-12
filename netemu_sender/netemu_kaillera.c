@@ -98,7 +98,8 @@ void _netemu_kaillera_add_game_struct(struct netemu_kaillera* info, struct game*
 
 int netemu_kaillera_start_game(struct netemu_kaillera *info) {
 	time_t timestamp;
-	struct application_instruction *message;
+	struct application_instruction *message, *reply;
+	struct game_start *start;
 	union netemu_connection_type type;
 	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
@@ -106,12 +107,14 @@ int netemu_kaillera_start_game(struct netemu_kaillera *info) {
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
 	message->important = 1;
-	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, START_GAME,timestamp);
+	reply = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, START_GAME,timestamp);
+	start = reply->body;
+	info->_internal->time_band = start->time_band;
 	return 1;
 }
 
 
-struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name) {
+struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, int conneciton_quality) {
 	struct netemu_kaillera *info;
 
 	info = (struct netemu_kaillera*)malloc(sizeof(struct netemu_kaillera));
@@ -134,8 +137,7 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name) 
 	info->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	info->_internal->game_status_updated_callbacks = netemu_list_new(3, FALSE);
 	info->_internal->send_buffer = netemu_sender_buffer_new(5, 10);
-	info->_internal->buffered_values = malloc(sizeof(struct buffered_play_values));
-	info->_internal->buffered_values->values = NULL;
+	info->_internal->waiting_values = netemu_list_new(10, TRUE);
 	info->_internal->game_create_requested = 1;
 	info->_internal->users = netemu_list_new(10, FALSE);
 	info->_internal->has_id = 0;
@@ -169,7 +171,7 @@ int netemu_kaillera_login(struct netemu_kaillera* info) {
 		return -1;
 	}
 	type.udp_sender = netemu_resources_get_sender();
-	error = netemu_application_login_request_add(message,info->emulator_name,info->username,1);
+	error = netemu_application_login_request_add(message,info->emulator_name,info->username, info->_internal->connection_quality);
 	if(error == -1) {
 		netemu_application_free_message(message);
 		return -1;
@@ -310,20 +312,68 @@ int _netemu_kaillera_game_comparator(const void* item1, const void* item2) {
 	return ((struct game*)item1)->id - ((struct game*)item2)->id;
 }
 
-struct buffered_play_values* netemu_kaillera_get_play_values(struct netemu_kaillera *info) {
-	return info->_internal->buffered_values;
+int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, void* data) {
+	time_t timestamp;
+	int i;
+	struct application_instruction *message, *reply;
+	struct buffered_play_values *values;
+	union netemu_connection_type type;
+	NETEMU_BOOL is_cached;
+
+	is_cached = FALSE;
+
+	memcpy(info->_internal->values_to_send + (info->_internal->frame_index * size), data, size);
+	info->_internal->frame_index++;
+
+	if(info->_internal->cached_count != 0) {
+		values = &info->_internal->cached_values[info->_internal->cache_index];
+		memcpy(data, values->values + (values->size*info->_internal->frame_index), size * info->current_game->player_count);
+	}
+	info->_internal->values_buffered++;
+
+	if(info->_internal->values_buffered == info->_internal->connection_quality && info->_internal->sent_values > info->_internal->time_band) {
+		type.udp_sender = netemu_resources_get_sender();
+		message = netemu_application_create_message();
+
+		for(i = 0; i < info->_internal->cached_count; i++) {
+			if(_netemu_kaillera_buffered_values_cmp(info->_internal->send_buffer,info->_internal->cached_values[i],
+					size, info->current_game->player_count)) {
+				netemu_application_intelligently_cached_play_values_add(message, i);
+				is_cached = TRUE;
+				break;
+			}
+		}
+		if(!is_cached) {
+			netemu_application_buffered_play_values_add(message,size,data);
+		}
+		timestamp = time(NULL);
+		netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+		info->_internal->sent_values++;
+	}
+	else if(info->_internal->sent_values > info->_internal->time_band) {
+		info->_internal->cache_index = netemu_kaillera_receive_play_values(info);
+		info->_internal->frame_index = 0;
+	}
+	return 1;
 }
 
-void netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, void* data) {
-	time_t timestamp;
-	struct application_instruction *message;
-	union netemu_connection_type type;
+int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
+	struct application_instruction *instruction;
+	struct buffered_play_values *values;
+	int index;
+	//instruction = list->elements[0];
+	if(instruction->id == INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES) {
+		return ((struct intelligently_cached_buffered_play_values*)instruction->body)->index;
+	}
 
-	type.udp_sender = netemu_resources_get_sender();
-	message = netemu_application_create_message();
-	netemu_application_buffered_play_values_add(message,size,data);
-	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	values = instruction->body;
+	//info->_internal->cached_values[info->_internal->cached_count] = values;
+	info->_internal->cached_count++;
+	return info->_internal->cached_count-1;
+}
+
+int _netemu_kaillera_buffered_values_cmp(char *playerval, char *cachedval, int size, int player_no) {
+	return memcmp(cachedval+(size*player_no-1), playerval, size);
 }
 
 int netemu_kaillera_send_player_ready(struct netemu_kaillera *info) {

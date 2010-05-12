@@ -57,7 +57,7 @@ struct callback {
 typedef struct server kaillera_server;
 typedef struct existing_game kaillera_existing_game;
 
-struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name);
+struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, int conneciton_quality);
 
 void netemu_kaillera_network_init(netemu_sockaddr_in *addr, int addr_size);
 
@@ -111,7 +111,7 @@ int netemu_register_play_values_received_callback(struct netemu_kaillera *connec
 
 int netemu_unregister_play_values_received_callback(struct netemu_kaillera *connection, valuesReceivedFn fn);
 
-void netemu_kaillera_send_play_values(struct netemu_kaillera* connection, int size, void* data);
+int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, void* data);
 
 int netemu_kaillera_start_game(struct netemu_kaillera *info);
 
