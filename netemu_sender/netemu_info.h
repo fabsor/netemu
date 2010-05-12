@@ -19,26 +19,6 @@ extern "C" {
 #include "network/netemu_receiver.h"
 #include "network/netemu_tcp.h"
 
-struct netemu_p2p_internal {
-	struct netemu_tcp_listener *host;
-	struct netemu_tcp_connection *login_connection;
-	struct netemu_sender_collection *peers;
-	struct netemu_list *login_callbacks;
-	struct netemu_list *play_values_callbacks;
-	struct netemu_list *game_created_callbacks;
-	struct netemu_list *join_callbacks;
-	struct netemu_list *player_joined_callbacks;
-	struct netemu_list *player_ready_callbacks;
-	struct netemu_list *game_started_callbacks;
-	struct netemu_list *all_ready_callbacks;
-	struct netemu_list *users;
-	struct netemu_list *games;
-	struct netemu_packet_buffer *receive_buffer;
-	struct buffered_play_values *buffered_values;
-	struct netemu_sender_buffer *send_buffer;
-	void (*continueFn)(struct netemu_p2p_connection *connection); /**< Function for continuing work after a ready instruction has been added */
-};
-
 struct _netemu_info_internal {
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
@@ -47,11 +27,11 @@ struct _netemu_info_internal {
 	struct netemu_list *game_created_callback;
 	struct netemu_list *play_values_callback;
 	struct netemu_list *player_ready_callback;
+	struct netemu_list *cached_values_callback;
 	struct netemu_list *game_status_updated_callbacks;
 	struct netemu_list *users;
 	struct netemu_list *games;
-	struct netemu_list *waiting_values;
-
+	struct netemu_list *received_play_values;
 	NETEMU_BOOL has_id;
 	short game_create_requested;
 	char *values_to_send; /**< Contains cached values that should be sent the next time we send something. */
@@ -68,6 +48,26 @@ struct _netemu_info_internal {
 	struct netemu_packet_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
 
+};
+
+struct netemu_p2p_internal {
+	struct netemu_tcp_listener *host;
+	struct netemu_tcp_connection *login_connection;
+	struct netemu_sender_collection *peers;
+	struct netemu_list *login_callbacks;
+	struct netemu_list *play_values_callbacks;
+	struct netemu_list *game_created_callbacks;
+	struct netemu_list *join_callbacks;
+	struct netemu_list *player_joined_callbacks;
+	struct netemu_list *player_ready_callbacks;
+	struct netemu_list *game_started_callbacks;
+	struct netemu_list *all_ready_callbacks;
+	struct netemu_list *users;struct netemu_list *game_status_updated_callbacks;
+	struct netemu_list *games;
+	struct netemu_packet_buffer *receive_buffer;
+	struct buffered_play_values *buffered_values;
+	struct netemu_sender_buffer *send_buffer;
+	void (*continueFn)(struct netemu_p2p_connection *connection); /**< Function for continuing work after a ready instruction has been added */
 };
 
 void netemu_udp_connection_receive(char* data, size_t size, struct netemu_receiver_udp* receiver, void* params);

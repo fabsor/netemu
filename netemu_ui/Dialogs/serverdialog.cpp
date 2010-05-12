@@ -43,12 +43,13 @@ void ServerDialog::OnGameListChanged()
 	int gameCount;
 
 	games = netemu_kaillera_get_game_list(this->serverInfo, &gameCount);
+	/*
 	ui.tableGames->setRowCount(gameCount);
-	ui.tableGames->clearContents();
+	ui.tableGames-clearContents();
 
 	for(int i = 0; i < gameCount; i++)
 	{
-		ui.tableGames->setItem(i, 0,
+		ui.tableGames-setItem(i, 0,
 				new QTableWidgetItem(games[i]->name, 0));
 		ui.tableGames->setItem(i, 0,
 				new QTableWidgetItem(games[i]->app_name, 0));
@@ -58,7 +59,7 @@ void ServerDialog::OnGameListChanged()
 						new QTableWidgetItem(QString::number(games[i]->status, 10), 0));
 		ui.tableGames->setItem(i, 0,
 				new QTableWidgetItem(games[i]->users_count, 0));
-	}
+	}*/
 }
 
 

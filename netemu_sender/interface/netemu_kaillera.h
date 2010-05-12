@@ -43,6 +43,7 @@ union callback_fn {
 	kailleraGameCreatedFn game_created_fn;
 	kailleraPlayerJoinFn player_join_fn;
 	valuesReceivedFn values_received_fn;
+	cachedValuesReceivedFn cached_values_received_fn;
 	playerJoinFn player_joined_fn;
 	playerReadyFn playerReadyFn;
 	gameStatusUpdatedFn status_update_fn;
@@ -112,6 +113,8 @@ int netemu_register_play_values_received_callback(struct netemu_kaillera *connec
 int netemu_unregister_play_values_received_callback(struct netemu_kaillera *connection, valuesReceivedFn fn);
 
 int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, void* data);
+
+int netemu_register_cached_values_received_callback(struct netemu_kaillera *connection, cachedValuesReceivedFn fn, void *user_data);
 
 int netemu_kaillera_start_game(struct netemu_kaillera *info);
 

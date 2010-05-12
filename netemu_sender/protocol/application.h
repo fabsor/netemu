@@ -10,6 +10,7 @@
 
 #include "../network/netemu_net.h"
 
+/* Below are the IDs for each instruction as they appear in the original Kaillera protocoll and our modified P2P protocoll */
 
 /*! P2P defines */
 #define CREATE_P2P_GAME		30
@@ -25,7 +26,7 @@
 #define P2P_GAME_START		40
 
 
-/* Kaillera defines */
+/*! Kaillera defines */
 #define USER_LEAVE										0x01
 #define USER_JOINED										0x02
 #define LOGIN_REQUEST									0x03

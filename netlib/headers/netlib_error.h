@@ -121,9 +121,9 @@ extern "C" {
 #define NETEMU_EINVALIDHANDLE		40003
 #define NETEMU_EINVALIDSERVERLIST 	40004
 
-
 int netlib_get_last_error();
 int netlib_get_last_platform_error();
+const char *netlib_get_last_error_string();
 void netlib_set_last_mapped_error(int error);
 void netlib_set_last_error(int error);
 

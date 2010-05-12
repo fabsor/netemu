@@ -34,7 +34,9 @@ void MainWindow::refreshServerList()
 	return_value = kaillera_communication_get_server_list(masterServer.toLatin1().constData(), &servers, &server_count, &games, &game_count);
 	if(return_value != 0)
 	{
-		ui.labelServerRefreshStatus->setText("Could not retrieve master server list. Error: " + QString::number(netlib_get_last_error(), 10));
+		//ui.labelServerRefreshStatus->setText("Could not retrieve master server list. Error: " + QString::number(netlib_get_last_error(), 10));
+		ui.labelServerRefreshStatus->setText("Could not retrieve master server list. Error: " + QString(netlib_get_last_error_string()));
+
 		return;
 	}
 	else

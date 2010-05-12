@@ -51,8 +51,8 @@ int netemu_register_user_join_callback(struct netemu_kaillera *connection, joinF
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->join_fn = callback;
-	netemu_kaillera_register_callback(connection->_internal->join_callback, fn, 0, user_data);
-	return 0;
+
+	return netemu_kaillera_register_callback(connection->_internal->join_callback, fn, 0, user_data);
 }
 
 int netemu_register_game_status_updated_callback(struct netemu_kaillera *connection, gameStatusUpdatedFn callback, void *user_data) {
@@ -101,8 +101,7 @@ int netemu_register_play_values_received_callback(struct netemu_kaillera *connec
 
 	fn->values_received_fn = callback;
 
-	netemu_kaillera_register_callback(connection->_internal->play_values_callback, fn, 0, user_data);
-	return 0;
+	return netemu_kaillera_register_callback(connection->_internal->play_values_callback, fn, 0, user_data);
 }
 
 int netemu_register_player_ready_callback(struct netemu_kaillera *connection, playerReadyFn callback, void *user_data) {
@@ -127,14 +126,42 @@ int netemu_register_player_join_callback(struct netemu_kaillera *connection, pla
 }
 
 
-int server_connection_unregister_play_values_callback(struct netemu_kaillera *connection, joinFn callback) {
+int netemu_unregister_play_values_callback(struct netemu_kaillera *connection, valuesReceivedFn callback) {
 	int error;
 	union callback_fn *fn;
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 	fn->join_fn = callback;
-	error = netemu_list_remove(connection->_internal->join_callback, fn);
+	netemu_list_remove(connection->_internal->play_values_callback, (void*)fn);
+	//error = netemu_list_remove(connection->_internal->play_values_callback, fn);
+	free(fn);
+
+	return error;
+}
+
+int netemu_register_cached_values_received_callback(struct netemu_kaillera *connection, cachedValuesReceivedFn callback, void *user_data) {
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+	fn->cached_values_received_fn = callback;
+
+	return netemu_kaillera_register_callback(connection->_internal->cached_values_callback, fn, 0, user_data);
+}
+
+int netemu_unregister_cached_values_callback(struct netemu_kaillera *connection, cachedValuesReceivedFn callback) {
+	union callback_fn *fn;
+	int error;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	fn->cached_values_received_fn = callback;
+	error = netemu_list_remove(connection->_internal->game_created_callback, fn);
 	free(fn);
 
 	return error;
