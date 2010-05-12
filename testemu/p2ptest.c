@@ -21,7 +21,7 @@ void p2p_player_ready(struct netemu_p2p_connection *connection);
 void host_p2p(netemu_sockaddr_in addr);
 void join_p2p_game(struct netemu_p2p_connection *connection);
 void show_p2p_game_list(struct netemu_p2p_connection* connection);
-void show_p2p_user_list(struct netemu_info* connection);
+void show_p2p_user_list(struct netemu_kaillera* connection);
 void p2p_player_joined_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user);
 
 /* We love the ugly stuff ;) */
@@ -181,7 +181,7 @@ void show_p2p_game_list(struct netemu_p2p_connection* connection) {
 }
 
 
-void show_p2p_user_list(struct netemu_info* connection) {
+void show_p2p_user_list(struct netemu_kaillera* connection) {
 	int no_users, i;
 	struct p2p_user** users;
 	users = netemu_p2p_get_user_list(connection, &no_users);

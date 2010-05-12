@@ -10,7 +10,7 @@ class ServerDialog : public QMainWindow
     Q_OBJECT
 
 public:
-    ServerDialog(QWidget *parent = 0, netemu_info *serverInfo = NULL);
+    ServerDialog(QWidget *parent = 0, netemu_kaillera *serverInfo = NULL);
     ~ServerDialog();
     void ChatCallBack(char *user, char *message);
     void OnUserListChanged();
@@ -21,7 +21,7 @@ private slots:
 
 private:
     Ui::ServerDialogClass ui;
-    netemu_info *serverInfo;
+    netemu_kaillera *serverInfo;
     void InitializeUserList();
     void CreateActions();
 };

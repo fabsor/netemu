@@ -19,7 +19,6 @@ extern "C" {
 typedef struct netemu_p2p_internal* netemu_p2p_internal;
 
 struct netemu_p2p_connection {
-	struct netemu_info* info;
 	struct p2p_user *user;
 	struct p2p_game *current_game;
 	netemu_p2p_internal _internal;

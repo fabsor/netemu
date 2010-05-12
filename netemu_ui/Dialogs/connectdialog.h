@@ -18,7 +18,7 @@ public:
     ConnectDialog(QWidget *parent = 0, QString serverName = QString::null, QString address = QString::null, HostType type = KailleraServer, QString userName = QString::null);
     ~ConnectDialog();
     bool canceled();
-    netemu_info *connectionInfo;
+    netemu_kaillera *connectionInfo;
 
 public slots:
 	int exec();
@@ -34,7 +34,7 @@ private:
     bool isCanceled;
     void createActions();
     bool Connect();
-    void ConnectSuccess(int status, struct netemu_info* server_connection);
+    void ConnectSuccess(int status, struct netemu_kaillera* server_connection);
 };
 
 #endif // WORKINGDIALOG_H
