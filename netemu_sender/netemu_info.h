@@ -25,8 +25,10 @@ struct _netemu_info_internal {
 	struct netemu_list *leave_callback;
 	struct netemu_list *game_created_callback;
 	struct netemu_list *play_values_callback;
+	struct netemu_list *cached_values_callback;
 	struct netemu_list *users;
 	struct netemu_list *games;
+	struct netemu_list *received_play_values;
 	NETEMU_BOOL has_id;
 	short game_create_requested;
 	struct buffered_play_values *buffered_values;

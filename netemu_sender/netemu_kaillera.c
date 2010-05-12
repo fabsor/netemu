@@ -136,6 +136,7 @@ struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct nete
 	info->_internal->game_create_requested = 1;
 	info->_internal->users = netemu_list_new(10, FALSE);
 	info->_internal->has_id = 0;
+	info->_internal->received_play_values = netemu_list_new(3, FALSE);
 	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
 	info->_internal->games = netemu_list_new(10, FALSE);
 	netemu_list_register_sort_fn(info->_internal->games,_netemu_kaillera_game_comparator);
@@ -149,6 +150,7 @@ struct netemu_info *netemu_info_new(char* user, char* emulator_name, struct nete
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer, PLAYER_JOINED, _netemu_respond_to_player_joined, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,CREATE_GAME,_netemu_respond_to_game_created, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,BUFFERED_PLAY_VALUES,_netemu_respond_to_buffered_values, info);
+	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer, INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES, _netemu_respond_to_cached_play_values, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,EXISTING_PLAYERS_LIST,_netemu_respond_to_player_list, info);
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,GAME_STATUS_UPDATE,_netemu_respond_to_game_status_update, info);
 	return info;

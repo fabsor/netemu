@@ -204,6 +204,8 @@ void _netemu_respond_to_buffered_values(struct netemu_packet_buffer* buffer, str
 	connection->_internal->buffered_values->values = malloc(values->size);
 	memcpy(connection->_internal->buffered_values->values, values->values, values->size);
 
+	netemu_list_add(connection->_internal->received_play_values, item->instruction);
+
 	for(i = 0; i < callbacks->count; i++) {
 		call = (struct callback*)callbacks->elements[i];
 		call->fn->values_received_fn(values, call->user_data);
@@ -225,3 +227,18 @@ void _netemu_respond_to_chat(struct netemu_packet_buffer* buffer, struct netemu_
 	}
 }
 
+void _netemu_respond_to_cached_play_values(struct netemu_packet_buffer *buffer, struct netemu_packet_buffer_item *item, void *arg) {
+	struct netemu_info* connection;
+	struct callback *call;
+	struct intelligently_cached_buffered_play_values *cache;
+	int i;
+	connection = (struct netemu_info*)arg;
+
+	netemu_list_add(connection->_internal->received_play_values, item->instruction);
+
+	cache = (struct intelligently_cached_buffered_play_values*)item->instruction->body;
+	for(i = 0; i < connection->_internal->cached_values_callback->count; i++) {
+		call = (struct callback*)netemu_list_get(connection->_internal->cached_values_callback, i);
+		call->fn->cached_values_received_fn(cache, call->user_data);
+	}
+}
