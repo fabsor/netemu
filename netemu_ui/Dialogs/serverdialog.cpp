@@ -6,7 +6,7 @@ void UserJoinCallBackWrapper(char *user, NETEMU_DWORD ping, char connection, voi
 void UserLeaveCallBackWrapper(NETEMU_WORD id, char *user, char *exit_message, void *user_data);
 void GameCreatedCallBackWrapper(struct game *createdGame, void *user_data);
 
-ServerDialog::ServerDialog(QWidget *parent, netemu_info *serverInfo)
+ServerDialog::ServerDialog(QWidget *parent, netemu_kaillera *serverInfo)
     : QMainWindow(parent)
 {
 	ui.setupUi(this);

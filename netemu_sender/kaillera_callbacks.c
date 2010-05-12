@@ -28,7 +28,7 @@ int netemu_kaillera_register_callback(struct netemu_list *list, union callback_f
 //}
 //>>>>>>> a7c1b7ed90953a796ad3d091682b9ee2fc2f19e2:netemu_sender/kaillera_callbacks.c
 
-int netemu_register_chat_callback(struct netemu_info *connection, chatFn callback, void *user_data) {
+int netemu_register_chat_callback(struct netemu_kaillera *connection, chatFn callback, void *user_data) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->chat_fn = callback;
@@ -40,19 +40,26 @@ int netemu_register_chat_callback(struct netemu_info *connection, chatFn callbac
 	return 0;
 }
 
-int netemu_unregister_chat_callback(struct netemu_info *connection, chatFn callback) {
+int netemu_unregister_chat_callback(struct netemu_kaillera *connection, chatFn callback) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->chat_fn = callback;
 	return netemu_list_remove(connection->_internal->chat_callback, fn);
 }
 
-int netemu_register_user_join_callback(struct netemu_info *connection, joinFn callback, void *user_data) {
+int netemu_register_user_join_callback(struct netemu_kaillera *connection, joinFn callback, void *user_data) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->join_fn = callback;
-//<<<<<<< HEAD:netemu_sender/callbacks.c
 	netemu_kaillera_register_callback(connection->_internal->join_callback, fn, 0, user_data);
+	return 0;
+}
+
+int netemu_register_game_status_updated_callback(struct netemu_kaillera *connection, gameStatusUpdatedFn callback, void *user_data) {
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->status_update_fn = callback;
+	netemu_kaillera_register_callback(connection->_internal->game_status_updated_callbacks, fn, 0, user_data);
 	return 0;
 }
 
@@ -71,9 +78,6 @@ int netemu_kaillera_register_callback(struct netemu_list *list, union callback_f
 		free(callback);
 		return -1;
 	}
-//=======
-//	netemu_kaillera_register_callback(connection->_internal->join_callback, fn, 0);
-//>>>>>>> a7c1b7ed90953a796ad3d091682b9ee2fc2f19e2:netemu_sender/kaillera_callbacks.c
 	return 0;
 }
 
@@ -89,22 +93,41 @@ int _server_connection_unregister_callback(struct netemu_list *list, union callb
 
 }
 
-int netemu_register_play_values_received_callback(struct netemu_info *connection, valuesReceivedFn callback, void *user_data) {
+int netemu_register_play_values_received_callback(struct netemu_kaillera *connection, valuesReceivedFn callback, void *user_data) {
 	union callback_fn *fn;
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
 		return -1;
 	}
 
 	fn->values_received_fn = callback;
-//<<<<<<< HEAD:netemu_sender/callbacks.c
+
 	netemu_kaillera_register_callback(connection->_internal->play_values_callback, fn, 0, user_data);
-//=======
-//	netemu_kaillera_register_callback(connection->_internal->play_values_callback, fn, 0);
-//>>>>>>> a7c1b7ed90953a796ad3d091682b9ee2fc2f19e2:netemu_sender/kaillera_callbacks.c
 	return 0;
 }
 
-int server_connection_unregister_play_values_callback(struct netemu_info *connection, joinFn callback) {
+int netemu_register_player_ready_callback(struct netemu_kaillera *connection, playerReadyFn callback, void *user_data) {
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		return -1;
+	}
+
+	fn->playerReadyFn = callback;
+	netemu_kaillera_register_callback(connection->_internal->player_ready_callback, fn, 0, user_data);
+	return 0;
+}
+
+int netemu_register_player_join_callback(struct netemu_kaillera *connection, playerJoinFn callback, void *user_data) {
+	union callback_fn *fn;
+	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
+		return -1;
+	}
+	fn->player_join_fn = callback;
+	netemu_kaillera_register_callback(connection->_internal->player_join_callback, fn, 0, user_data);
+	return 0;
+}
+
+
+int server_connection_unregister_play_values_callback(struct netemu_kaillera *connection, joinFn callback) {
 	int error;
 	union callback_fn *fn;
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
@@ -117,15 +140,15 @@ int server_connection_unregister_play_values_callback(struct netemu_info *connec
 	return error;
 }
 
-
-int netemu_unregister_user_join_callback(struct netemu_info *connection, joinFn callback) {
+int netemu_unregister_user_join_callback(struct netemu_kaillera *connection, joinFn callback) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
-	fn->join_fn = callback;
 	return _server_connection_unregister_callback(connection->_internal->join_callback, fn);
 }
 
-int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn callback, void *user_data) {
+
+
+int netemu_register_user_leave_callback(struct netemu_kaillera *connection, leaveFn callback, void *user_data) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->leave_fn = callback;
@@ -138,14 +161,14 @@ int netemu_register_user_leave_callback(struct netemu_info *connection, leaveFn 
 }
 
 
-int netmeu_unregister_user_leave_callback(struct netemu_info *connection, leaveFn callback) {
+int netmeu_unregister_user_leave_callback(struct netemu_kaillera *connection, leaveFn callback) {
 	union callback_fn *fn;
 	fn = malloc(sizeof(union callback_fn));
 	fn->leave_fn = callback;
 	return netemu_list_remove(connection->_internal->leave_callback, fn);
 }
 
-int netemu_register_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn callback, void *user_data) {
+int netemu_register_game_created_callback(struct netemu_kaillera *connection, kailleraGameCreatedFn callback, void *user_data) {
 	union callback_fn *fn;
 	int error;
 	if((fn = malloc(sizeof(union callback_fn))) == NULL) {
@@ -164,7 +187,7 @@ int netemu_register_game_created_callback(struct netemu_info *connection, kaille
 	return 0;
 }
 
-int netemu_unregister_game_created_callback(struct netemu_info *connection, kailleraGameCreatedFn callback) {
+int netemu_unregister_game_created_callback(struct netemu_kaillera *connection, kailleraGameCreatedFn callback) {
 	union callback_fn *fn;
 	int error;
 

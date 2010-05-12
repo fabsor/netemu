@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'serverdialog.ui'
 **
-** Created: Sun May 9 21:13:49 2010
+** Created: Wed May 12 12:28:43 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -49,7 +49,7 @@ public:
     QPushButton *buttonSendChat;
     QGroupBox *groupGames;
     QVBoxLayout *verticalLayout_2;
-    QTableWidget *tableUsers_2;
+    QTableWidget *tableGames;
     QHBoxLayout *horizontalLayout_3;
     QSpacerItem *horizontalSpacer;
     QPushButton *buttonJoinGame;
@@ -137,26 +137,26 @@ public:
         groupGames->setObjectName(QString::fromUtf8("groupGames"));
         verticalLayout_2 = new QVBoxLayout(groupGames);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        tableUsers_2 = new QTableWidget(groupGames);
-        if (tableUsers_2->columnCount() < 5)
-            tableUsers_2->setColumnCount(5);
+        tableGames = new QTableWidget(groupGames);
+        if (tableGames->columnCount() < 5)
+            tableGames->setColumnCount(5);
         QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
         __qtablewidgetitem3->setFont(font);
-        tableUsers_2->setHorizontalHeaderItem(0, __qtablewidgetitem3);
+        tableGames->setHorizontalHeaderItem(0, __qtablewidgetitem3);
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        tableUsers_2->setHorizontalHeaderItem(1, __qtablewidgetitem4);
+        tableGames->setHorizontalHeaderItem(1, __qtablewidgetitem4);
         QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
-        tableUsers_2->setHorizontalHeaderItem(2, __qtablewidgetitem5);
+        tableGames->setHorizontalHeaderItem(2, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
-        tableUsers_2->setHorizontalHeaderItem(3, __qtablewidgetitem6);
+        tableGames->setHorizontalHeaderItem(3, __qtablewidgetitem6);
         QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
-        tableUsers_2->setHorizontalHeaderItem(4, __qtablewidgetitem7);
-        tableUsers_2->setObjectName(QString::fromUtf8("tableUsers_2"));
-        tableUsers_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        tableUsers_2->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableUsers_2->verticalHeader()->setVisible(false);
+        tableGames->setHorizontalHeaderItem(4, __qtablewidgetitem7);
+        tableGames->setObjectName(QString::fromUtf8("tableGames"));
+        tableGames->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableGames->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableGames->verticalHeader()->setVisible(false);
 
-        verticalLayout_2->addWidget(tableUsers_2);
+        verticalLayout_2->addWidget(tableGames);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
@@ -182,9 +182,6 @@ public:
         verticalLayout_3->addWidget(groupGames);
 
         ServerDialogClass->setCentralWidget(centralwidget);
-        groupPartyLine->raise();
-        groupGames->raise();
-        tableUsers_2->raise();
         menubar = new QMenuBar(ServerDialogClass);
         menubar->setObjectName(QString::fromUtf8("menubar"));
         menubar->setGeometry(QRect(0, 0, 800, 25));
@@ -226,15 +223,15 @@ public:
         ___qtablewidgetitem2->setText(QApplication::translate("ServerDialogClass", "Status", 0, QApplication::UnicodeUTF8));
         buttonSendChat->setText(QApplication::translate("ServerDialogClass", "Send chat", 0, QApplication::UnicodeUTF8));
         groupGames->setTitle(QApplication::translate("ServerDialogClass", "Games", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem3 = tableUsers_2->horizontalHeaderItem(0);
+        QTableWidgetItem *___qtablewidgetitem3 = tableGames->horizontalHeaderItem(0);
         ___qtablewidgetitem3->setText(QApplication::translate("ServerDialogClass", "Game", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem4 = tableUsers_2->horizontalHeaderItem(1);
+        QTableWidgetItem *___qtablewidgetitem4 = tableGames->horizontalHeaderItem(1);
         ___qtablewidgetitem4->setText(QApplication::translate("ServerDialogClass", "Version", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem5 = tableUsers_2->horizontalHeaderItem(2);
+        QTableWidgetItem *___qtablewidgetitem5 = tableGames->horizontalHeaderItem(2);
         ___qtablewidgetitem5->setText(QApplication::translate("ServerDialogClass", "Owner", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem6 = tableUsers_2->horizontalHeaderItem(3);
+        QTableWidgetItem *___qtablewidgetitem6 = tableGames->horizontalHeaderItem(3);
         ___qtablewidgetitem6->setText(QApplication::translate("ServerDialogClass", "Status", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem7 = tableUsers_2->horizontalHeaderItem(4);
+        QTableWidgetItem *___qtablewidgetitem7 = tableGames->horizontalHeaderItem(4);
         ___qtablewidgetitem7->setText(QApplication::translate("ServerDialogClass", "# Users", 0, QApplication::UnicodeUTF8));
         buttonJoinGame->setText(QApplication::translate("ServerDialogClass", "Join game", 0, QApplication::UnicodeUTF8));
         buttonCreateGame->setText(QApplication::translate("ServerDialogClass", "Create Game", 0, QApplication::UnicodeUTF8));

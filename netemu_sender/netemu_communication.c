@@ -30,7 +30,7 @@ struct communication_callback {
 	int async;
 	int port;
 	netemu_sockaddr_in *addr;
-	void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg);
+	void (*ConnectionReceivedFn)(int status, struct netemu_kaillera*, void *arg);
 	char* emulatorname;
 	char* username;
 	void *arg;
@@ -79,21 +79,17 @@ int kaillera_communication_get_server_list(const char *address, struct server **
 	return 0;
 }
 
-struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int addr_size, char* emulatorname, char* username) {
+struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connection, NETEMU_DWORD local_address, unsigned short local_port, NETEMU_DWORD server_address, unsigned short server_port) {
 	struct netemu_client *client;
-	struct netemu_info *connection;
 	char* hello;
 	struct communication_callback callback;
-	struct netemu_sender_buffer *buffer;
-	union netemu_connection_type *type;
 	netemu_sockaddr_in in_addr;
 	callback.port = -1;
 	callback.async = -1;
 	client = netemu_resources_get_client();
 
-	/* TODO: This can't be hardcoded, it should rather be passed into the function. */
-	in_addr.sin_addr.s_addr = netemu_inet_addr("127.0.0.1");
-	in_addr.sin_port = netemu_htons(35000);
+	in_addr.sin_addr.s_addr = local_address;
+	in_addr.sin_port = local_port;
 	in_addr.sin_family = NETEMU_AF_INET;
 
 	if(client == NULL)
@@ -103,7 +99,12 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	if(client->receiver == NULL)
 		return NULL;
 	netemu_receiver_udp_start_receiving(client->receiver, kaillera_communication_listener, &callback);
-	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, addr, addr_size);
+
+	in_addr.sin_addr.s_addr = server_address;
+	in_addr.sin_port = server_port;
+	in_addr.sin_family = NETEMU_AF_INET;
+
+	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, &in_addr, sizeof(in_addr));
 	if(client->sender == NULL)
 		return NULL;
 	/* TODO: Free the receiver and sender incase of errors. Need new functions for this. */
@@ -115,18 +116,15 @@ struct netemu_info* kaillera_communication_connect(netemu_sockaddr_in *addr, int
 	free(hello);
 	while(callback.port == -1);
 	netemu_receiver_udp_stop_receiving(client->receiver);
-	addr->sin_port = netemu_htons(callback.port);
-	client->sender->addr = (struct sockaddr*)addr;
-	type = malloc(sizeof(union netemu_connection_type));
-	type->udp_sender = client->sender;
-	buffer = netemu_sender_buffer_new(5,10);
-	connection = netemu_info_new(username,emulatorname,buffer);
+	in_addr.sin_port = netemu_htons(callback.port);
+	client->sender->addr = netemu_util_copy_addr((netemu_sockaddr*)&in_addr,sizeof(in_addr));
+
 	netemu_receiver_udp_start_receiving(client->receiver, netemu_application_parse_udp, connection->_internal->receive_buffer);
 	netemu_kaillera_login(connection);
 	return connection;
 }
 
-void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_info*, void *arg), void *arg) {
+void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_kaillera*, void *arg), void *arg) {
 	struct netemu_client *client;
 	char* hello;
 	struct communication_callback *callback;
@@ -162,7 +160,7 @@ void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_siz
 
 void _kaillera_communication_login(struct communication_callback *callback) {
 	struct netemu_client *client;
-	struct netemu_info* connection;
+	struct netemu_kaillera* connection;
 	client = netemu_resources_get_client();
 	callback->addr = netemu_htons(callback->port);
 	client->sender->addr = (netemu_sockaddr*)callback->addr;

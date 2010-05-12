@@ -22,7 +22,7 @@ ConnectDialog::ConnectDialog(QWidget *parent, QString serverName, QString addres
 	//ui.labelConnecting->setText("Connecting to " + (type == KailleraServer ? "server " : "cloud ") + name);
 }
 
-void ConnectResponse(int status, struct netemu_info* server_connection, void *arg) {
+void ConnectResponse(int status, struct netemu_kaillera* server_connection, void *arg) {
 	ConnectDialog* dialog = (ConnectDialog*)arg;
 	if(dialog != NULL && !dialog->canceled()) {
 		dialog->accept();
@@ -94,7 +94,7 @@ bool ConnectDialog::Connect()
 		/* TODO: Figure out why connect_async wont work. netemu_util_prepare_receiver errors on the first malloc for some reason */
 		/*kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", this->userName.toLatin1().data(), ConnectResponse, this);*/
 
-		this->connectionInfo = kaillera_communication_connect(&addr, sizeof(addr), "W00t", usernameBytes.data());
+		this->connectionInfo = netemu_kaillera_connect(&addr, sizeof(addr), "W00t", usernameBytes.data());
 		if(this->connectionInfo == NULL) {
 			qDebug("Connection error");
 			return false;
@@ -104,7 +104,7 @@ bool ConnectDialog::Connect()
 	return false;
 }
 
-void ConnectDialog::ConnectSuccess(int status, struct netemu_info* server_connection)
+void ConnectDialog::ConnectSuccess(int status, struct netemu_kaillera* server_connection)
 {
 
 }
