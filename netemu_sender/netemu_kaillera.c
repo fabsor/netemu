@@ -349,7 +349,7 @@ int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, voi
 
 	if(info->_internal->values_buffered == info->_internal->connection_quality) {
 
-		if(info->_internal->sent_values > info->_internal->time_band) {
+		if(info->_internal->sent_values == info->_internal->time_band) {
 				info->_internal->cache_index = netemu_kaillera_receive_play_values(info);
 				info->_internal->frame_index = 0;
 				info->_internal->sent_values = 0;

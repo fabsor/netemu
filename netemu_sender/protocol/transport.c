@@ -37,7 +37,7 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 	memcpy(buffer,(void *)&count,sizeof(char));
 	pos = sizeof(char);
 	for (i = 0; i < count; i++) {
-		index = current_index+i;
+		index = current_index-i;
 		memcpy((void *)(buffer+pos),(void *)&index, sizeof(NETEMU_WORD));
 		pos += sizeof(NETEMU_WORD);
 		instruction_size = messages[i]->body_size + wrapper_size;
@@ -53,7 +53,7 @@ struct transport_packet_buffer netemu_transport_pack(struct application_instruct
 		}
 		
 	}
-	current_index += count;
+	current_index++;;
 	packet_buffer.data = buffer;
 	packet_buffer.size = total_size;
 	return packet_buffer;

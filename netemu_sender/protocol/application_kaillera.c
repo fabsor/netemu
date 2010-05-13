@@ -304,19 +304,16 @@ void netemu_application_buffered_play_values_parse(struct application_instructio
 	struct buffered_play_values *play_values;
 
 	play_values = malloc(sizeof(struct buffered_play_values));
-
 	play_values->size = *((NETEMU_WORD*)data);
 	data += sizeof(NETEMU_WORD);
-
 	play_values->values = malloc(play_values->size);
 	memcpy(play_values->values, data, play_values->size);
-
 	instruction->body = play_values;
 }
 
 void netemu_application_buffered_play_values_copy(struct buffered_play_values *target, struct buffered_play_values *values) {
 	target->size = values->size;
-	memcpy(target->values, values->values, values->size);
+	target->values = values->values;
 }
 
 void netemu_application_intelligently_cached_play_values_parse(struct application_instruction *instruction, char *data) {
