@@ -24,23 +24,46 @@ int netemu_init_network() {
 
 /* Creates a new NETEMU_SOCKET. */
 NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
-    return socket(address_family,socket_type,0);
+	int error;
 
+    error = socket(address_family,socket_type,0);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 /* Binds a given NETEMU_SOCKET to an address. */
 int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
-    return bind(socket,address,address_len);
+	int error;
+
+    error = bind(socket,address,address_len);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 /* Places a socket in a state where it listens for incoming connection attempts. */
 int netemu_listen(NETEMU_SOCKET socket, int backlog) {
-    return listen(socket,backlog);
+	int error;
+
+    error = listen(socket,backlog);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 /* Accepts a connection attempt made on the listening socket. */
 NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, socklen_t *address_len) {
-    return accept(socket,address,address_len);
+	int error;
+
+    error = accept(socket,address,address_len);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 /* We have to use this ugly function until we can decide to remove netemu_prepare_addr.*/
@@ -67,7 +90,7 @@ int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
     int error;
 	error = send(socket,buffer,len,flags);
 	if(error == -1) {
-		netlib_set_last_error(error);
+		netlib_set_last_error(errno);
 	}
 	return error;
 }
@@ -77,7 +100,7 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
     int error;
 	error = sendto(socket,buffer,len,flags,dest_address,address_len);
 	if(error == -1) {
-		netlib_set_last_error(error);
+		netlib_set_last_error(errno);
 	}
 	return error;
 }
@@ -89,26 +112,45 @@ int netemu_set_blocking(NETEMU_SOCKET socket, int blocking) {
 
 /* Receives data on a connected socket. */
 int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
-    return recv(socket,buffer,len,flags);
+	int error;
+
+    error = recv(socket,buffer,len,flags);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 /* Received a datagram and stores the sender address */
 int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len) {
-    return recvfrom(socket,buffer,len,flags,address,address_len);
+	int error;
+
+    error = recvfrom(socket,buffer,len,flags,address,address_len);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 /* Disables send or receive on a socket. */
 int netemu_shutdown(NETEMU_SOCKET socket, int how) {
-    return shutdown(socket,how);
+	int error;
+
+    error = shutdown(socket,how);
+    if(error == -1) {
+    	netlib_set_last_error(errno);
+    }
+    return error;
 }
 
 int netemu_closesocket(NETEMU_SOCKET socket) {
-	return close(socket);
-}
+	int error;
 
-/* Returns the error code for the last error that occured */
-int netemu_get_last_error() {
-  return errno;
+	error = close(socket);
+	if(error == -1) {
+		netlib_set_last_error(errno);
+	}
+	return error;
 }
 
 int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
@@ -164,7 +206,13 @@ unsigned long netemu_inet_addr(char* addr) {
 
 
 int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
-	return connect(socket,address,address_len);
+	int error;
+
+	error = connect(socket,address,address_len);
+	if(error == -1) {
+		netlib_set_last_error(errno);
+	}
+	return error;
 }
 
 
