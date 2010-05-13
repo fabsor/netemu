@@ -398,24 +398,30 @@ int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
 		}
 	}
 
-	if(info->_internal->cached_count == 255) {
+	if(info->_internal->cached_count == 256) {
+		for(i = 0; i < 255; i++) {
+			info->_internal->cached_values[i] = info->_internal->cached_values[i+1];
+		}
 		netemu_application_buffered_play_values_copy(&info->_internal->cached_values[255], values);
-		memcpy(info->_internal->cached_values, info->_internal->cached_values+sizeof(struct buffered_play_values), 255*sizeof(struct buffered_play_values));
 	}
 	else {
 		netemu_application_buffered_play_values_copy(&info->_internal->cached_values[info->_internal->cached_count], values);
 		info->_internal->cached_count++;
 	}
-
-
 	return info->_internal->cached_count-1;
 }
 
 int _netemu_kaillera_buffered_values_cmp(char *playerval, char *cachedval, int size, int player_no) {
+	if(cachedval == NULL) {
+		return 1;
+	}
 	return memcmp(cachedval+(size*player_no-1), playerval, size);
 }
 
 int _netemu_kaillera_buffered_values_cmp_all(char *playerval, char *cachedval, int size) {
+	if(cachedval == NULL) {
+		return 1;
+	}
 	return memcmp(cachedval, playerval, size);
 }
 
