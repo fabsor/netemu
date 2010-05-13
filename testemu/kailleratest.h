@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 void run_kaillera_game_creator_test();
+void run_kaillera_game_joiner_test();
 
 
 

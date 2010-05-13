@@ -227,3 +227,10 @@ int netemu_unregister_game_created_callback(struct netemu_kaillera *connection, 
 	free(fn);
 	return error;
 }
+
+int netemu_register_game_started_callback(struct netemu_kaillera *connection, gameStartedFn callback, void *user_data) {
+	union callback_fn *fn;
+	fn = malloc(sizeof(union callback_fn));
+	fn->game_started_fn = callback;
+	return netemu_kaillera_register_callback(connection->_internal->game_started_callbacks, fn, 0, user_data);
+}

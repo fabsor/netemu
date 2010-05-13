@@ -502,7 +502,7 @@ void netemu_application_create_game_add(struct application_instruction *instruct
 void netemu_application_join_game_add(struct application_instruction *instruction, NETEMU_DWORD game_id, char connection) {
 	struct player_joined *join;
 	int size;
-	join = malloc(sizeof(struct user_joined));
+	join = malloc(sizeof(struct player_joined));
 	join->user_id = 0xFFFF;
 	join->game_id = game_id;
 	join->ping = 0;

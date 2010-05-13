@@ -30,6 +30,7 @@ struct _netemu_info_internal {
 	struct netemu_list *player_ready_callback;
 	struct netemu_list *cached_values_callback;
 	struct netemu_list *game_status_updated_callbacks;
+	struct netemu_list *game_started_callbacks;
 	struct netemu_list *users;
 	struct netemu_list *games;
 	struct netemu_list *received_play_values;

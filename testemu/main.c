@@ -31,46 +31,69 @@ void server_connect(netemu_sockaddr_in addr);
 void game_created(struct game* game);
 void host_p2p(netemu_sockaddr_in addr);
 void connect_p2p();
-int main() {
+int main(int argc, char *argv[]) {
 	netemu_sockaddr_in addr;
+	int i;
+	NETEMU_BOOL kaillera = FALSE;
+	NETEMU_BOOL p2p = FALSE;
 	char choice;
 	info = NULL;
-	addr.sin_addr.s_addr = ADDR;
-	addr.sin_port = PORT;
-	addr.sin_family = NETEMU_AF_INET;
-	netemu_init_network();
-	//info = netemu_client_new(EMUNAME,games);
-	//kaillera_communication_get_server_list(&servers, &games);
-	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
-	printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n5. Connect p2p async\n6. Run p2p host test\n7. Run p2p join test");
-	choice = getchar();
-	switch(choice) {
-		case '1':
-			connect_async(addr);
-		break;
-		case '2':
-			server_connect(addr);
-		break;
-		case '3':
-			connect_p2p();
-		break;
-		case '4':
-			host_p2p(addr);
-		case '5':
-			connect_p2p_async(addr);
-			break;
-		case '6':
-			run_p2p_host_test();
-			break;
-		case '7':
-			run_p2p_join_test();
-			break;
-		case '8':
-			run_kaillera_game_creator_test();
-		break;
+
+	for(i = 0; i < argc; i++) {
+		if(strcmp(argv[i],"kaillera") == 0) {
+			kaillera = TRUE;
+		}
+		if(kaillera) {
+				if(strcmp(argv[i],"joiner") == 0) {
+					run_kaillera_game_joiner_test();
+				}
+				if(strcmp(argv[i],"creator") == 0) {
+					run_kaillera_game_creator_test();
+				}
+			}
 	}
 
+	if(!kaillera) {
+		addr.sin_addr.s_addr = ADDR;
+		addr.sin_port = PORT;
+		addr.sin_family = NETEMU_AF_INET;
+		netemu_init_network();
+		//info = netemu_client_new(EMUNAME,games);
+		//kaillera_communication_get_server_list(&servers, &games);
+		//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+
+		printf("1. Connect Async\n2. Connect\n3. Connect p2p\n4. host p2p cloud\n5. Connect p2p async\n6. Run p2p host test\n7. Run p2p join test");
+		choice = getchar();
+		switch(choice) {
+			case '1':
+				connect_async(addr);
+			break;
+			case '2':
+				server_connect(addr);
+			break;
+			case '3':
+				connect_p2p();
+			break;
+			case '4':
+				host_p2p(addr);
+			case '5':
+				connect_p2p_async(addr);
+				break;
+			case '6':
+				run_p2p_host_test();
+				break;
+			case '7':
+				run_p2p_join_test();
+				break;
+			case '8':
+				run_kaillera_game_creator_test();
+			break;
+			case '9':
+				run_kaillera_game_joiner_test();
+			break;
+		}
+	}
 	//muntrace();
 	return 0;
 }

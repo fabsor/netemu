@@ -103,14 +103,19 @@ void _netemu_respond_to_ping(struct netemu_packet_buffer* buffer, struct netemu_
 }
 
 void _netemu_respond_to_game_started(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {
-	struct application_instruction* pong;
+	int i;
 	struct netemu_kaillera* connection;
 	struct game_start *start;
-
+	struct callback *call;
 	connection = (struct netemu_kaillera*)arg;
 	start = item->instruction->body;
 	connection->_internal->time_band = start->time_band;
 	connection->_internal->player_no = start->player_no;
+	for(i = 0; i < connection->_internal->game_started_callbacks->count; i++)
+	{
+		call = connection->_internal->game_started_callbacks->elements[i];
+		call->fn->game_started_fn(connection, connection->current_game, start, call->user_data);
+	}
 }
 
 void _netemu_respond_to_user_join(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {

@@ -30,7 +30,8 @@ typedef void (* kailleraGameCreatedFn)(struct netemu_kaillera *info, struct game
 typedef void (* kailleraPlayerJoinFn)(struct netemu_kaillera *info, struct player_joined *result);
 typedef void (* valuesReceivedFn)(struct netemu_kaillera *info, struct buffered_play_values *result, void *user_data);
 typedef void (* gameStatusUpdatedFn)(struct netemu_kaillera *info, struct game *game, struct game_status_update *update, void *user_data);
-typedef void (* gameCreatedFn)(struct netemu_kaillera *info, struct game* new_game);
+typedef void (* gameCreatedFn)(struct netemu_kaillera *info, struct game* new_game, void *user_data);
+typedef void (* gameStartedFn)(struct netemu_kaillera *info, struct game* game, struct game_start *start, void* user_data);
 typedef void (* playerJoinFn)(struct netemu_kaillera *info, struct player_joined *result);
 typedef void (* joinFn)(struct netemu_kaillera *info, char *user, NETEMU_DWORD ping, char connection, void *user_data);
 typedef void (* playerReadyFn)(struct netemu_kaillera *info);
@@ -47,6 +48,7 @@ union callback_fn {
 	playerJoinFn player_joined_fn;
 	playerReadyFn playerReadyFn;
 	gameStatusUpdatedFn status_update_fn;
+	gameStartedFn game_started_fn;
 };
 
 struct callback {
@@ -117,6 +119,8 @@ int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, voi
 int netemu_register_cached_values_received_callback(struct netemu_kaillera *connection, cachedValuesReceivedFn fn, void *user_data);
 
 int netemu_kaillera_start_game(struct netemu_kaillera *info);
+
+int netemu_register_game_started_callback(struct netemu_kaillera *connection, gameStartedFn callback, void *user_data);
 
 
 #ifdef	__cplusplus
