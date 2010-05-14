@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'masterserversettings.ui'
 **
-** Created: Wed May 12 21:03:32 2010
+** Created: Fri May 14 01:43:50 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

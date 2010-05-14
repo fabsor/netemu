@@ -86,15 +86,14 @@ bool ConnectDialog::Connect()
 	addressBytes = stringList.value(0).toLatin1();
 	usernameBytes = this->userName.toLatin1();
 	address = addressBytes.data();
-	addr.sin_addr.s_addr = netemu_inet_addr(address);
-	addr.sin_port = netemu_htons(port);
-	addr.sin_family = NETEMU_AF_INET;
+
 	if(this->type == KailleraServer)
 	{
 		/* TODO: Figure out why connect_async wont work. netemu_util_prepare_receiver errors on the first malloc for some reason */
 		/*kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", this->userName.toLatin1().data(), ConnectResponse, this);*/
+		this->connectionInfo = netemu_kaillera_create(usernameBytes.data(),"W00t", 1);
+		this->connectionInfo = netemu_kaillera_connect(this->connectionInfo, netemu_inet_addr("127.0.0.1"),0,netemu_inet_addr(address), netemu_htons(port));
 
-		this->connectionInfo = netemu_kaillera_connect(&addr, sizeof(addr), "W00t", usernameBytes.data());
 		if(this->connectionInfo == NULL) {
 			qDebug("Connection error");
 			return false;
