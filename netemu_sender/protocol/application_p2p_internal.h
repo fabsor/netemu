@@ -13,16 +13,23 @@ struct p2p_user_internal {
 	struct netemu_tcp_connection *connection;
 	struct netemu_sender_udp *sender; /**< The sender for udp packages */
 	struct netemu_receiver_udp *receiver; /**< The receiver for udp packages*/
+	struct netemu_list *play_values; /**< Play values received since last time. */
+	struct buffered_play_values cache[256];
+	NETEMU_BOOL values_received;
+	int cache_index;
+	int player_no;
 };
 
 struct p2p_game_internal {
 	struct netemu_sender_collection *tcp_collection; /**< This is used for status update messages */
 	struct netemu_sender_collection *udp_collection; /**< This is used for play values */
 	NETEMU_WORD ready_count;
+	NETEMU_BOOL all_values_received;
 	netemu_mutex game_lock;
+	int emulator_value_size;
 };
 
-void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator);
+void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator, char connection_quality);
 
 void netemu_application_p2p_leave_game_add(struct application_instruction* instruction);
 
@@ -60,11 +67,17 @@ void netemu_application_p2p_join_host_add(struct application_instruction *instru
 
 void netemu_application_p2p_join_host_parse(struct application_instruction *instruction, char *buffer);
 
+void netemu_application_p2p_start_game_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port);
+
 void netemu_application_add_start_game(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port);
 
 void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port);
+
+void netemu_application_p2p_cached_play_values_add(struct application_instruction *instruction, char player_no, char index);
+
+void netemu_application_p2p_buffered_play_values_add(struct application_instruction *instruction, char player_no, char size, void* data);
 
 struct p2p_game_internal *netemu_application_p2p_create_game_internal();
 

@@ -108,7 +108,7 @@ void connect_async(netemu_sockaddr_in addr) {
 
 void server_connect(netemu_sockaddr_in addr) {
 	info = netemu_kaillera_create("a-sad-user", EMUNAME, 1);
-	netemu_kaillera_connect(info, ADDR, 0, ADDR, PORT);
+	netemu_kaillera_connect(info, BIND_ADDR, 0, ADDR, PORT);
 	netemu_register_play_values_received_callback(info, receive_values, NULL);
 	menu(info);
 }

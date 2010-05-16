@@ -27,7 +27,7 @@ void run_kaillera_game_creator_test() {
 	printf("Trying to connect to server...");
 	info = netemu_kaillera_create(PLAYERNAME, EMUNAME, 1);
 	register_kaillera_game_creator_callbacks(info);
-	netemu_kaillera_connect(info,ADDR, 0, ADDR, PORT);
+	netemu_kaillera_connect(info,BIND_ADDR, 0, ADDR, PORT);
 	printf("OK!\n Waiting for other users to join.");
 	while(user_joined == 0) {
 		netemu_thread_event_wait(game_creator_event);

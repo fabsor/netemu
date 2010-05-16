@@ -105,7 +105,7 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 		case TCP_CONNECTION:
 			key = recipient.connection;
 			break;
-		case UDP_CONNECTION:
+		case UDP_SENDER:
 			key = recipient.udp_sender;
 			break;
 		case CONNECTION_COLLECTION:
@@ -141,7 +141,7 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 
 void netemu_sender_buffer_send(netemu_connection_types type, union netemu_connection_type recipient, char* data, int size) {
 	switch(type) {
-		case UDP_CONNECTION:
+		case UDP_SENDER:
 			netemu_sender_udp_send(recipient.udp_sender,data,size);
 			break;
 		case TCP_CONNECTION:

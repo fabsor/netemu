@@ -99,7 +99,7 @@ void _netemu_respond_to_ping(struct netemu_packet_buffer* buffer, struct netemu_
 	pong = netemu_application_create_message();
 	netemu_application_pong_add(pong);
 	pong->important = 1;
-	netemu_sender_buffer_add(connection->_internal->send_buffer,pong,UDP_CONNECTION,type);
+	netemu_sender_buffer_add(connection->_internal->send_buffer,pong,UDP_SENDER,type);
 }
 
 void _netemu_respond_to_game_started(struct netemu_packet_buffer* buffer, struct netemu_packet_buffer_item *item, void* arg) {

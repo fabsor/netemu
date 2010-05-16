@@ -67,7 +67,7 @@ int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
     int error;
 	error = send(socket,buffer,len,flags);
 	if(error == -1) {
-		netlib_set_last_error(error);
+		netlib_set_last_error(errno);
 	}
 	return error;
 }
@@ -77,7 +77,7 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
     int error;
 	error = sendto(socket,buffer,len,flags,dest_address,address_len);
 	if(error == -1) {
-		netlib_set_last_error(error);
+		netlib_set_last_error(errno);
 	}
 	return error;
 }

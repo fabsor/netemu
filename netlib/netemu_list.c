@@ -79,6 +79,8 @@ int _netemu_enlarge_list(struct netemu_list* list, int size) {
 	elements = list->elements;
 	if((list->elements = malloc(sizeof(void*)*list->_intern->size)) == NULL) {
 		netlib_set_last_mapped_error(NETEMU_ENOTENOUGHMEMORY);
+		if(list->thread_safe)
+			netemu_thread_mutex_release(list->_intern->list_mutex);
 		return -1;
 	}
 	memcpy(list->elements,elements,sizeof(void*)*list->count);
@@ -104,11 +106,15 @@ int _netemu_list_search_linear(struct netemu_list* list, void* element) {
 	for (i = 0; i < list->count; i++) {
 		if(list->_intern->comparator != NULL) {
 			if(list->_intern->comparator(list->elements[i],element) == 0) {
+				if(list->thread_safe)
+					netemu_thread_mutex_release(list->_intern->list_mutex);
 				return i;
 			}
 		}
 		else {
 			if (list->elements[i] == element) {
+				if(list->thread_safe)
+					netemu_thread_mutex_release(list->_intern->list_mutex);
 				return i;
 			}
 		}
@@ -139,6 +145,8 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
 
 	if (list->count < index) {
+		if(list->thread_safe)
+			netemu_thread_mutex_release(list->_intern->list_mutex);
 		return -1;
 	}
 	for (i = index; i < list->count - 1; i++) {

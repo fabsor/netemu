@@ -19,6 +19,7 @@ extern "C" {
 #include "protocol/application_kaillera.h"
 #include "network/netemu_receiver.h"
 #include "network/netemu_tcp.h"
+#include "netemu_thread.h"
 
 struct _netemu_info_internal {
 	struct netemu_list *chat_callback;
@@ -64,8 +65,15 @@ struct netemu_p2p_internal {
 	struct netemu_list *player_ready_callbacks;
 	struct netemu_list *game_started_callbacks;
 	struct netemu_list *all_ready_callbacks;
-	struct netemu_list *users;struct netemu_list *game_status_updated_callbacks;
+	struct netemu_list *users;
+	struct netemu_list *game_status_updated_callbacks;
 	struct netemu_list *games;
+	char *values_to_send; /**< Contains cached values that should be sent the next time we send something. */
+	int values_buffered; /**< The number of values that has been buffered for sending. */
+	int sent_values; /**< values sent since last value was received. */
+	char *values_received; /**< Contains values that have been received. */
+	int frame_index; /**< The index of the frame to return to the user. */
+	netemu_event play_values_event;
 	struct netemu_packet_buffer *receive_buffer;
 	struct buffered_play_values *buffered_values;
 	struct netemu_sender_buffer *send_buffer;

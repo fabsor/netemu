@@ -13,17 +13,19 @@
 /* Below are the IDs for each instruction as they appear in the original Kaillera protocoll and our modified P2P protocoll */
 
 /*! P2P defines */
-#define CREATE_P2P_GAME		30
-#define JOIN_P2P_GAME		31
-#define LEAVE_P2P_GAME 		32
-#define KICK_P2P_PLAYER 	33
-#define P2P_LOGIN_SUCCESS	34
-#define P2P_LOGIN_REQUEST	35
-#define P2P_READY			36
-#define P2P_USER_JOIN		37
-#define P2P_JOIN_HOST		38
-#define P2P_PLAYER_READY	39
-#define P2P_GAME_START		40
+#define CREATE_P2P_GAME				30
+#define JOIN_P2P_GAME				31
+#define LEAVE_P2P_GAME 				32
+#define KICK_P2P_PLAYER 			33
+#define P2P_LOGIN_SUCCESS			34
+#define P2P_LOGIN_REQUEST			35
+#define P2P_READY					36
+#define P2P_USER_JOIN				37
+#define P2P_JOIN_HOST				38
+#define P2P_PLAYER_READY			39
+#define P2P_GAME_START				40
+#define P2P_BUFFERED_PLAY_VALUES		41
+#define P2P_CACHED_BUFFERED_PLAY_VALUES	42
 
 
 /*! Kaillera defines */
