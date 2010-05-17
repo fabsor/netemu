@@ -841,6 +841,7 @@
 <option id="gnu.c.compiler.option.include.paths.1672932776" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/netlib/headers}&quot;"/>
 </option>
+<option id="gnu.c.compiler.option.misc.other.119035359" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -m32" valueType="string"/>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2085971274" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1648044579" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">
