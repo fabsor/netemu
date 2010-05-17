@@ -175,7 +175,7 @@ void _netemu_respond_to_player_ready(struct netemu_packet_buffer *buffer, struct
 
 	for(i = 0; i < connection->_internal->player_ready_callback->count; i++) {
 		call = connection->_internal->player_ready_callback->elements[i];
-		call->fn->playerReadyFn(connection);
+		call->fn->player_ready_fn(connection);
 	}
 
 }

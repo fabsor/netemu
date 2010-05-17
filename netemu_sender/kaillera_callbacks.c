@@ -110,7 +110,7 @@ int netemu_register_player_ready_callback(struct netemu_kaillera *connection, pl
 		return -1;
 	}
 
-	fn->playerReadyFn = callback;
+	fn->player_ready_fn = callback;
 	netemu_kaillera_register_callback(connection->_internal->player_ready_callback, fn, 0, user_data);
 	return 0;
 }
