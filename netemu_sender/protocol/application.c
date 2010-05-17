@@ -217,6 +217,12 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 		case P2P_GAME_START: case P2P_PLAYER_READY:
 			netemu_application_p2p_start_game_parse(app_instruction, data);
 			break;
+		case P2P_BUFFERED_PLAY_VALUES:
+			netemu_application_p2p_buffered_play_values_parse(app_instruction, data);
+			break;
+		case P2P_CACHED_BUFFERED_PLAY_VALUES:
+			netemu_application_p2p_cached_play_values_parse(app_instruction, data);
+			break;
 
 	}
 	return app_instruction;

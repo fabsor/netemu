@@ -20,7 +20,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netemu_sockaddr* addr, s
 	NETEMU_SOCKET socket;
 	struct netemu_tcp_connection* sender;
 	if((sender = malloc(sizeof(struct netemu_tcp_connection))) == NULL) {
-		//netlib_set_last_error(NETMEU_ENOTENOUGHMEMORY);
+		/*netlib_set_last_error(NETMEU_ENOTENOUGHMEMORY);*/
 		return NULL;
 	}
 

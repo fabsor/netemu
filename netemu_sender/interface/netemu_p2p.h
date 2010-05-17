@@ -61,7 +61,7 @@ int netemu_p2p_connect_async(struct netemu_p2p_connection* p2p, netemu_sockaddr_
 
 int netemu_p2p_host(struct netemu_p2p_connection* p2p, NETEMU_DWORD address, unsigned short port, char* cloudname);
 
-int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, struct p2p_game** result);
+int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, char connection_quality, int emulator_value_size, struct p2p_game** result);
 
 void netemu_p2p_login(struct netemu_p2p_connection *p2p);
 
@@ -75,7 +75,7 @@ struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p_connection* info, i
 
 struct p2p_user** netemu_p2p_get_user_list(struct netemu_p2p_connection* info, int *count);
 
-int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, int size, void* data);
+int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data);
 
 int netemu_p2p_register_play_values_received_callback(struct netemu_p2p_connection *connection, p2pValuesReceivedFn callback);
 

@@ -12,16 +12,17 @@ extern "C" {
 
 #include "netemu_socket.h"
 #include "netemu_sender_collection.h"
-#include "netemu_sender_udp.h"
 
 union netemu_connection_type{
 	struct netemu_sender_udp *udp_sender;
+	struct netemu_receiver_udp *udp_receiver;
 	struct netemu_tcp_connection *connection;
 	struct netemu_sender_collection *collection;
 };
 
 typedef enum {
-	UDP_CONNECTION,
+	UDP_SENDER,
+	UDP_RECEIVER,
 	TCP_CONNECTION,
 	CONNECTION_COLLECTION
 } netemu_connection_types;

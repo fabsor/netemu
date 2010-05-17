@@ -133,7 +133,7 @@ void start_p2p_game(struct netemu_p2p_connection *connection) {
 
 void p2p_send_play_values(struct netemu_p2p_connection *connection) {
 	char* data = VALUE;
-	netemu_p2p_send_play_values(connection, strlen(data)+1, data);
+	//netemu_p2p_send_play_values(connection, strlen(data)+1, data);
 }
 
 void p2p_player_ready(struct netemu_p2p_connection *connection) {
@@ -160,7 +160,7 @@ void join_p2p_game(struct netemu_p2p_connection *connection) {
 void create_p2p_game(struct netemu_p2p_connection* connection) {
 	struct p2p_game *result;
 	printf("Creating game\n");
-	netemu_p2p_create_game(connection,"foo",&result);
+	netemu_p2p_create_game(connection,"foo",1,sizeof(VALUE)+1,&result);
 
 }
 

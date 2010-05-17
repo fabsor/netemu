@@ -59,7 +59,7 @@ int netemu_kaillera_create_game(struct netemu_kaillera *info, char *gamename, st
 	netemu_application_create_game_add(message, gamename);
 
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer, message, UDP_CONNECTION, type);
+	netemu_sender_buffer_add(info->_internal->send_buffer, message, UDP_SENDER, type);
 	item = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, CREATE_GAME, timestamp);
 	*result = (struct game*)item->instruction->body;
 	return 1;
@@ -76,7 +76,7 @@ void netemu_kaillera_create_game_async(struct netemu_kaillera *info, char *gamen
 	message = netemu_application_create_message();
 	netemu_application_create_game_add(message, gamename);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message,UDP_CONNECTION, type);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message,UDP_SENDER, type);
 	netemu_kaillera_register_callback(info->_internal->game_created_callback, fn, 1);
 }
 
@@ -109,7 +109,7 @@ int netemu_kaillera_start_game(struct netemu_kaillera *info) {
 	message = netemu_application_create_message();
 	netemu_application_start_game_add(message);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	message->important = 1;
 	reply = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, START_GAME,timestamp);
 	return 1;
@@ -193,7 +193,7 @@ int netemu_kaillera_login(struct netemu_kaillera* info) {
 	message->important = 1;
 	timestamp = time(NULL);
 
-	if(netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type) == -1) {
+	if(netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type) == -1) {
 		netemu_application_free_login_request((struct login_request*)message->body);
 	}
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
@@ -210,7 +210,7 @@ int netemu_kaillera_join_game(struct netemu_kaillera *info, NETEMU_DWORD gameid)
 	message = netemu_application_create_message();
 	timestamp = time(NULL);
 	netemu_application_join_game_add(message,gameid,1);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer,EXISTING_PLAYERS_LIST, timestamp);
 	return 1;
 }
@@ -222,7 +222,7 @@ int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD g
 	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_create_message();
 	netemu_application_join_game_add(message,gameid,1);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 
 	return 1;
 }
@@ -370,7 +370,7 @@ int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, voi
 			netemu_application_buffered_play_values_add(message,size,data);
 		}
 		timestamp = time(NULL);
-		netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+		netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 		info->_internal->values_buffered = 0;
 		info->_internal->sent_values++;
 	}
@@ -382,7 +382,7 @@ int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
 	struct buffered_play_values *values;
 	int i;
 	while(info->_internal->received_play_values->count == 0) {
-		netemu_thread_event_wait(info->_internal->play_values_event);
+		netemu_thread_event_wait(info->_internal->play_values_event, NETEMU_INFINITE);
 	}
 
 	instruction = info->_internal->received_play_values->elements[0];
@@ -434,7 +434,7 @@ int netemu_kaillera_send_player_ready(struct netemu_kaillera *info) {
 	message = netemu_application_create_message();
 	netemu_application_player_ready_add(message);
 	timestamp = time(NULL);
-	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_CONNECTION, type);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, PLAYER_READY, timestamp);
 	return 1;
 }

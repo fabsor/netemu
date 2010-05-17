@@ -70,12 +70,12 @@ void netemu_receiver_recv(void* params) {
 	receiver = (struct netemu_receiver_udp*)params;
 	receiver->listening = 1;
 	/*TODO: We need to figure out how to fix this, it's ugly to include a null. */
-	type.udp_sender = NULL;
+	type.udp_sender = receiver;
 	receiver->lock = netemu_thread_mutex_create();
 	while (receiver->listening) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
-		error = receiver->fn(receiver->socket, UDP_CONNECTION, type, receiver->received_data_param);
+		error = receiver->fn(receiver->socket, UDP_RECEIVER, type, receiver->received_data_param);
 		if (error == -1) {
 			receiver->error = netlib_get_last_platform_error();
 			netemu_thread_mutex_release(receiver->lock);

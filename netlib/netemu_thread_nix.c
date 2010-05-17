@@ -15,6 +15,9 @@
 #include "headers/netemu_thread.h"
 #include "headers/netemu_list.h"
 #include <pthread.h>
+#include <time.h>
+#include <errno.h>
+#include "headers/netlib_error.h"
 
 struct netemu_event_internal {
 	pthread_mutex_t* mutex;
@@ -165,12 +168,32 @@ int netemu_thread_event_signal(netemu_event event_identifier) {
  * Waits for an event to be signaled.
  * @param event_identifier the identifier of the event.
  */
-int netemu_thread_event_wait(netemu_event event_identifier) {
+int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds) {
+	struct timespec spec;
+	int retval;
+
 	pthread_mutex_lock(event_identifier->mutex);
-	pthread_cond_wait(event_identifier->cond,event_identifier->mutex);
+	if(seconds = NETEMU_INFINITE) {
+		retval = pthread_cond_wait(event_identifier->cond, event_identifier->mutex);
+	}
+	else {
+		spec.tv_sec = seconds;
+		retval = pthread_cond_timedwait(event_identifier->cond, event_identifier->mutex, &spec);
+	}
 	pthread_mutex_unlock(event_identifier->mutex);
 
-	return 0;
+	if(retval == ETIMEDOUT) {
+		retval = NETEMU_WAIT_TIMEOUT;
+	}
+	else if(retval != 0) {
+		retval = -1;
+		netlib_set_last_error(NETEMU_EUNKNOWNERROR);
+	}
+	else {
+		retval = 0;
+	}
+
+	return retval;
 }
 
 int netemu_thread_event_destroy(netemu_event event_identifier) {

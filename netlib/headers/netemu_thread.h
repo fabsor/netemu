@@ -24,7 +24,8 @@ extern "C" {
 	typedef HANDLE netemu_thread;
 #endif
 
-#define NETEMU_INFINITE		0xFFFFFFFF
+#define NETEMU_INFINITE			0xFFFFFFFF
+#define NETEMU_WAIT_TIMEOUT		0xF0F0F0F0
 #include "netlib_util.h"
 
 	/* TODO: make sure this is a good type to use. */
@@ -86,7 +87,7 @@ extern "C" {
 	* Waits for an event to be signaled.
 	* @param event_identifier the identifier of the event.
 	*/
-	int netemu_thread_event_wait(netemu_event event_identifier);
+	int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds);
 
 	/**
 	* Destroy an event.

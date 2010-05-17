@@ -321,6 +321,7 @@ void netemu_application_intelligently_cached_play_values_parse(struct applicatio
 
 	cache = malloc(sizeof(struct intelligently_cached_buffered_play_values));
 	cache->index = *data;
+	instruction->body = cache;
 }
 
 void netemu_application_player_dropped_parse(struct application_instruction *instruction, char *data) {

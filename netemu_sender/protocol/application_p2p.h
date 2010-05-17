@@ -36,6 +36,8 @@ struct p2p_game {
 	struct p2p_user* creator;
 	struct p2p_user* players;
 	NETEMU_BOOL started;
+	NETEMU_BOOL received_start_signal;
+	char connection_quality;
 	p2p_game_internal _internal;
 };
 
@@ -53,6 +55,17 @@ struct p2p_login_success {
 	NETEMU_WORD games_count;
 	struct p2p_user *users;
 	struct p2p_game *games;
+};
+
+struct p2p_buffered_play_values {
+	char player_no;
+	NETEMU_WORD size;
+	char *values;
+};
+
+struct p2p_cached_buffered_play_values {
+	char player_no;
+	char index;
 };
 
 

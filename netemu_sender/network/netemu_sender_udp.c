@@ -24,7 +24,7 @@ struct netemu_sender_udp* netemu_sender_udp_new(netemu_sockaddr* addr, int addr_
 	sender = malloc(sizeof(struct netemu_sender_udp));
 	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
 	if (socket == NETEMU_INVALID_SOCKET) {
-		//sender->error = netemu_get_last_error();
+		sender->error = netlib_get_last_platform_error();
 	}
 	sender->addr_len = addr_len;
 	sender->addr = addr;
