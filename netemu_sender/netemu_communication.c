@@ -83,6 +83,8 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	struct netemu_client *client;
 	char* hello;
 	struct communication_callback callback;
+	int connection_attempts;
+	NETEMU_BOOL connection_success;
 	netemu_sockaddr_in in_addr;
 	callback.port = -1;
 	callback.async = -1;
@@ -112,7 +114,14 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	if((hello = netemu_communication_create_hello_message(VERSION)) == NULL)
 		return NULL;
 
-	netemu_util_send_data(client->sender,hello);
+	/*connection_attempts = 0;
+	while(connection_attempts < 5 && !connection_success) {*/
+		netemu_util_send_data(client->sender,hello);
+		/*if(netemu_thread_event_wait(connection->_internal->connected_event, 3) != NETEMU_WAIT_TIMEOUT) {
+			connection_success = TRUE;
+		}
+	}*/
+
 	free(hello);
 	while(callback.port == -1);
 	netemu_receiver_udp_stop_receiving(client->receiver);

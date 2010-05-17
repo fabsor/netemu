@@ -19,5 +19,7 @@ netemu_ui/Makefile.Release
 *.o
 *.d
 *.ncb
+libnetemu.a
+libnetlib.a
 netemu.org/*
 

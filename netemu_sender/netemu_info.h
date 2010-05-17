@@ -22,6 +22,7 @@ extern "C" {
 #include "netemu_thread.h"
 
 struct _netemu_info_internal {
+	netemu_event connected_event;
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
