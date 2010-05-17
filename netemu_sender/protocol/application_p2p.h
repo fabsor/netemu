@@ -38,6 +38,7 @@ struct p2p_game {
 	NETEMU_BOOL started;
 	NETEMU_BOOL received_start_signal;
 	char connection_quality;
+	NETEMU_WORD emulator_value_size;
 	p2p_game_internal _internal;
 };
 

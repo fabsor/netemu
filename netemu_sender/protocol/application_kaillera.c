@@ -726,7 +726,6 @@ void netemu_application_start_game_parse(struct application_instruction* instruc
 	buffer += sizeof(char);
 	memcpy(&start->max_players,buffer,sizeof(char));
 	buffer += sizeof(char);
-
 	instruction->body = start;
 }
 

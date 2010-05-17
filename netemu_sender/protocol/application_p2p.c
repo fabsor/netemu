@@ -30,7 +30,8 @@ void netemu_application_p2p_start_game_pack(struct application_instruction *inst
 void netemu_application_p2p_buffered_play_values_pack(struct application_instruction *instruction, char *data);
 void netemu_application_p2p_cached_play_values_pack(struct application_instruction *instruction, char *data);
 
-void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname, struct p2p_user* creator, char connection_quality) {
+void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname,
+		struct p2p_user* creator, char connection_quality, NETEMU_WORD value_size) {
 	struct p2p_game *game;
 	int size;
 	game = malloc(sizeof(struct p2p_game));
@@ -42,7 +43,9 @@ void netemu_application_p2p_create_game_add(struct application_instruction *inst
 	game->players = NULL;
 	game->_internal = NULL;
 	game->connection_quality = connection_quality;
-	size += sizeof(NETEMU_WORD);
+	game->emulator_value_size = value_size;
+	game->started = 0;
+	size += 1+ sizeof(NETEMU_WORD) + sizeof(NETEMU_WORD);
 	instruction->body = game;
 	instruction->id = CREATE_P2P_GAME;
 	instruction->body_size = size;
@@ -137,9 +140,13 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	pos += netemu_util_pack_str(buffer+pos,game->app_name);
 	memcpy(buffer+pos, &game->user_count, sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
+	memcpy(buffer+pos, &game->emulator_value_size, sizeof(NETEMU_WORD));
+	pos += sizeof(NETEMU_WORD);
 	memcpy(buffer+pos, &game->connection_quality, sizeof(char));
 	pos += sizeof(char);
+
 	pos += _netemu_application_p2p_pack_user(buffer+pos,game->creator);
+
 	if(game->players != NULL) {
 		for(i = 0; i < game->user_count-1; i++) {
 			pos += _netemu_application_p2p_pack_user(buffer+pos,&game->players[i]);
@@ -182,6 +189,8 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	game->app_name = netemu_util_parse_string(buffer+pos);
 	pos += strlen(game->app_name)+1;
 	memcpy(&game->user_count, buffer+pos, sizeof(NETEMU_WORD));
+	pos += sizeof(NETEMU_WORD);
+	memcpy(&game->emulator_value_size, buffer+pos, sizeof(NETEMU_WORD));
 	pos += sizeof(NETEMU_WORD);
 	memcpy(&game->connection_quality, buffer+pos, sizeof(char));
 	pos++;
@@ -241,6 +250,12 @@ void netemu_application_p2p_login_success_parse(struct application_instruction *
 	instruction->freeBodyFn = netemu_application_p2p_login_success_free;
 }
 
+void netemu_application_p2p_buffered_play_values_copy(struct p2p_buffered_play_values *target, struct p2p_buffered_play_values *values) {
+	target->size = values->size;
+	target->player_no = values->player_no;
+	target->values = values->values;
+}
+
 int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game) {
 	int size, i;
 	if(game->_internal != NULL) {
@@ -250,6 +265,7 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 	size += netemu_util_copy_string(&target->name, game->name);
 	target->user_count = game->user_count;
 	target->connection_quality = game->connection_quality;
+	target->emulator_value_size = game->emulator_value_size;
 	size +=  1 + sizeof(NETEMU_DWORD);
 	target->players = game->players;
 	if(target->players != NULL) {
@@ -611,7 +627,7 @@ void netemu_application_p2p_buffered_play_values_add(struct application_instruct
 	play_values->size = size;
 	play_values->values = data;
 	instruction->body = play_values;
-	instruction->body_size = 2 + size;
+	instruction->body_size = sizeof(NETEMU_WORD) + 1 + size;
 	instruction->packBodyFn = netemu_application_p2p_buffered_play_values_pack;
 	instruction->id = P2P_BUFFERED_PLAY_VALUES;
 }
@@ -636,12 +652,6 @@ void netemu_application_p2p_buffered_play_values_parse(struct application_instru
 	play_values->values = malloc(play_values->size);
 	memcpy(play_values->values, data, play_values->size);
 	instruction->body = play_values;
-}
-
-void netemu_application_p2p_buffered_play_values_copy(struct p2p_buffered_play_values *target, struct p2p_buffered_play_values *values) {
-	target->size = values->size;
-	target->player_no = values->player_no;
-	target->values = values->values;
 }
 
 void netemu_application_p2p_cached_play_values_add(struct application_instruction *instruction, char player_no, char index) {
