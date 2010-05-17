@@ -36,6 +36,8 @@ int main(int argc, char *argv[]) {
 	int i;
 	NETEMU_BOOL kaillera = FALSE;
 	NETEMU_BOOL p2p = FALSE;
+	NETEMU_BOOL creator = FALSE;
+	int no_instructions = 1000;
 	char choice;
 	info = NULL;
 
@@ -44,14 +46,25 @@ int main(int argc, char *argv[]) {
 		if(strcmp(argv[i],"kaillera") == 0) {
 			kaillera = TRUE;
 		}
-		if(kaillera) {
-				if(strcmp(argv[i],"joiner") == 0) {
-					run_kaillera_game_joiner_test();
-				}
-				if(strcmp(argv[i],"creator") == 0) {
-					run_kaillera_game_creator_test();
-				}
-			}
+		if(strcmp(argv[i], "p2p") == 0) {
+			p2p = TRUE;
+		}
+
+		if(strcmp(argv[i],"creator") == 0) {
+			creator = TRUE;
+		}
+		if(strstr(argv[i],"send=")) {
+			no_instructions = atoi(argv[i] + strlen("send="));
+		}
+	}
+
+	if(kaillera) {
+		if(creator) {
+			run_kaillera_game_creator_test(no_instructions);
+		}
+		else {
+			run_kaillera_game_joiner_test(no_instructions);
+		}
 	}
 
 	if(!kaillera) {
@@ -108,7 +121,7 @@ void connect_async(netemu_sockaddr_in addr) {
 
 void server_connect(netemu_sockaddr_in addr) {
 	info = netemu_kaillera_create("a-sad-user", EMUNAME, 1);
-	netemu_kaillera_connect(info, ADDR, 0, ADDR, PORT);
+	netemu_kaillera_connect(info, BIND_ADDR, 0, ADDR, PORT);
 	netemu_register_play_values_received_callback(info, receive_values, NULL);
 	menu(info);
 }
