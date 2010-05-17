@@ -15,7 +15,7 @@ class ConnectDialog : public QDialog
     Q_OBJECT
 
 public:
-    ConnectDialog(QWidget *parent = 0, QString serverName = QString::null, QString address = QString::null, HostType type = KailleraServer, QString userName = QString::null);
+    ConnectDialog(QWidget *parent = 0, QString serverName = QString::null, QString address = QString::null, HostType type = KailleraServer, QString userName = QString::null, int connectionQuality = 1);
     ~ConnectDialog();
     bool canceled();
     netemu_kaillera *connectionInfo;
@@ -31,6 +31,7 @@ private:
     QString address;
     HostType type;
     QString userName;
+    int connectionQuality;
     bool isCanceled;
     void createActions();
     bool Connect();

@@ -3,7 +3,7 @@
 #define DEFAULT_PORT	27888
 //#include "netemu_p2p.h"
 
-ConnectDialog::ConnectDialog(QWidget *parent, QString serverName, QString address, HostType type, QString userName)
+ConnectDialog::ConnectDialog(QWidget *parent, QString serverName, QString address, HostType type, QString userName, int connectionQuality)
     : QDialog(parent)
 {
 	QString connectingString;
@@ -13,6 +13,7 @@ ConnectDialog::ConnectDialog(QWidget *parent, QString serverName, QString addres
 	this->address = address;
 	this->type = type;
 	this->userName = userName;
+	this->connectionQuality = connectionQuality;
 	this->setWindowTitle("NetEmu - Connecting to " + serverName);
 
 	connectingString = "Connecting to ";// (type == KailleraServer ? "server '" : "cloud '") + name + "'";
@@ -91,7 +92,7 @@ bool ConnectDialog::Connect()
 	{
 		/* TODO: Figure out why connect_async wont work. netemu_util_prepare_receiver errors on the first malloc for some reason */
 		/*kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", this->userName.toLatin1().data(), ConnectResponse, this);*/
-		this->connectionInfo = netemu_kaillera_create(usernameBytes.data(),"W00t", 1);
+		this->connectionInfo = netemu_kaillera_create(usernameBytes.data(),"W00t", this->connectionQuality);
 		this->connectionInfo = netemu_kaillera_connect(this->connectionInfo, netemu_inet_addr("127.0.0.1"),0,netemu_inet_addr(address), netemu_htons(port));
 
 		if(this->connectionInfo == NULL) {
