@@ -46,7 +46,7 @@ union callback_fn {
 	valuesReceivedFn values_received_fn;
 	cachedValuesReceivedFn cached_values_received_fn;
 	playerJoinFn player_joined_fn;
-	playerReadyFn playerReadyFn;
+	playerReadyFn player_ready_fn;
 	gameStatusUpdatedFn status_update_fn;
 	gameStartedFn game_started_fn;
 };

@@ -129,6 +129,7 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->user_count = 0;
 	info->game_count = 0;
 	info->_internal = malloc(sizeof(struct _netemu_info_internal));
+	info->_internal->connected_event = netemu_thread_event_create();
 	info->_internal->chat_callback = netemu_list_new(3, FALSE);
 	info->_internal->game_created_callback = netemu_list_new(3, FALSE);
 	info->_internal->join_callback = netemu_list_new(3, FALSE);
@@ -382,7 +383,7 @@ int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
 	struct buffered_play_values *values;
 	int i;
 	while(info->_internal->received_play_values->count == 0) {
-		netemu_thread_event_wait(info->_internal->play_values_event);
+		netemu_thread_event_wait(info->_internal->play_values_event, NETEMU_INFINITE);
 	}
 
 	instruction = info->_internal->received_play_values->elements[0];

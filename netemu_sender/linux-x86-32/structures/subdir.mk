@@ -4,32 +4,23 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../netemu_list.c \
-../netemu_socket_nix.c \
-../netemu_thread_nix.c \
-../netlib_error_nix.c \
-../netlib_util_nix.c 
+../structures/netemu_hashtbl.c \
+../structures/netemu_stringbuilder.c 
 
 OBJS += \
-./netemu_list.o \
-./netemu_socket_nix.o \
-./netemu_thread_nix.o \
-./netlib_error_nix.o \
-./netlib_util_nix.o 
+./structures/netemu_hashtbl.o \
+./structures/netemu_stringbuilder.o 
 
 C_DEPS += \
-./netemu_list.d \
-./netemu_socket_nix.d \
-./netemu_thread_nix.d \
-./netlib_error_nix.d \
-./netlib_util_nix.d 
+./structures/netemu_hashtbl.d \
+./structures/netemu_stringbuilder.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-%.o: ../%.c
+structures/%.o: ../structures/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -D_NIX -O0 -g3 -pedantic -Wall -c -fmessage-length=0 -m32 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	gcc -D_NIX -I"/home/emil/workspace/netemu/netlib/headers" -O0 -g3 -pedantic -Wall -c -fmessage-length=0 -m32 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

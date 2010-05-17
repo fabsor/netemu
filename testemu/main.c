@@ -36,6 +36,8 @@ int main(int argc, char *argv[]) {
 	int i;
 	NETEMU_BOOL kaillera = FALSE;
 	NETEMU_BOOL p2p = FALSE;
+	NETEMU_BOOL creator = FALSE;
+	int no_instructions = 1000;
 	char choice;
 	info = NULL;
 
@@ -44,14 +46,25 @@ int main(int argc, char *argv[]) {
 		if(strcmp(argv[i],"kaillera") == 0) {
 			kaillera = TRUE;
 		}
-		if(kaillera) {
-				if(strcmp(argv[i],"joiner") == 0) {
-					run_kaillera_game_joiner_test();
-				}
-				if(strcmp(argv[i],"creator") == 0) {
-					run_kaillera_game_creator_test();
-				}
-			}
+		if(strcmp(argv[i], "p2p") == 0) {
+			p2p = TRUE;
+		}
+
+		if(strcmp(argv[i],"creator") == 0) {
+			creator = TRUE;
+		}
+		if(strstr(argv[i],"send=")) {
+			no_instructions = atoi(argv[i] + strlen("send="));
+		}
+	}
+
+	if(kaillera) {
+		if(creator) {
+			run_kaillera_game_creator_test(no_instructions);
+		}
+		else {
+			run_kaillera_game_joiner_test(no_instructions);
+		}
 	}
 
 	if(!kaillera) {

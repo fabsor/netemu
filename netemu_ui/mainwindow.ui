@@ -489,6 +489,59 @@
          <widget class="QLineEdit" name="textUsername"/>
         </item>
         <item>
+         <widget class="QLabel" name="labelConnectionQuality">
+          <property name="text">
+           <string>Connection:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboConnection">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>250</width>
+            <height>0</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>LAN (60 keyframes/s)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Excellent (30 keyframes/s)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Good (20 keyframes/s)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Average (15 keyframes/s)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Low (12 keyframes/s)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Bad (10 keyframes/s)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

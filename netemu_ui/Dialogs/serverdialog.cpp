@@ -2,9 +2,9 @@
 #include "netemu_kaillera.h"
 
 void ChatCallBackWrapper(char *user, char *message, void *user_data);
-void UserJoinCallBackWrapper(char *user, NETEMU_DWORD ping, char connection, void *user_data);
+void UserJoinCallBackWrapper(struct netemu_kaillera *info, char *user, NETEMU_DWORD ping, char connection, void *user_data);
 void UserLeaveCallBackWrapper(NETEMU_WORD id, char *user, char *exit_message, void *user_data);
-void GameCreatedCallBackWrapper(struct game *createdGame, void *user_data);
+void GameCreatedCallBackWrapper(struct netemu_kaillera *info, struct game* new_game, void *user_data);
 
 ServerDialog::ServerDialog(QWidget *parent, netemu_kaillera *serverInfo)
     : QMainWindow(parent)
@@ -19,7 +19,7 @@ ServerDialog::ServerDialog(QWidget *parent, netemu_kaillera *serverInfo)
 	netemu_register_game_created_callback(this->serverInfo, GameCreatedCallBackWrapper, this);
 }
 
-void UserJoinCallBackWrapper(char *user, NETEMU_DWORD ping, char connection, void *user_data)
+void UserJoinCallBackWrapper(struct netemu_kaillera *info, char *user, NETEMU_DWORD ping, char connection, void *user_data)
 {
 	ServerDialog *dialog = (ServerDialog*)user_data;
 	dialog->OnUserListChanged();
@@ -31,7 +31,7 @@ void UserLeaveCallBackWrapper(NETEMU_WORD id, char *user, char *exit_message, vo
 	dialog->OnUserListChanged();
 }
 
-void GameCreatedCallBackWrapper(struct game *createdGame, void *user_data)
+void GameCreatedCallBackWrapper(struct netemu_kaillera *info, struct game* new_game, void *user_data)
 {
 	ServerDialog *dialog = (ServerDialog*)user_data;
 	dialog->OnGameListChanged();

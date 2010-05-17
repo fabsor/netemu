@@ -92,7 +92,7 @@ void MainWindow::OnButtonServerConnectClicked()
 
 void MainWindow::ShowConnectDialog(QString name, QString address, HostType type)
 {
-	ConnectDialog dialog(this, name, address, type, ui.textUsername->text());
+	ConnectDialog dialog(this, name, address, type, ui.textUsername->text(), 1);
 	if(dialog.exec() == QDialog::Accepted)
 	{
 		if(type == KailleraServer)

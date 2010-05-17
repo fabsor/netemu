@@ -19,7 +19,7 @@ int game_exists = 0;
 int join_game_created = 0;
 int join_game_started = 0;
 netemu_event game_join_event;
-void run_kaillera_game_joiner_test() {
+void run_kaillera_game_joiner_test(no_instructions) {
 	struct netemu_kaillera *info;
 	struct game** games;
 	int i, count;
@@ -28,23 +28,23 @@ void run_kaillera_game_joiner_test() {
 	printf("Trying to connect to server...");
 	info = netemu_kaillera_create("Christophe", EMUNAME, 1);
 	register_kaillera_game_joiner_callbacks(info);
-	netemu_kaillera_connect(info,ADDR, 0, ADDR, PORT);
+	netemu_kaillera_connect(info,BIND_ADDR, 0, ADDR, PORT);
 	printf("OK!\nLooking for a game to join...");
 	while(info->game_count == 0) {
-		netemu_thread_event_wait(game_join_event);
+		netemu_thread_event_wait(game_join_event, NETEMU_INFINITE);
 	}
 	printf("OK!\nJoining game...");
 	games = netemu_kaillera_get_game_list(info,&count);
 	netemu_kaillera_join_game(info, games[0]->id);
 	printf("OK!\nWaiting for game start...");
 	while(join_game_started == 0) {
-		netemu_thread_event_wait(game_join_event);
+		netemu_thread_event_wait(game_join_event, NETEMU_INFINITE);
 	}
 	printf("OK!\n Sending player ready...");
 	netemu_kaillera_send_player_ready(info);
 	printf("OK!\n We're ready for action!");
 	data = malloc(512);
-	for (i = 0; i < 10000; i++) {
+	for (i = 0; i < no_instructions; i++) {
 		data = VALUE;
 		netemu_kaillera_send_play_values(info, strlen(VALUE)+1, data);
 	}

@@ -76,8 +76,8 @@ int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
 	else if(errcode == WAIT_FAILED)
 		netlib_set_last_mapped_error(GetLastError());
 
-	/* TODO: Det är inte så bra att bara returnera -1 här, eftersom det antyder att något gick fel i WaitForSingleObject,
-	 * vilket det nödvändigtvis inte gjorde.*/
+	/* TODO: Det ï¿½r inte sï¿½ bra att bara returnera -1 hï¿½r, eftersom det antyder att nï¿½got gick fel i WaitForSingleObject,
+	 * vilket det nï¿½dvï¿½ndigtvis inte gjorde.*/
 	return -1;
 }
 
@@ -95,8 +95,8 @@ int netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
 int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
 	int errcode;
 
-	/* TODO: Mutex-objektet blir förstört först när ALLA handles till objektet
-	 * har stängts, hur försäkrar man sig om att det inte finns mer handles till mutex-objektet?*/
+	/* TODO: Mutex-objektet blir fï¿½rstï¿½rt fï¿½rst nï¿½r ALLA handles till objektet
+	 * har stï¿½ngts, hur fï¿½rsï¿½krar man sig om att det inte finns mer handles till mutex-objektet?*/
 	errcode = CloseHandle(mutex_identifier->mutex);
 	if(errcode == 0) {
 		netlib_set_last_mapped_error(GetLastError());
@@ -114,8 +114,8 @@ netemu_event netemu_thread_event_create() {
 		return NULL;
 	}
 
-	/* Manual reset sätts till false, vilket betyder att såfort den signaleras och nåt objekt väntat på eventet,
-	 * så nollställs det till non-signaled automatiskt.*/
+	/* Manual reset sï¿½tts till false, vilket betyder att sï¿½fort den signaleras och nï¿½t objekt vï¿½ntat pï¿½ eventet,
+	 * sï¿½ nollstï¿½lls det till non-signaled automatiskt.*/
 	if((handle = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
 		netlib_set_last_mapped_error(GetLastError());
 		free(event_struct);
@@ -138,10 +138,10 @@ int netemu_thread_event_signal(netemu_event event_identifier) {
 	return 0;
 }
 
-int netemu_thread_event_wait(netemu_event event_identifier) {
+int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds) {
 	int errcode;
 	
-	errcode = WaitForSingleObject(event_identifier->eventhandle, INFINITE);
+	errcode = WaitForSingleObject(event_identifier->eventhandle, seconds);
 	if(errcode == WAIT_OBJECT_0)
 		return 0;
 	else if(errcode == WAIT_FAILED)

@@ -732,7 +732,7 @@ int netemu_p2p_receive_play_values(struct netemu_p2p_connection *info) {
 
 	/* Wait for values if there we haven't received values from all players. */
 	while(!info->current_game->_internal->all_values_received) {
-		netemu_thread_event_wait(info->_internal->play_values_event);
+		netemu_thread_event_wait(info->_internal->play_values_event, NETEMU_INFINITE);
 	}
 	netemu_thread_mutex_lock(info->current_game->_internal->game_lock, NETEMU_INFINITE);
 	netemu_process_user_value(info, info->current_game->creator);

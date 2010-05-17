@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Wed May 12 21:03:32 2010
+** Created: Mon May 17 15:31:39 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -14,6 +14,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QComboBox>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
@@ -83,6 +84,8 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *labelUsername;
     QLineEdit *textUsername;
+    QLabel *labelConnectionQuality;
+    QComboBox *comboConnection;
     QSpacerItem *horizontalSpacer_2;
     QPushButton *buttonAbout;
     QPushButton *buttonCancel;
@@ -375,6 +378,22 @@ public:
 
         horizontalLayout_2->addWidget(textUsername);
 
+        labelConnectionQuality = new QLabel(centralwidget);
+        labelConnectionQuality->setObjectName(QString::fromUtf8("labelConnectionQuality"));
+
+        horizontalLayout_2->addWidget(labelConnectionQuality);
+
+        comboConnection = new QComboBox(centralwidget);
+        comboConnection->setObjectName(QString::fromUtf8("comboConnection"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(comboConnection->sizePolicy().hasHeightForWidth());
+        comboConnection->setSizePolicy(sizePolicy);
+        comboConnection->setMinimumSize(QSize(250, 0));
+
+        horizontalLayout_2->addWidget(comboConnection);
+
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
@@ -495,6 +514,16 @@ public:
         buttonGameConnect->setText(QApplication::translate("mainwindowClass", "Connect", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("mainwindowClass", "Waiting games", 0, QApplication::UnicodeUTF8));
         labelUsername->setText(QApplication::translate("mainwindowClass", "Username:", 0, QApplication::UnicodeUTF8));
+        labelConnectionQuality->setText(QApplication::translate("mainwindowClass", "Connection:", 0, QApplication::UnicodeUTF8));
+        comboConnection->clear();
+        comboConnection->insertItems(0, QStringList()
+         << QApplication::translate("mainwindowClass", "LAN (60 keyframes/s)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("mainwindowClass", "Excellent (30 keyframes/s)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("mainwindowClass", "Good (20 keyframes/s)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("mainwindowClass", "Average (15 keyframes/s)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("mainwindowClass", "Low (12 keyframes/s)", 0, QApplication::UnicodeUTF8)
+         << QApplication::translate("mainwindowClass", "Bad (10 keyframes/s)", 0, QApplication::UnicodeUTF8)
+        );
         buttonAbout->setText(QApplication::translate("mainwindowClass", "About", 0, QApplication::UnicodeUTF8));
         buttonCancel->setText(QApplication::translate("mainwindowClass", "Cancel", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("mainwindowClass", "File", 0, QApplication::UnicodeUTF8));

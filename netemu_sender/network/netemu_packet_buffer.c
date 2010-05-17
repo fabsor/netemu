@@ -98,7 +98,7 @@ void _netemu_packet_buffer_update(void* args) {
 
 	while(1) {
 		if(itemsToAdd->count == 0) {
-			netemu_thread_event_wait(buffer->_internal->event);
+			netemu_thread_event_wait(buffer->_internal->event, NETEMU_INFINITE);
 		}
 		if(itemsToAdd->count > 0) {
 			netemu_thread_mutex_lock(lock,NETEMU_INFINITE);
@@ -128,7 +128,7 @@ struct netemu_packet_buffer_item* netemu_packet_buffer_wait_for_instruction(stru
 
 	eventhandle = netemu_thread_event_create();
 	info = _netemu_packet_buffer_register_wakeup_on_instruction(buffer, instruction_id, timestamp, eventhandle);
-	netemu_thread_event_wait(eventhandle);
+	netemu_thread_event_wait(eventhandle, NETEMU_INFINITE);
 	netemu_thread_event_destroy(eventhandle);
 	item = info->item;
 	free(info);
