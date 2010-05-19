@@ -11,8 +11,8 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-void run_kaillera_game_creator_test(no_instructions);
-void run_kaillera_game_joiner_test(no_instructions);
+void run_kaillera_game_creator_test(int no_instructions);
+void run_kaillera_game_joiner_test(int no_instructions);
 
 
 

@@ -20,7 +20,7 @@ netemu_event p2p_host_event;
 int p2p_host_test_ready = 0;
 int p2p_host_ready_to_send = 0;
 
-void run_p2p_host_test() {
+void run_p2p_host_test(int no_instructions) {
 	struct netemu_p2p_connection *p2p;
 	struct p2p_game** games;
 	int n;
@@ -43,7 +43,7 @@ void run_p2p_host_test() {
 	while(!p2p_host_ready_to_send) {
 		netemu_thread_event_wait(p2p_host_event, NETEMU_INFINITE);
 	}
-	for(n = 0; n < 10000; n++) {
+	for(n = 0; n < no_instructions; n++) {
 		netemu_p2p_send_play_values(p2p, data);
 	}
 }

@@ -49,6 +49,9 @@ int main(int argc, char *argv[]) {
 		if(strcmp(argv[i], "p2p") == 0) {
 			p2p = TRUE;
 		}
+		if(strcmp(argv[i], "p2p") == 0) {
+			p2p = TRUE;
+		}
 
 		if(strcmp(argv[i],"creator") == 0) {
 			creator = TRUE;
@@ -64,6 +67,14 @@ int main(int argc, char *argv[]) {
 		}
 		else {
 			run_kaillera_game_joiner_test(no_instructions);
+		}
+	}
+	else if(p2p) {
+		if(creator) {
+			run_p2p_host_test(no_instructions);
+		}
+		else {
+			run_p2p_join_test(no_instructions);
 		}
 	}
 
@@ -110,7 +121,6 @@ int main(int argc, char *argv[]) {
 	//muntrace();
 	return 0;
 }
-
 
 void connect_async(netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success, NULL);
