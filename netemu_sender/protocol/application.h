@@ -15,7 +15,7 @@
 /*! P2P defines */
 #define CREATE_P2P_GAME				30
 #define JOIN_P2P_GAME				31
-#define LEAVE_P2P_GAME 				32
+#define P2P_LEAVE_GAME 				32
 #define KICK_P2P_PLAYER 			33
 #define P2P_LOGIN_SUCCESS			34
 #define P2P_LOGIN_REQUEST			35

@@ -37,7 +37,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 		printf("Failed! Could not bind! Exiting...");
 		return;
 	}
-	netemu_p2p_create_game(p2p, "TheGame",1,strlen(VALUE)+1,&game);
+	netemu_p2p_create_game(p2p, "TheGame",connection,strlen(VALUE)+1,&game);
 	netemu_thread_event_wait(p2p_join_event, NETEMU_INFINITE);
 	printf("A new player has joined the game! OK!\n Starting the game...\n");
 	netemu_p2p_start_game(p2p,ADDR,45400);
