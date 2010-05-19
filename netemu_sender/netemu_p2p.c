@@ -47,7 +47,7 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_packet_buffer* buffe
 /**
  * Create a host connection.
  */
-struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname) {
+struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname, char connection_quality) {
 	struct netemu_p2p_connection *p2p;
 	union netemu_connection_type *type;
 
@@ -58,7 +58,7 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname)
 	p2p->user = malloc(sizeof(struct p2p_user));
 	p2p->user->name = username;
 	p2p->user->app_name = emulatorname;
-	p2p->user->connection = 1;
+	p2p->user->connection = connection_quality;
 	p2p->user->ping = 0;
 	p2p->user->_internal = netemu_application_p2p_create_user_internal();
 	p2p->current_game = NULL;

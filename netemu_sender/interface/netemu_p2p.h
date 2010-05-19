@@ -53,7 +53,7 @@ struct p2p_callback {
 };
 
 
-struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname);
+struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname, char connection_quality);
 
 int netemu_p2p_connect(struct netemu_p2p_connection* p2p, NETEMU_DWORD in_addr, unsigned short port,  NETEMU_DWORD connect_addr, unsigned short connect_port);
 
