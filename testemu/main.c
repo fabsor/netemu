@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	int no_instructions = 1000;
 	char choice;
 	info = NULL;
-	int connection;
+	int connection = 1;
 
 
 	for(i = 0; i < argc; i++) {
@@ -106,10 +106,10 @@ int main(int argc, char *argv[]) {
 				connect_p2p_async(addr);
 				break;
 			case '6':
-				run_p2p_host_test(no_instructions);
+				run_p2p_host_test(no_instructions, connection);
 				break;
 			case '7':
-				run_p2p_join_test(no_instructions);
+				run_p2p_join_test(no_instructions, connection);
 				break;
 			case '8':
 				run_kaillera_game_creator_test(no_instructions);

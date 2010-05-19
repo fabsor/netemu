@@ -34,7 +34,7 @@ void host_p2p(netemu_sockaddr_in addr) {
 	printf("Enter Port Number:\n");
 	scanf("%d",&port);
 	printf("\n");
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, 1);
 	netemu_p2p_host(p2p, BIND_ADDR,netemu_htons(port),CLOUD_NAME);
 	p2p_menu(p2p);
 }
@@ -51,7 +51,7 @@ void connect_p2p() {
 	printf("Enter Port Number to the host:\n");
 	scanf("%d",&join_port);
 	printf("\n");
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, 1);
 	netemu_p2p_connect(p2p,BIND_ADDR,netemu_htons(host_port),ADDR,netemu_htons(join_port));
 	p2p_menu(p2p);
 }
@@ -78,7 +78,7 @@ void connect_p2p_async() {
 	out_addr.sin_port = netemu_htons(port);
 	printf("\n");
 
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, 1);
 	netemu_p2p_connect_async(p2p,&in_addr,sizeof(in_addr),&out_addr,sizeof(out_addr), respond_to_login);
 	while(logged_in != 1);
 	p2p_menu(p2p);
