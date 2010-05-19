@@ -69,6 +69,9 @@ struct p2p_cached_buffered_play_values {
 	char index;
 };
 
+struct p2p_leave_player {
+	char player_no;
+};
 
 #ifdef	__cplusplus
 }

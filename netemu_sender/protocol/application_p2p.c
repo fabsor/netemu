@@ -209,12 +209,28 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	return pos;
 }
 
-void netemu_application_p2p_leave_game_add(struct application_instruction* instruction) {
-	instruction->body_size = 0;
-	instruction->id = LEAVE_P2P_GAME;
+void netemu_application_p2p_player_leave_add(struct application_instruction* instruction, char player_no) {
+	struct p2p_leave_player *player;
+	player = malloc(sizeof(struct p2p_leave_player));
+	player->player_no = player_no;
+	instruction->body = player;
+	instruction->body_size = 1;
+	instruction->id = P2P_LEAVE_GAME;
 	instruction->body = NULL;
 	instruction->body_size = 0;
 	instruction->packBodyFn = NULL;
+}
+
+void netemu_application_p2p_player_leave_pack(struct application_instruction *instruction, char *buffer) {
+	struct p2p_leave_player *player;
+	player = instruction->body;
+	memcpy(buffer, &player->player_no, 1);
+}
+
+void netemu_application_p2p_player_leave_parse(struct application_instruction *instruction, char *buffer) {
+	struct p2p_leave_player *player;
+	player = malloc(sizeof(struct p2p_leave_player));
+	memcpy(&player->player_no,buffer,1);
 }
 
 void netemu_application_p2p_login_success_parse(struct application_instruction *instruction, char *buffer) {
