@@ -105,16 +105,16 @@ int main(int argc, char *argv[]) {
 				connect_p2p_async(addr);
 				break;
 			case '6':
-				run_p2p_host_test();
+				run_p2p_host_test(no_instructions);
 				break;
 			case '7':
-				run_p2p_join_test();
+				run_p2p_join_test(no_instructions);
 				break;
 			case '8':
-				run_kaillera_game_creator_test();
+				run_kaillera_game_creator_test(no_instructions);
 			break;
 			case '9':
-				run_kaillera_game_joiner_test();
+				run_kaillera_game_joiner_test(no_instructions);
 			break;
 		}
 	}
