@@ -17,7 +17,7 @@ void p2p_join_register_callbacks(struct netemu_p2p_connection *connection);
 void p2p_join_play_values_received_callback(struct netemu_p2p_connection *, char* values, int size);
 netemu_event p2p_join_event;
 int p2p_join_ready_to_send = 0;
-void run_p2p_join_test() {
+void run_p2p_join_test(int no_instructions, char connection) {
 	struct netemu_p2p_connection *p2p;
 	struct p2p_game *game;
 	int n;
@@ -25,7 +25,7 @@ void run_p2p_join_test() {
 	data = malloc(512);
 	memcpy(data, VALUE, strlen(VALUE)+1);
 	p2p_join_event = netemu_thread_event_create();
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");
 	p2p_join_register_callbacks(p2p);
 	printf("OK!\Hosting on %d and connecting to %d...", P2P_JOIN_TEST_PORT, P2P_JOIN_TEST_CONNECT_PORT);
@@ -44,7 +44,7 @@ void run_p2p_join_test() {
 	while(!p2p_join_ready_to_send) {
 		netemu_thread_event_wait(p2p_join_event, NETEMU_INFINITE);
 	}
-	for(n = 0; n < 10000; n++) {
+	for(n = 0; n < no_instructions; n++) {
 		netemu_p2p_send_play_values(p2p, data);
 	}
 }

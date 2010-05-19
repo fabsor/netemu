@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
 	int no_instructions = 1000;
 	char choice;
 	info = NULL;
+	int connection = 1;
 
 
 	for(i = 0; i < argc; i++) {
@@ -56,6 +57,9 @@ int main(int argc, char *argv[]) {
 		if(strstr(argv[i],"send=")) {
 			no_instructions = atoi(argv[i] + strlen("send="));
 		}
+		if(strstr(argv[i], "connection=")) {
+			connection = atoi(argv[i] + strlen("connection="));
+		}
 	}
 
 	if(kaillera) {
@@ -64,6 +68,14 @@ int main(int argc, char *argv[]) {
 		}
 		else {
 			run_kaillera_game_joiner_test(no_instructions);
+		}
+	}
+	else if(p2p) {
+		if(creator) {
+			run_p2p_host_test(no_instructions, (char)connection);
+		}
+		else {
+			run_p2p_join_test(no_instructions, (char)connection);
 		}
 	}
 
@@ -94,23 +106,22 @@ int main(int argc, char *argv[]) {
 				connect_p2p_async(addr);
 				break;
 			case '6':
-				run_p2p_host_test();
+				run_p2p_host_test(no_instructions, connection);
 				break;
 			case '7':
-				run_p2p_join_test();
+				run_p2p_join_test(no_instructions, connection);
 				break;
 			case '8':
-				run_kaillera_game_creator_test();
+				run_kaillera_game_creator_test(no_instructions);
 			break;
 			case '9':
-				run_kaillera_game_joiner_test();
+				run_kaillera_game_joiner_test(no_instructions);
 			break;
 		}
 	}
 	//muntrace();
 	return 0;
 }
-
 
 void connect_async(netemu_sockaddr_in addr) {
 	kaillera_communication_connect_async(&addr,sizeof(addr),EMUNAME,PLAYERNAME,login_success, NULL);
