@@ -20,14 +20,14 @@ netemu_event p2p_host_event;
 int p2p_host_test_ready = 0;
 int p2p_host_ready_to_send = 0;
 
-void run_p2p_host_test(int no_instructions) {
+void run_p2p_host_test(int no_instructions, char connection) {
 	struct netemu_p2p_connection *p2p;
 	struct p2p_game** games;
 	int n;
 	char* data;
 	data = malloc(512);
 	memcpy(data, VALUE, strlen(VALUE)+1);
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME);
+	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");
 	p2p_host_register_callbacks(p2p);
 

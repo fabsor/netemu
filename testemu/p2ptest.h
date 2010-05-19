@@ -13,7 +13,7 @@ void host_p2p(netemu_sockaddr_in addr);
 void connect_p2p();
 void connect_p2p_async();
 
-void run_p2p_host_test(int no_instructions);
-void run_p2p_join_test(int no_instructions);
+void run_p2p_host_test(int no_instructions, char connection);
+void run_p2p_join_test(int no_instructions, char connection);
 
 #endif /* P2PTEST_H_ */
