@@ -625,17 +625,6 @@ void netemu_application_p2p_player_join_parse(struct application_instruction *in
 	instruction->packBodyFn = netemu_application_p2p_player_join_pack;
 }
 
-void netemu_application_p2p_kick_player_add(struct application_instruction *instruction, char* player_name) {
-	struct p2p_kick_player *kick;
-	int size;
-	kick = malloc(sizeof(struct p2p_kick_player));
-	size = netemu_util_copy_string(&kick->name,player_name);
-	instruction->body = kick;
-	instruction->id = KICK_P2P_PLAYER;
-	instruction->body_size = size;
-	instruction->packBodyFn = netemu_application_create_game_pack;
-}
-
 void netemu_application_p2p_buffered_play_values_add(struct application_instruction *instruction, char player_no, char size, void* data) {
 	struct p2p_buffered_play_values *play_values;
 	play_values = malloc(sizeof(struct p2p_buffered_play_values));

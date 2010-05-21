@@ -1,4 +1,7 @@
-﻿
+﻿/**
+ * @file
+ * This file contains the netemu_kaillera module.
+ */
 #include <stdio.h>
 #include "netemu_info.h"
 #include "interface/netemu_kaillera.h"

@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 	#include "../structures/netemu_hashtbl.h"
-	#include "../protocol/application_kaillera.h"
 	#include "netemu_thread.h"
 	#include "netemu_net.h"
 

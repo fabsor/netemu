@@ -20,7 +20,6 @@ struct netemu_receiver_udp{
 	NETEMU_SOCKET socket;
 	netemu_sockaddr* addr;
 	netemu_mutex lock;
-	struct netemu_packet_buffer *buffer;
 	parseReceivedDataFn fn;
 	NETEMU_BOOL listening;
 	void* received_data_param;
@@ -50,10 +49,8 @@ void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, p
 void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver);
 
 /**
- * Register a function that will act as a listener. The function will be called when data is received.
- * The function must be thread safe.
+ * Free the memory that this receiver is using.
  */
-
 void netemu_receiver_udp_free(struct netemu_receiver_udp* receiver);
 
 #endif /* NETEMU_RECEIVER_H_ */

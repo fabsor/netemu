@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-#include "interface/netemu.h"
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "netemu_thread.h"

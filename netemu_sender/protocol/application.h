@@ -1,16 +1,16 @@
-/*
- * application.h
- *
- *  Created on: May 10, 2010
- *      Author: emil
+/**
+ * @file
+ * This file contains defines for id numbers for all packets for
+ * both kaillera and netemu p2p. It also contains functions that both
+ * protocols use.
  */
 
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
-
+#include "protocol.h"
 #include "../network/netemu_net.h"
 
-/* Below are the IDs for each instruction as they appear in the original Kaillera protocoll and our modified P2P protocoll */
+/* Below are the IDs for each instruction as they appear in the original Kaillera protocol and our modified P2P protocoll */
 
 /*! P2P defines */
 #define CREATE_P2P_GAME				30
@@ -51,9 +51,12 @@
 #define MOTD_CHAT										0x17
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
+
 int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
 
 int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
+
+struct application_instruction* netemu_application_create_message();
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
 

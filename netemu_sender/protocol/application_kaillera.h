@@ -9,6 +9,7 @@
 #define APPLICATION_KAILLERA_H_
 #include "transport.h"
 #include "netlib_util.h"
+#include "application.h"
 #include "netemu_socket.h"
 #include <time.h>
 /* Size of the application_instruction struct excluding the body. */
@@ -36,20 +37,6 @@
 #define MOTD_CHAT										0x17
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
-
-/*! A message to be sent to the server. */
-struct application_instruction {
-	char id; /* 1...23 */
-	char *user;
-	void *body;
-	int body_size;
-	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
-	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
-	void* (*copyBodyFn)(struct application_instruction* instruction);
-	void (*freeBodyFn)(struct application_instruction* instruction);
-	int important; /**< Set this to > 0 and it will cause the buffer containing it to pack all buffered packets up and send them directly.*/
-	time_t timestamp;
-};
 
 struct login_request {
 	char *user;
@@ -178,8 +165,6 @@ struct chat {
 	char *message;
 };
 
-
-struct application_instruction* netemu_application_create_message();
 
 void netemu_application_free_message(struct application_instruction* message);
 

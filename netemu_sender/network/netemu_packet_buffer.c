@@ -1,5 +1,6 @@
 #include "netemu_packet_buffer.h"
 #include "netemu_list.h"
+#include "../protocol/application.h"
 
 struct _netemu_packet_buffer_wakeup_info {
 	netemu_event eventhandle;

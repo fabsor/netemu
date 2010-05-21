@@ -3,6 +3,12 @@
  * This header file contains functions for using the kaillera protocol.
  */
 
+/**
+ * @defgroup netemu_kaillera netemu_kaillera module
+ * This module contains everything external developers need to
+ * interact with kaillera servers.
+ */
+
 #ifndef NETEMU_KAILLERA_H_
 #define NETEMU_KAILLERA_H_
 
@@ -12,18 +18,23 @@ extern "C" {
 
 #include "../protocol/application_kaillera.h"
 #include "../protocol/communication.h"
-#include "netemu.h"
 #include "netemu_socket.h"
 
+typedef struct _netemu_info_internal *server_connection_internal;
+
+/**
+ * This struct is the base for the netemu_kaillera module
+ * @ingroup netemu_kaillera
+ */
 struct netemu_kaillera {
-	struct user* user;
-	int game_count;
-	int user_count;
-	char *emulator_name;
-	char *username;
-	struct game *current_game;
-	NETEMU_WORD player_id;
-	server_connection_internal _internal;
+	struct user* user; /**< The user which this instance of the module is logged in as. */
+	int game_count; /**< The number of games on the server. */
+	int user_count; /**< The number of users on the server. */
+	char *emulator_name; /**< The name of the emulator */
+	char *username; /**< The username */
+	struct game *current_game; /**< The game this instance currently participates in. */
+	NETEMU_WORD player_id; /**< the player id */
+	server_connection_internal _internal; /**< Internal members that is used internally. Do not try to modify! */
 };
 
 typedef void (* kailleraGameCreatedFn)(struct netemu_kaillera *info, struct game* new_game, void *user_data);
@@ -35,8 +46,16 @@ typedef void (* gameStartedFn)(struct netemu_kaillera *info, struct game* game, 
 typedef void (* playerJoinFn)(struct netemu_kaillera *info, struct player_joined *result);
 typedef void (* joinFn)(struct netemu_kaillera *info, char *user, NETEMU_DWORD ping, char connection, void *user_data);
 typedef void (* playerReadyFn)(struct netemu_kaillera *info);
+typedef void (* chatFn)(char *user, char *message, void *user_data);
+typedef void (* leaveFn)(NETEMU_WORD id, char *user, char *exit_message, void *user_data);
+typedef void (* cachedValuesReceivedFn)(struct intelligently_cached_buffered_play_values *result, void *user_data);
+typedef void (* connectionAcquiredFn) (struct netemu_kaillera *info, int status, void *user_data);
 
 /* We must store the function pointers in structs since ISO C99 does not allow void* to be typecasted to function pointers. */
+/**
+ * This union contains the different callback functions that can be used and registered.
+ * @ingroup netemu_kaillera
+ */
 union callback_fn {
 	chatFn chat_fn;
 	joinFn join_fn;
@@ -49,8 +68,12 @@ union callback_fn {
 	playerReadyFn player_ready_fn;
 	gameStatusUpdatedFn status_update_fn;
 	gameStartedFn game_started_fn;
+	connectionAcquiredFn connection_acquired_fn;
 };
-
+/**
+ * This struct represents a callback
+ * @ingroup netemu_kaillera
+ */
 struct callback {
 	void *user_data;
 	short disposable;
@@ -66,11 +89,12 @@ void netemu_kaillera_network_init(netemu_sockaddr_in *addr, int addr_size);
 
 int kaillera_communication_get_server_list(const char *address, struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount);
 
-void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct netemu_communication_server *server)));
+/* void kaillera_communication_get_server_list_async(void (*listReceivedFn(struct netemu_communication_server *server))); */
 
 struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connection, NETEMU_DWORD local_address, unsigned short local_port, NETEMU_DWORD server_address, unsigned short server_port);
 
-void kaillera_communication_connect_async(netemu_sockaddr_in *addr, int addr_size, char* emulator_name, char* username, void (*ConnectionReceivedFn)(int status, struct netemu_kaillera*, void *arg), void* arg);
+int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWORD local_address, unsigned short local_port,
+		NETEMU_DWORD server_address, unsigned short server_port, connectionAcquiredFn connectionFn, void* user_data);
 
 int netemu_send_chat_message(struct netemu_kaillera *connection, char *message);
 

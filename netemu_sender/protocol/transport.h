@@ -9,25 +9,8 @@
 #define TRANSPORT_H_
 
 #include "netlib_util.h"
-#include "application_kaillera.h"
 #include "netemu_socket.h"
-struct transport_instruction {
-	/* ? */
-	NETEMU_WORD serial;
-	NETEMU_WORD length;
-	long p2p_id;
-	void* instruction;
-};
-
-struct transport_packet {
-	char count;
-	struct transport_instruction **instructions;
-};
-
-struct transport_packet_buffer {
-	int size;
-	char* data;
-};
+#include "protocol.h"
 
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count);
 void netemu_transport_free_packet_buffer(struct transport_packet_buffer* buffer);

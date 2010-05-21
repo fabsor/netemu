@@ -86,6 +86,7 @@ int netemu_application_chat_partyline_add(struct application_instruction *instru
 		return -1;
 	}
 
+
 	instruction->body = partyline_chat;
 	instruction->body_size = size;
 	instruction->id = PARTYLINE_CHAT;

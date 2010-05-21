@@ -8,8 +8,6 @@
 #include "application.h"
 #include <stdlib.h>
 #include "netlib_error.h"
-#include "application_kaillera.h"
-#include "application_p2p.h"
 #include "../network/netemu_packet_buffer.h"
 #include "../network/netemu_net.h"
 

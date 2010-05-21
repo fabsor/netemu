@@ -102,12 +102,9 @@ void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver) {
 	}
 }
 
-void free_receiver(struct netemu_receiver_udp* receiver) {
-	free(receiver->addr);
-	netemu_closesocket(receiver->socket);
-	free(receiver);
-}
 
 void netemu_receiver_udp_free(struct netemu_receiver_udp* receiver) {
+	netemu_receiver_udp_stop_receiving(receiver);
 	netemu_closesocket(receiver->socket);
+	free(receiver->addr);
 }
