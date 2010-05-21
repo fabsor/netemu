@@ -21,12 +21,10 @@ void p2p_player_ready(struct netemu_p2p_connection *connection);
 void host_p2p(netemu_sockaddr_in addr);
 void join_p2p_game(struct netemu_p2p_connection *connection);
 void show_p2p_game_list(struct netemu_p2p_connection* connection);
-void show_p2p_user_list(struct netemu_kaillera* connection);
+void show_p2p_user_list(struct netemu_p2p_connection* connection);
 void p2p_player_joined_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user);
 
-/* We love the ugly stuff ;) */
 int logged_in = 0;
-
 
 void host_p2p(netemu_sockaddr_in addr) {
 	int port;
@@ -123,17 +121,14 @@ void p2p_menu(struct netemu_p2p_connection *connection) {
 }
 
 void start_p2p_game(struct netemu_p2p_connection *connection) {
-	netemu_sockaddr_in addr;
-	addr.sin_family = NETEMU_AF_INET;
-	addr.sin_addr.s_addr = ADDR;
-	addr.sin_port = netemu_htons(40000);
-
-	netemu_p2p_start_game(connection,(netemu_sockaddr*)&addr,sizeof(addr));
+	netemu_p2p_start_game(connection,ADDR,PORT);
 }
 
 void p2p_send_play_values(struct netemu_p2p_connection *connection) {
-	char* data = VALUE;
-	//netemu_p2p_send_play_values(connection, strlen(data)+1, data);
+	char* data;
+	data = malloc(512);
+	memcpy(data, VALUE, sizeof(VALUE)+1);
+	netemu_p2p_send_play_values(connection, data);
 }
 
 void p2p_player_ready(struct netemu_p2p_connection *connection) {
@@ -141,7 +136,6 @@ void p2p_player_ready(struct netemu_p2p_connection *connection) {
 	addr.sin_family = NETEMU_AF_INET;
 	addr.sin_addr.s_addr = ADDR;
 	addr.sin_port = netemu_htons(40001);
-
 	netemu_p2p_player_ready(connection,(netemu_sockaddr*)&addr,sizeof(addr));
 }
 
@@ -181,7 +175,7 @@ void show_p2p_game_list(struct netemu_p2p_connection* connection) {
 }
 
 
-void show_p2p_user_list(struct netemu_kaillera* connection) {
+void show_p2p_user_list(struct netemu_p2p_connection* connection) {
 	int no_users, i;
 	struct p2p_user** users;
 	users = netemu_p2p_get_user_list(connection, &no_users);

@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "p2ptest.h"
 #include "netemu_socket.h"
+#include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
 
