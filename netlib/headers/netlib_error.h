@@ -64,9 +64,6 @@ extern "C" {
 
 #else
 
-//#include <winsock2.h>
-//#include <ws2tcpip.h>
-
 #define NETEMU_ENOTINITIALIZED	WSANOTINITIALISED
 #define NETEMU_EINTR			WSAEINTR
 #define NETEMU_EWOULDBLOCK		WSAEWOULDBLOCK

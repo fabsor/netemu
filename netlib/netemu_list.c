@@ -257,7 +257,7 @@ int netemu_list_clear(struct netemu_list* list) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		error = -1;
 	}
-	//free(list->elements);
+	free(list->elements);
 	list->elements = new_buffer;
 	list->count = 0;
 	list->_intern->size = 20;

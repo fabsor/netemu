@@ -59,11 +59,10 @@ void run_kaillera_game_creator_test(int no_instructions) {
 
 
 	elapsed = end_time.tv_usec - start_time.tv_usec;
-	printf("Elapsed microseconds: %i", elapsed);
+	printf("Elapsed microseconds: %ld", elapsed);
 }
 
 void register_kaillera_game_creator_callbacks(struct netemu_kaillera *info) {
-	//netemu_register_play_values_received_callback(info, kaillera_game_creator_values_received, NULL);
 	netemu_register_user_join_callback(info, kaillera_game_creator_user_joined, NULL);
 	netemu_register_game_status_updated_callback(info, kaillera_game_creator_game_status, NULL);
 }

@@ -8,7 +8,7 @@
 #ifndef NETEMU_STRINGBUILDER_H_
 #define NETEMU_STRINGBUILDER_H_
 
-#include "../netemu_util.h"
+#include "../util.h"
 
 struct netemu_stringbuilder {
 	NETEMU_DWORD count;

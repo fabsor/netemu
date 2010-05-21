@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "../netemu_util.h"
+#include "../util.h"
 
 void network_listener(char* data, size_t size, struct netemu_receiver_udp* receiver, void*);
 void send_network_data(struct netemu_sender_udp* sender);
@@ -21,7 +21,7 @@ void test_network(){
 	sender = netemu_util_prepare_sender(INTERNAL_PORT);
 	send_network_data(sender);
 	while(!net_ping && !net_hello);
-	netemu_receiver_udp_free(receiver);
+	netemu_receiver_udp_destroy(receiver);
 	netemu_sender_udp_free(sender);
 	printf("network test finished\n");
 }

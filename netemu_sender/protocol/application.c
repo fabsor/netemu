@@ -6,20 +6,21 @@
  */
 #include "transport.h"
 #include "application.h"
+#include "application_kaillera.h"
+#include "application_p2p_internal.h"
 #include <stdlib.h>
 #include "netlib_error.h"
-#include "../network/netemu_packet_buffer.h"
-#include "../network/netemu_net.h"
+#include "../util.h"
+#include "../network/receiver_buffer.h"
 
 int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param) {
 	int i, j;
-	unsigned int pos;
 	struct transport_packet* packet;
 	struct transport_instruction* instruction;
 	struct application_instruction *app_instruction;
-	struct netemu_packet_buffer *buffer;
+	struct netemu_receiver_buffer *buffer;
 	int error;
-	buffer = (struct netemu_packet_buffer *)param;
+	buffer = (struct netemu_receiver_buffer *)param;
 	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
@@ -62,8 +63,8 @@ int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types t
 		packet->instructions[i] = instruction;
 	}
 	for(i = 0; i < packet->count; i++) {
-		app_instruction = netemu_application_parse_message(packet->instructions[i]);
-		netemu_packet_buffer_add(buffer, app_instruction,type,connection);
+		app_instruction = netemu_application_instruction_parse(packet->instructions[i]);
+		netemu_receiver_buffer_add(buffer, app_instruction,type,connection);
 	}
 	return 0;
 }
@@ -74,12 +75,12 @@ int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types t
 	struct transport_packet* packet;
 	struct application_instruction *app_instruction;
 	struct transport_instruction* instruction;
-	struct netemu_packet_buffer *buffer;
+	struct netemu_receiver_buffer *buffer;
 	int error;
 	char* bytebuffer;
 
 	bytebuffer = malloc(512);
-	buffer = (struct netemu_packet_buffer *)param;
+	buffer = (struct netemu_receiver_buffer *)param;
 
 	error = netemu_recvfrom(socket, bytebuffer, 512, 0, NULL, 0);
 	if(error == -1) {
@@ -121,13 +122,13 @@ int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types t
 	}
 
 	for(i = 0; i < packet->count; i++) {
-		app_instruction = netemu_application_parse_message(packet->instructions[i]);
-		netemu_packet_buffer_add(buffer, app_instruction,type,connection);
+		app_instruction = netemu_application_instruction_parse(packet->instructions[i]);
+		netemu_receiver_buffer_add(buffer, app_instruction,type,connection);
 	}
 	return 0;
 }
 
-struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {
+struct application_instruction* netemu_application_instruction_parse(struct transport_instruction *instruction) {
 	struct application_instruction *app_instruction;
 	char *data;
 
@@ -140,8 +141,8 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 	data = (char*)instruction->instruction;
 	memcpy(&app_instruction->id,data,sizeof(char));
 	data += sizeof(char);
-
-	if((app_instruction->user = netemu_util_parse_string(data)) == NULL) {
+	app_instruction->user = netemu_util_parse_string(data);
+	if(app_instruction->user == NULL) {
 		/* Error code already set in parse_string */
 		free(app_instruction);
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
@@ -224,5 +225,13 @@ struct application_instruction* netemu_application_parse_message(struct transpor
 
 	}
 	return app_instruction;
+}
+
+void netemu_application_instruction_destroy(struct application_instruction* message) {
+	if(message->freeBodyFn != NULL) {
+		message->freeBodyFn(message);
+	}
+	free(message->user);
+	free(message);
 }
 

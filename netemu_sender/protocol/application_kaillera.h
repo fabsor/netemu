@@ -165,9 +165,6 @@ struct chat {
 	char *message;
 };
 
-
-void netemu_application_free_message(struct application_instruction* message);
-
 void netemu_application_buffered_play_values_add(struct application_instruction *instruction, NETEMU_WORD size, char *data);
 
 void netemu_application_buffered_play_values_pack(struct application_instruction *instruction, char *buffer);
@@ -253,6 +250,4 @@ void netemu_application_user_leave_parse(struct application_instruction *instruc
 void netemu_application_client_timeout_request_add(struct application_instruction* instruction);
 
 void netemu_application_buffered_play_values_copy(struct buffered_play_values *target, struct buffered_play_values *values);
-
-struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction);
 #endif /* APPLICATION_KAILLERA_H_ */

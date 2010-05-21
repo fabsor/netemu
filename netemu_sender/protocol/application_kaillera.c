@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "../netemu_util.h"
+#include "../util.h"
 #include "netemu_socket.h"
 #include "netlib_util.h"
 #include "application_kaillera.h"
@@ -18,7 +18,7 @@ void netemu_application_player_left_pack(struct application_instruction* instruc
 int _netemu_application_login_success_games_parse(struct login_success *success, char **data);
 int _netemu_application_login_success_users_parse(struct login_success *success, char **data);
 
-struct application_instruction* netemu_application_create_message() {
+struct application_instruction* netemu_application_instruction_create() {
 	struct application_instruction* message;
 	if((message = malloc(sizeof(struct application_instruction))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
@@ -374,14 +374,6 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 	memcpy(buffer, &play_values->size, sizeof(NETEMU_WORD));
 	buffer += sizeof(NETEMU_WORD);
 	memcpy(buffer, play_values->values, play_values->size);
-}
-
-void netemu_application_free_message(struct application_instruction* message) {
-	/* TODO: Var inte detta ändrat redan? Så att vi inte frigör hela bodyn här, utan använder specifika free-metoder
-	 * beroende på body-typ. Håll käften, jag gör vad jag vill! =) */
-	free(message->body);
-	free(message->user);
-	free(message);
 }
 
 int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection) {

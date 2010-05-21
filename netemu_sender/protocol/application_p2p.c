@@ -4,13 +4,12 @@
  */
 
 #include "netlib_util.h"
-#include "../netemu_util.h"
+#include "../util.h"
 #include "application_p2p.h"
 #include "application.h"
 #include "application_p2p_internal.h"
-#include "../network/netemu_net.h"
-#include "../network/netemu_sender_udp.h"
-#include "../network/netemu_tcp.h"
+#include "../network/sender_udp.h"
+#include "../network/tcp.h"
 
 int _netemu_application_p2p_pack_user(char* buffer, struct p2p_user *user);
 int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETEMU_BOOL parse_user);

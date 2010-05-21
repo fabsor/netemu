@@ -6,9 +6,9 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include "../netemu_util.h"
-#include "../network/netemu_receiver.h"
-#include "../network/netemu_sender_udp.h"
+#include "../util.h"
+#include "../network/receiver_udp.h"
+#include "../network/sender_udp.h"
 #include "../protocol/application_kaillera.h"
 #include "../protocol/transport.h"
 #include "../protocol/communication.h"
@@ -70,7 +70,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver_udp* r
 	else {
 		packet = netemu_transport_unpack(data);
 		for (i = 0; i < packet->count; i++) {
-			instruction = netemu_application_parse_message(packet->instructions[i]);
+			instruction = netemu_application_instruction_parse(packet->instructions[i]);
 			if(instruction->id == PING) {
 				ping_received = 1;
 				printf("PING! Sending PONG!\n");
@@ -99,7 +99,7 @@ void application_listener(char* data, size_t size, struct netemu_receiver_udp* r
 void test_login_request(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
+	messages[0] = netemu_application_instruction_create();
 	netemu_application_login_request_add(messages[0],"netemu","haha",1);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_udp_send(sender,buffer.data,buffer.size);
@@ -109,7 +109,7 @@ void test_login_request(struct netemu_sender_udp* sender) {
 void test_send_leave(struct netemu_sender_udp *sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
+	messages[0] = netemu_application_instruction_create();
 	netemu_application_user_leave_add(messages[0],"leavin.");
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_udp_send(sender,buffer.data,buffer.size);
@@ -118,7 +118,7 @@ void test_send_leave(struct netemu_sender_udp *sender) {
 void test_pong(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
+	messages[0] = netemu_application_instruction_create();
 	netemu_application_pong_add(messages[0]);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_udp_send(sender,buffer.data,buffer.size);
@@ -127,7 +127,7 @@ void test_pong(struct netemu_sender_udp* sender) {
 void test_create_game(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
+	messages[0] = netemu_application_instruction_create();
 	netemu_application_create_game_add(messages[0],"thegame");
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_udp_send(sender,buffer.data,buffer.size);
@@ -136,7 +136,7 @@ void test_create_game(struct netemu_sender_udp* sender) {
 void test_join_game(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
+	messages[0] = netemu_application_instruction_create();
 	netemu_application_join_game_add(messages[0],game_id,1);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_udp_send(sender,buffer.data,buffer.size);
@@ -145,7 +145,7 @@ void test_join_game(struct netemu_sender_udp* sender) {
 void test_quit_game(struct netemu_sender_udp* sender) {
 	struct transport_packet_buffer buffer;
 	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
+	messages[0] = netemu_application_instruction_create();
 	netemu_application_player_left_add(messages[0]);
 	buffer = netemu_transport_pack(messages,1);
 	netemu_sender_udp_send(sender,buffer.data,buffer.size);

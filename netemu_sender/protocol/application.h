@@ -8,7 +8,7 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 #include "protocol.h"
-#include "../network/netemu_net.h"
+#include "../network/net.h"
 
 /* Below are the IDs for each instruction as they appear in the original Kaillera protocol and our modified P2P protocoll */
 
@@ -56,8 +56,11 @@ int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types t
 
 int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
 
-struct application_instruction* netemu_application_create_message();
+struct application_instruction* netemu_application_instruction_create();
 
-struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction);
+struct application_instruction* netemu_application_instruction_parse(struct transport_instruction *instruction);
 
+struct application_instruction* netemu_application_instruction_copy(struct application_instruction* instruction);
+
+void netemu_application_instruction_destroy(struct application_instruction* message);
 #endif /* APPLICATION_H_ */

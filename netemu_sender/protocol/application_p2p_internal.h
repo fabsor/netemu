@@ -79,6 +79,10 @@ void netemu_application_p2p_cached_play_values_add(struct application_instructio
 
 void netemu_application_p2p_buffered_play_values_add(struct application_instruction *instruction, char player_no, char size, void* data);
 
+void netemu_application_p2p_buffered_play_values_parse(struct application_instruction *instruction, char *data);
+
+void netemu_application_p2p_cached_play_values_parse(struct application_instruction *instruction, char *data);
+
 void netemu_application_p2p_buffered_play_values_copy(struct p2p_buffered_play_values *target, struct p2p_buffered_play_values *values);
 
 struct p2p_game_internal *netemu_application_p2p_create_game_internal();

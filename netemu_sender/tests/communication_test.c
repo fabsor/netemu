@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../netemu_util.h"
+#include "../util.h"
 #include "../protocol/communication.h"
 
 void send_communication_data(struct netemu_sender_udp* sender);
