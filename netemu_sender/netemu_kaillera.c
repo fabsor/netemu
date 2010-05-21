@@ -37,7 +37,7 @@ int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
 	struct application_instruction *messages[1];
 	messages[0] = netemu_application_create_message();
 	*/
-	return 1;
+	return 0;
 }
 
 int netemu_disconnect(struct netemu_kaillera *info, char *message) {
@@ -65,7 +65,7 @@ int netemu_kaillera_create_game(struct netemu_kaillera *info, char *gamename, st
 	netemu_sender_buffer_add(info->_internal->send_buffer, message, UDP_SENDER, type);
 	item = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, CREATE_GAME, timestamp);
 	*result = (struct game*)item->instruction->body;
-	return 1;
+	return 0;
 }
 
 void netemu_kaillera_create_game_async(struct netemu_kaillera *info, char *gamename, kailleraGameCreatedFn callback) {
@@ -115,7 +115,7 @@ int netemu_kaillera_start_game(struct netemu_kaillera *info) {
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	message->important = 1;
 	reply = netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, START_GAME,timestamp);
-	return 1;
+	return 0;
 }
 
 
@@ -133,20 +133,20 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->game_count = 0;
 	info->_internal = malloc(sizeof(struct _netemu_info_internal));
 	info->_internal->connected_event = netemu_thread_event_create();
-	info->_internal->chat_callback = netemu_list_new(3, FALSE);
-	info->_internal->game_created_callback = netemu_list_new(3, FALSE);
-	info->_internal->join_callback = netemu_list_new(3, FALSE);
-	info->_internal->player_join_callback = netemu_list_new(3, FALSE);
-	info->_internal->leave_callback = netemu_list_new(3, FALSE);
-	info->_internal->play_values_callback = netemu_list_new(3, FALSE);
-	info->_internal->player_ready_callback = netemu_list_new(3, FALSE);
+	info->_internal->chat_callback = netemu_list_create(3, FALSE);
+	info->_internal->game_created_callback = netemu_list_create(3, FALSE);
+	info->_internal->join_callback = netemu_list_create(3, FALSE);
+	info->_internal->player_join_callback = netemu_list_create(3, FALSE);
+	info->_internal->leave_callback = netemu_list_create(3, FALSE);
+	info->_internal->play_values_callback = netemu_list_create(3, FALSE);
+	info->_internal->player_ready_callback = netemu_list_create(3, FALSE);
 	info->_internal->receive_buffer = netemu_packet_buffer_new(100);
-	info->_internal->game_status_updated_callbacks = netemu_list_new(3, FALSE);
-	info->_internal->game_started_callbacks = netemu_list_new(3, FALSE);
+	info->_internal->game_status_updated_callbacks = netemu_list_create(3, FALSE);
+	info->_internal->game_started_callbacks = netemu_list_create(3, FALSE);
 	info->_internal->send_buffer = netemu_sender_buffer_new(5, 10);
-	info->_internal->cached_values_callback = netemu_list_new(3, TRUE);
+	info->_internal->cached_values_callback = netemu_list_create(3, TRUE);
 	info->_internal->game_create_requested = 1;
-	info->_internal->users = netemu_list_new(10, FALSE);
+	info->_internal->users = netemu_list_create(10, FALSE);
 	info->_internal->has_id = 0;
 	info->_internal->connection_quality = conneciton_quality;
 	info->_internal->cache_index = 0;
@@ -154,11 +154,11 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->_internal->cached_count = 0;
 	info->_internal->values_buffered = 0;
 	info->_internal->sent_values = 0;
-	info->_internal->received_play_values = netemu_list_new(3, FALSE);
+	info->_internal->received_play_values = netemu_list_create(3, FALSE);
 	info->_internal->values_to_send = NULL;
 	info->_internal->play_values_event = netemu_thread_event_create();
 	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
-	info->_internal->games = netemu_list_new(10, FALSE);
+	info->_internal->games = netemu_list_create(10, FALSE);
 	netemu_list_register_sort_fn(info->_internal->games,_netemu_kaillera_game_comparator);
 
 	netemu_packet_buffer_add_instruction_received_fn(info->_internal->receive_buffer,PARTYLINE_CHAT, _netemu_respond_to_chat, info);
@@ -216,7 +216,7 @@ int netemu_kaillera_join_game(struct netemu_kaillera *info, NETEMU_DWORD gameid)
 	netemu_application_join_game_add(message,gameid,1);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer,EXISTING_PLAYERS_LIST, timestamp);
-	return 1;
+	return 0;
 }
 
 int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD gameid) {
@@ -228,7 +228,7 @@ int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD g
 	netemu_application_join_game_add(message,gameid,1);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 
-	return 1;
+	return 0;
 }
 
 
@@ -364,7 +364,7 @@ int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, voi
 
 		for(i = 0; i < info->_internal->cached_count; i++) {
 			if(_netemu_kaillera_buffered_values_cmp(info->_internal->values_to_send,info->_internal->cached_values[i].values,
-					size, info->current_game->player_count)) {
+					size, info->current_game->player_count) == 0) {
 				netemu_application_intelligently_cached_play_values_add(message, i);
 				is_cached = TRUE;
 				break;
@@ -378,7 +378,7 @@ int netemu_kaillera_send_play_values(struct netemu_kaillera* info, int size, voi
 		info->_internal->values_buffered = 0;
 		info->_internal->sent_values++;
 	}
-	return 1;
+	return 0;
 }
 
 int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
@@ -440,5 +440,5 @@ int netemu_kaillera_send_player_ready(struct netemu_kaillera *info) {
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	netemu_packet_buffer_wait_for_instruction(info->_internal->receive_buffer, PLAYER_READY, timestamp);
-	return 1;
+	return 0;
 }

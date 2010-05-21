@@ -65,7 +65,7 @@ int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types t
 		app_instruction = netemu_application_parse_message(packet->instructions[i]);
 		netemu_packet_buffer_add(buffer, app_instruction,type,connection);
 	}
-	return 1;
+	return 0;
 }
 
 int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param) {
@@ -124,7 +124,7 @@ int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types t
 		app_instruction = netemu_application_parse_message(packet->instructions[i]);
 		netemu_packet_buffer_add(buffer, app_instruction,type,connection);
 	}
-	return 1;
+	return 0;
 }
 
 struct application_instruction* netemu_application_parse_message(struct transport_instruction *instruction) {

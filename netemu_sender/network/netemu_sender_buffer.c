@@ -32,7 +32,7 @@ struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_p
 	buffer->preferred_delay_time = preferred_delay_time;
 	buffer->send_lock = netemu_thread_mutex_create();
 	buffer->running = 1;
-	buffer->itemsToAdd = netemu_list_new(10,1);
+	buffer->itemsToAdd = netemu_list_create(10,1);
 	buffer->event = netemu_thread_event_create();
 	/* Start a new thread. */
 	netemu_thread_new(_netemu_sender_buffer_update,buffer);
@@ -118,19 +118,19 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 	}
 	netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
 	if((list = netemu_hashtbl_get(buffer->instructions,key,sizeof(void*))) == NULL) {
-		list = netemu_list_new(10,0);
+		list = netemu_list_create(10,0);
 		if(list == NULL) {
 			free(item);
 			return -1;
 		}
 		if(netemu_hashtbl_insert(buffer->instructions,key,sizeof(void*),list) == -1) {
-			netemu_list_free(list);
+			netemu_list_destroy(list);
 			free(item);
 			return -1;
 		}
 	}
 	if(netemu_list_add(list,item) == -1) {
-		netemu_list_free(list);
+		netemu_list_destroy(list);
 		free(item);
 		return -1;
 	}

@@ -24,5 +24,6 @@ struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SO
 netemu_sockaddr* netemu_util_copy_addr(netemu_sockaddr *addr, int addr_size);
 netemu_sockaddr_in* netemu_util_create_addr(NETEMU_DWORD addr, unsigned short port, int *size);
 void netemu_util_send_data(struct netemu_sender_udp* sender, char* data);
+void* netemu_util_alloc_or_die(size_t size);
 int netemu_util_pack_str(char* buffer, char* str);
 #endif /* TEST_UTIL_H_ */

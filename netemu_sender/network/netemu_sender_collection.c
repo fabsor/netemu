@@ -9,7 +9,7 @@
 struct netemu_sender_collection* netemu_sender_collection_new() {
 	struct netemu_sender_collection *collection;
 	collection = malloc(sizeof(struct netemu_collection*));
-	collection->senders = netemu_list_new(10,1);
+	collection->senders = netemu_list_create(10,1);
 
 	return collection;
 }
@@ -54,6 +54,6 @@ void netemu_sender_collection_send_data(struct netemu_sender_collection* collect
 }
 
 void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection) {
-	netemu_list_free(collection->senders);
+	netemu_list_destroy(collection->senders);
 	free(collection);
 }

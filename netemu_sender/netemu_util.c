@@ -1,31 +1,16 @@
-/*
- * test_util.c
- *
- *  Created on: 6 apr 2010
- *      Author: fabian
+/**
+ * @file
+ * This file contains some convenient utility function used in the
+ * framework.
+ */
+
+/**
+ * @defgroup netemu_util Various utilities
+ * Some nice utility functions used in the API.
  */
 #include "netemu_util.h"
 #include "netlib_error.h"
 #include <stdio.h>
-/**
- * @file
- * This file contains some utilities used often in tests of the framework.
- */
-
-/* #define SERVER_ADDRESS	netemu_inet_addr("192.168.106.222"); */
-#define SERVER_ADDRESS	netemu_htonl(INADDR_LOOPBACK);
-
-
-struct netemu_sender_udp* netemu_util_prepare_sender_on_socket(NETEMU_SOCKET socket, int port) {
-	netemu_sockaddr_in* addr_in;
-	struct netemu_sender_udp* sender;
-	addr_in = malloc(sizeof(netemu_sockaddr_in));
-	addr_in->sin_addr.s_addr = SERVER_ADDRESS;
-	addr_in->sin_family = NETEMU_AF_INET;
-	addr_in->sin_port = netemu_htons(port);
-	sender = netemu_sender_udp_new_on_socket((netemu_sockaddr*)addr_in,socket,sizeof(addr_in));
-	return sender;
-}
 
 struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, netemu_sockaddr_in *addr_in, int size) {
 	struct netemu_sender_udp* sender;
@@ -33,6 +18,9 @@ struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SO
 	return sender;
 }
 
+/**
+ * Send a string.
+ */
 void netemu_util_send_data(struct netemu_sender_udp* sender, char* data) {
 	int error;
 	error = netemu_sender_udp_send(sender,data,strlen(data)+1);
@@ -82,6 +70,20 @@ netemu_sockaddr_in* netemu_util_create_addr(NETEMU_DWORD address, unsigned short
 	addr->sin_family = NETEMU_AF_INET;
 	*size = sizeof(netemu_sockaddr_in);
 	return addr;
+}
+
+/**
+ * This function allocates memory, and if it fails it kills the application.
+ * Handle with care!
+ * @param size the size of the block to allocate.
+ */
+void* netemu_util_alloc_or_die(size_t size) {
+	void *pointer;
+	pointer = malloc(size);
+	if(pointer == NULL) {
+		exit(-1);
+	}
+	return pointer;
 }
 
 int netemu_util_pack_str(char* buffer, char* str) {

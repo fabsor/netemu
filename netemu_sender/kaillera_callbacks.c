@@ -114,7 +114,7 @@ int netemu_unregister_play_values_callback(struct netemu_kaillera *connection, v
 	fn->values_received_fn = callback;
 	netemu_list_remove(connection->_internal->play_values_callback, (void*)fn);
 	free(fn);
-	return 1;
+	return 0;
 }
 
 int netemu_register_cached_values_received_callback(struct netemu_kaillera *connection, cachedValuesReceivedFn callback, void *user_data) {

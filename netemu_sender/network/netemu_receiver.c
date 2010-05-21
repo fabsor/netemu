@@ -63,14 +63,11 @@ void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, p
 /*! Called to receive data. */
 void netemu_receiver_recv(void* params) {
 	struct netemu_receiver_udp* receiver;
-	struct transport_instruction *instruction;
-	struct transport_packet *packet;
 	union netemu_connection_type type;
-	int error, i;
+	int error;
 	receiver = (struct netemu_receiver_udp*)params;
 	receiver->listening = 1;
-	/*TODO: We need to figure out how to fix this, it's ugly to include a null. */
-	type.udp_sender = receiver;
+	type.udp_receiver = receiver;
 	receiver->lock = netemu_thread_mutex_create();
 	while (receiver->listening) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */

@@ -14,7 +14,7 @@ struct _netemu_list_internal {
 int _netemu_enlarge_list(struct netemu_list* list, int size);
 int _netemu_list_search_linear(struct netemu_list* list, void* element);
 
-struct netemu_list* netemu_list_new(int count, NETEMU_BOOL thread_safe) {
+struct netemu_list* netemu_list_create(int count, NETEMU_BOOL thread_safe) {
 	struct netemu_list* list;
 	struct _netemu_list_internal* intern;
 	if((intern = malloc(sizeof(struct _netemu_list_internal))) == NULL) {
@@ -186,7 +186,7 @@ void netemu_list_register_sort_fn(struct netemu_list* list, int(* comparator)(
 
 /**
  * Sort the list. To use this function, you need to register a sorting function.
- * @return 1 if the sorting was successful, 0 if you haven't registered a sorting function.
+ * @return 0 if the sorting was successful, 0 if you haven't registered a sorting function.
  */
 int netemu_list_sort(struct netemu_list* list) {
 	int return_value;
@@ -215,6 +215,8 @@ int netemu_list_sort(struct netemu_list* list) {
 
 /**
  * Trim the list to the actual size.
+ * @todo: Actually implement this function.
+ * @param list the list instance
  */
 void netemu_list_trim(struct netemu_list* list) {
 
@@ -224,7 +226,7 @@ void netemu_list_trim(struct netemu_list* list) {
  * Free the resources taken up by this list. Note that this will not free the memory the items in the list
  * takes up, since the items might be used in other parts of the program.
  */
-void netemu_list_free(struct netemu_list* list) {
+void netemu_list_destroy(struct netemu_list* list) {
 	free(list->elements);
 	if(list->thread_safe) {
 		netemu_thread_mutex_destroy(list->_intern->list_mutex);

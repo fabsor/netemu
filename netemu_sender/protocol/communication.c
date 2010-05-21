@@ -63,7 +63,7 @@ int netemu_communication_ping_server(struct server *server, void (* pingReceived
 	/* Store current time, so we can calculate roundtrip time when we receive the pong. */
 	server->_internal->ping_timestamp = time(NULL);
 	netemu_sender_udp_send(server->_internal->sender, ping, strlen(ping)+1);
-	return 1;
+	return 0;
 }
 
 
@@ -164,7 +164,7 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		return -1;
 	}
 
-	game_list = netemu_list_new(128, FALSE);
+	game_list = netemu_list_create(128, FALSE);
 	if(game_list == NULL) {
 		netemu_stringbuilder_free(builder);
 		return -1;
@@ -176,17 +176,17 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		for(i = 0; i < game_list->count; i++)
 			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
-		netemu_list_free(game_list);
+		netemu_list_destroy(game_list);
 		return -1;
 	}
 
 
-	server_list = netemu_list_new(128, FALSE);
+	server_list = netemu_list_create(128, FALSE);
 	if(server_list == NULL) {
 		for(i = 0; i < game_list->count; i++)
 			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
-		netemu_list_free(game_list);
+		netemu_list_destroy(game_list);
 	}
 
 	response_body = _netemu_parse_server_list(response_body, server_list);
@@ -197,8 +197,8 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		for(i = 0; i < game_list->count; i++)
 			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
-		netemu_list_free(game_list);
-		netemu_list_free(server_list);
+		netemu_list_destroy(game_list);
+		netemu_list_destroy(server_list);
 		return -1;
 	}
 
@@ -209,8 +209,8 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 		for(i = 0; i < game_list->count; i++)
 			free(netemu_list_get(game_list, i));
 		netemu_stringbuilder_free(builder);
-		netemu_list_free(game_list);
-		netemu_list_free(server_list);
+		netemu_list_destroy(game_list);
+		netemu_list_destroy(server_list);
 		return -1;
 	}
 
@@ -222,8 +222,8 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 			free(netemu_list_get(game_list, i));
 		free(*games);
 		netemu_stringbuilder_free(builder);
-		netemu_list_free(game_list);
-		netemu_list_free(server_list);
+		netemu_list_destroy(game_list);
+		netemu_list_destroy(server_list);
 		return -1;
 	}
 
@@ -231,8 +231,8 @@ int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game *
 	*servercount = server_list->count;
 
 	netemu_stringbuilder_free(builder);
-	netemu_list_free(game_list);
-	netemu_list_free(server_list);
+	netemu_list_destroy(game_list);
+	netemu_list_destroy(server_list);
 
 	return 0;
 }

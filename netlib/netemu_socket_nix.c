@@ -175,7 +175,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	}
 
 	if((addr_result = malloc(sizeof(struct netemu_addrinfo))) == NULL) {
-		//netlib_set_last_error(0);
+		netlib_set_last_error(0);
 		return -1;
 	}
 	_fill_netemu_addrinfo(info,addr_result);
@@ -184,6 +184,10 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	while(info != NULL) {
 		/* TODO: Check for out-of-memory errors here */
 		iter = malloc(sizeof(struct netemu_addrinfo));
+		if(iter == NULL) {
+			netlib_set_last_error(errno);
+			return -1;
+		}
 		_fill_netemu_addrinfo(info, iter);
 		iter = iter->next;
 		info = info->ai_next;

@@ -22,4 +22,6 @@ netemu_ui/Makefile.Release
 libnetemu.a
 libnetlib.a
 netemu.org/*
+docs
+docs/*
 

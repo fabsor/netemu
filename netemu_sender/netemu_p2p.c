@@ -82,20 +82,20 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname,
 	p2p->user->_internal = netemu_application_p2p_create_user_internal();
 	p2p->current_game = NULL;
 	p2p->_internal = malloc(sizeof(struct netemu_p2p_internal));
-	p2p->_internal->users = netemu_list_new(10,TRUE);
-	p2p->_internal->games = netemu_list_new(10,TRUE);
+	p2p->_internal->users = netemu_list_create(10,TRUE);
+	p2p->_internal->games = netemu_list_create(10,TRUE);
 	p2p->_internal->send_buffer = netemu_sender_buffer_new(5,20);
 	p2p->_internal->receive_buffer = netemu_packet_buffer_new(100);
 	netemu_list_add(p2p->_internal->users, p2p->user);
 	p2p->_internal->login_connection = NULL;
 	p2p->_internal->continueFn = NULL;
-	p2p->_internal->login_callbacks = netemu_list_new(2,0);
-	p2p->_internal->play_values_callbacks = netemu_list_new(2,0);
-	p2p->_internal->game_created_callbacks = netemu_list_new(2,0);
-	p2p->_internal->join_callbacks = netemu_list_new(2,0);
-	p2p->_internal->game_started_callbacks = netemu_list_new(2,0);
-	p2p->_internal->all_ready_callbacks = netemu_list_new(2,0);
-	p2p->_internal->player_joined_callbacks = netemu_list_new(2,0);
+	p2p->_internal->login_callbacks = netemu_list_create(2,0);
+	p2p->_internal->play_values_callbacks = netemu_list_create(2,0);
+	p2p->_internal->game_created_callbacks = netemu_list_create(2,0);
+	p2p->_internal->join_callbacks = netemu_list_create(2,0);
+	p2p->_internal->game_started_callbacks = netemu_list_create(2,0);
+	p2p->_internal->all_ready_callbacks = netemu_list_create(2,0);
+	p2p->_internal->player_joined_callbacks = netemu_list_create(2,0);
 
 
 	p2p->_internal->values_to_send = NULL;
@@ -178,7 +178,7 @@ int netemu_p2p_host(struct netemu_p2p_connection* p2p, NETEMU_DWORD address, uns
 
 	netemu_tcp_listener_register_new_connection_fn(p2p->_internal->host,_netemu_p2p_new_connection,p2p);
 	netemu_tcp_listener_start_listening(p2p->_internal->host);
-	return 1;
+	return 0;
 }
 /**
  * Connect to a host. This function let's you connect to an existing cloud by specifying an address to which users can
@@ -200,7 +200,7 @@ int netemu_p2p_connect(struct netemu_p2p_connection* p2p, NETEMU_DWORD in_addr, 
 	struct netemu_tcp_connection *connection;
 	netemu_sockaddr *saddr;
 
-	error = 1;
+	error = 0;
 	saddr = (netemu_sockaddr*)netemu_util_create_addr(connect_addr,connect_port,&size);
 	netemu_p2p_host(p2p, in_addr,port,"thecloud");
 	connection = _netemu_p2p_connect_to(p2p,saddr,size);
@@ -368,7 +368,7 @@ void _netemu_p2p_send_login_success(struct netemu_p2p_connection *info, struct n
  * No value sent over the network in this game can be larger than this.
  * @param result the created game.
  * @return The return value can be:
- * - 1 if all went well
+ * - 0 if all went well
  * - -1 if something went wrong. This generally indicates that you already have created a game.
  */
 int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamename, char connection_quality, int emulator_value_size, struct p2p_game** result) {
@@ -394,7 +394,7 @@ int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamen
 	game->_internal->udp_collection = netemu_sender_collection_new();
 	game->creator->_internal->values_received = TRUE;
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
-	return 1;
+	return 0;
 }
 /**
  * Join an existing game. This is a blocking call that will connect to the creator of the
@@ -402,7 +402,7 @@ int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamen
  * @param connection an instance of the netemu_p2p module.
  * @param game the game you want to join. Use netemu_get_game_list to get a game to join.
  * @return the return value can be:
- * - 1 if everything went alright.
+ * - 0 if everything went alright.
  * - -1 if you're already in a game.
  * - -2 if you try to join a game which you have created.
  * @todo we need more errors here for:
@@ -455,7 +455,7 @@ int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_ga
 	instruction = netemu_application_create_message();
 	netemu_application_p2p_player_join_add(instruction, connection->user);
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, TCP_CONNECTION, type);
-	return 1;
+	return 0;
 }
 
 /**
@@ -470,7 +470,7 @@ int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_ga
  * @param listen_addr the address you want to listen to. This must be in network byte order.
  * @param listen_port the port you want to bind to. This must be in network byte order.
  * @return this function will return one of the following:
- * - 1 if everything went OK
+ * - 0 if everything went OK
  * - -1 if you're not in a game or if you're not the owner.
  * @todo We need to add more errors, specifically:
  * - An error that indicates that we couldn't bind to the address.
@@ -502,7 +502,7 @@ int netemu_p2p_start_game(struct netemu_p2p_connection *connection, NETEMU_DWORD
 	type.collection = connection->_internal->peers;
 	connection->current_game->_internal->ready_count++;
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
-	return 1;
+	return 0;
 }
 /**
  * Indicate that you are ready to play. In order for the game to start, you must call this function.
@@ -517,7 +517,7 @@ int netemu_p2p_start_game(struct netemu_p2p_connection *connection, NETEMU_DWORD
  * @param listen_addr the address you want to listen to. This must be in network byte order.
  * @param listen_port the port you want to bind to. This must be in network byte order.
  * @return this function will return one of the following:
- * - 1 if everything went OK
+ * - 0 if everything went OK
  * - -1 if you're not in a game, if you're the creator of this game or if the game hasn't started.
  * @todo We need to add more errors, specifically:
  * - An error that indicates that we couldn't bind to the address.
@@ -547,7 +547,7 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWO
 	/* This instruction will be broadcasted to all game members */
 	type.collection = connection->current_game->_internal->tcp_collection;
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
-	return 1;
+	return 0;
 }
 /**
  * Get a list of games in the netemu p2p cloud.
@@ -870,7 +870,7 @@ void _netemu_p2p_respond_to_player_join(struct netemu_packet_buffer* buffer, str
 NETEMU_BOOL _netemu_p2p_player_exists(struct p2p_game *game, struct p2p_user *player) {
 	int i;
 	if(_netemu_p2p_user_compare(player,game->creator) == 0) {
-		return 1;
+		return TRUE;
 	}
 	if(game->_internal != NULL) {
 		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
@@ -878,13 +878,13 @@ NETEMU_BOOL _netemu_p2p_player_exists(struct p2p_game *game, struct p2p_user *pl
 	for(i = 0; i < game->user_count-1; i++) {
 		if(_netemu_p2p_user_compare(player,&game->players[i]) == 0) {
 			netemu_thread_mutex_release(game->_internal->game_lock);
-			return 1;
+			return TRUE;
 		}
 	}
 	if(game->_internal != NULL) {
 		netemu_thread_mutex_release(game->_internal->game_lock);
 	}
-	return 0;
+	return FALSE;
 }
 
 
@@ -1003,7 +1003,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data) 
 		netemu_p2p_receive_play_values(info);
 		info->_internal->frame_index = 0;
 	}
-	return 1;
+	return 0;
 }
 
 /**
@@ -1039,7 +1039,7 @@ int netemu_p2p_receive_play_values(struct netemu_p2p_connection *info) {
 	}
 	info->current_game->_internal->all_values_received = FALSE;
 	netemu_thread_mutex_release(info->current_game->_internal->game_lock);
-	return 1;
+	return 0;
 }
 
 void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_user *player) {

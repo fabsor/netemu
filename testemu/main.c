@@ -119,7 +119,6 @@ int main(int argc, char *argv[]) {
 
 /**
  * Connect asyncronously to a server.
- * TODO: Make this function work.
  */
 void connect_async() {
 	info = netemu_kaillera_create("a-sad-user", EMUNAME, 1);

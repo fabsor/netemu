@@ -203,7 +203,7 @@ int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWO
 	}
 	netemu_thread_new(_netemu_kaillera_communication_login, callback);
 
-	return 1;
+	return 0;
 }
 
 void _netemu_kaillera_communication_login(void *param) {

@@ -163,7 +163,7 @@ struct p2p_user_internal *netemu_application_p2p_create_user_internal() {
 	internal = malloc(sizeof(struct p2p_user_internal));
 	internal->connection = NULL;
 	internal->sender = NULL;
-	internal->play_values = netemu_list_new(10,TRUE);
+	internal->play_values = netemu_list_create(10,TRUE);
 	internal->player_no = 0;
 	internal->cache_index = 0;
 	internal->values_received = FALSE;
