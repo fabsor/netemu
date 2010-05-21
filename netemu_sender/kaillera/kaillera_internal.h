@@ -27,6 +27,7 @@ struct _netemu_info_internal {
 	struct netemu_list *game_started_callbacks;
 	struct netemu_list *users;
 	struct netemu_list *games;
+	struct netemu_list *callbacks_to_remove; /**< used by the various callback functions in order to be able to remove callbacks */
 	struct netemu_list *received_play_values;
 	NETEMU_BOOL has_id;
 	short game_create_requested;

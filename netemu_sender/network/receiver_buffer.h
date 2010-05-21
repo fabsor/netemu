@@ -97,6 +97,15 @@ extern "C" {
 	 * @return a receiver_buffer_item containing the instruction, and where it came from if everything went all right, or NULL if something went wrong.
 	 */
 	struct netemu_receiver_buffer_item* netemu_receiver_buffer_wait_for_instruction(struct netemu_receiver_buffer* buffer, int instruction_id, time_t timestamp);
+
+	/**
+	 * Remove a listener function so that it doesn't get called anymore when the instruction is received.
+	 * @ingroup netemu_receiver_buffer
+	 * @todo implement this function.
+	 * @param buffer an instance of the netemu_receiver_buffer module.
+	 * @param bufferListenerFn fn the function to remove.
+	 */
+	int netemu_receiver_buffer_remove_instruction_received_fn(struct netemu_receiver_buffer *buffer, bufferListenerFn fn);
 #ifdef	__cplusplus
 }
 #endif

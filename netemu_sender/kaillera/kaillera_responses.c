@@ -59,7 +59,13 @@ void _netemu_respond_to_player_joined(struct netemu_receiver_buffer* buffer, str
 	for(i = 0; i < connection->_internal->player_join_callback->count; i++) {
 		call = connection->_internal->player_join_callback->elements[i];
 		call->fn->player_join_fn(connection, joined);
+		if(call->disposable)
+			netemu_list_add(connection->_internal->callbacks_to_remove, call);
 	}
+	for(i = 0; i < connection->_internal->callbacks_to_remove->count; i++) {
+		netemu_list_remove(connection->_internal->player_join_callback, call);
+	}
+	netemu_list_clear(connection->_internal->callbacks_to_remove);
 	free(player->username);
 	free(player);
 }
@@ -111,9 +117,20 @@ void _netemu_respond_to_game_started(struct netemu_receiver_buffer* buffer, stru
 	connection->_internal->player_no = start->player_no;
 	for(i = 0; i < connection->_internal->game_started_callbacks->count; i++)
 	{
+
 		call = connection->_internal->game_started_callbacks->elements[i];
 		call->fn->game_started_fn(connection, connection->current_game, start, call->user_data);
+		if(call->disposable)
+			netemu_list_add(connection->_internal->callbacks_to_remove, call);
 	}
+	for (i = 0; i < connection->_internal->callbacks_to_remove->count; i++) {
+		netemu_list_remove(connection->_internal->game_started_callbacks, call);
+	}
+	netemu_list_clear(connection->_internal->game_started_callbacks);
+}
+
+void _netemu_kaillera_remove_callback(struct netemu_receiver_buffer *buffer) {
+
 }
 
 void _netemu_respond_to_user_join(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {

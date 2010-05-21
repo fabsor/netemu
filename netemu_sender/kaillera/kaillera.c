@@ -6,7 +6,8 @@
 #include "kaillera_internal.h"
 #include "../interface/netemu_kaillera.h"
 #include "../protocol/application_kaillera.h"
-#include "../netemu_resources.h"
+#include "../resources.h"
+#include "netlib_error.h"
 #include "../network/receiver_buffer.h"
 #include "../network/sender_buffer.h"
 #include "../network/sender_udp.h"
@@ -40,6 +41,13 @@ int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
 	return 0;
 }
 
+/**
+ * Disconnect from a kaillera server.
+ * @todo this probably doesn't work, but it's fun to try!
+ * @ingroup netemu_kaillera
+ * @param info the instance of the netemu_kaillera module.
+ * @param message your going away message.
+ */
 int netemu_disconnect(struct netemu_kaillera *info, char *message) {
 	struct netemu_client *client;
 	struct application_instruction *instruction;
@@ -51,16 +59,28 @@ int netemu_disconnect(struct netemu_kaillera *info, char *message) {
 	return 0;
 }
 
-
+/**
+ * Create a game on the server.
+ * @param netemu_kaillera info an instance of the netemu_kaillera module.
+ * @param gamename the name of the game
+ * @param result the game that was created.
+ */
 int netemu_kaillera_create_game(struct netemu_kaillera *info, char *gamename, struct game** result) {
 	time_t timestamp;
 	struct application_instruction *message;
 	struct netemu_receiver_buffer_item *item;
 	union netemu_connection_type type;
+	if(info->current_game != NULL) {
+		netlib_set_last_error(NETEMU_EINKAILLERAGAME);
+		return -1;
+	}
+
 	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_instruction_create();
+	if(message == NULL) {
+		return -1;
+	}
 	netemu_application_create_game_add(message, gamename);
-
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(info->_internal->send_buffer, message, UDP_SENDER, type);
 	item = netemu_receiver_buffer_wait_for_instruction(info->_internal->receive_buffer, CREATE_GAME, timestamp);
@@ -82,7 +102,6 @@ void netemu_kaillera_create_game_async(struct netemu_kaillera *info, char *gamen
 	netemu_sender_buffer_add(info->_internal->send_buffer,message,UDP_SENDER, type);
 	netemu_kaillera_register_callback(info->_internal->game_created_callback, fn, 1);
 }
-
 
 void _netemu_kaillera_add_game_struct(struct netemu_kaillera* info, struct game* game) {
 	int index;
@@ -117,6 +136,19 @@ int netemu_kaillera_start_game(struct netemu_kaillera *info) {
 	return 0;
 }
 
+int netemu_kaillera_start_game_async(struct netemu_kaillera *info, gameStartedFn fn) {
+	time_t timestamp;
+	struct application_instruction *message;
+	union netemu_connection_type type;
+	type.udp_sender = netemu_resources_get_sender();
+	message = netemu_application_instruction_create();
+	netemu_application_start_game_add(message);
+	timestamp = time(NULL);
+	netemu_kaillera_register_callback(info->_internal->game_started_callbacks, fn, info);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
+	message->important = 1;
+	return 0;
+}
 
 struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, int conneciton_quality) {
 	struct netemu_kaillera *info;
@@ -144,6 +176,7 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->_internal->game_started_callbacks = netemu_list_create(3, FALSE);
 	info->_internal->send_buffer = netemu_sender_buffer_new(5, 10);
 	info->_internal->cached_values_callback = netemu_list_create(3, TRUE);
+	info->_internal->callbacks_to_remove = netemu_list_create(3, TRUE);
 	info->_internal->game_create_requested = 1;
 	info->_internal->users = netemu_list_create(10, FALSE);
 	info->_internal->has_id = 0;
@@ -218,13 +251,14 @@ int netemu_kaillera_join_game(struct netemu_kaillera *info, NETEMU_DWORD gameid)
 	return 0;
 }
 
-int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD gameid) {
+int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD gameid, joinFn fn) {
 	struct application_instruction* message;
 	union netemu_connection_type type;
 
 	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_instruction_create();
 	netemu_application_join_game_add(message,gameid,1);
+	netemu_kaillera_register_callback(info->_internal->join_callback, fn, 1, info);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 
 	return 0;

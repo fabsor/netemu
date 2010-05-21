@@ -20,6 +20,9 @@ extern "C" {
 #include "../protocol/communication.h"
 #include "netemu_socket.h"
 
+/*! Error returned if you're in a game already. */
+#define NETEMU_EINKAILLERAGAME 50001
+
 typedef struct _netemu_info_internal *server_connection_internal;
 
 /**
@@ -144,8 +147,9 @@ int netemu_register_cached_values_received_callback(struct netemu_kaillera *conn
 
 int netemu_kaillera_start_game(struct netemu_kaillera *info);
 
-int netemu_register_game_started_callback(struct netemu_kaillera *connection, gameStartedFn callback, void *user_data);
+int netemu_kaillera_start_game_async(struct netemu_kaillera *info, gameStartedFn fn);
 
+int netemu_register_game_started_callback(struct netemu_kaillera *connection, gameStartedFn callback, void *user_data);
 
 #ifdef	__cplusplus
 }
