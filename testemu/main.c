@@ -149,7 +149,7 @@ void menu(struct netemu_kaillera* connection) {
 	val = 'n';
 
 	while (val != '0') {
-		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY\n\8. START GAME ASYNC");
+		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY\n\8. START GAME ASYNC\n9. DISCONNECT");
 		val = getchar();
 
 		switch (val) {
@@ -176,6 +176,9 @@ void menu(struct netemu_kaillera* connection) {
 			break;
 		case '8':
 			start_game_async(connection);
+		case '9':
+			netemu_kaillera_disconnect(connection, "BYE");
+			break;
 
 		}
 	}

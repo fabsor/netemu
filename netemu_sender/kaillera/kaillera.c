@@ -51,7 +51,7 @@ int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
  * @param info the instance of the netemu_kaillera module.
  * @param message your going away message.
  */
-int netemu_disconnect(struct netemu_kaillera *info, char *message) {
+int netemu_kaillera_disconnect(struct netemu_kaillera *info, char *message) {
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
 

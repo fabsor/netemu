@@ -121,7 +121,7 @@ int netemu_unregister_game_created_callback(struct netemu_kaillera *connection, 
 
 int netemu_register_player_join_callback(struct netemu_kaillera *connection, playerJoinFn callback, void *user_data);
 
-int netemu_disconnect(struct netemu_kaillera *connection, char *message);
+int netemu_kaillera_disconnect(struct netemu_kaillera *connection, char *message);
 
 int netemu_kaillera_create_game(struct netemu_kaillera *connection, char *gamename, struct game** result);
 
