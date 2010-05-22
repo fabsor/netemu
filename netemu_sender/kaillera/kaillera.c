@@ -140,11 +140,14 @@ int netemu_kaillera_start_game_async(struct netemu_kaillera *info, gameStartedFn
 	time_t timestamp;
 	struct application_instruction *message;
 	union netemu_connection_type type;
+	union callback_fn *fnunion;
+	fnunion = malloc(sizeof(union callback_fn));
 	type.udp_sender = netemu_resources_get_sender();
 	message = netemu_application_instruction_create();
 	netemu_application_start_game_add(message);
 	timestamp = time(NULL);
-	netemu_kaillera_register_callback(info->_internal->game_started_callbacks, fn, info);
+	fnunion->game_started_fn = fn;
+	netemu_kaillera_register_callback(info->_internal->game_started_callbacks, fnunion, info);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	message->important = 1;
 	return 0;
