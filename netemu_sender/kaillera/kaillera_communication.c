@@ -151,7 +151,6 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 		}
 	}
 	free(hello);
-	while(callback.port == -1);
 	netemu_receiver_udp_stop_receiving(client->receiver);
 	in_addr.sin_port = netemu_htons(callback.port);
 	client->sender->addr = netemu_util_copy_addr((netemu_sockaddr*)&in_addr,sizeof(in_addr));

@@ -17,7 +17,8 @@ void create_game(struct netemu_kaillera *connection);
 void show_game_list(struct netemu_kaillera *connection);
 void join_game(struct netemu_kaillera* connection);
 void start_game(struct netemu_kaillera *connection);
-
+void start_game_async(struct netemu_kaillera *connection);
+void game_started_callback(struct netemu_kaillera *info, struct game* game, struct game_start *start, void* args);
 void send_play_values(struct netemu_kaillera *connection);
 void show_user_list(struct netemu_kaillera* connection);
 void player_ready(struct netemu_kaillera *connection);
@@ -148,7 +149,7 @@ void menu(struct netemu_kaillera* connection) {
 	val = 'n';
 
 	while (val != '0') {
-		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY\n");
+		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAY VALUES\n7. SEND PLAYER READY\n\8. START GAME ASYNC");
 		val = getchar();
 
 		switch (val) {
@@ -173,6 +174,8 @@ void menu(struct netemu_kaillera* connection) {
 		case '7':
 			player_ready(connection);
 			break;
+		case '8':
+			start_game_async(connection);
 
 		}
 	}
@@ -193,6 +196,7 @@ void create_game(struct netemu_kaillera* connection) {
 	printf("Creating game\n");
 	netemu_kaillera_create_game_async(connection, "thegame", game_created);
 }
+
 
 
 /**
@@ -238,6 +242,18 @@ void game_created(struct game* game) {
 void start_game(struct netemu_kaillera *connection) {
 	printf("Starting game\n");
 	netemu_kaillera_start_game(connection);
+}
+
+/**
+ * Callback for game started.
+ */
+void start_game_async(struct netemu_kaillera *connection) {
+	printf("Starting game\n");
+	netemu_kaillera_start_game_async(connection, game_started_callback);
+}
+
+void game_started_callback(struct netemu_kaillera *info, struct game* game, struct game_start *start, void* args) {
+	printf("game started man");
 }
 
 /**
