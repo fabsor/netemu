@@ -153,6 +153,8 @@ int netemu_kaillera_start_game_async(struct netemu_kaillera *info, gameStartedFn
 
 int netemu_register_game_started_callback(struct netemu_kaillera *connection, gameStartedFn callback, void *user_data);
 
+int netemu_kaillera_leave_game(struct netemu_kaillera *info);
+
 #ifdef	__cplusplus
 }
 #endif

@@ -258,6 +258,19 @@ int netemu_kaillera_login(struct netemu_kaillera* info) {
 	return 0;
 }
 
+int netemu_kaillera_leave_game(struct netemu_kaillera *info) {
+	struct application_instruction* message;
+	time_t timestamp;
+	union netemu_connection_type type;
+
+	type.udp_sender = netemu_resources_get_sender();
+	message = netemu_application_instruction_create();
+	timestamp = time(NULL);
+	netemu_application_player_left_add(message);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
+	return 0;
+}
+
 
 int netemu_kaillera_join_game(struct netemu_kaillera *info, NETEMU_DWORD gameid) {
 	struct application_instruction* message;
