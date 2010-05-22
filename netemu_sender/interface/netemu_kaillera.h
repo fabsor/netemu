@@ -155,6 +155,8 @@ int netemu_register_game_started_callback(struct netemu_kaillera *connection, ga
 
 int netemu_kaillera_leave_game(struct netemu_kaillera *info);
 
+int netemu_kaillera_kick_player(struct netemu_kaillera *info, NETEMU_WORD player_id);
+
 #ifdef	__cplusplus
 }
 #endif

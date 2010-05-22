@@ -153,6 +153,18 @@ int netemu_kaillera_start_game(struct netemu_kaillera *info) {
 	return 0;
 }
 
+int netemu_kaillera_kick_player(struct netemu_kaillera *info, NETEMU_WORD player_id) {
+	time_t timestamp;
+	struct application_instruction *message;
+	union netemu_connection_type type;
+	type.udp_sender = netemu_resources_get_sender();
+	message = netemu_application_instruction_create();
+	netemu_application_kick_player_add(message,player_id);
+	timestamp = time(NULL);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
+	return 0;
+}
+
 int netemu_kaillera_start_game_async(struct netemu_kaillera *info, gameStartedFn fn) {
 	time_t timestamp;
 	struct application_instruction *message;
