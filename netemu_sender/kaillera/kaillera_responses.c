@@ -175,14 +175,12 @@ void _netemu_respond_to_user_leave(struct netemu_receiver_buffer* buffer, struct
 	{
 		call = netemu_list_get(connection->_internal->leave_callback, i);
 		call->fn->leave_fn(left->id, item->instruction->user, left->exit_message, call->user_data);
-		//call->fn->leave_fn()
 	}
 }
 
 void _netemu_respond_to_player_ready(struct netemu_receiver_buffer *buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct netemu_kaillera* connection;
 	struct game *game;
-	struct game_status_update *update;
 	struct callback *call;
 	int i;
 	game = NULL;

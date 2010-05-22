@@ -52,14 +52,13 @@ int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
  * @param message your going away message.
  */
 int netemu_disconnect(struct netemu_kaillera *info, char *message) {
-	struct netemu_client *client;
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
 
-	client = netemu_resources_get_client();
+	type.udp_sender = netemu_resources_get_sender();
 	instruction = netemu_application_instruction_create();
 	netemu_application_user_leave_add(instruction, message);
-	/* TODO: Fix this function.*/
+	netemu_sender_buffer_add(info->_internal->send_buffer, instruction, UDP_SENDER, type);
 	return 0;
 }
 
