@@ -44,6 +44,7 @@ struct _netemu_info_internal {
 	int player_no;
 	struct netemu_receiver_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
+	netemu_event send_timeout;
 };
 
 #ifdef	__cplusplus

@@ -30,7 +30,7 @@ void _netemu_kaillera_add_user_struct(struct netemu_kaillera* info, struct user 
 int netemu_kaillera_login(struct netemu_kaillera* connection);
 int _netemu_kaillera_buffered_values_cmp(char *playerval, char *cachedval, int size, int player_no);
 int _netemu_kaillera_buffered_values_cmp_all(char *playerval, char *cachedval, int size);
-
+void _netemu_kaillera_update(void *param);
 
 int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
 	struct application_instruction *instruction;
@@ -89,6 +89,20 @@ int netemu_kaillera_create_game(struct netemu_kaillera *info, char *gamename, st
 	item = netemu_receiver_buffer_wait_for_instruction(info->_internal->receive_buffer, CREATE_GAME, timestamp);
 	*result = (struct game*)item->instruction->body;
 	return 0;
+}
+
+void _netemu_kaillera_update(void *param) {
+	struct netemu_kaillera *info;
+	struct application_instruction *instruction;
+	union netemu_connection_type type;
+	info = param;
+	type.udp_sender = netemu_resources_get_sender();
+	instruction = netemu_application_instruction_create();
+	netemu_application_client_timeout_request_add(instruction);
+	while(TRUE) {
+		netemu_thread_event_wait(info->_internal->send_timeout, 60);
+		netemu_sender_buffer_add(info->_internal->send_buffer, instruction, UDP_SENDER, type);
+	}
 }
 
 void netemu_kaillera_create_game_async(struct netemu_kaillera *info, char *gamename, kailleraGameCreatedFn callback) {
@@ -193,6 +207,7 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->_internal->values_buffered = 0;
 	info->_internal->sent_values = 0;
 	info->_internal->received_play_values = netemu_list_create(3, FALSE);
+	info->_internal->send_timeout = netemu_thread_event_create();
 	info->_internal->values_to_send = NULL;
 	info->_internal->play_values_event = netemu_thread_event_create();
 	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
@@ -213,6 +228,7 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	netemu_receiver_buffer_add_instruction_received_fn(info->_internal->receive_buffer,GAME_STATUS_UPDATE,_netemu_respond_to_game_status_update, info);
 	netemu_receiver_buffer_add_instruction_received_fn(info->_internal->receive_buffer,PLAYER_READY ,_netemu_respond_to_player_ready, info);
 	netemu_receiver_buffer_add_instruction_received_fn(info->_internal->receive_buffer,START_GAME ,_netemu_respond_to_game_started, info);
+	netemu_thread_new(_netemu_kaillera_update, info);
 	return info;
 }
 
