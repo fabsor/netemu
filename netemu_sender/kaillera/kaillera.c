@@ -257,13 +257,15 @@ int netemu_kaillera_join_game(struct netemu_kaillera *info, NETEMU_DWORD gameid)
 int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD gameid, joinFn fn) {
 	struct application_instruction* message;
 	union netemu_connection_type type;
-
+	union callback_fn *callback;
+	callback = malloc(sizeof(union callback));
+	callback->join_fn = fn;
 	type.udp_sender = netemu_resources_get_sender();
+
 	message = netemu_application_instruction_create();
 	netemu_application_join_game_add(message,gameid,1);
-	netemu_kaillera_register_callback(info->_internal->join_callback, fn, 1, info);
+	netemu_kaillera_register_callback(info->_internal->join_callback, callback, 1, info);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
-
 	return 0;
 }
 
