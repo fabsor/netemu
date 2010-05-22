@@ -131,6 +131,8 @@ int netemu_kaillera_game_created_callback(struct netemu_kaillera *connection, ka
 
 int netemu_kaillera_join_game(struct netemu_kaillera *connection, NETEMU_DWORD gameid);
 
+int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD gameid, joinFn fn);
+
 struct game** netemu_kaillera_get_game_list(struct netemu_kaillera* connection, int *count);
 
 struct user** netemu_kaillera_get_user_list(struct netemu_kaillera* info, int *count);

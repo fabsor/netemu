@@ -191,6 +191,14 @@ void _netemu_respond_to_player_ready(struct netemu_receiver_buffer *buffer, stru
 	for(i = 0; i < connection->_internal->player_ready_callback->count; i++) {
 		call = connection->_internal->player_ready_callback->elements[i];
 		call->fn->player_ready_fn(connection);
+		if(call->disposable) {
+			netemu_list_add(connection->_internal->callbacks_to_remove,
+					connection->_internal->player_ready_callback->elements[i]);
+		}
+	}
+	for(i = 0; i < connection->_internal->callbacks_to_remove->count; i++) {
+		netemu_list_remove(connection->_internal->player_ready_callback->elements,
+							connection->_internal->callbacks_to_remove->elements[i]);
 	}
 
 }

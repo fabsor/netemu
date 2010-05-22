@@ -33,11 +33,14 @@ int _netemu_kaillera_buffered_values_cmp_all(char *playerval, char *cachedval, i
 
 
 int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
-	/*TODO: Implement chat message! */
-	/*
-	struct application_instruction *messages[1];
-	messages[0] = netemu_application_create_message();
-	*/
+	struct application_instruction *instruction;
+	union netemu_connection_type type;
+	time_t timestamp;
+	instruction = netemu_application_instruction_create();
+	timestamp = time(NULL);
+	type.udp_sender = netemu_resources_get_sender();
+	netemu_application_chat_game_add(instruction, message, info->user);
+	netemu_sender_buffer_add(info->_internal->send_buffer, instruction, UDP_SENDER, type);
 	return 0;
 }
 
@@ -51,6 +54,7 @@ int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
 int netemu_disconnect(struct netemu_kaillera *info, char *message) {
 	struct netemu_client *client;
 	struct application_instruction *instruction;
+	union netemu_connection_type type;
 
 	client = netemu_resources_get_client();
 	instruction = netemu_application_instruction_create();
@@ -258,7 +262,7 @@ int netemu_kaillera_join_game_async(struct netemu_kaillera *info, NETEMU_DWORD g
 	struct application_instruction* message;
 	union netemu_connection_type type;
 	union callback_fn *callback;
-	callback = malloc(sizeof(union callback));
+	callback = malloc(sizeof(union callback_fn));
 	callback->join_fn = fn;
 	type.udp_sender = netemu_resources_get_sender();
 
@@ -479,5 +483,22 @@ int netemu_kaillera_send_player_ready(struct netemu_kaillera *info) {
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	netemu_receiver_buffer_wait_for_instruction(info->_internal->receive_buffer, PLAYER_READY, timestamp);
+	return 0;
+}
+
+int netemu_kaillera_send_player_ready_async(struct netemu_kaillera *info, playerReadyFn fn) {
+	time_t timestamp;
+	struct application_instruction *message;
+	union netemu_connection_type type;
+	union callback_fn *callback;
+	callback = malloc(sizeof(union callback_fn));
+	callback->player_ready_fn = fn;
+	type.udp_sender = netemu_resources_get_sender();
+	message = netemu_application_instruction_create();
+	netemu_application_player_ready_add(message);
+	timestamp = time(NULL);
+	netemu_kaillera_register_callback(info->_internal->player_ready_callback,
+										callback, 1, info);
+	netemu_sender_buffer_add(info->_internal->send_buffer,message, UDP_SENDER, type);
 	return 0;
 }
