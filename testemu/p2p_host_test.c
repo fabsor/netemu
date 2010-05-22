@@ -34,7 +34,7 @@ void run_p2p_host_test(int no_instructions, char connection) {
 
 	p2p_host_event = netemu_thread_event_create();
 	printf("OK!\nHosting cloud on %d...", P2P_HOST_TEST_PORT);
-	if(netemu_p2p_host(p2p, P2P_HOST_TEST_BIND_ADDR,P2P_HOST_TEST_PORT,CLOUD_NAME)) {
+	if(netemu_p2p_host(p2p, P2P_HOST_TEST_BIND_ADDR,P2P_HOST_TEST_PORT,CLOUD_NAME) == 0) {
 		printf("OK!\n Waiting for incoming connections...");
 	}
 	else {

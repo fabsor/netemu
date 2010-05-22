@@ -154,6 +154,8 @@ typedef unsigned int NETEMU_SOCKET;
 	*/
 	typedef struct sockaddr netemu_sockaddr;
 
+	typedef struct sockaddr_storage netemu_sockaddr_storage;
+
 	typedef struct sockaddr_in netemu_sockaddr_in;
 
 	typedef struct sockaddr_in6 netemu_sockaddr_in6;

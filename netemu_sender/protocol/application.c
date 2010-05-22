@@ -64,14 +64,16 @@ int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types t
 	}
 	for(i = 0; i < packet->count; i++) {
 		app_instruction = netemu_application_instruction_parse(packet->instructions[i]);
-		netemu_receiver_buffer_add(buffer, app_instruction,type,connection);
+		netemu_receiver_buffer_add(buffer, app_instruction,type,connection, NULL, 0);
 	}
 	return 1;
 }
 
 int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param) {
 	int i, j;
+	socklen_t addr_size;
 	unsigned int pos;
+	netemu_sockaddr_storage addr;
 	struct transport_packet* packet;
 	struct application_instruction *app_instruction;
 	struct transport_instruction* instruction;
@@ -80,9 +82,9 @@ int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types t
 	char* bytebuffer;
 
 	bytebuffer = malloc(512);
+	//addr = malloc(sizeof(netemu_sockaddr_in));
 	buffer = (struct netemu_receiver_buffer *)param;
-
-	error = netemu_recvfrom(socket, bytebuffer, 512, 0, NULL, 0);
+	error = netemu_recvfrom(socket, bytebuffer, 512, 0, (netemu_sockaddr*)&addr, &addr_size);
 	if(error == -1) {
 		return -1;
 	}
@@ -123,7 +125,7 @@ int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types t
 
 	for(i = 0; i < packet->count; i++) {
 		app_instruction = netemu_application_instruction_parse(packet->instructions[i]);
-		netemu_receiver_buffer_add(buffer, app_instruction,type,connection);
+		netemu_receiver_buffer_add(buffer, app_instruction,type,connection,netemu_util_copy_addr((netemu_sockaddr*)&addr, addr_size), addr_size);
 	}
 	return 1;
 }

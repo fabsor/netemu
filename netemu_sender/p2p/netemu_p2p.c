@@ -354,7 +354,7 @@ int netemu_p2p_create_game(struct netemu_p2p_connection *connection, char *gamen
 	struct application_instruction* instruction;
 	union netemu_connection_type type;
 
-	if(connection->current_game == NULL)
+	if(connection->current_game != NULL)
 		return -1;
 
 	type.collection = connection->_internal->peers;

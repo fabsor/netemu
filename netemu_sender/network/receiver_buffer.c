@@ -76,7 +76,7 @@ struct netemu_receiver_buffer *netemu_receiver_buffer_create(hash_size size) {
  * - Any error related to mutex locks can also occur.
  */
 int netemu_receiver_buffer_add(struct netemu_receiver_buffer *buffer, struct application_instruction *instruction,
-		netemu_connection_types type,  union netemu_connection_type connection) {
+		netemu_connection_types type,  union netemu_connection_type connection, netemu_sockaddr* addr, int addr_len) {
 	struct netemu_receiver_buffer_item *item;
 	/* If there are any nullpointers, we might as well stop right here. */
 	if(buffer == NULL || instruction == NULL) {
@@ -90,6 +90,8 @@ int netemu_receiver_buffer_add(struct netemu_receiver_buffer *buffer, struct app
 	}
 	item->instruction = instruction;
 	item->connection = connection;
+	item->addr = addr;
+	item->addr_size = addr_len;
 	item->type = type;
 
 	netemu_thread_mutex_lock(buffer->_internal->add_mutex, NETEMU_INFINITE);
@@ -138,6 +140,7 @@ int netemu_receiver_buffer_add_instruction_received_fn(struct netemu_receiver_bu
 	netemu_thread_mutex_release(buffer->_internal->fn_mutex);
 	return 0;
 }
+
 /**
  * Primary function for the worker thread. This function goes through instructions that have come in,
  * notifies functions and wakeups sleeping threads that waits for the instruction

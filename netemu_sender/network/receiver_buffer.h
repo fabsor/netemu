@@ -27,6 +27,8 @@ extern "C" {
 	struct netemu_receiver_buffer_item {
 		struct application_instruction *instruction; /**< The instruction */
 		union netemu_connection_type connection; /**< The connection from which the instruction was received */
+		netemu_sockaddr *addr; /**< The address from the instruction was received. */
+		int addr_size; /**< The address size. */
 		netemu_connection_types type; /**< The type of connection. */
 	};
 	/**
@@ -66,7 +68,7 @@ extern "C" {
 	 * - Any error related to mutex locks can also occur.
 	 */
 	int netemu_receiver_buffer_add(struct netemu_receiver_buffer *buffer, struct application_instruction *instruction,
-			netemu_connection_types type,  union netemu_connection_type connection);
+			netemu_connection_types type,  union netemu_connection_type connection, netemu_sockaddr* addr, int addr_size);
 
 	/**
 	 * Adds a listener function that listens for a particular instruction.
