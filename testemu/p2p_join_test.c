@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define JOIN_VALUE "JOINER"
+
 int p2p_join_test_ready = 0;
 void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user);
 void p2p_join_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
@@ -24,7 +26,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	int n;
 	char* data;
 	data = malloc(512);
-	memcpy(data, VALUE, strlen(VALUE)+1);
+	memcpy(data, JOIN_VALUE, strlen(JOIN_VALUE)+1);
 	p2p_join_event = netemu_thread_event_create();
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");

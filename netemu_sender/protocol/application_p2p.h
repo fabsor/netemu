@@ -10,9 +10,6 @@ extern "C" {
 #endif
 #include "netlib_util.h"
 
-typedef struct p2p_user_internal* p2p_user_internal;
-typedef struct p2p_game_internal* p2p_game_internal;
-
 /**
  * This struct represents a player. It also contains everything that
  * is included in a player instruction.
@@ -24,7 +21,7 @@ struct p2p_user {
 	NETEMU_DWORD port; /**< The port to the player in network byte order. This is included in all instructions that sends users.  */
 	NETEMU_DWORD ping; /**< The player ping. This is included in all instructions that sends users.  */
 	char connection; /**< The connection quality. This is included in all instructions that sends users.  */
-	p2p_user_internal _internal; /**< A struct containing private values that are being used by the internal structure of the program. Nothing in this struct is included in any instruction. Do not try to modify this.*/
+	struct p2p_user_internal *_internal; /**< A struct containing private values that are being used by the internal structure of the program. Nothing in this struct is included in any instruction. Do not try to modify this.*/
 };
 /**
  * This struct represents a game. It also contains everything that is included in a game instruction.
@@ -39,7 +36,7 @@ struct p2p_game {
 	NETEMU_BOOL received_start_signal; /**< Determines if this game has received a start signal, meaning that the game_started instruction has been received.  */
 	char connection_quality; /**< Connection quality. This determines how often packets will be sent in this game.  */
 	NETEMU_WORD emulator_value_size; /**< The size of values sent over the network for ONE player.  */
-	p2p_game_internal _internal; /**< A struct containing private values that are being used by the internal structure of the program. Nothing in this struct is included in any instruction. Do not try to modify this.*/
+	struct p2p_game_internal *_internal; /**< A struct containing private values that are being used by the internal structure of the program. Nothing in this struct is included in any instruction. Do not try to modify this.*/
 };
 
 /**

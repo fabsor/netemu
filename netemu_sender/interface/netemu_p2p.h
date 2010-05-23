@@ -16,12 +16,10 @@ extern "C" {
 #include "netemu_socket.h"
 #include "netemu_kaillera.h"
 
-typedef struct netemu_p2p_internal* netemu_p2p_internal;
-
 struct netemu_p2p_connection {
 	struct p2p_user *user;
 	struct p2p_game *current_game;
-	netemu_p2p_internal _internal;
+	struct netemu_p2p_internal* _internal;
 	char* cloud_name;
 };
 
