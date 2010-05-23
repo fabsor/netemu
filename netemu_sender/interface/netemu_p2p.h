@@ -48,6 +48,7 @@ union p2p_callback_fn {
 struct p2p_callback {
 	short disposable;
 	union p2p_callback_fn fn;
+	void *user_data;
 };
 
 
@@ -75,19 +76,19 @@ struct p2p_user** netemu_p2p_get_user_list(struct netemu_p2p_connection* info, i
 
 int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data);
 
-int netemu_p2p_register_play_values_received_callback(struct netemu_p2p_connection *connection, p2pValuesReceivedFn callback);
+int netemu_p2p_register_play_values_received_callback(struct netemu_p2p_connection *connection, p2pValuesReceivedFn callback, void *user_data);
 
-int netemu_p2p_register_game_created_callback(struct netemu_p2p_connection *connection, p2pGameCreatedFn callback);
+int netemu_p2p_register_game_created_callback(struct netemu_p2p_connection *connection, p2pGameCreatedFn callback, void *user_data);
 
-int netemu_p2p_register_user_joined_callback(struct netemu_p2p_connection *connection, p2pUserJoinedFn callback);
+int netemu_p2p_register_user_joined_callback(struct netemu_p2p_connection *connection, p2pUserJoinedFn callback, void *user_data);
 
-int netemu_p2p_register_game_started_callback(struct netemu_p2p_connection *connection, p2pGameStartedFn callback);
+int netemu_p2p_register_game_started_callback(struct netemu_p2p_connection *connection, p2pGameStartedFn callback, void *user_data);
 
-int netemu_p2p_register_player_joined_callback(struct netemu_p2p_connection *connection, p2pPlayerJoinedFn callback);
+int netemu_p2p_register_player_joined_callback(struct netemu_p2p_connection *connection, p2pPlayerJoinedFn callback, void *user_data);
 
-int netemu_p2p_register_player_ready_callback(struct netemu_p2p_connection *connection, p2pPlayerReadyFn callback);
+int netemu_p2p_register_player_ready_callback(struct netemu_p2p_connection *connection, p2pPlayerReadyFn callback, void *user_data);
 
-int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p_connection *connection, p2pAllReadyFn callback);
+int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p_connection *connection, p2pAllReadyFn callback, void *user_data);
 
 #ifdef	__cplusplus
 }

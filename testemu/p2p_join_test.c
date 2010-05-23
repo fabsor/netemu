@@ -53,8 +53,8 @@ void run_p2p_join_test(int no_instructions, char connection) {
 }
 
 void p2p_join_register_callbacks(struct netemu_p2p_connection *connection) {
-	netemu_p2p_register_player_joined_callback(connection, p2p_join_player_join_callback);
-	netemu_p2p_register_all_players_ready_callback(connection, p2p_join_all_ready_callback);
+	netemu_p2p_register_player_joined_callback(connection, p2p_join_player_join_callback, NULL);
+	netemu_p2p_register_all_players_ready_callback(connection, p2p_join_all_ready_callback, NULL);
 
 }
 
