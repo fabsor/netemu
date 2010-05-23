@@ -723,7 +723,7 @@ int netemu_p2p_receive_play_values(struct netemu_p2p_connection *info) {
 void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_user *player) {
 	struct p2p_buffered_play_values *values;
 	struct application_instruction *instruction;
-	int index, i;
+	int index, i, foo1, foo2;
 	instruction = player->_internal->play_values->elements[0];
 	netemu_list_remove_at(player->_internal->play_values, 0);
 	if(info->user->_internal->player_no != player->_internal->player_no) {
@@ -746,13 +746,17 @@ void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_us
 
 			}
 		}
-		/*
+
 		for(i = 0; i < info->current_game->connection_quality; i++) {
-			memcpy(info->_internal->values_received + (i * (info->current_game->emulator_value_size * info->current_game->user_count)) +
+			if(player->_internal->player_no < 1) {
+				printf("WTF!");
+			}
+			memcpy(info->_internal->values_received + (i * (info->current_game->emulator_value_size)) +
 					(info->current_game->emulator_value_size*player->_internal->player_no-1),
 							   player->_internal->cache[index].values,info->current_game->emulator_value_size);
+			foo1 = info->_internal->values_received + (i * (info->current_game->emulator_value_size)) +
+					(info->current_game->emulator_value_size*player->_internal->player_no-1);
 		}
-		*/
 		player->_internal->values_received = FALSE;
 	}
 

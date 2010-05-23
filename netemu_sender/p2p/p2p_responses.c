@@ -87,7 +87,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 	struct netemu_p2p_connection* connection;
 	struct netemu_sender_udp *sender;
 	struct sockaddr *addr;
-	int i, size;
+	int i, size, foo;
 	NETEMU_BOOL user_joined;
 	user_joined = 0;
 	connection = (struct netemu_p2p_connection*)arg;
@@ -97,7 +97,8 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 	connection->current_game->received_start_signal = TRUE;
 	connection->_internal->values_received = malloc((connection->current_game->emulator_value_size*
 			connection->current_game->user_count)*connection->current_game->connection_quality);
-
+	foo = (connection->current_game->emulator_value_size*
+			connection->current_game->user_count)*connection->current_game->connection_quality;
 	game = (struct p2p_start_game*)item->instruction->body;
 	addr = (netemu_sockaddr*) netemu_util_create_addr(game->addr,game->port,&size);
 	sender = netemu_sender_udp_new(addr, size);
@@ -232,6 +233,7 @@ void _netemu_p2p_respond_to_game_created(struct netemu_receiver_buffer* buffer, 
 		if((index = netemu_list_contains(connection->_internal->users,game->creator)) != -1) {
 			game->creator->_internal = ((struct p2p_user*)connection->_internal->users->elements[index])->_internal;
 		}
+		game->creator->_internal->player_no = 1;
 		/* Add the game to our game list. */
 		netemu_list_add(connection->_internal->games,game);
 		/* Create a copy of the game, to preserve the instruction integrity. */
