@@ -50,10 +50,10 @@ void run_p2p_host_test(int no_instructions, char connection) {
 }
 
 void p2p_host_register_callbacks(struct netemu_p2p_connection *connection) {
-	netemu_p2p_register_user_joined_callback(connection, p2p_host_user_joined_callback);
-	netemu_p2p_register_game_created_callback(connection, p2p_host_game_created_callback);
-	netemu_p2p_register_game_started_callback(connection, p2p_host_game_started_callback);
-	netemu_p2p_register_all_players_ready_callback(connection, p2p_host_all_ready_callback);
+	netemu_p2p_register_user_joined_callback(connection, p2p_host_user_joined_callback, NULL);
+	netemu_p2p_register_game_created_callback(connection, p2p_host_game_created_callback, NULL);
+	netemu_p2p_register_game_started_callback(connection, p2p_host_game_started_callback, NULL);
+	netemu_p2p_register_all_players_ready_callback(connection, p2p_host_all_ready_callback, NULL);
 }
 
 void p2p_host_game_created_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {

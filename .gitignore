@@ -15,6 +15,9 @@ Release/*
 netemu_ui/Makefile
 netemu_ui/Makefile.Debug
 netemu_ui/Makefile.Release
+boring-game/Makefile
+boring-game/Makefile.Debug
+boring-game/Makefile.Release
 *.a
 *.o
 *.d
