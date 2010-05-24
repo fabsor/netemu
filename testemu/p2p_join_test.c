@@ -40,6 +40,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	int n;
 	char* data;
 	data = malloc(512);
+	netemu_p2p_initialize();
 	memcpy(data, JOIN_VALUE, strlen(JOIN_VALUE)+1);
 	p2p_join_event = netemu_thread_event_create();
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);

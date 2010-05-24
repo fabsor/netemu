@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Users\Emil\Documents\NetBeansProjects\netemu\netlib\headers"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Fabbe\My Documents\Visual Studio 2008\Projects\netemu\netlib\headers&quot;;C:\Users\Emil\Documents\NetBeansProjects\netemu\netlib\headers"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

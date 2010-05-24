@@ -15,8 +15,8 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netlib_error.h"
-#include "netemu_thread.h"
+#include "headers/netlib_error.h"
+#include "headers/netemu_thread.h"
 
 struct netemu_mutex_internal {
 	HANDLE mutex;

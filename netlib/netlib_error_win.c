@@ -15,7 +15,7 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netlib_error.h"
+#include "headers/netlib_error.h"
 #include <windows.h>
 
 int last_error;

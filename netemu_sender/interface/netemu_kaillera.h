@@ -103,6 +103,7 @@ struct callback {
 typedef struct server kaillera_server;
 typedef struct existing_game kaillera_existing_game;
 
+int netemu_kaillera_initialize();
 struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, int conneciton_quality);
 
 void netemu_kaillera_network_init(netemu_sockaddr_in *addr, int addr_size);

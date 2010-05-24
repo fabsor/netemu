@@ -35,6 +35,7 @@ void run_kaillera_game_joiner_test(no_instructions) {
 	struct game** games;
 	int i, count;
 	char *data;
+	netemu_kaillera_initialize();
 	game_join_event = netemu_thread_event_create();
 	printf("Trying to connect to server...");
 	info = netemu_kaillera_create("Christophe", EMUNAME, 1);

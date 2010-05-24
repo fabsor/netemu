@@ -35,6 +35,7 @@ void run_kaillera_game_creator_test(int no_instructions) {
 	int i;
 	char *data;
 	long int elapsed;
+	netemu_kaillera_initialize();
 	game_creator_event = netemu_thread_event_create();
 	printf("Trying to connect to server...");
 	info = netemu_kaillera_create(PLAYERNAME, EMUNAME, 1);
