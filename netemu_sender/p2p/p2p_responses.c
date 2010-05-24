@@ -42,6 +42,7 @@ void _netemu_p2p_register_responders(struct netemu_p2p_connection *p2p) {
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_READY, netemu_p2p_respond_to_ready, p2p);
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_BUFFERED_PLAY_VALUES, netemu_p2p_respond_to_play_values, p2p);
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_CACHED_BUFFERED_PLAY_VALUES, netemu_p2p_respond_to_cached_play_values, p2p);
+	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_PLAYER_JOIN_SUCCESS, _netemu_p2p_respond_to_player_join_success, p2p);
 }
 
 /**
@@ -186,6 +187,7 @@ void _netemu_p2p_respond_to_join_host(struct netemu_receiver_buffer* buffer, str
  */
 void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct p2p_user *user;
+	struct application_instruction *join_success;
 	struct netemu_p2p_connection* connection;
 	struct netemu_tcp_connection *player_con;
 	int index, i, size;
@@ -202,7 +204,7 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 			/* If the user is not in the list, we shouldn't have received this instruction */
 			return;
 		}
-		/* Does this player already exist in our list? In that case we don't need to do anything further. */
+		/* Does this player already exist in our list of players? In that case we don't need to do anything further. */
 		if(_netemu_p2p_player_exists(connection->current_game,user)) {
 			return;
 		}
@@ -213,18 +215,29 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 			user->_internal = netemu_application_p2p_create_user_internal();
 			user->_internal->connection = player_con;
 			netemu_sender_collection_add_tcp_sender(connection->_internal->peers, player_con);
-
-			//netemu_p2p_send_user_joined(connection, connection->user);
 		}
 		netemu_sender_collection_add_tcp_sender(connection->current_game->_internal->tcp_collection, user->_internal->connection);
 		_netemu_p2p_add_player(connection->current_game,user);
-		type.connection = user->_internal->connection;
-		netemu_sender_buffer_add(connection->_internal->send_buffer, item->instruction, TCP_CONNECTION, type);
+		/* If this is our game, we send a join success back to the user TODO: Send denial if we're filled up. */
+		if(_netemu_p2p_user_compare(connection->current_game->creator, connection->user)) {
+			type.connection = user->_internal->connection;
+			join_success = netemu_application_instruction_create();
+			netemu_application_p2p_player_join_success_add(join_success, connection->current_game);
+			netemu_sender_buffer_add(connection->_internal->send_buffer, join_success, TCP_CONNECTION, type);
+		}
+		type.collection = connection->current_game->_internal->tcp_collection;
+		netemu_sender_buffer_add(connection->_internal->send_buffer, item->instruction, CONNECTION_COLLECTION, type);
 		for(i = 0; i < connection->_internal->player_joined_callbacks->count; i++) {
 			((struct p2p_callback*)connection->_internal->player_joined_callbacks->elements[i])->fn.playerJoinedFn(connection,
 					connection->current_game, user);
 		}
 	}
+}
+
+void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
+	struct netemu_p2p_connection *connection;
+	connection = arg;
+	/* TODO: Fix some stuff here. */
 }
 
 /**

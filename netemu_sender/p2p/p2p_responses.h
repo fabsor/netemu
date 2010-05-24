@@ -130,6 +130,8 @@ void _netemu_p2p_respond_to_login_success(struct netemu_receiver_buffer* buffer,
  */
 void netemu_p2p_respond_to_login_request(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
 
+void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
+
 #ifdef	__cplusplus
 }
 #endif

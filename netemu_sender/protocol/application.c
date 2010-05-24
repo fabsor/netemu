@@ -224,6 +224,9 @@ struct application_instruction* netemu_application_instruction_parse(struct tran
 		case P2P_CACHED_BUFFERED_PLAY_VALUES:
 			netemu_application_p2p_cached_play_values_parse(app_instruction, data);
 			break;
+		case P2P_PLAYER_JOIN_SUCCESS:
+			netemu_application_p2p_player_join_success_parse(app_instruction, data);
+			break;
 
 	}
 	return app_instruction;

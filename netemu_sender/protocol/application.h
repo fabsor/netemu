@@ -43,6 +43,8 @@
 #define P2P_GAME_START				40
 #define P2P_BUFFERED_PLAY_VALUES		41
 #define P2P_CACHED_BUFFERED_PLAY_VALUES	42
+#define P2P_PLAYER_JOIN_SUCCESS		43
+#define P2P_LOGIN_DENIED			44
 
 
 /*! Kaillera defines */

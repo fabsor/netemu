@@ -76,6 +76,7 @@ void p2p_join_register_callbacks(struct netemu_p2p_connection *connection) {
 
 void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user) {
 	netemu_p2p_player_ready(connection, P2P_JOIN_TEST_BIND_ADDR, netemu_htons(40000));
+	netemu_thread_event_signal(p2p_join_event);
 }
 
 void p2p_join_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {
