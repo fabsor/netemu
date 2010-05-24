@@ -14,9 +14,9 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef NETEMU_CLIENT_H_
-#define NETEMU_CLIENT_H_
+#pragma once
+#ifndef NETEMU_P2P_H_
+#define NETEMU_P2P_H_
 
 #ifdef	__cplusplus
 extern "C" {
@@ -105,4 +105,4 @@ int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p_connection 
 #endif
 
 
-#endif /* NETEMU_CLIENT_H_ */
+#endif /* NETEMU_P2P_H_ */

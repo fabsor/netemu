@@ -59,7 +59,7 @@ NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
 	return return_socket;
 }
 
-int netemu_bind(NETEMU_SOCKET socket, const struct sockaddr *address, socklen_t address_len) {
+int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
 	int errcode;
     
 	errcode = bind(socket, address, address_len);
@@ -94,7 +94,7 @@ int netemu_listen(NETEMU_SOCKET socket, int backlog) {
 	return errcode;
 }
 
-NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, struct sockaddr *address, socklen_t *address_len) {
+NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, socklen_t *address_len) {
 	int errcode;
 
     errcode = accept(socket, address, address_len);
@@ -110,7 +110,7 @@ NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address,
     socklen_t size;
     int error;
     size = sizeof(addr);
-    error = accept(socket,(struct sockaddr*)&addr,&size);
+    error = accept(socket,(netemu_sockaddr*)&addr,&size);
 
     if(error == -1) {
     	return error;
@@ -132,7 +132,7 @@ int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
 	return errcode;
 }
 
-int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const struct sockaddr *dest_address, socklen_t address_len) {
+int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len) {
     int errcode;
 	
 	errcode = sendto(socket, buffer, len, flags, dest_address, address_len);
@@ -152,7 +152,7 @@ int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
 	return errcode;
 }
 
-int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, struct sockaddr *address, socklen_t *address_len) {
+int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len) {
 	int errcode;
 
     errcode = recvfrom(socket, buffer, len, flags, address, address_len);

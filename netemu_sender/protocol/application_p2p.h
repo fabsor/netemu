@@ -19,8 +19,9 @@
  * @file
  * This file contains structs used when handling p2p instructions.
  */
-#ifndef APPLICATION_P2P_H_
-#define APPLICATION_P2P_H_
+#pragma once
+#ifndef NETEMU_APPLICATION_P2P_H_
+#define NETEMU_APPLICATION_P2P_H_
 
 #ifdef	__cplusplus
 extern "C" {
@@ -99,4 +100,4 @@ struct p2p_leave_player {
 #endif
 
 
-#endif /* APPLICATION_P2P_H_ */
+#endif /* NETEMU_APPLICATION_P2P_H_ */

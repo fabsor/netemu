@@ -24,6 +24,7 @@
  * @defgroup netemu_net General network tools
  * General network stuff.
  */
+#pragma once
 #ifndef NETEMU_NET_H_
 #define NETEMU_NET_H_
 

@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
+#pragma once
 #ifndef NETEMU_STRINGBUILDER_H_
 #define NETEMU_STRINGBUILDER_H_
 

@@ -16,7 +16,7 @@
  */
 
 #include "netlib_error.h"
-#include "windows.h"
+#include <windows.h>
 
 int last_error;
 
@@ -26,6 +26,10 @@ int netlib_get_last_error() {
 
 void netlib_set_last_error(int error) {
 	last_error = error;
+}
+
+const char *netlib_get_last_error_string() {
+	return 0;
 }
 
 void netlib_set_last_mapped_error(int error) {

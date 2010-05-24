@@ -14,10 +14,10 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef COMMUNICATION_TEST_H_
-#define COMMUNICATION_TEST_H_
+#pragma once
+#ifndef NETEMU_COMMUNICATION_TEST_H_
+#define NETEMU_COMMUNICATION_TEST_H_
 
 void test_server_communication();
 
-#endif /* COMMUNICATION_TEST_H_ */
+#endif /* NETEMU_COMMUNICATION_TEST_H_ */

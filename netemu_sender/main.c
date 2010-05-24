@@ -16,7 +16,7 @@
  */
 
 #include "netemu_socket.h"
-#include "application_test.h"
+#include "tests/application_test.h"
 #include <stdio.h>
 #include <stdlib.h>
 

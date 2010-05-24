@@ -19,7 +19,7 @@
  * @file
  * Header for the netlib socket component.
  */
-
+#pragma once
 #ifndef _NETEMU_SOCKET_H
 #define	_NETEMU_SOCKET_H
 
@@ -77,7 +77,6 @@ typedef int NETEMU_SOCKET;
 
 #else
 
-#include <winsock2.h>
 #include <ws2tcpip.h>
 
 typedef unsigned int NETEMU_SOCKET;

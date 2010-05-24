@@ -14,10 +14,11 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-#ifndef APPLICATION_TEST_H_
-#define APPLICATION_TEST_H_
+#pragma once
+#ifndef NETEMU_APPLICATION_TEST_H_
+#define NETEMU_APPLICATION_TEST_H_
 
 void run_application_tests();
 
 
-#endif /* APPLICATION_TEST_H_ */
+#endif /* NETEMU_APPLICATION_TEST_H_ */

@@ -23,9 +23,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Retrieved from: http://en.literateprograms.org/Hash_table_(C)?oldid=16632
 */
-
-#ifndef HASHTBL_H_INCLUDE_GUARD
-#define HASHTBL_H_INCLUDE_GUARD
+#pragma once
+#ifndef NETEMU_HASHTBL_H_
+#define NETEMU_HASHTBL_H_
 
 #include<stdlib.h>
 #include "netemu_list.h"
@@ -67,5 +67,5 @@ hash_size def_hashfunc_int(const void *key, size_t key_len);
 hash_size def_hashfunc_char(const void *key, size_t key_len);
 int comparator_int(const void *value1, const void *value2);
 int comparator_char(const void *value1, const void *value2);
-#endif
 
+#endif /* NETEMU_HASHTBL_H */

@@ -14,15 +14,16 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef KAILLERA_INTERNAL_H_
-#define KAILLERA_INTERNAL_H_
+#pragma once
+#ifndef NETEMU_KAILLERA_INTERNAL_H_
+#define NETEMU_KAILLERA_INTERNAL_H_
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
-#include "netemu_thread.h"
 #include "../protocol/application_kaillera.h"
+#include "netemu_thread.h"
+
 struct _netemu_info_internal {
 	netemu_event connected_event;
 	struct netemu_list *chat_callback;
@@ -62,4 +63,4 @@ struct _netemu_info_internal {
 #endif
 
 
-#endif /* KAILLERA_INTERNAL_H_ */
+#endif /* NETEMU_KAILLERA_INTERNAL_H_ */

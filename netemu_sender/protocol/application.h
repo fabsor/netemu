@@ -21,9 +21,10 @@
  * both kaillera and netemu p2p. It also contains functions that both
  * protocols use.
  */
-
+#pragma once
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
+
 #include "protocol.h"
 #include "../network/net.h"
 

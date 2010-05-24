@@ -16,11 +16,11 @@
  */
 
 #include "netemu_socket.h"
-#include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "constants.h"
 #include "netemu_p2p.h"
+#include "netemu_thread.h"
 
 void p2p_menu(struct netemu_p2p_connection *connection);
 void create_p2p_game(struct netemu_p2p_connection* connection);

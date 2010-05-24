@@ -19,7 +19,7 @@
  * @file
  * This header file contains functions and structs that are used by the p2p application layer and should not be exposed to the public.
  */
-
+#pragma once
 #ifndef APPLICATION_P2P_INTERNAL_H_
 #define APPLICATION_P2P_INTERNAL_H_
 

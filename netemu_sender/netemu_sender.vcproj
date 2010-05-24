@@ -163,6 +163,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\protocol\application.c"
+				>
+			</File>
+			<File
 				RelativePath=".\protocol\application_kaillera.c"
 				>
 			</File>
@@ -175,10 +179,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\callbacks.c"
-				>
-			</File>
-			<File
 				RelativePath=".\protocol\communication.c"
 				>
 			</File>
@@ -187,11 +187,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\main.c"
+				RelativePath=".\kaillera\kaillera.c"
 				>
 			</File>
 			<File
-				RelativePath=".\netemu_communication.c"
+				RelativePath=".\kaillera\kaillera_callbacks.c"
+				>
+			</File>
+			<File
+				RelativePath=".\kaillera\kaillera_communication.c"
+				>
+			</File>
+			<File
+				RelativePath=".\kaillera\kaillera_responses.c"
+				>
+			</File>
+			<File
+				RelativePath=".\main.c"
 				>
 			</File>
 			<File
@@ -199,35 +211,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\netemu_kaillera.c"
-				>
-			</File>
-			<File
-				RelativePath=".\netemu_p2p.c"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_packet_buffer.c"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_receiver.c"
-				>
-			</File>
-			<File
-				RelativePath=".\netemu_resources.c"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_sender_buffer.c"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_sender_collection.c"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_sender_udp.c"
+				RelativePath=".\p2p\netemu_p2p.c"
 				>
 			</File>
 			<File
@@ -235,23 +219,51 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_tcp.c"
-				>
-			</File>
-			<File
-				RelativePath=".\netemu_util.c"
-				>
-			</File>
-			<File
 				RelativePath=".\tests\network_test.c"
 				>
 			</File>
 			<File
-				RelativePath=".\responses.c"
+				RelativePath=".\p2p\p2p_callbacks.c"
+				>
+			</File>
+			<File
+				RelativePath=".\p2p\p2p_responses.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\receiver_buffer.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\receiver_udp.c"
+				>
+			</File>
+			<File
+				RelativePath=".\resources.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\sender_buffer.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\sender_collection.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\sender_udp.c"
+				>
+			</File>
+			<File
+				RelativePath=".\network\tcp.c"
 				>
 			</File>
 			<File
 				RelativePath=".\protocol\transport.c"
+				>
+			</File>
+			<File
+				RelativePath=".\util.c"
 				>
 			</File>
 		</Filter>
@@ -261,11 +273,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\protocol\application.h"
+				>
+			</File>
+			<File
 				RelativePath=".\protocol\application_kaillera.h"
 				>
 			</File>
 			<File
 				RelativePath=".\protocol\application_p2p.h"
+				>
+			</File>
+			<File
+				RelativePath=".\protocol\application_p2p_internal.h"
 				>
 			</File>
 			<File
@@ -281,7 +301,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\interface\netemu.h"
+				RelativePath=".\kaillera\kaillera_internal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\kaillera\kaillera_responses.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\net.h"
 				>
 			</File>
 			<File
@@ -289,15 +317,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\netemu_info.h"
-				>
-			</File>
-			<File
 				RelativePath=".\interface\netemu_kaillera.h"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_net.h"
 				>
 			</File>
 			<File
@@ -305,27 +325,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_packet_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_receiver.h"
-				>
-			</File>
-			<File
-				RelativePath=".\netemu_resources.h"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_sender_buffer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_sender_collection.h"
-				>
-			</File>
-			<File
-				RelativePath=".\network\netemu_sender_udp.h"
+				RelativePath=".\p2p\netemu_p2p_internal.h"
 				>
 			</File>
 			<File
@@ -333,23 +333,51 @@
 				>
 			</File>
 			<File
-				RelativePath=".\network\netemu_tcp.h"
-				>
-			</File>
-			<File
-				RelativePath=".\netemu_util.h"
-				>
-			</File>
-			<File
 				RelativePath=".\tests\network_test.h"
 				>
 			</File>
 			<File
-				RelativePath=".\responses.h"
+				RelativePath=".\p2p\p2p_responses.h"
+				>
+			</File>
+			<File
+				RelativePath=".\protocol\protocol.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\receiver_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\receiver_udp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resources.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\sender_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\sender_collection.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\sender_udp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\network\tcp.h"
 				>
 			</File>
 			<File
 				RelativePath=".\protocol\transport.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util.h"
 				>
 			</File>
 		</Filter>

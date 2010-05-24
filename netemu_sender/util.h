@@ -14,9 +14,9 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef TEST_UTIL_H_
-#define TEST_UTIL_H_
+#pragma once
+#ifndef NETEMU_UTIL_H_
+#define NETEMU_UTIL_H_
 
 #include "network/receiver_udp.h"
 #include "network/sender_udp.h"
@@ -36,4 +36,4 @@ netemu_sockaddr_in* netemu_util_create_addr(NETEMU_DWORD addr, unsigned short po
 void netemu_util_send_data(struct netemu_sender_udp* sender, char* data);
 void* netemu_util_alloc_or_die(size_t size);
 int netemu_util_pack_str(char* buffer, char* str);
-#endif /* TEST_UTIL_H_ */
+#endif /* NETEMU_UTIL_H_ */

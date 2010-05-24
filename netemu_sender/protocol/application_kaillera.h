@@ -14,9 +14,10 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
+#pragma once
+#ifndef NETEMU_APPLICATION_KAILLERA_H_
+#define NETEMU_APPLICATION_KAILLERA_H_
 
-#ifndef APPLICATION_KAILLERA_H_
-#define APPLICATION_KAILLERA_H_
 #include "transport.h"
 #include "netlib_util.h"
 #include "application.h"
@@ -260,4 +261,4 @@ void netemu_application_user_leave_parse(struct application_instruction *instruc
 void netemu_application_client_timeout_request_add(struct application_instruction* instruction);
 
 void netemu_application_buffered_play_values_copy(struct buffered_play_values *target, struct buffered_play_values *values);
-#endif /* APPLICATION_KAILLERA_H_ */
+#endif /* NETEMU_APPLICATION_KAILLERA_H_ */

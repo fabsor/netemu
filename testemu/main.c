@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
 	NETEMU_BOOL creator = FALSE;
 	int no_instructions = 1000;
 	char choice;
+		int connection = 1;
 	info = NULL;
-	int connection = 1;
 
 	/* Let's go through and parse the arguments. */
 	for (i = 0; i < argc; i++) {

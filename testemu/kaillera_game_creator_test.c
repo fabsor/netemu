@@ -19,8 +19,6 @@
 #include "netemu_thread.h"
 #include "constants.h"
 #include <stdio.h>
-#include <time.h>
-#include <sys/time.h>
 void register_kaillera_game_creator_callbacks(struct netemu_kaillera *info);
 void kaillera_game_creator_user_joined(struct netemu_kaillera *info, char *user, NETEMU_DWORD ping, char connection, void *user_data);
 void kaillera_game_creator_player_joined(struct netemu_kaillera *info, struct player_joined *result);
@@ -36,7 +34,6 @@ void run_kaillera_game_creator_test(int no_instructions) {
 	struct game* game;
 	int i;
 	char *data;
-	struct timeval start_time, end_time;
 	long int elapsed;
 	game_creator_event = netemu_thread_event_create();
 	printf("Trying to connect to server...");
@@ -61,16 +58,10 @@ void run_kaillera_game_creator_test(int no_instructions) {
 	printf("OK!\n We're ready for action!");
 	data = malloc(512);
 
-	gettimeofday(&start_time, NULL);
 	for (i = 0; i < no_instructions; i++) {
 		data = VALUE;
 		netemu_kaillera_send_play_values(info, strlen(VALUE)+1, data);
 	}
-	gettimeofday(&end_time, NULL);
-
-
-	elapsed = end_time.tv_usec - start_time.tv_usec;
-	printf("Elapsed microseconds: %ld", elapsed);
 }
 
 void register_kaillera_game_creator_callbacks(struct netemu_kaillera *info) {

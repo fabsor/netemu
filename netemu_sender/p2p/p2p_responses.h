@@ -24,9 +24,9 @@
  * @defgroup p2p_responses netemu p2p responder functions
  * Responder functions to different instructions.
  */
-
-#ifndef P2P_RESPONSES_H_
-#define P2P_RESPONSES_H_
+#pragma once
+#ifndef NETEMU_P2P_RESPONSES_H_
+#define NETEMU_P2P_RESPONSES_H_
 
 #ifdef	__cplusplus
 extern "C" {
@@ -137,4 +137,4 @@ void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* b
 #endif
 
 
-#endif /* P2P_RESPONSES_H_ */
+#endif /* NETEMU_P2P_RESPONSES_H_ */

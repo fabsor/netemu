@@ -25,7 +25,7 @@
  * The netemu list module can be used to construct list without
  * having to worry about the size of it.
  */
-
+#pragma once
 #ifndef _NETEMU_LIST_H
 #define	_NETEMU_LIST_H
 

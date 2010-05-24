@@ -67,7 +67,7 @@ int netemu_communication_ping_server(struct server *server, void (* pingReceived
 	addr.sin_port = netemu_htons(port);
 	addr.sin_family = NETEMU_AF_INET;
 
-	server->_internal->sender = netemu_sender_udp_new(netemu_util_copy_addr((struct sockaddr*)&addr,sizeof(addr)), sizeof(addr));
+	server->_internal->sender = netemu_sender_udp_new(netemu_util_copy_addr((netemu_sockaddr*)&addr,sizeof(addr)), sizeof(addr));
 
 	ping = netemu_communication_create_ping_message();
 	/* Store current time, so we can calculate roundtrip time when we receive the pong. */

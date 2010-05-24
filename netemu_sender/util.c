@@ -31,7 +31,7 @@
 
 struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, netemu_sockaddr_in *addr_in, int size) {
 	struct netemu_sender_udp* sender;
-	sender = netemu_sender_udp_new_on_socket(netemu_util_copy_addr((struct sockaddr*)addr_in,size),socket,size);
+	sender = netemu_sender_udp_new_on_socket(netemu_util_copy_addr((netemu_sockaddr*)addr_in,size),socket,size);
 	return sender;
 }
 

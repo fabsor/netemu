@@ -104,7 +104,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 	struct p2p_start_game *game;
 	struct netemu_p2p_connection* connection;
 	struct netemu_sender_udp *sender;
-	struct sockaddr *addr;
+	netemu_sockaddr *addr;
 	int i, size, foo;
 	NETEMU_BOOL user_joined;
 	user_joined = 0;

@@ -14,4 +14,18 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
+#pragma once
+#ifndef NETEMU_NETWORK_TEST_H_
+#define NETEMU_NETWORK_TEST_H_
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
 void test_network();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* NETEMU_NETEMU_TEST_H_ */

@@ -25,13 +25,13 @@
  * The netemu Receiver UDP module can be used to receive
  * packets at a designated port.
  */
-
-#ifndef NETEMU_RECEIVER_H_
-#define NETEMU_RECEIVER_H_
+#pragma once
+#ifndef NETEMU_RECEIVER_UDP_H_
+#define NETEMU_RECEIVER_UDP_H_
 #include "netemu_socket.h"
 #include "netemu_list.h"
-#include "netemu_thread.h"
 #include "net.h"
+#include "netemu_thread.h"
 
 
 /*! This struct describes a receiver. */
@@ -72,4 +72,4 @@ void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver);
  */
 void netemu_receiver_udp_destroy(struct netemu_receiver_udp* receiver);
 
-#endif /* NETEMU_RECEIVER_H_ */
+#endif /* NETEMU_RECEIVER_UDP_H_ */

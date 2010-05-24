@@ -15,8 +15,8 @@
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef SENDER_H_
-#define SENDER_H_
+#ifndef NETEMU_SENDER_UDP_H_
+#define NETEMU_SENDER_UDP_H_
 
 #include "netemu_socket.h"
 
@@ -38,4 +38,4 @@ void netemu_sender_free(struct netemu_sender_udp* sender);
 
 void netemu_sender_udp_free(struct netemu_sender_udp* sender);
 
-#endif /* SENDER_H_ */
+#endif /* SENDER_UDP_H_ */

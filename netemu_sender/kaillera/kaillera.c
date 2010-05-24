@@ -31,9 +31,9 @@
 #include "../network/receiver_udp.h"
 #include "../structures/netemu_hashtbl.h"
 #include "netemu_list.h"
-#include "netemu_thread.h"
 #include "kaillera_responses.h"
 #include "../protocol/application_p2p.h"
+#include "netemu_thread.h"
 
 void netemu_kaillera_add_user(struct netemu_kaillera* info, NETEMU_WORD user_id, char connection_type, char* username);
 void netemu_kaillera_remove_user(struct netemu_kaillera *info, NETEMU_WORD user_id);

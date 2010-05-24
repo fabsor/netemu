@@ -172,7 +172,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\kaillera_game_creator_test.c"
+				>
+			</File>
+			<File
+				RelativePath=".\kaillera_game_joiner_test.c"
+				>
+			</File>
+			<File
 				RelativePath=".\main.c"
+				>
+			</File>
+			<File
+				RelativePath=".\p2p_build_network_test.c"
+				>
+			</File>
+			<File
+				RelativePath=".\p2p_host_test.c"
+				>
+			</File>
+			<File
+				RelativePath=".\p2p_join_test.c"
 				>
 			</File>
 			<File
@@ -185,6 +205,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\constants.h"
+				>
+			</File>
+			<File
+				RelativePath=".\kailleratest.h"
+				>
+			</File>
 			<File
 				RelativePath=".\p2ptest.h"
 				>

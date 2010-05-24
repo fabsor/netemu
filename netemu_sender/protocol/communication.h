@@ -14,9 +14,9 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef COMMUNICATION_H_
-#define COMMUNICATION_H_
+#pragma once
+#ifndef NETEMU_COMMUNICATION_H_
+#define NETEMU_COMMUNICATION_H_
 
 #include "netemu_socket.h"
 #include "netlib_util.h"
@@ -87,4 +87,4 @@ char* netemu_communication_http_get(char* host, char* path);
 int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount);
 
 
-#endif /* COMMUNICATION_H_ */
+#endif /* NETEMU_COMMUNICATION_H_ */

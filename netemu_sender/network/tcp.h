@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
+#pragma once
 #ifndef NETEMU_TCP_H_
 #define NETEMU_TCP_H_
 
@@ -23,8 +23,8 @@ extern "C" {
 #endif
 
 #include "netemu_socket.h"
-#include "netemu_thread.h"
 #include "net.h"
+#include "netemu_thread.h"
 
 struct netemu_tcp_connection {
 	NETEMU_SOCKET socket;

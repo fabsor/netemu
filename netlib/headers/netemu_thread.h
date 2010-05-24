@@ -19,7 +19,7 @@
 * @file
 * This header defines an interface which clients can use to get cross platform multithreading.
 */
-
+#pragma once
 #ifndef NETEMU_THREAD_H_
 #define NETEMU_THREAD_H_
 #ifdef	__cplusplus

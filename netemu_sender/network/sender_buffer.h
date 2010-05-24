@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
+#pragma once
 #ifndef NETEMU_SENDER_BUFFER_H_
 #define NETEMU_SENDER_BUFFER_H_
 
@@ -22,11 +22,11 @@
 extern "C" {
 #endif
 #include "net.h"
-#include "netemu_thread.h"
 #include "netemu_list.h"
 #include "sender_udp.h"
 #include "tcp.h"
 #include "sender_collection.h"
+#include "netemu_thread.h"
 
 #define LIST_START_SIZE	10
 #define PACKET_SEND_INTERVAL 30

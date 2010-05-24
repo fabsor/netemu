@@ -14,12 +14,13 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
+#pragma once
+#ifndef NETLIB_UTIL_H_
+#define NETLIB_UTIL_H_
 
-#ifndef NETEMU_UTIL_H_
-#define NETEMU_UTIL_H_
 #include <stdlib.h>
-#include "inttypes.h"
 #ifdef _NIX
+#include "inttypes.h"
 typedef unsigned int NETEMU_DWORD;
 #else
 typedef unsigned long NETEMU_DWORD;
@@ -38,5 +39,5 @@ typedef char NETEMU_BOOL;
 void netemu_snprintf(char* dest,size_t size, char* format, void* data);
 
 long netlib_get_time_millis();
-#endif /* NETEMU_UTIL_H_ */
+#endif /* NETLIB_UTIL_H_ */
 

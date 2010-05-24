@@ -14,9 +14,9 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef NETEMU_SENDER_H_
-#define NETEMU_SENDER_H_
+#pragma once
+#ifndef NETEMU_SENDER_COLLECTION_H_
+#define NETEMU_SENDER_COLLECTION_H_
 
 #ifdef	__cplusplus
 extern "C" {
@@ -62,4 +62,4 @@ void netemu_sender_collection_send_data(struct netemu_sender_collection* collect
 #endif
 
 
-#endif /* NETEMU_SENDER_H_ */
+#endif /* NETEMU_SENDER_COLLECTION_H_ */

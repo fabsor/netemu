@@ -25,7 +25,7 @@
  * This module contains everything external developers need to
  * interact with kaillera servers.
  */
-
+#pragma once
 #ifndef NETEMU_KAILLERA_H_
 #define NETEMU_KAILLERA_H_
 

@@ -25,16 +25,16 @@
  * This module handles received packets and delegates them
  * to appropriate listener functions.
  */
-
-#ifndef _NETEMU_PACKET_BUFFER_H
-#define _NETEMU_PACKET_BUFFER_H
+#pragma once
+#ifndef NETEMU_RECEIVER_BUFFER_H
+#define NETEMU_RECEIVER_BUFFER_H
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 	#include "../structures/netemu_hashtbl.h"
-	#include "netemu_thread.h"
 	#include "net.h"
+	#include "netemu_thread.h"
 
 	typedef struct _netemu_receiver_buffer_internal* netemu_receiver_buffer_internal;
 	/**
@@ -129,4 +129,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* NETEMU_RECEIVER_BUFFER_H */

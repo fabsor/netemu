@@ -14,9 +14,9 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
-
-#ifndef TRANSPORT_H_
-#define TRANSPORT_H_
+#pragma once
+#ifndef NETEMU_TRANSPORT_H_
+#define NETEMU_TRANSPORT_H_
 
 #include "netlib_util.h"
 #include "netemu_socket.h"
@@ -25,4 +25,4 @@
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count);
 void netemu_transport_free_packet_buffer(struct transport_packet_buffer* buffer);
 
-#endif /* TRANSPORT_H_ */
+#endif /* NETEMU_TRANSPORT_H_ */

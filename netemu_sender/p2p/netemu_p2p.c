@@ -280,7 +280,7 @@ void netemu_p2p_join_host(struct netemu_p2p_connection *p2p, struct p2p_user *us
  * Connect to a specific player.
  * @ingroup netemu_p2p
  * @param p2p the netemu_p2p module instance.
- * @param addr the sockaddr to connect to.
+ * @param addr the netemu_sockaddr to connect to.
  * @param the size of the struct.
  */
 struct netemu_tcp_connection *_netemu_p2p_connect_to(struct netemu_p2p_connection *p2p, netemu_sockaddr *connect_addr, int connect_addr_size) {
@@ -301,7 +301,7 @@ struct netemu_tcp_connection *_netemu_p2p_connect_to(struct netemu_p2p_connectio
  * Connect asyncronously.
  * @ingroup netemu_p2p
  * @param p2p the netemu_p2p module instance.
- * @param addr the sockaddr to connect to.
+ * @param addr the netemu_sockaddr to connect to.
  * @param the size of the struct.
  */
 struct netemu_tcp_connection *_netemu_p2p_connect_to_async(struct netemu_p2p_connection *p2p, netemu_sockaddr *connect_addr, int connect_addr_size) {

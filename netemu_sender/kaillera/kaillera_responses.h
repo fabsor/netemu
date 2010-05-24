@@ -19,10 +19,9 @@
  * @file
  * This header file defines the different responses that can be used to respond to instructions.
  */
-
-#ifndef RESPONSES_H_
-#define RESPONSES_H_
-
+#pragma once
+#ifndef NETEMU_KAILLERA_RESPONSES_H_
+#define NETEMU_KAILLERA_RESPONSES_H_
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -48,4 +47,4 @@ void _netemu_respond_to_game_started(struct netemu_receiver_buffer* buffer, stru
 #endif
 
 
-#endif /* RESPONSES_H_ */
+#endif /* NETEMU_KAILLERA_RESPONSES_H_ */

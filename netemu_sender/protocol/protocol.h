@@ -20,7 +20,7 @@
  * This file contains some structs that are being used by both the transport and application files.
  * It is here to avoid cross references.
  */
-
+#pragma once
 #ifndef PROTOCOL_H_
 #define PROTOCOL_H_
 

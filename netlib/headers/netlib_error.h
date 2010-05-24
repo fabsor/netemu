@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU Lesser General Public License
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
-
+#pragma once
 #ifndef _NETEMU_ERROR_H
 #define	_NETEMU_ERROR_H
 

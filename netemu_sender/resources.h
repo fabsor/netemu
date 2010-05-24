@@ -19,7 +19,7 @@
  * @file
  * This file defines global resources used by the whole library.
  */
-
+#pragma once
 #ifndef NETEMU_RESOURCES_H_
 #define NETEMU_RESOURCES_H_
 

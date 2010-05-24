@@ -32,13 +32,13 @@
 #include "../resources.h"
 #include "../network/sender_udp.h"
 #include "../network/receiver_udp.h"
-#include "netemu_thread.h"
 #include "../util.h"
 #include "netlib_error.h"
 #include "netemu_socket.h"
 #include "../interface/netemu_kaillera.h"
 #include "../network/net.h"
 #include "../protocol/application.h"
+#include "netemu_thread.h"
 
 /* These defines are temporary and let's you connect to the official kaillera server list. */
 #define DOMAIN	"www.kaillera.com"
@@ -137,7 +137,7 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	if(client == NULL)
 		return NULL;
 
-	client->receiver = netemu_receiver_udp_create((struct sockaddr*)&in_addr, sizeof(in_addr));
+	client->receiver = netemu_receiver_udp_create((netemu_sockaddr*)&in_addr, sizeof(in_addr));
 	if(client->receiver == NULL)
 		return NULL;
 	netemu_receiver_udp_start_receiving(client->receiver, netemu_kaillera_communication_listener, &callback);
@@ -200,7 +200,7 @@ int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWO
 	if(client == NULL)
 		return -1;
 
-	client->receiver = netemu_receiver_udp_create((struct sockaddr*)&in_addr, sizeof(in_addr));
+	client->receiver = netemu_receiver_udp_create((netemu_sockaddr*)&in_addr, sizeof(in_addr));
 	if(client->receiver == NULL)
 		return -1;
 
