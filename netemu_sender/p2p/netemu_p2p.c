@@ -791,7 +791,7 @@ void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_us
 		}
 		else {
 			netemu_application_p2p_buffered_play_values_copy(&player->_internal->cache[player->_internal->cache_index], values);
-			player->_internal->current_index = player->_internal->cache_index;
+			index = player->_internal->cache_index;
 			player->_internal->cache_index++;
 
 		}
