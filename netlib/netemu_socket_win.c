@@ -15,8 +15,8 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netemu_socket.h"
-#include "netlib_error.h"
+#include "headers/netemu_socket.h"
+#include "headers/netlib_error.h"
 
 int netemu_init_network() {
     int errcode;

@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Users\Emil\Documents\NetBeansProjects\netemu\netlib\headers;C:\Users\Emil\Documents\NetBeansProjects\netemu\netemu_sender\interface"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Fabbe\My Documents\Visual Studio 2008\Projects\netemu\netemu_sender\interface&quot;;&quot;C:\Documents and Settings\Fabbe\My Documents\Visual Studio 2008\Projects\netemu\netlib\headers&quot;;C:\Users\Emil\Documents\NetBeansProjects\netemu\netlib\headers;C:\Users\Emil\Documents\NetBeansProjects\netemu\netemu_sender\interface"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

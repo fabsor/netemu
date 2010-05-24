@@ -43,7 +43,7 @@ void connect_async();
 void server_connect();
 void connection_success(struct netemu_kaillera *info, int status, void *user_data);
 void game_created(struct game* game);
-void host_p2p(netemu_sockaddr_in addr);
+void host_p2p();
 void connect_p2p();
 
 /**
@@ -54,7 +54,6 @@ void connect_p2p();
  * @param argv an array containing the arguments.
  */
 int main(int argc, char *argv[]) {
-	netemu_sockaddr_in addr;
 	int i;
 	NETEMU_BOOL kaillera = FALSE;
 	NETEMU_BOOL p2p = FALSE;
@@ -105,18 +104,18 @@ int main(int argc, char *argv[]) {
 		choice = getchar();
 		switch (choice) {
 		case '1':
-			connect_async(addr);
+			connect_async();
 			break;
 		case '2':
-			server_connect(addr);
+			server_connect();
 			break;
 		case '3':
 			connect_p2p();
 			break;
 		case '4':
-			host_p2p(addr);
+			host_p2p();
 		case '5':
-			connect_p2p_async(addr);
+			connect_p2p_async();
 			break;
 		case '6':
 			run_p2p_host_test(no_instructions, connection);

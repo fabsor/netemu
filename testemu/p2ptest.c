@@ -29,7 +29,7 @@ void respond_to_login(struct netemu_p2p_connection *connection, int status);
 void start_p2p_game(struct netemu_p2p_connection *connection);
 void p2p_send_play_values(struct netemu_p2p_connection *connection);
 void p2p_player_ready(struct netemu_p2p_connection *connection);
-void host_p2p(netemu_sockaddr_in addr);
+void host_p2p();
 void join_p2p_game(struct netemu_p2p_connection *connection);
 void show_p2p_game_list(struct netemu_p2p_connection* connection);
 void show_p2p_user_list(struct netemu_p2p_connection* connection);
@@ -37,7 +37,7 @@ void p2p_player_joined_callback(struct netemu_p2p_connection *connection, struct
 
 int logged_in = 0;
 
-void host_p2p(netemu_sockaddr_in addr) {
+void host_p2p() {
 	int port;
 	struct netemu_p2p_connection *p2p;
 	printf("Enter Port Number:\n");
