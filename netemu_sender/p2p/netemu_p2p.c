@@ -695,10 +695,12 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data) 
 	}
 
 	memcpy(info->_internal->values_to_send + (info->_internal->values_buffered * size), data, size);
+
 	/* Copy data from the current frame index. */
-	if(info->_internal->values_received != NULL) {
+	if(info->current_game->_internal->sent_first_values) {
 		memcpy(data, info->_internal->values_received + (size*info->_internal->frame_index), size * info->current_game->user_count);
 	}
+
 	info->_internal->frame_index++;
 	info->_internal->values_buffered++;
 
@@ -708,6 +710,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data) 
 		cache_index = netemu_p2p_value_in_cache(info->user, info->_internal->values_to_send, info->current_game->emulator_value_size);
 		if(cache_index == -1) {
 			netemu_application_p2p_buffered_play_values_add(message,info->user->_internal->player_no, size,data);
+			netemu_list_add(info->user->_internal->play_values, message);
 		}
 		else {
 			netemu_application_p2p_cached_play_values_add(message,info->user->_internal->player_no, cache_index);
@@ -718,6 +721,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data) 
 		info->_internal->values_buffered = 0;
 		netemu_p2p_receive_play_values(info);
 		info->_internal->frame_index = 0;
+		info->current_game->_internal->sent_first_values = TRUE;
 	}
 	return 0;
 }
@@ -761,39 +765,58 @@ int netemu_p2p_receive_play_values(struct netemu_p2p_connection *info) {
 void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_user *player) {
 	struct p2p_buffered_play_values *values;
 	struct application_instruction *instruction;
-	int index, i, foo1, foo2;
+	int index, i;
+	char *insert_ptr, *retrieve_ptr;
 	instruction = player->_internal->play_values->elements[0];
 	netemu_list_remove_at(player->_internal->play_values, 0);
-	if(info->user->_internal->player_no != player->_internal->player_no) {
-		if(instruction->id == P2P_CACHED_BUFFERED_PLAY_VALUES) {
-			index = ((struct intelligently_cached_buffered_play_values*)instruction->body)->index;
-		}
-		else if(instruction->id == P2P_BUFFERED_PLAY_VALUES) {
-			values = instruction->body;
-			if(player->_internal->cache_index == 256) {
-				for(i = 0; i < 255; i++) {
-					player->_internal->cache[i] = player->_internal->cache[i+1];
-				}
-				netemu_application_p2p_buffered_play_values_copy(&player->_internal->cache[255], values);
-				index = 255;
-			}
-			else {
-				netemu_application_p2p_buffered_play_values_copy(&player->_internal->cache[player->_internal->cache_index], values);
-				index = player->_internal->cache_index;
-				player->_internal->cache_index++;
-
-			}
-		}
-
-		for(i = 0; i < info->current_game->connection_quality; i++) {
-			memcpy(info->_internal->values_received + (i * (info->current_game->emulator_value_size)) +
-					(info->current_game->emulator_value_size*player->_internal->player_no-1),
-							   player->_internal->cache[index].values,info->current_game->emulator_value_size);
-			foo1 = info->_internal->values_received + (i * (info->current_game->emulator_value_size)) +
-					(info->current_game->emulator_value_size*player->_internal->player_no-1);
-		}
-		player->_internal->values_received = FALSE;
+	if(instruction->id == P2P_CACHED_BUFFERED_PLAY_VALUES) {
+		index = ((struct intelligently_cached_buffered_play_values*)instruction->body)->index;
 	}
+	else if(instruction->id == P2P_BUFFERED_PLAY_VALUES) {
+		values = instruction->body;
+		if(player->_internal->cache_index == 256) {
+			for(i = 0; i < 255; i++) {
+				player->_internal->cache[i] = player->_internal->cache[i+1];
+			}
+			netemu_application_p2p_buffered_play_values_copy(&player->_internal->cache[255], values);
+			index = 255;
+		}
+		else {
+			netemu_application_p2p_buffered_play_values_copy(&player->_internal->cache[player->_internal->cache_index], values);
+			player->_internal->current_index = player->_internal->cache_index;
+			player->_internal->cache_index++;
+
+		}
+	}
+	for(i = 0; i < info->current_game->connection_quality; i++) {
+		/*
+		 * This is very tricky.
+		 * First, some definitions:
+		 * - A frame represents the input data one player sends for one frame in the game.
+		 * - value_size is the size of one players input in a frame.
+		 * - connection_quality is the number of frames in the packet.
+		 *
+		 * One block is always (value_size * player_count) big.
+		 * If connection quality is bigger than 1, we have more than one frame in here. That means we have a block with the size
+		 * (value_size * player_count * connection_quality) in total.
+		 * We want to insert a specific player's value in the right place.
+		 * We got a block from the other player containing (emulator_value_size * connection_quality).
+		 * We need to:
+		 *   - Get the data for each frame from the users data. We do that by adding (emulator_value_size * frame) in the block we received
+		 *     from the other player.
+		 *	 - We need to take the part described above, and insert it in the right place in the block we will return to the user. The right place
+		 *	   means (player_no * emulator_value_size * frame).
+		 * i is the frame below.
+		 */
+		insert_ptr = info->_internal->values_received + (i * (info->current_game->user_count * info->current_game->emulator_value_size)) /* Moves us to the right frame */ +
+				(info->current_game->emulator_value_size*(player->_internal->player_no-1)); /* Moves us to the right place in the block. */
+
+		retrieve_ptr = player->_internal->cache[index].values + (info->current_game->emulator_value_size * i); /* Moves us to the right place in the block */
+		memcpy(insert_ptr, retrieve_ptr ,info->current_game->emulator_value_size);
+
+	}
+	player->_internal->values_received = FALSE;
+
 
 }
 

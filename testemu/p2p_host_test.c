@@ -72,6 +72,7 @@ void run_p2p_host_test(int no_instructions, char connection) {
 		netemu_thread_event_wait(p2p_host_event, NETEMU_INFINITE);
 	}
 	for(n = 0; n < no_instructions; n++) {
+		memcpy(data, VALUE, strlen(VALUE)+1);
 		netemu_p2p_send_play_values(p2p, data);
 	}
 }

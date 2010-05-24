@@ -194,6 +194,7 @@ struct p2p_game_internal *netemu_application_p2p_create_game_internal() {
 	internal->udp_collection = NULL;
 	internal->ready_count = 0;
 	internal->all_values_received = FALSE;
+	internal->sent_first_values = FALSE;
 	internal->game_lock = netemu_thread_mutex_create();
 	return internal;
 }
