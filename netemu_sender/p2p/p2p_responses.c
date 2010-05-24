@@ -219,7 +219,7 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 		netemu_sender_collection_add_tcp_sender(connection->current_game->_internal->tcp_collection, user->_internal->connection);
 		_netemu_p2p_add_player(connection->current_game,user);
 		/* If this is our game, we send a join success back to the user TODO: Send denial if we're filled up. */
-		if(_netemu_p2p_user_compare(connection->current_game->creator, connection->user)) {
+		if(_netemu_p2p_user_compare(connection->current_game->creator, connection->user) == 0) {
 			type.connection = user->_internal->connection;
 			join_success = netemu_application_instruction_create();
 			netemu_application_p2p_player_join_success_add(join_success, connection->current_game);

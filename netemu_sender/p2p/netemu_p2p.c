@@ -453,8 +453,9 @@ int netemu_p2p_join_game(struct netemu_p2p_connection *connection, struct p2p_ga
 
 	/* We need to go through the array of players and establish a link to them. */
 	for(i = 0; i < connection->current_game->user_count-1; i++) {
-		if(_netemu_p2p_user_compare(&connection->current_game->players[i], connection->user)) {
+		if(_netemu_p2p_user_compare(&connection->current_game->players[i], connection->user) == 0) {
 			connection->current_game->players[i]._internal = connection->user->_internal;
+			connection->user->_internal->player_no = i+1;
 		}
 		else {
 			connection->current_game->players[i]._internal = netemu_application_p2p_create_user_internal();
@@ -548,6 +549,9 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWO
 	addr.sin_port = listen_port;
 
 	receiver = netemu_receiver_udp_create((netemu_sockaddr*)&addr,sizeof(addr));
+	if(receiver == NULL) {
+		return -1;
+	}
 	netemu_receiver_udp_start_receiving(receiver, netemu_application_parse_udp, connection->_internal->receive_buffer);
 	connection->user->_internal->receiver = receiver;
 	instruction = netemu_application_instruction_create();
