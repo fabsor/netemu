@@ -115,7 +115,7 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname,
 	p2p->_internal->game_started_callbacks = netemu_list_create(2,0);
 	p2p->_internal->all_ready_callbacks = netemu_list_create(2,0);
 	p2p->_internal->player_joined_callbacks = netemu_list_create(2,0);
-
+	p2p->_internal->player_ready_callbacks = netemu_list_create(2,0);
 
 	p2p->_internal->values_to_send = NULL;
 	p2p->_internal->values_buffered = 0;

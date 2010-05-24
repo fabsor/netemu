@@ -128,15 +128,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 			((struct p2p_callback*)connection->_internal->all_ready_callbacks->elements[i])->fn.allReadyFn(connection, connection->current_game);
 		}
 	}
-
-	for(i = 0; i < connection->current_game->user_count-1; i++) {
-		if(connection->current_game->players[i].addr == game->addr && connection->current_game->creator->port == game->port) {
-				user_joined = 1;
-				break;
-		}
-
-	}
-	if(user_joined) {
+	if(item->instruction->id == P2P_PLAYER_READY) {
 		for(i = 0; i < connection->_internal->player_ready_callbacks->count; i++) {
 			((struct p2p_callback*)connection->_internal->player_ready_callbacks->elements[i])->fn.gameStartedFn(connection, connection->current_game);
 		}
