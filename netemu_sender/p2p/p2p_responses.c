@@ -262,7 +262,9 @@ void _netemu_p2p_respond_to_game_created(struct netemu_receiver_buffer* buffer, 
 		if((index = netemu_list_contains(connection->_internal->users,game->creator)) != -1) {
 			game->creator->_internal = ((struct p2p_user*)connection->_internal->users->elements[index])->_internal;
 		}
-		game->creator->_internal->player_no = 1;
+		if(game->creator->_internal != NULL) {
+			game->creator->_internal->player_no = 1;
+		}
 		/* Add the game to our game list. */
 		netemu_list_add(connection->_internal->games,game);
 		/* Create a copy of the game, to preserve the instruction integrity. */

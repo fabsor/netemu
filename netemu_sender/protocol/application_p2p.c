@@ -317,6 +317,9 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 		target->_internal->game_lock = game->_internal->game_lock;
 		target->_internal->all_values_received = game->_internal->all_values_received;
 	}
+	else {
+		target->_internal = NULL;	
+	}
 	target->creator = malloc(sizeof(struct p2p_user));
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
 	if(game->_internal != NULL) {
