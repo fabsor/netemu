@@ -161,7 +161,6 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	pos += sizeof(NETEMU_WORD);
 	memcpy(buffer+pos, &game->connection_quality, sizeof(char));
 	pos += sizeof(char);
-
 	pos += _netemu_application_p2p_pack_user(buffer+pos,game->creator);
 
 	if(game->players != NULL) {
@@ -658,7 +657,7 @@ void netemu_application_p2p_player_join_success_add(struct application_instructi
 	copy = malloc(sizeof(struct p2p_game));
 	size = netemu_application_p2p_copy_game(copy, game);
 	instruction->id = P2P_PLAYER_JOIN_SUCCESS;
-	instruction->body = game;
+	instruction->body = copy;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_p2p_player_join_success_pack;
 

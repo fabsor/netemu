@@ -543,6 +543,7 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWO
 	struct netemu_receiver_udp *receiver;
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
+	int i;
 	netemu_sockaddr_in addr;
 	/* We can't join a game if a game is not created and started first, and you are not the owner of the game. */
 	if(connection->current_game == NULL || (_netemu_p2p_user_compare(connection->current_game->creator, connection->user)) == -1)
@@ -563,6 +564,9 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWO
 	connection->current_game->_internal->ready_count++;
 	if(connection->current_game->_internal->ready_count >= connection->current_game->user_count) {
 		connection->current_game->started = 1;
+		for(i = 0; i < connection->_internal->all_ready_callbacks->count; i++) {
+			((struct p2p_callback*)connection->_internal->all_ready_callbacks->elements[i])->fn.allReadyFn(connection, connection->current_game);
+		}
 	}
 	/* This instruction will be broadcasted to all game members */
 	type.collection = connection->current_game->_internal->tcp_collection;

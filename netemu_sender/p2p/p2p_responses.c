@@ -66,7 +66,7 @@ void netemu_p2p_respond_to_user_join(struct netemu_receiver_buffer* buffer, stru
 		type.collection = connection->_internal->peers;
 		netemu_list_add(connection->_internal->users,user);
 		netemu_sender_buffer_add(connection->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
-		for(i = 0; i < connection->_internal->join_callbacks->count; i++) {
+		for (i = 0; i < connection->_internal->join_callbacks->count; i++) {
 			((struct p2p_callback*)connection->_internal->join_callbacks->elements[i])->fn.userJoinedFn(connection, user);
 		}
 	}

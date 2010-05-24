@@ -36,7 +36,7 @@ struct p2p_user {
 	char *name; /**< The name of the player. This is included in the instructions all sends users. */
 	char *app_name; /**< The name of the application the player is using. This is included in all instructions that sends users. */
 	NETEMU_DWORD addr; /**< The address to the player in network byte order. This is included in all instructions that sends users.  */
-	NETEMU_DWORD port; /**< The port to the player in network byte order. This is included in all instructions that sends users.  */
+	NETEMU_WORD port; /**< The port to the player in network byte order. This is included in all instructions that sends users.  */
 	NETEMU_DWORD ping; /**< The player ping. This is included in all instructions that sends users.  */
 	char connection; /**< The connection quality. This is included in all instructions that sends users.  */
 	struct p2p_user_internal *_internal; /**< A struct containing private values that are being used by the internal structure of the program. Nothing in this struct is included in any instruction. Do not try to modify this.*/
