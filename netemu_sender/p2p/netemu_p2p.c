@@ -698,7 +698,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data) 
 
 	/* Copy data from the current frame index. */
 	if(info->current_game->_internal->sent_first_values) {
-		memcpy(data, info->_internal->values_received + (size*info->_internal->frame_index), size * info->current_game->user_count);
+		memcpy(data, info->_internal->values_received + (size * info->current_game->user_count*info->_internal->frame_index), size * info->current_game->user_count * info->current_game->connection_quality);
 	}
 
 	info->_internal->frame_index++;
