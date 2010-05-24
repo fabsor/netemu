@@ -44,6 +44,7 @@ void run_p2p_host_test(int no_instructions, char connection) {
 	struct p2p_game** games;
 	int n;
 	char* data;
+	netemu_p2p_initialize();
 	data = malloc(512);
 	host_created_game = NULL;
 	memcpy(data, VALUE, strlen(VALUE)+1);

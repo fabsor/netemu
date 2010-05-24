@@ -69,6 +69,10 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 void _netemu_p2p_register_responders(struct netemu_p2p_connection *p2p);
 /* End of function declarations */
 
+int netemu_p2p_initialize() {
+	return netemu_init_network();
+}
+
 /**
  * Create a new netemu_p2p instance.
  * This function creates a new p2p instance.

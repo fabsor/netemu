@@ -49,6 +49,10 @@ int _netemu_kaillera_buffered_values_cmp(char *playerval, char *cachedval, int s
 int _netemu_kaillera_buffered_values_cmp_all(char *playerval, char *cachedval, int size);
 void _netemu_kaillera_update(void *param);
 
+int netemu_kaillera_initialize() {
+	return netemu_init_network();
+}
+
 int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
 	struct application_instruction *instruction;
 	union netemu_connection_type type;

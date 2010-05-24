@@ -104,15 +104,19 @@ int main(int argc, char *argv[]) {
 		choice = getchar();
 		switch (choice) {
 		case '1':
+			netemu_kaillera_initialize();
 			connect_async();
 			break;
 		case '2':
+			netemu_kaillera_initialize();
 			server_connect();
 			break;
 		case '3':
+			netemu_p2p_initialize();
 			connect_p2p();
 			break;
 		case '4':
+			netemu_p2p_initialize();
 			host_p2p();
 		case '5':
 			connect_p2p_async();
