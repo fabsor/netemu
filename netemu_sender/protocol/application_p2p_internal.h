@@ -32,6 +32,7 @@ struct p2p_user_internal {
 	struct netemu_receiver_udp *receiver; /**< The receiver for udp packages*/
 	struct netemu_list *play_values; /**< Play values received since last time. */
 	struct p2p_buffered_play_values cache[256];
+	int current_index; /**< The currently seleced index. */
 	NETEMU_BOOL values_received;
 	int cache_index;
 	int player_no;
@@ -41,6 +42,7 @@ struct p2p_game_internal {
 	struct netemu_sender_collection *tcp_collection; /**< This is used for status update messages */
 	struct netemu_sender_collection *udp_collection; /**< This is used for play values */
 	NETEMU_WORD ready_count;
+	NETEMU_BOOL sent_first_values; /**< We need to know that we haven't sent any values, and that we can't have any data to fetch from */
 	NETEMU_BOOL all_values_received;
 	netemu_mutex game_lock;
 };

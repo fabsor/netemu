@@ -20,6 +20,7 @@
  * This file contains the netemu_kaillera module.
  */
 #include <stdio.h>
+#include "netemu_thread.h"
 #include "kaillera_internal.h"
 #include "../interface/netemu_kaillera.h"
 #include "../protocol/application_kaillera.h"
@@ -31,7 +32,6 @@
 #include "../network/receiver_udp.h"
 #include "../structures/netemu_hashtbl.h"
 #include "netemu_list.h"
-#include "netemu_thread.h"
 #include "kaillera_responses.h"
 #include "../protocol/application_p2p.h"
 

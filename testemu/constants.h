@@ -27,6 +27,7 @@
 #define ADDR	netemu_inet_addr("127.0.0.1")
 #define PORT	netemu_htons(27888)
 #define VALUE	"0x0x0xff"
+#define JOIN_VALUE "1x1x1xff"
 
 #define P2P_HOST_TEST_BIND_ADDR	netemu_inet_addr("127.0.0.1")
 #define P2P_HOST_TEST_PORT	netemu_htons(3535)
