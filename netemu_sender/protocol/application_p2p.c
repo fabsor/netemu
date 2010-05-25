@@ -723,11 +723,10 @@ void netemu_application_p2p_cached_play_values_add(struct application_instructio
 
 void netemu_application_p2p_cached_play_values_pack(struct application_instruction *instruction, char *data) {
 	struct p2p_cached_buffered_play_values *cache;
-	cache = malloc(sizeof(struct p2p_cached_buffered_play_values));
+	cache = instruction->body;
 	memcpy(data, &cache->player_no, 1);
 	data++;
-	*data = cache->index;
-	instruction->body = cache;
+	memcpy(data, &cache->index, 1);
 }
 
 void netemu_application_p2p_cached_play_values_parse(struct application_instruction *instruction, char *data) {
@@ -735,6 +734,7 @@ void netemu_application_p2p_cached_play_values_parse(struct application_instruct
 	cache = malloc(sizeof(struct p2p_cached_buffered_play_values));
 	memcpy(&cache->player_no,data, 1);
 	data++;
-	cache->index = *data;
+	memcpy(&cache->index, data, 1);
 	instruction->body = cache;
+	instruction->packBodyFn = netemu_application_p2p_cached_play_values_pack;
 }

@@ -778,7 +778,7 @@ void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_us
 	instruction = player->_internal->play_values->elements[0];
 	netemu_list_remove_at(player->_internal->play_values, 0);
 	if(instruction->id == P2P_CACHED_BUFFERED_PLAY_VALUES) {
-		index = ((struct intelligently_cached_buffered_play_values*)instruction->body)->index;
+		index = ((struct p2p_cached_buffered_play_values*)instruction->body)->index;
 	}
 	else if(instruction->id == P2P_BUFFERED_PLAY_VALUES) {
 		values = instruction->body;
