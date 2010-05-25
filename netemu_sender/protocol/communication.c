@@ -31,6 +31,11 @@
 #define GAME_STRING_SEPARATOR		'|'
 #define PARSE_STRING_MAX_LENGTH		512
 
+/**
+ * This struct contains internal data related to servers in the
+ * kaillera master server list.
+ * @ingroup netemu_communication
+ */
 struct _server_internal {
 	struct netemu_sender_udp *sender;
 	time_t ping_timestamp;
