@@ -42,7 +42,7 @@ void player_ready(struct netemu_kaillera *connection);
 void connect_async();
 void server_connect();
 void connection_success(struct netemu_kaillera *info, int status, void *user_data);
-void game_created(struct game* game);
+void game_created(struct netemu_kaillera *info, struct game* new_game, void *user_data);
 void host_p2p();
 void connect_p2p();
 
@@ -160,6 +160,9 @@ void server_connect() {
 	menu(info);
 }
 
+void game_created(struct netemu_kaillera *info, struct game* new_game, void *user_data) {
+}
+
 /**
  * Displays and handles a menu with applicable choices
  * when connected to a kaillera server.
@@ -253,12 +256,6 @@ void show_user_list(struct netemu_kaillera* connection) {
 	for (i = 0; i < no_users; i++) {
 		printf("%s\n", users[i]->username);
 	}
-}
-/**
- * Callback for created games.
- */
-void game_created(struct game* game) {
-	printf("%s", game->name);
 }
 
 /**

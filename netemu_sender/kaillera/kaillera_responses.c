@@ -89,6 +89,7 @@ void _netemu_respond_to_player_joined(struct netemu_receiver_buffer* buffer, str
 
 void _netemu_respond_to_game_created(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct game_created *created;
+	struct game *game;
 	struct netemu_kaillera* connection;
 	struct callback *call;
 	int* itemsToRemove, i, j;
@@ -100,7 +101,8 @@ void _netemu_respond_to_game_created(struct netemu_receiver_buffer* buffer, stru
 	netemu_kaillera_add_game(connection, created->appName, created->gameName, created->id, 0, 0, item->instruction->user);
 	for(i = 0; i < connection->_internal->game_created_callback->count; i++) {
 		call = (struct callback*)connection->_internal->game_created_callback->elements[i];
-		call->fn->game_created_fn(connection, connection->_internal->games->elements[connection->_internal->games->count-1], call->user_data);
+		game = connection->_internal->games->elements[connection->_internal->games->count-1];
+		call->fn->game_created_fn(connection, game, call->user_data);
 		if(((struct callback*)connection->_internal->game_created_callback->elements[i])->disposable) {
 			itemsToRemove[j] = i;
 			j++;

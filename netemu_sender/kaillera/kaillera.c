@@ -121,7 +121,7 @@ void _netemu_kaillera_update(void *param) {
 	instruction = netemu_application_instruction_create();
 	netemu_application_client_timeout_request_add(instruction);
 	while(TRUE) {
-		netemu_thread_event_wait(info->_internal->send_timeout, 60);
+		netemu_thread_event_wait(info->_internal->send_timeout, 60000);
 		netemu_sender_buffer_add(info->_internal->send_buffer, instruction, UDP_SENDER, type);
 	}
 }
