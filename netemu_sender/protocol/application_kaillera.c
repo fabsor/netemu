@@ -387,7 +387,7 @@ void netemu_application_buffered_play_values_pack(struct application_instruction
 	memcpy(buffer, play_values->values, play_values->size);
 }
 
-int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection) {
+int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, char connection) {
 	struct login_request* request;
 	int size, strlength;
 	if((request = malloc(sizeof(struct login_request))) == NULL) {

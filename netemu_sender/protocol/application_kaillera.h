@@ -50,9 +50,8 @@
 
 
 struct login_request {
-	char *user;
 	char *name;
-	short connection;
+	char connection;
 };
 
 struct user {
@@ -222,7 +221,7 @@ void netemu_application_leave_add(struct application_instruction* instruction, c
 
 void netemu_application_leave_pack(struct application_instruction *instruction, char *buffer);
 
-int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, int connection);
+int netemu_application_login_request_add(struct application_instruction* instruction, char* appName, char* user, char connection);
 
 void netemu_application_login_request_pack(struct application_instruction *instruction, char *buffer);
 
