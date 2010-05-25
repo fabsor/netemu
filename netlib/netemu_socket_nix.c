@@ -221,6 +221,11 @@ void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *ne
 	netemuinfo->addr = (netemu_sockaddr*)addrinfo->ai_addr;
 }
 
+/**
+ * Converts a string containing a dotted IPv4 address to a network order unsigned long.
+ * @param addr the address to convert.
+ * @return the address in network byte order.
+ */
 unsigned long netemu_inet_addr(char* addr) {
 	return inet_addr(addr);
 }
@@ -237,12 +242,20 @@ int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen
 }
 
 
-/* Converts an unsigned long from host order to network order. */
+/**
+ * Converts an unsigned long from host order to network order.
+ * @param value the value to convert
+ * @return the value in network byte order.
+ */
 unsigned long netemu_htonl(unsigned long value) {
 	return htonl(value);
 }
 
-/* Converts an unsigned long from network order to host order. */
+/**
+ * Converts an unsigned long from network order to host order.
+ * @param value the value to convert.
+ * @return the value in host order.
+ */
 unsigned long netemu_ntohl(unsigned long value) {
 	return ntohl(value);
 }

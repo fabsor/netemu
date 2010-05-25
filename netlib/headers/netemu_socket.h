@@ -19,6 +19,11 @@
  * @file
  * Header for the netlib socket component.
  */
+
+/**
+ * @defgroup netlib_network network tools.
+ * Various functions for handling networks.
+ */
 #pragma once
 #ifndef _NETEMU_SOCKET_H
 #define	_NETEMU_SOCKET_H
@@ -236,18 +241,35 @@ typedef unsigned int NETEMU_SOCKET;
 
 	int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result);
 
+	/**
+	 * Free an netemu_addr_info struct.
+	 */
 	void netemu_free_addr_info(struct netemu_addrinfo *info);
 
-	/* Converts a string containing a dotted IPv4 address to a network order unsigned long. */
+	/**
+	 * Converts a string containing a dotted IPv4 address to a network order unsigned long.
+	 * @param addr the address to convert.
+	 * @return the address in network byte order.
+	 */
 	unsigned long netemu_inet_addr(char* addr);
 
-	/* Converts an unsigned long from host order to network order. */
+	/**
+	 * Converts an unsigned long from host order to network order.
+	 * @param value the value to convert
+	 * @return the value in network byte order.
+	 */
 	unsigned long netemu_htonl(unsigned long value);
 
-	/* Converts an unsigned long from network order to host order. */
+	/**
+	 * Converts an unsigned long from network order to host order.
+	 * @param value the value to convert.
+	 * @return the value in host order.
+	 */
 	unsigned long netemu_ntohl(unsigned long value);
 
-	/* Converts an unsigned long from network order to host order. */
+	/**
+	 * Converts an unsigned long from network order to host order.
+	 */
 	unsigned short netemu_htons(unsigned short value);
 
 #ifdef	__cplusplus

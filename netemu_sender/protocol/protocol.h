@@ -20,6 +20,11 @@
  * This file contains some structs that are being used by both the transport and application files.
  * It is here to avoid cross references.
  */
+
+/**
+ * @defgroup netemu_protocol Protocol structures
+ * Some structures that both the kaillera and netemu p2p protocols shares in common.
+ */
 #pragma once
 #ifndef PROTOCOL_H_
 #define PROTOCOL_H_
@@ -28,6 +33,11 @@
 extern "C" {
 #endif
 
+/**
+ * This struct represents a transport instruction
+ * in the netemu p2p and kaillera protocols.
+ * @ingroup netemu_protocol
+ */
 struct transport_instruction {
 	/* ? */
 	NETEMU_WORD serial;
@@ -35,27 +45,42 @@ struct transport_instruction {
 	long p2p_id;
 	void* instruction;
 };
-
+/**
+ * This struct represents a packet in the
+ * netemu_p2p and kaillera protocols.
+ * @ingroup netemu_protocol
+ */
 struct transport_packet {
 	char count;
 	struct transport_instruction **instructions;
 };
 
+/**
+ * This struct represents data that
+ * is ready to be sent over the network.
+ * @ingroup netemu_protocol
+ */
 struct transport_packet_buffer {
-	int size;
-	char* data;
+	int size; /**< The size of the data block. */
+	char* data; /**< The actual data block. */
 };
 
-/*! A message to be sent to the server. */
+/**
+ * This struct represents an application-layer instruction
+ * for both the netemu p2p and the kaillera protocol
+ * @ingroup netemu_protocol
+ */
 struct application_instruction {
-	char id; /* 1...23 */
-	char *user;
-	void *body;
-	int body_size;
-	/* Since we dont know the actual size, this is probably the best option, unfortunately. */
-	void (*packBodyFn)(struct application_instruction* instruction, char* buffer);
-	void* (*copyBodyFn)(struct application_instruction* instruction);
-	void (*freeBodyFn)(struct application_instruction* instruction);
+	char id; /**< The application ID */
+	char *user; /**< The user name. This is primarily used by the kaillera protocol. */
+	void *body; /**< The instruction body. */
+	int body_size; /**< The size of the body. */
+	void (*packBodyFn)(struct application_instruction* instruction, char* buffer); /**< This is a function pointer
+	that points to a function that can pack the data in this instruction to something that can be sent over the network (serializing) */
+	void* (*copyBodyFn)(struct application_instruction* instruction); /**< This is a function pointer that points to a function that can copy the
+	instruction body. */
+	void (*freeBodyFn)(struct application_instruction* instruction); /**< This is a function pointer that points to a function that can free the memory
+	allocated in the function body */
 	int important; /**< Set this to > 0 and it will cause the buffer containing it to pack all buffered packets up and send them directly.*/
 	time_t timestamp;
 };

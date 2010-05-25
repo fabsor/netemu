@@ -254,7 +254,7 @@ void netemu_list_destroy(struct netemu_list* list) {
 
 /**
  * Get a pointer to an element in the list.
- * @return the pointer to the element in the list or null.
+ * @return the pointer to the element in the list, or NULL.
  */
 void* netemu_list_get(struct netemu_list* list, int index) {
 	if (index > list->count - 1 || index < 0) {
