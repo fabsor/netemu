@@ -43,6 +43,14 @@ char *_netemu_parse_game_list(char *input, struct netemu_list *games);
 char *_netemu_parse_response_string(char *input, char **output, char terminator);
 char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers);
 
+/**
+ * Ping a server. This is not a blocking call.
+ * @ingroup netemu_communication
+ * @param server the server to ping.
+ * @param pingReceivedCallback the callback which should be called after the server has been pinged.
+ * @return 0 if everything went fine, -1 on failure.
+ * @todo This function does not work yet. We need a clever way to ping servers.
+ */
 int netemu_communication_ping_server(struct server *server, void (* pingReceivedCallback)(struct server *server)) {
 	netemu_sockaddr_in addr;
 	char *address, *ip, *ping;
@@ -76,7 +84,12 @@ int netemu_communication_ping_server(struct server *server, void (* pingReceived
 	return 0;
 }
 
-
+/**
+ * Create an hello message that can be sent to the server.
+ * @ingroup netemu_communication
+ * @param int version the version of the protocol you want to tell the server that you have.
+ * @return an appropriately formatted hello message for the server.
+ */
 char* netemu_communication_create_hello_message(char* version) {
 	char* hello_message;
 	char* hello;
@@ -93,6 +106,11 @@ char* netemu_communication_create_hello_message(char* version) {
 	return hello_message;
 }
 
+/**
+ * Create a ping message can be sent to the server.
+ * @ingroup netemu_communication
+ * @return an appropriately formatted hello message for the server.
+ */
 char* netemu_communication_create_ping_message() {
 	char* msg;
 	char* ret;
@@ -102,6 +120,15 @@ char* netemu_communication_create_ping_message() {
 	return ret;
 }
 
+/**
+ * Parse incoming messages from the server.
+ * @ingroup netemu_communication
+ * @return an int describing the server response. it could be one of:
+ * CONNECTION_ACCEPTED the connection has been accepted. You should use netemu_protocol_parse_server_accept port to get the port
+ * CONNECTION_REJECTED_VER the connection was rejected because of version concerns.
+ * CONNECTION_REJECTED_TOO the connection was rejected because this server is full.
+ * PING_RECEIVED The sent ping was received.
+ */
 int netemu_communication_parse_server_message(char* server_message) {
 	if(strstr(server_message,"VER") != NULL) {
 		return CONNECTION_REJECTED_VER;
@@ -119,6 +146,11 @@ int netemu_communication_parse_server_message(char* server_message) {
 	return -1;
 }
 
+/**
+ * Parse the accept port out of a CONNECTION_ACCEPTED message.
+ * @ingroup netemu_communication
+ * @return the port number or -1 if the parsing failed.
+ */
 int netemu_communication_parse_server_accept_port(char* server_message) {
 	int start,len;
 	char* port;
@@ -130,6 +162,13 @@ int netemu_communication_parse_server_accept_port(char* server_message) {
 	return atoi(port);
 }
 
+/**
+ * Create a http get request.
+ * @ingroup netemu_communication
+ * @param host the host
+ * @param path the path
+ * @return the http get request.
+ */
 char* netemu_communication_http_get(char* host, char* path) {
 	char *format;
 	char *buffer;
@@ -150,6 +189,16 @@ char* netemu_communication_http_get(char* host, char* path) {
 	return buffer;
 }
 
+/**
+ * Parse an http response
+ * @ingroup netemu_communication
+ * @param socket the socket from which the request should be received.
+ * @param games the active games. Just send in a pointer here, and it will be filled automaticly.
+ * @param gamecount the number of games. It will be filled by the function.
+ * @param servers The actual server. The pointer will be directed to a block containing the server.
+ * @param servercount the number of servers. It will be filled with the appropriate number.
+ * @return 0 if everything went OK, -1 on failure.
+ */
 int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount) {
 	struct netemu_stringbuilder *builder;
 	struct netemu_list *game_list, *server_list;
