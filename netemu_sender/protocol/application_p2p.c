@@ -47,6 +47,16 @@ void netemu_application_p2p_buffered_play_values_pack(struct application_instruc
 void netemu_application_p2p_cached_play_values_pack(struct application_instruction *instruction, char *data);
 void netemu_application_p2p_player_join_success_pack(struct application_instruction *instruction, char *buffer);
 
+/**
+ * Add a "Create game" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param gamename the name of the game.
+ * @param appname the name of the application.
+ * @param creator the user who created the game.
+ * @param connection_quality the connection quality.
+ * @param value_size the size of the player value sent between clients.
+ */
 void netemu_application_p2p_create_game_add(struct application_instruction *instruction, char* gamename, char* appname,
 		struct p2p_user* creator, char connection_quality, NETEMU_WORD value_size) {
 	struct p2p_game *game;
@@ -70,6 +80,12 @@ void netemu_application_p2p_create_game_add(struct application_instruction *inst
 	instruction->copyBodyFn = netemu_application_p2p_create_game_copy;
 }
 
+/**
+ * Add a "Join Host" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param user the user to that joined.
+ */
 void netemu_application_p2p_join_host_add(struct application_instruction *instruction, struct p2p_user *user) {
 	struct p2p_user *copy;
 	int size;
@@ -88,6 +104,12 @@ void netemu_application_p2p_join_host_pack(struct application_instruction *instr
 	_netemu_application_p2p_pack_user(buffer,user);
 }
 
+/**
+ * Parse a "Join host" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_join_host_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_user *user;
 	user = malloc(sizeof(struct p2p_user));
@@ -102,6 +124,12 @@ void netemu_application_p2p_create_game_pack(struct application_instruction *ins
 	_netemu_application_p2p_pack_game(buffer,game);
 }
 
+/**
+ * Parse a "Create game" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_create_game_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_game *game;
 	int pos;
@@ -174,6 +202,11 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	return pos;
 }
 
+/**
+ * Create the internal struct of a user.
+ * @ingroup application_p2p
+ * @return an empty p2p_user_internal struct.
+ */
 struct p2p_user_internal *netemu_application_p2p_create_user_internal() {
 	struct p2p_user_internal *internal;
 	internal = malloc(sizeof(struct p2p_user_internal));
@@ -186,6 +219,11 @@ struct p2p_user_internal *netemu_application_p2p_create_user_internal() {
 	return internal;
 }
 
+/**
+ * Create the internal struct of a game.
+ * @ingroup application_p2p
+ * @return an empty p2p_game_internal struct.
+ */
 struct p2p_game_internal *netemu_application_p2p_create_game_internal() {
 	struct p2p_game_internal *internal;
 	internal = malloc(sizeof(struct p2p_game_internal));
@@ -250,6 +288,12 @@ void netemu_application_p2p_player_leave_parse(struct application_instruction *i
 	memcpy(&player->player_no,buffer,1);
 }
 
+/**
+ * Parse a "Login success" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_login_success_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_login_success* success;
 	int i;
@@ -283,12 +327,22 @@ void netemu_application_p2p_login_success_parse(struct application_instruction *
 	instruction->freeBodyFn = netemu_application_p2p_login_success_free;
 }
 
+/**
+ * Copy buffered play values.
+ */
 void netemu_application_p2p_buffered_play_values_copy(struct p2p_buffered_play_values *target, struct p2p_buffered_play_values *values) {
 	target->size = values->size;
 	target->player_no = values->player_no;
 	target->values = values->values;
 }
 
+/**
+ * Copy a game.
+ * @ingroup application_p2p
+ * @param target the target to which the data should be copied.
+ * @param user the original from which the data should be copied
+ * @return 0 if everything went OK, -1 otherwise.
+ */
 int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game) {
 	int size, i;
 	if(game->_internal != NULL) {
@@ -327,6 +381,14 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 	return size;
 }
 
+/**
+ * Add a "Login Success" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param host the user the client connected to.
+ * @param users a list of users in the cloud.
+ * @param games a list of games in the cloud.
+ */
 void netemu_application_p2p_login_success_add(struct application_instruction *instruction, struct p2p_user *host, struct netemu_list *users, struct netemu_list *games) {
 	struct p2p_login_success *success;
 	int size, i;
@@ -411,6 +473,12 @@ void netemu_application_p2p_login_success_free(struct application_instruction *i
 	free(body->games);
 }
 
+/**
+ * Pack a "Login success" body and put it in the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to read from.
+ * @param buffer the buffer to write the data to.
+ */
 void netemu_application_p2p_login_success_pack(struct application_instruction *instruction, char *buffer) {
 	struct p2p_login_success* success;
 	int i;
@@ -469,6 +537,13 @@ int _netemu_application_p2p_parse_user(char* buffer, struct p2p_user *user, NETE
 	return pos;
 }
 
+/**
+ * Copy a user.
+ * @ingroup application_p2p
+ * @param target the target to which the data should be copied.
+ * @param user the original from which the data should be copied
+ * @return 0 if everything went OK, -1 otherwise.
+ */
 int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *user) {
 	int size;
 	target->addr = user->addr;
@@ -503,6 +578,11 @@ int netemu_application_p2p_copy_user(struct p2p_user *target, struct p2p_user *u
 	return size;
 }
 
+/**
+ * Add a "Login request" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ */
 void netemu_application_p2p_login_request_add(struct application_instruction *instruction, unsigned long addr, unsigned short port, char* username, char* appname, int connection) {
 	struct p2p_user *user;
 	int size;
@@ -525,6 +605,11 @@ void netemu_application_p2p_login_request_add(struct application_instruction *in
 	instruction->copyBodyFn = netemu_application_p2p_login_request_copy;
 }
 
+/**
+ * Add a "request denied" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ */
 void netemu_p2p_login_request_denied_add(struct application_instruction *instruction) {
 	instruction->id = P2P_LOGIN_DENIED;
 	instruction->body = NULL;
@@ -544,12 +629,24 @@ void netemu_application_p2p_login_request_free(struct application_instruction *i
 	netemu_application_p2p_free_user(user,1);
 }
 
+/**
+ * Pack a "Login request" body and put it in the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to read from.
+ * @param buffer the buffer to write the data to.
+ */
 void netemu_application_p2p_login_request_pack(struct application_instruction *instruction, char* buffer) {
 	struct p2p_user *user;
 	user = (struct p2p_user*)instruction->body;
 	_netemu_application_p2p_pack_user(buffer,user);
 }
 
+/**
+ * Parse a "Login request" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_login_request_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_user *user;
 	user = malloc(sizeof(struct p2p_user));
@@ -558,6 +655,12 @@ void netemu_application_p2p_login_request_parse(struct application_instruction *
 
 }
 
+/**
+ * Add a "User Join" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param user the user to add to the instruction.
+ */
 void netemu_application_p2p_user_join_add(struct application_instruction *instruction, struct p2p_user *user) {
 	struct p2p_user *copy;
 	copy = malloc(sizeof(struct p2p_user));
@@ -571,6 +674,12 @@ void netemu_application_p2p_user_join_pack(struct application_instruction *instr
 	_netemu_application_p2p_pack_user(buffer,(struct p2p_user*) instruction->body);
 }
 
+/**
+ * Parse a "User join" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_user_join_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_user *user;
 	user = malloc(sizeof(struct p2p_user));
@@ -579,6 +688,11 @@ void netemu_application_p2p_user_join_parse(struct application_instruction *inst
 	instruction->body = user;
 }
 
+/**
+ * Add a "Player ready" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ */
 void netemu_application_p2p_ready_add(struct application_instruction *instruction) {
 	instruction->body = NULL;
 	instruction->id = P2P_READY;
@@ -586,12 +700,26 @@ void netemu_application_p2p_ready_add(struct application_instruction *instructio
 	instruction->packBodyFn = NULL;
 }
 
+/**
+ * Add a "Start game" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param addr the address in network byte order.
+ * @param port the port in network byte order.
+ */
 void netemu_application_p2p_start_game_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port) {
 	netemu_application_add_start_game(instruction, addr, port);
 	instruction->id = P2P_GAME_START;
 	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
 }
 
+/**
+ * Add a "Player ready" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param addr the address in network byte order.
+ * @param port the port in network byte order.
+ */
 void netemu_application_p2p_player_ready_add(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port) {
 	netemu_application_add_start_game(instruction, addr, port);
 	instruction->id = P2P_PLAYER_READY;
@@ -608,6 +736,12 @@ void netemu_application_p2p_start_game_pack(struct application_instruction *inst
 	pos += sizeof(NETEMU_DWORD);
 }
 
+/**
+ * Parse a "Start game" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_start_game *start_game;
 	int pos;
@@ -620,6 +754,9 @@ void netemu_application_p2p_start_game_parse(struct application_instruction *ins
 	instruction->packBodyFn = netemu_application_p2p_start_game_pack;
 }
 
+/**
+ * Add a start game to an instruction without changing anything but the body.
+ */
 void netemu_application_add_start_game(struct application_instruction *instruction, NETEMU_DWORD addr, unsigned short port) {
 	struct p2p_start_game *start_game;
 
@@ -632,6 +769,12 @@ void netemu_application_add_start_game(struct application_instruction *instructi
 	instruction->body = start_game;
 }
 
+/**
+ * Add a "Player join" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param user the user to that joined.
+ */
 void netemu_application_p2p_player_join_add(struct application_instruction *instruction, struct p2p_user *user) {
 	instruction->body = malloc(sizeof(struct p2p_user));
 	instruction->body_size = netemu_application_p2p_copy_user(instruction->body, user);
@@ -643,6 +786,12 @@ void netemu_application_p2p_player_join_pack(struct application_instruction *ins
 	_netemu_application_p2p_pack_user(buffer,(struct p2p_user*) instruction->body);
 }
 
+/**
+ * Parse a "Player join" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_player_join_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_user *user;
 	user = malloc(sizeof(struct p2p_user));
@@ -651,6 +800,12 @@ void netemu_application_p2p_player_join_parse(struct application_instruction *in
 	instruction->packBodyFn = netemu_application_p2p_player_join_pack;
 }
 
+/**
+ * Add a "Player join success" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param game the game to send.
+ */
 void netemu_application_p2p_player_join_success_add(struct application_instruction *instruction, struct p2p_game *game) {
 	struct p2p_game *copy;
 	int size;
@@ -667,6 +822,12 @@ void netemu_application_p2p_player_join_success_pack(struct application_instruct
 	_netemu_application_p2p_pack_game(buffer,(struct p2p_game*) instruction->body);
 }
 
+/**
+ * Parse a "Player join success" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_player_join_success_parse(struct application_instruction *instruction, char *buffer) {
 	struct p2p_game *game;
 	game = malloc(sizeof(struct p2p_game));
@@ -675,6 +836,15 @@ void netemu_application_p2p_player_join_success_parse(struct application_instruc
 	instruction->packBodyFn = netemu_application_p2p_player_join_success_pack;
 }
 
+/**
+ * Add a "Cached Play values" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param player_no the player number.
+ * @param size the size of the play value.
+ * @param data the bloc of data
+ * @todo size is no longer needed, it can be removed from this instruction.
+ */
 void netemu_application_p2p_buffered_play_values_add(struct application_instruction *instruction, char player_no, char size, void* data) {
 	struct p2p_buffered_play_values *play_values;
 	play_values = malloc(sizeof(struct p2p_buffered_play_values));
@@ -697,6 +867,12 @@ void netemu_application_p2p_buffered_play_values_pack(struct application_instruc
 	memcpy(data, play_values->values, play_values->size);
 }
 
+/**
+ * Parse a "Play values" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_buffered_play_values_parse(struct application_instruction *instruction, char *data) {
 	struct p2p_buffered_play_values *play_values;
 	play_values = malloc(sizeof(struct p2p_buffered_play_values));
@@ -709,6 +885,13 @@ void netemu_application_p2p_buffered_play_values_parse(struct application_instru
 	instruction->body = play_values;
 }
 
+/**
+ * Add a "Cached Play values" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param player_no the player number.
+ * @param index the index in the cache array.
+ */
 void netemu_application_p2p_cached_play_values_add(struct application_instruction *instruction, char player_no, char index) {
 	struct p2p_cached_buffered_play_values *cache;
 	cache = malloc(sizeof(struct p2p_cached_buffered_play_values));
@@ -729,6 +912,12 @@ void netemu_application_p2p_cached_play_values_pack(struct application_instructi
 	memcpy(data, &cache->index, 1);
 }
 
+/**
+ * Parse a "Cached play values" body from the buffer.
+ * @ingroup application_p2p
+ * @param instruction the instruction to save the body to.
+ * @param buffer the buffer to read the data from.
+ */
 void netemu_application_p2p_cached_play_values_parse(struct application_instruction *instruction, char *data) {
 	struct p2p_cached_buffered_play_values *cache;
 	cache = malloc(sizeof(struct p2p_cached_buffered_play_values));
