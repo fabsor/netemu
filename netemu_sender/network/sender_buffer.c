@@ -45,12 +45,12 @@ struct netemu_sender_buffer* netemu_sender_buffer_new(const short preferred_no_p
 	buffer->instructions = netemu_hashtbl_create(10, def_hashfunc_int, comparator_int);
 	buffer->preferred_no_packets = preferred_no_packets;
 	buffer->preferred_delay_time = preferred_delay_time;
-	buffer->send_lock = netemu_thread_mutex_create();
+	buffer->send_lock = netlib_thread_mutex_create();
 	buffer->running = 1;
 	buffer->itemsToAdd = netemu_list_create(10,1);
-	buffer->event = netemu_thread_event_create();
+	buffer->event = netlib_thread_event_create();
 	/* Start a new thread. */
-	netemu_thread_new(_netemu_sender_buffer_update,buffer);
+	netlib_thread_new(_netemu_sender_buffer_update,buffer);
 	return buffer;
 }
 
@@ -70,12 +70,12 @@ void _netemu_sender_buffer_update(void* arg) {
 	itemsToSend = buffer->instructions;
 	while (buffer->running) {
 		if(buffer->instructions->count == 0) {
-			netemu_thread_event_wait(buffer->event, NETEMU_INFINITE);
+			netemu_thread_event_wait(buffer->event, NETLIB_INFINITE);
 		}
 
 		current_time = time(NULL);
 		if (buffer->instructions->count > 0 /*&& (buffer->instructions->count > buffer->preferred_no_packets || buffer->send == 1 || (current_time - buffer->last_send ) > PACKET_SEND_INTERVAL)*/) {
-			netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
+			netlib_thread_mutex_lock(buffer->send_lock, NETLIB_INFINITE);
 			count = itemsToSend->count;
 			for (i = 0; i < itemsToSend->keys->count; i++) {
 				items = netemu_hashtbl_get(itemsToSend,itemsToSend->keys->elements[i], sizeof(struct netemu_list*));
@@ -95,7 +95,7 @@ void _netemu_sender_buffer_update(void* arg) {
 				}
 			}
 			netemu_hashtbl_clear(itemsToSend);
-			netemu_thread_mutex_release(buffer->send_lock);
+			netlib_thread_mutex_release(buffer->send_lock);
 			buffer->send = 0;
 			buffer->last_send = current_time;
 		}
@@ -131,7 +131,7 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 	if (instruction->important) {
 		buffer->send = 1;
 	}
-	netemu_thread_mutex_lock(buffer->send_lock, NETEMU_INFINITE);
+	netlib_thread_mutex_lock(buffer->send_lock, NETLIB_INFINITE);
 	if((list = netemu_hashtbl_get(buffer->instructions,key,sizeof(void*))) == NULL) {
 		list = netemu_list_create(10,0);
 		if(list == NULL) {
@@ -149,8 +149,8 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 		free(item);
 		return -1;
 	}
-	netemu_thread_event_signal(buffer->event);
-	netemu_thread_mutex_release(buffer->send_lock);
+	netlib_thread_event_signal(buffer->event);
+	netlib_thread_mutex_release(buffer->send_lock);
 	return 0;
 }
 

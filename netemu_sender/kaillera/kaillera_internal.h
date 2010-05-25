@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 #include "../protocol/application_kaillera.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 struct _netemu_info_internal {
 	netemu_event connected_event;

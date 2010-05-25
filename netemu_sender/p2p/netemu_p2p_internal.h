@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #include "netlib_util.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 struct netemu_p2p_internal {
 	struct netemu_tcp_listener *host;

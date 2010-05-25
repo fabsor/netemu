@@ -31,7 +31,7 @@
 #include "netlib_network.h"
 #include "../structures/netemu_list.h"
 #include "net.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 
 /*! This struct describes a receiver. */

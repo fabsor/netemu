@@ -79,7 +79,7 @@ void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, p
 	if(!receiver->listening) {
 		receiver->fn = fn;
 		receiver->received_data_param = param;
-		netemu_thread_new(_netemu_receiver_udp_recv, (void*)receiver);
+		netlib_thread_new(_netemu_receiver_udp_recv, (void*)receiver);
 	}
 }
 
@@ -93,23 +93,23 @@ void _netemu_receiver_udp_recv(void* params) {
 	receiver = (struct netemu_receiver_udp*)params;
 	receiver->listening = 1;
 	type.udp_receiver = receiver;
-	receiver->lock = netemu_thread_mutex_create();
+	receiver->lock = netlib_thread_mutex_create();
 	while (receiver->listening) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
-		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(receiver->lock, NETLIB_INFINITE);
 		error = receiver->fn(receiver->socket, UDP_RECEIVER, type, receiver->received_data_param);
 		if (error == -1) {
 			receiver->error = netlib_get_last_platform_error();
-			netemu_thread_mutex_release(receiver->lock);
+			netlib_thread_mutex_release(receiver->lock);
 			receiver->listening = 0;
 			break;
 		}
 		else if(error == 0) {
 			receiver->listening = 0;
 		}
-		netemu_thread_mutex_release(receiver->lock);
+		netlib_thread_mutex_release(receiver->lock);
 	}
-	netemu_thread_mutex_destroy(receiver->lock);
+	netlib_thread_mutex_destroy(receiver->lock);
 }
 
 /**
@@ -119,9 +119,9 @@ void _netemu_receiver_udp_recv(void* params) {
 void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver) {
 	if(receiver->listening) {
 		/* Let's not interfere  with any ongoing parsings. */
-		netemu_thread_mutex_lock(receiver->lock, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(receiver->lock, NETLIB_INFINITE);
 		receiver->listening = 0;
-		netemu_thread_mutex_release(receiver->lock);
+		netlib_thread_mutex_release(receiver->lock);
 	}
 }
 

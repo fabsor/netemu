@@ -24,7 +24,7 @@
 #define APPLICATION_P2P_INTERNAL_H_
 
 #include "application_p2p.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 /**
  * This struct holds internal stuff that can be interesting to

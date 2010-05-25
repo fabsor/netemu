@@ -285,7 +285,7 @@ void netemu_p2p_respond_to_play_values(struct netemu_receiver_buffer* buffer, st
 	connection = (struct netemu_p2p*)arg;
 	callbacks = connection->_internal->play_values_callbacks;
 	values = item->instruction->body;
-	netemu_thread_mutex_lock(connection->current_game->_internal->game_lock, NETEMU_INFINITE);
+	netlib_thread_mutex_lock(connection->current_game->_internal->game_lock, NETLIB_INFINITE);
 	if(values->player_no == 1) {
 		netemu_list_add(connection->current_game->creator->_internal->play_values, item->instruction);
 		connection->current_game->creator->_internal->values_received = TRUE;
@@ -302,11 +302,11 @@ void netemu_p2p_respond_to_play_values(struct netemu_receiver_buffer* buffer, st
 			all_values_received = FALSE;
 		}
 	}
-	netemu_thread_mutex_release(connection->current_game->_internal->game_lock);
+	netlib_thread_mutex_release(connection->current_game->_internal->game_lock);
 	if(all_values_received) {
 		/* Signal anyone that waits for an event. */
 		connection->current_game->_internal->all_values_received = TRUE;
-		netemu_thread_event_signal(connection->_internal->play_values_event);
+		netlib_thread_event_signal(connection->_internal->play_values_event);
 	}
 
 	for(i = 0; i < callbacks->count; i++) {
@@ -322,7 +322,7 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 	all_values_received = TRUE;
 	connection = (struct netemu_p2p*)arg;
 	values = item->instruction->body;
-	netemu_thread_mutex_lock(connection->current_game->_internal->game_lock, NETEMU_INFINITE);
+	netlib_thread_mutex_lock(connection->current_game->_internal->game_lock, NETLIB_INFINITE);
 	if(values->player_no == 1) {
 		netemu_list_add(connection->current_game->creator->_internal->play_values, item->instruction);
 		connection->current_game->creator->_internal->values_received = TRUE;
@@ -339,11 +339,11 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 			all_values_received = FALSE;
 		}
 	}
-	netemu_thread_mutex_release(connection->current_game->_internal->game_lock);
+	netlib_thread_mutex_release(connection->current_game->_internal->game_lock);
 	if(all_values_received) {
 		/* Signal anyone that waits for an event. */
 		connection->current_game->_internal->all_values_received = TRUE;
-		netemu_thread_event_signal(connection->_internal->play_values_event);
+		netlib_thread_event_signal(connection->_internal->play_values_event);
 	}
 }
 

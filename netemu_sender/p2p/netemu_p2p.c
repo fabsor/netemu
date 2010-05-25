@@ -388,7 +388,7 @@ int netemu_p2p_create_game(struct netemu_p2p *connection, char *gamename, char c
 	game = (struct p2p_game *)instruction->body;
 	/* We have created a game, so we will set this to our current game. */
 	connection->current_game = game;
-	connection->_internal->play_values_event = netemu_thread_event_create();
+	connection->_internal->play_values_event = netlib_thread_event_create();
 	netemu_list_add(connection->_internal->games, game);
 	game->_internal = netemu_application_p2p_create_game_internal();
 	game->_internal->tcp_collection = netemu_sender_collection_new();
@@ -473,7 +473,7 @@ int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
 	}
 
 	netemu_sender_collection_add_tcp_sender(connection->current_game->_internal->tcp_collection, connection->current_game->creator->_internal->connection);
-	connection->_internal->play_values_event = netemu_thread_event_create();
+	connection->_internal->play_values_event = netlib_thread_event_create();
 	return 0;
 }
 
@@ -642,16 +642,16 @@ NETEMU_BOOL _netemu_p2p_player_exists(struct p2p_game *game, struct p2p_user *pl
 		return TRUE;
 	}
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(game->_internal->game_lock, NETLIB_INFINITE);
 	}
 	for(i = 0; i < game->user_count-1; i++) {
 		if(_netemu_p2p_user_compare(player,&game->players[i]) == 0) {
-			netemu_thread_mutex_release(game->_internal->game_lock);
+			netlib_thread_mutex_release(game->_internal->game_lock);
 			return TRUE;
 		}
 	}
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_release(game->_internal->game_lock);
+		netlib_thread_mutex_release(game->_internal->game_lock);
 	}
 	return FALSE;
 }
@@ -669,7 +669,7 @@ void _netemu_p2p_add_player(struct p2p_game *game, struct p2p_user *player) {
 	int i;
 	/* If we have an internal struct, then we have a lock which we can use. */
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(game->_internal->game_lock, NETLIB_INFINITE);
 	}
 
 	game->user_count++;
@@ -686,7 +686,7 @@ void _netemu_p2p_add_player(struct p2p_game *game, struct p2p_user *player) {
 	game->players = new_player_list;
 	/* Release the lock. */
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_release(game->_internal->game_lock);
+		netlib_thread_mutex_release(game->_internal->game_lock);
 	}
 }
 
@@ -768,16 +768,16 @@ int _netemu_p2p_receive_play_values(struct netemu_p2p *info) {
 
 	/* Wait for values if there we haven't received values from all players. */
 	while(!info->current_game->_internal->all_values_received) {
-		netemu_thread_event_wait(info->_internal->play_values_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(info->_internal->play_values_event, NETLIB_INFINITE);
 	}
-	netemu_thread_mutex_lock(info->current_game->_internal->game_lock, NETEMU_INFINITE);
+	netlib_thread_mutex_lock(info->current_game->_internal->game_lock, NETLIB_INFINITE);
 	_netemu_process_user_value(info, info->current_game->creator);
 	for(i = 0; i < info->current_game->user_count-1; i++) {
 		player = &info->current_game->players[i];
 		_netemu_process_user_value(info, player);
 	}
 	info->current_game->_internal->all_values_received = FALSE;
-	netemu_thread_mutex_release(info->current_game->_internal->game_lock);
+	netlib_thread_mutex_release(info->current_game->_internal->game_lock);
 	return 0;
 }
 

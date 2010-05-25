@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include "constants.h"
 #include "netemu_p2p.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 void p2p_menu(struct netemu_p2p *connection);
 void create_p2p_game(struct netemu_p2p* connection);

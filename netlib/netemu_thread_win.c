@@ -16,35 +16,35 @@
  */
 
 #include "headers/netlib_error.h"
-#include "headers/netemu_thread.h"
+#include "headers/netlib_thread.h"
 
-struct netemu_mutex_internal {
+struct netlib_mutex_internal {
 	HANDLE mutex;
 };
 
-struct netemu_event_internal {
+struct netlib_event_internal {
 	HANDLE eventhandle;
 };
 
-struct netemu_thread_args {
+struct netlib_thread_args {
 	void (*start_fn) (void *);
 	void *arguments;
 };
 
-DWORD WINAPI _netemu_thread_callback(void *arg);
+DWORD WINAPI _netlib_thread_callback(void *arg);
 
-netemu_thread netemu_thread_new(void (*start_fn) (void *), void* arg) {
-	netemu_thread return_thread;
+netlib_thread netlib_thread_new(void (*start_fn) (void *), void* arg) {
+	netlib_thread return_thread;
 	int errcode;
-	struct netemu_thread_args *thread_args;
-	if((thread_args = malloc(sizeof(struct netemu_thread_args))) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+	struct netlib_thread_args *thread_args;
+	if((thread_args = malloc(sizeof(struct netlib_thread_args))) == NULL) {
+		netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 
 	thread_args->start_fn = start_fn;
 	thread_args->arguments = arg;
-	return_thread = CreateThread(NULL, 0, _netemu_thread_callback, thread_args, 0, NULL);
+	return_thread = CreateThread(NULL, 0, _netlib_thread_callback, thread_args, 0, NULL);
 
 	if(return_thread == NULL) {
 		netlib_set_last_mapped_error(GetLastError());
@@ -54,24 +54,24 @@ netemu_thread netemu_thread_new(void (*start_fn) (void *), void* arg) {
 	return return_thread;
 }
 
-int netemu_thread_exit() {
+int netlib_thread_exit() {
 	ExitThread(0);
 	return 0;
 }
 
-DWORD WINAPI _netemu_thread_callback(void *arg) {
-	struct netemu_thread_args *data = (struct netemu_thread_args *)arg;
+DWORD WINAPI _netlib_thread_callback(void *arg) {
+	struct netlib_thread_args *data = (struct netlib_thread_args *)arg;
 	data->start_fn(data->arguments);
 
 	return 0;
 }
 
-netemu_mutex netemu_thread_mutex_create() {
+netlib_mutex netlib_thread_mutex_create() {
 	int errcode;
-	netemu_mutex mutex_struct;
+	netlib_mutex mutex_struct;
 
-	if((mutex_struct = malloc(sizeof(struct netemu_mutex_internal))) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+	if((mutex_struct = malloc(sizeof(struct netlib_mutex_internal))) == NULL) {
+		netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 
@@ -84,7 +84,7 @@ netemu_mutex netemu_thread_mutex_create() {
 	return mutex_struct;
 }
 
-int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
+int netlib_thread_mutex_lock(netlib_mutex mutex_identifier, DWORD timeout) {
 	int errcode;
 
 	errcode = WaitForSingleObject(mutex_identifier->mutex, timeout);
@@ -93,14 +93,14 @@ int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
 	else if(errcode == WAIT_FAILED)
 		netlib_set_last_mapped_error(GetLastError());
 	else if(errcode == WAIT_TIMEOUT) {
-		return NETEMU_WAIT_TIMEOUT;
+		return netlib_WAIT_TIMEOUT;
 	}
 	/* TODO: Det �r inte s� bra att bara returnera -1 h�r, eftersom det antyder att n�got gick fel i WaitForSingleObject,
 	 * vilket det n�dv�ndigtvis inte gjorde.*/
 	return -1;
 }
 
-int netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
+int netlib_thread_mutex_release(netlib_mutex mutex_identifier) {
 	int errcode;
 	
 	errcode = ReleaseMutex(mutex_identifier->mutex);
@@ -111,7 +111,7 @@ int netemu_thread_mutex_release(netemu_mutex mutex_identifier) {
 	return 0;
 }
 
-int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
+int netlib_thread_mutex_destroy(netlib_mutex mutex_identifier) {
 	int errcode;
 
 	/* TODO: Mutex-objektet blir f�rst�rt f�rst n�r ALLA handles till objektet
@@ -124,12 +124,12 @@ int netemu_thread_mutex_destroy(netemu_mutex mutex_identifier) {
 	return 0;
 }
 
-netemu_event netemu_thread_event_create() {
-	netemu_event event_struct;
+netlib_event netlib_thread_event_create() {
+	netlib_event event_struct;
 	HANDLE handle;
 
-	if((event_struct = malloc(sizeof(struct netemu_event_internal))) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+	if((event_struct = malloc(sizeof(struct netlib_event_internal))) == NULL) {
+		netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
 		return NULL;
 	}
 
@@ -146,7 +146,7 @@ netemu_event netemu_thread_event_create() {
 	return event_struct;
 }
 
-int netemu_thread_event_signal(netemu_event event_identifier) {
+int netlib_thread_event_signal(netlib_event event_identifier) {
 	int errcode;
 	
 	errcode = SetEvent(event_identifier->eventhandle);
@@ -157,7 +157,7 @@ int netemu_thread_event_signal(netemu_event event_identifier) {
 	return 0;
 }
 
-int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds) {
+int netlib_thread_event_wait(netlib_event event_identifier, netlib_DWORD seconds) {
 	int errcode;
 	
 	errcode = WaitForSingleObject(event_identifier->eventhandle, seconds);
@@ -170,7 +170,7 @@ int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds
 	return -1;
 }
 
-int netemu_thread_event_destroy(netemu_event event_identifier) {
+int netlib_thread_event_destroy(netlib_event event_identifier) {
 	int errcode;
 
 	errcode = CloseHandle(event_identifier->eventhandle);

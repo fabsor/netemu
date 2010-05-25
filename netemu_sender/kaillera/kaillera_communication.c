@@ -38,7 +38,7 @@
 #include "../interface/netemu_kaillera.h"
 #include "../network/net.h"
 #include "../protocol/application.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 /* These defines are temporary and let's you connect to the official kaillera server list. */
 #define DOMAIN	"www.kaillera.com"
@@ -128,7 +128,7 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	/* This is not an async call. */
 	callback.async = -1;
 	callback.response_received = FALSE;
-	callback.instruction_received_event = netemu_thread_event_create();
+	callback.instruction_received_event = netlib_thread_event_create();
 	client = netemu_resources_get_client();
 	in_addr.sin_addr.s_addr = local_address;
 	in_addr.sin_port = local_port;
@@ -163,7 +163,7 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	/* TODO: Fix better constants here. */
 	while(connection_attempts < 5 && !callback.response_received) {
 		netemu_util_send_data(client->sender,hello);
-		if(netemu_thread_event_wait(callback.instruction_received_event, 3000) == NETEMU_WAIT_TIMEOUT) {
+		if(netemu_thread_event_wait(callback.instruction_received_event, 3000) == NETLIB_WAIT_TIMEOUT) {
 			connection_attempts++;
 		}
 	}
@@ -191,7 +191,7 @@ int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWO
 	callback->connection = connection;
 	callback->fn = connectionFn;
 	callback->arg = user_data;
-	callback->instruction_received_event = netemu_thread_event_create();
+	callback->instruction_received_event = netlib_thread_event_create();
 	client = netemu_resources_get_client();
 	in_addr.sin_addr.s_addr = local_address;
 	in_addr.sin_port = local_port;
@@ -214,7 +214,7 @@ int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWO
 		netemu_receiver_udp_destroy(client->receiver);
 		return -1;
 	}
-	netemu_thread_new(_netemu_kaillera_communication_login, callback);
+	netlib_thread_new(_netemu_kaillera_communication_login, callback);
 
 	return 0;
 }
@@ -243,7 +243,7 @@ void _netemu_kaillera_communication_login(void *param) {
 	/* TODO: Fix better constants here. */
 	while(connection_attempts < 5 && !callback->response_received) {
 		netemu_util_send_data(client->sender,hello);
-		if(netemu_thread_event_wait(callback->instruction_received_event, 3000) == NETEMU_WAIT_TIMEOUT) {
+		if(netemu_thread_event_wait(callback->instruction_received_event, 3000) == NETLIB_WAIT_TIMEOUT) {
 			connection_attempts++;
 		}
 	}
@@ -279,7 +279,7 @@ int netemu_kaillera_communication_listener(NETLIB_SOCKET socket, netemu_connecti
 		ret = 0;
 	}
 	callback->response_received = TRUE;
-	netemu_thread_event_signal(callback->instruction_received_event);
+	netlib_thread_event_signal(callback->instruction_received_event);
 	free(buffer);
 	return ret;
 }

@@ -24,7 +24,7 @@ extern "C" {
 
 #include "netlib_network.h"
 #include "net.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 struct netemu_tcp_connection {
 	NETLIB_SOCKET socket;

@@ -33,7 +33,7 @@
 #include "../structures/netemu_list.h"
 #include "kaillera_responses.h"
 #include "../protocol/application_p2p.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 void netemu_kaillera_add_user(struct netemu_kaillera* info, NETEMU_WORD user_id, char connection_type, char* username);
 void netemu_kaillera_remove_user(struct netemu_kaillera *info, NETEMU_WORD user_id);
@@ -216,7 +216,7 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->user_count = 0;
 	info->game_count = 0;
 	info->_internal = malloc(sizeof(struct _netemu_info_internal));
-	info->_internal->connected_event = netemu_thread_event_create();
+	info->_internal->connected_event = netlib_thread_event_create();
 	info->_internal->chat_callback = netemu_list_create(3, FALSE);
 	info->_internal->game_created_callback = netemu_list_create(3, FALSE);
 	info->_internal->join_callback = netemu_list_create(3, FALSE);
@@ -240,9 +240,9 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	info->_internal->values_buffered = 0;
 	info->_internal->sent_values = 0;
 	info->_internal->received_play_values = netemu_list_create(3, FALSE);
-	info->_internal->send_timeout = netemu_thread_event_create();
+	info->_internal->send_timeout = netlib_thread_event_create();
 	info->_internal->values_to_send = NULL;
-	info->_internal->play_values_event = netemu_thread_event_create();
+	info->_internal->play_values_event = netlib_thread_event_create();
 	netemu_list_register_sort_fn(info->_internal->users,_netemu_kaillera_user_comparator);
 	info->_internal->games = netemu_list_create(10, FALSE);
 	netemu_list_register_sort_fn(info->_internal->games,_netemu_kaillera_game_comparator);
@@ -287,7 +287,7 @@ int netemu_kaillera_login(struct netemu_kaillera* info) {
 		netemu_application_free_login_request((struct login_request*)message->body);
 	}
 	netemu_receiver_buffer_wait_for_instruction(info->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
-	netemu_thread_new(_netemu_kaillera_update, info);
+	netlib_thread_new(_netemu_kaillera_update, info);
 	return 0;
 }
 
@@ -490,7 +490,7 @@ int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
 	struct buffered_play_values *values;
 	int i;
 	while(info->_internal->received_play_values->count == 0) {
-		netemu_thread_event_wait(info->_internal->play_values_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(info->_internal->play_values_event, NETLIB_INFINITE);
 	}
 
 	instruction = info->_internal->received_play_values->elements[0];

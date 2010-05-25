@@ -19,7 +19,7 @@
 #include "netemu_list.h"
 #include <string.h>
 #include "netlib_error.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
@@ -46,7 +46,7 @@ struct netemu_list* netemu_list_create(int count, NETEMU_BOOL thread_safe) {
 
 	list->thread_safe = thread_safe;
 	if(list->thread_safe)
-		intern->list_mutex = netemu_thread_mutex_create();
+		intern->list_mutex = netlib_thread_mutex_create();
 
 	intern->size = count;
 	if((list->elements = malloc(sizeof(void*) * intern->size)) == NULL) {
@@ -68,7 +68,7 @@ int netemu_list_add(struct netemu_list* list, void* element) {
 	int error;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 
 	/* Enlarge the array if necessary. */
 	if (list->_intern->size <= list->count) {
@@ -81,7 +81,7 @@ int netemu_list_add(struct netemu_list* list, void* element) {
 	list->sorted = 0;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_release(list->_intern->list_mutex);
+		netlib_thread_mutex_release(list->_intern->list_mutex);
 
 	return 0;
 }
@@ -90,21 +90,21 @@ int _netemu_enlarge_list(struct netemu_list* list, int size) {
 	void** elements;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 
 	list->_intern->size += size;
 	elements = list->elements;
 	if((list->elements = malloc(sizeof(void*)*list->_intern->size)) == NULL) {
 		netlib_set_last_mapped_error(NETEMU_ENOTENOUGHMEMORY);
 		if(list->thread_safe)
-			netemu_thread_mutex_release(list->_intern->list_mutex);
+			netlib_thread_mutex_release(list->_intern->list_mutex);
 		return -1;
 	}
 	memcpy(list->elements,elements,sizeof(void*)*list->count);
 	free(elements);
 
 	if(list->thread_safe)
-		netemu_thread_mutex_release(list->_intern->list_mutex);
+		netlib_thread_mutex_release(list->_intern->list_mutex);
 
 	return 0;
 }
@@ -117,28 +117,28 @@ int _netemu_list_search_linear(struct netemu_list* list, void* element) {
 	int i;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 
 	
 	for (i = 0; i < list->count; i++) {
 		if(list->_intern->comparator != NULL) {
 			if(list->_intern->comparator(list->elements[i],element) == 0) {
 				if(list->thread_safe)
-					netemu_thread_mutex_release(list->_intern->list_mutex);
+					netlib_thread_mutex_release(list->_intern->list_mutex);
 				return i;
 			}
 		}
 		else {
 			if (list->elements[i] == element) {
 				if(list->thread_safe)
-					netemu_thread_mutex_release(list->_intern->list_mutex);
+					netlib_thread_mutex_release(list->_intern->list_mutex);
 				return i;
 			}
 		}
 	}
 
 	if(list->thread_safe)
-		netemu_thread_mutex_release(list->_intern->list_mutex);
+		netlib_thread_mutex_release(list->_intern->list_mutex);
 
 	return -1;
 }
@@ -159,11 +159,11 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 	int i;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 
 	if (list->count < index) {
 		if(list->thread_safe)
-			netemu_thread_mutex_release(list->_intern->list_mutex);
+			netlib_thread_mutex_release(list->_intern->list_mutex);
 		return -1;
 	}
 	for (i = index; i < list->count - 1; i++) {
@@ -172,7 +172,7 @@ int netemu_list_remove_at(struct netemu_list* list, int index) {
 	list->count--;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_release(list->_intern->list_mutex);
+		netlib_thread_mutex_release(list->_intern->list_mutex);
 
 	return 0;
 }
@@ -214,7 +214,7 @@ int netemu_list_sort(struct netemu_list* list) {
 		return 0;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 
 	/* We can't sort if we don't have a comparator. */
 	if (list->_intern->comparator != 0) {
@@ -225,7 +225,7 @@ int netemu_list_sort(struct netemu_list* list) {
 	}
 
 	if(list->thread_safe)
-		netemu_thread_mutex_release(list->_intern->list_mutex);
+		netlib_thread_mutex_release(list->_intern->list_mutex);
 
 	return return_value;
 }
@@ -246,7 +246,7 @@ void netemu_list_trim(struct netemu_list* list) {
 void netemu_list_destroy(struct netemu_list* list) {
 	free(list->elements);
 	if(list->thread_safe) {
-		netemu_thread_mutex_destroy(list->_intern->list_mutex);
+		netlib_thread_mutex_destroy(list->_intern->list_mutex);
 	}
 	free(list->_intern);
 	free(list);
@@ -268,7 +268,7 @@ int netemu_list_clear(struct netemu_list* list) {
 	void **new_buffer;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_lock(list->_intern->list_mutex, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 
 	if((new_buffer = malloc(sizeof(void*)*20)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
@@ -280,7 +280,7 @@ int netemu_list_clear(struct netemu_list* list) {
 	list->_intern->size = 20;
 
 	if(list->thread_safe)
-		netemu_thread_mutex_release(list->_intern->list_mutex);
+		netlib_thread_mutex_release(list->_intern->list_mutex);
 
 	return error;
 }

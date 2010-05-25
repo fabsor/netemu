@@ -23,7 +23,7 @@
 #include "constants.h"
 #include "p2ptest.h"
 #include "netlib_network.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -42,7 +42,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	data = malloc(512);
 	netemu_p2p_initialize();
 	memcpy(data, JOIN_VALUE, strlen(JOIN_VALUE)+1);
-	p2p_join_event = netemu_thread_event_create();
+	p2p_join_event = netlib_thread_event_create();
 	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");
 	p2p_join_register_callbacks(p2p);
@@ -56,11 +56,11 @@ void run_p2p_join_test(int no_instructions, char connection) {
 		return;
 	}
 	netemu_p2p_create_game(p2p, "TheGame",connection,strlen(VALUE)+1,&game);
-	netemu_thread_event_wait(p2p_join_event, NETEMU_INFINITE);
+	netemu_thread_event_wait(p2p_join_event, NETLIB_INFINITE);
 	printf("A new player has joined the game! OK!\n Starting the game...\n");
 	netemu_p2p_start_game(p2p,ADDR,45400);
 	while(!p2p_join_ready_to_send) {
-		netemu_thread_event_wait(p2p_join_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(p2p_join_event, NETLIB_INFINITE);
 	}
 	for(n = 0; n < no_instructions; n++) {
 		memcpy(data, VALUE, strlen(VALUE)+1);
@@ -75,10 +75,10 @@ void p2p_join_register_callbacks(struct netemu_p2p *connection) {
 }
 
 void p2p_join_player_join_callback(struct netemu_p2p *connection, struct p2p_game *game, struct p2p_user *user) {
-	netemu_thread_event_signal(p2p_join_event);
+	netlib_thread_event_signal(p2p_join_event);
 }
 
 void p2p_join_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	p2p_join_ready_to_send = 1;
-	netemu_thread_event_signal(p2p_join_event);
+	netlib_thread_event_signal(p2p_join_event);
 }

@@ -26,7 +26,7 @@ extern "C" {
 #include "sender_udp.h"
 #include "tcp.h"
 #include "sender_collection.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 
 #define LIST_START_SIZE	10
 #define PACKET_SEND_INTERVAL 30

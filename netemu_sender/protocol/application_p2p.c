@@ -179,7 +179,7 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	int i, pos;
 	/* Make sure that no one works with this game at the same time as us. */
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(game->_internal->game_lock, NETLIB_INFINITE);
 	}
 	pos = netemu_util_pack_str(buffer,game->name);
 	pos += netemu_util_pack_str(buffer+pos,game->app_name);
@@ -197,7 +197,7 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 		}
 	}
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_release(game->_internal->game_lock);
+		netlib_thread_mutex_release(game->_internal->game_lock);
 	}
 	return pos;
 }
@@ -232,7 +232,7 @@ struct p2p_game_internal *netemu_application_p2p_create_game_internal() {
 	internal->ready_count = 0;
 	internal->all_values_received = FALSE;
 	internal->sent_first_values = FALSE;
-	internal->game_lock = netemu_thread_mutex_create();
+	internal->game_lock = netlib_thread_mutex_create();
 	return internal;
 }
 
@@ -346,7 +346,7 @@ void netemu_application_p2p_buffered_play_values_copy(struct p2p_buffered_play_v
 int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *game) {
 	int size, i;
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_lock(game->_internal->game_lock, NETEMU_INFINITE);
+		netlib_thread_mutex_lock(game->_internal->game_lock, NETLIB_INFINITE);
 	}
 	size = netemu_util_copy_string(&target->app_name,game->app_name);
 	size += netemu_util_copy_string(&target->name, game->name);
@@ -376,7 +376,7 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 	target->creator = malloc(sizeof(struct p2p_user));
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
 	if(game->_internal != NULL) {
-		netemu_thread_mutex_release(game->_internal->game_lock);
+		netlib_thread_mutex_release(game->_internal->game_lock);
 	}
 	return size;
 }

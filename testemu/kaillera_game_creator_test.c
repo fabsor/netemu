@@ -16,7 +16,7 @@
  */
 
 #include "netemu_kaillera.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 #include "constants.h"
 #include <stdio.h>
 void register_kaillera_game_creator_callbacks(struct netemu_kaillera *info);
@@ -36,20 +36,20 @@ void run_kaillera_game_creator_test(int no_instructions) {
 	char *data;
 	long int elapsed;
 	netemu_kaillera_initialize();
-	game_creator_event = netemu_thread_event_create();
+	game_creator_event = netlib_thread_event_create();
 	printf("Trying to connect to server...");
 	info = netemu_kaillera_create(PLAYERNAME, EMUNAME, 1);
 	register_kaillera_game_creator_callbacks(info);
 	netemu_kaillera_connect(info,BIND_ADDR, 0, ADDR, PORT);
 	printf("OK!\n Waiting for other users to join.");
 	while(user_joined == 0) {
-		netemu_thread_event_wait(game_creator_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(game_creator_event, NETLIB_INFINITE);
 	}
 	printf("Other users have joined! Let's start a game...");
 	netemu_kaillera_create_game(info, "gamename", &game);
 	printf("OK!\n Now we wait for other players...");
 	while(player_joined == 0) {
-		netemu_thread_event_wait(game_creator_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(game_creator_event, NETLIB_INFINITE);
 	}
 	printf("OK!\n Let's start the game...");
 	/* We have liftoff! Let's start the game. */
@@ -74,14 +74,14 @@ void kaillera_game_creator_user_joined(struct netemu_kaillera *info, char *user,
 	/* Let's create a game once another user has joined. */
 	if(info->user_count > 1 && !user_joined) {
 		user_joined = 1;
-		netemu_thread_event_signal(game_creator_event);
+		netlib_thread_event_signal(game_creator_event);
 	}
 
 }
 void kaillera_game_creator_game_status(struct netemu_kaillera *info, struct game *game, struct game_status_update *update, void *user_data) {
 	if(update->num_players > 1 && !player_joined) {
 		player_joined = 1;
-		netemu_thread_event_signal(game_creator_event);
+		netlib_thread_event_signal(game_creator_event);
 	}
 }
 

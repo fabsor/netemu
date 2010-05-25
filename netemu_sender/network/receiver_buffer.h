@@ -34,7 +34,7 @@ extern "C" {
 #endif
 	#include "../structures/netemu_hashtbl.h"
 	#include "net.h"
-	#include "netemu_thread.h"
+	#include "netlib_thread.h"
 
 	typedef struct _netemu_receiver_buffer_internal* netemu_receiver_buffer_internal;
 	/**

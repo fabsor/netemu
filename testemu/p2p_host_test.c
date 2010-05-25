@@ -23,7 +23,7 @@
 #include "constants.h"
 #include "p2ptest.h"
 #include "netlib_network.h"
-#include "netemu_thread.h"
+#include "netlib_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -52,8 +52,8 @@ void run_p2p_host_test(int no_instructions, char connection) {
 	printf("Registering callbacks...");
 	p2p_host_register_callbacks(p2p);
 
-	p2p_host_event = netemu_thread_event_create();
-	p2p_host_join_event = netemu_thread_event_create();
+	p2p_host_event = netlib_thread_event_create();
+	p2p_host_join_event = netlib_thread_event_create();
 	printf("OK!\nHosting cloud on %d...", P2P_HOST_TEST_PORT);
 	if(netemu_p2p_host(p2p, P2P_HOST_TEST_BIND_ADDR,P2P_HOST_TEST_PORT,CLOUD_NAME) == 0) {
 		printf("OK!\n Waiting for incoming connections...");
@@ -63,14 +63,14 @@ void run_p2p_host_test(int no_instructions, char connection) {
 		return;
 	}
 	while(host_created_game == NULL) {
-		netemu_thread_event_wait(p2p_host_join_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(p2p_host_join_event, NETLIB_INFINITE);
 	}
 
 	netemu_p2p_join_game(p2p, host_created_game);
 	printf("OK!\n Waiting for game start...");
 
 	while(!p2p_host_ready_to_send) {
-		netemu_thread_event_wait(p2p_host_event, NETEMU_INFINITE);
+		netemu_thread_event_wait(p2p_host_event, NETLIB_INFINITE);
 	}
 	for(n = 0; n < no_instructions; n++) {
 		memcpy(data, VALUE, strlen(VALUE)+1);
@@ -89,7 +89,7 @@ void p2p_host_game_created_callback(struct netemu_p2p *connection, struct p2p_ga
 	printf("A game has been created!\nTrying to join the game...");
 	/* Join the game that was just created. */
 	host_created_game = game;
-	netemu_thread_event_signal(p2p_host_join_event);
+	netlib_thread_event_signal(p2p_host_join_event);
 }
 
 void p2p_host_game_started_callback(struct netemu_p2p *connection, struct p2p_game *game) {
@@ -101,7 +101,7 @@ void p2p_host_game_started_callback(struct netemu_p2p *connection, struct p2p_ga
 void p2p_host_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	printf("OK!\nNow let's have some fun shall we? Let's send some data to the other player...");
 	p2p_host_ready_to_send = 1;
-	netemu_thread_event_signal(p2p_host_event);
+	netlib_thread_event_signal(p2p_host_event);
 }
 
 void p2p_host_user_joined_callback(struct netemu_p2p *connection, struct p2p_user *user) {
