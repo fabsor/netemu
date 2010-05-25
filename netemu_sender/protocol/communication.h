@@ -29,7 +29,7 @@
 #ifndef NETEMU_COMMUNICATION_H_
 #define NETEMU_COMMUNICATION_H_
 
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "netlib_util.h"
 
 /**
@@ -136,6 +136,6 @@ char* netemu_communication_http_get(char* host, char* path);
  * @param servercount the number of servers. It will be filled with the appropriate number.
  * @return 0 if everything went OK, -1 on failure.
  */
-int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount);
+int netemu_communication_parse_http(NETLIB_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount);
 
 #endif /* NETEMU_COMMUNICATION_H_ */

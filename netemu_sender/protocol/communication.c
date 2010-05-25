@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "../structures/netemu_list.h"
 #include "netlib_error.h"
 #include "../structures/netemu_stringbuilder.h"
@@ -43,7 +43,7 @@ struct _server_internal {
 	struct netemu_receiver *receiver;
 };
 
-int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder *builder);
+int _netemu_get_http_response(NETLIB_SOCKET socket, struct netemu_stringbuilder *builder);
 char *_netemu_parse_game_list(char *input, struct netemu_list *games);
 char *_netemu_parse_response_string(char *input, char **output, char terminator);
 char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers);
@@ -57,7 +57,7 @@ char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers
  * @todo This function does not work yet. We need a clever way to ping servers.
  */
 int netemu_communication_ping_server(struct server *server, void (* pingReceivedCallback)(struct server *server)) {
-	netemu_sockaddr_in addr;
+	netlib_sockaddr_in addr;
 	char *address, *ip, *ping;
 	int ip_len, port_len;
 	short port;
@@ -76,11 +76,11 @@ int netemu_communication_ping_server(struct server *server, void (* pingReceived
 	port = atoi(address);
 
 	/* Connect */
-	addr.sin_addr.s_addr = netemu_inet_addr(ip);
-	addr.sin_port = netemu_htons(port);
-	addr.sin_family = NETEMU_AF_INET;
+	addr.sin_addr.s_addr = netlib_inet_addr(ip);
+	addr.sin_port = netlib_htons(port);
+	addr.sin_family = NETLIB_AF_INET;
 
-	server->_internal->sender = netemu_sender_udp_new(netemu_util_copy_addr((netemu_sockaddr*)&addr,sizeof(addr)), sizeof(addr));
+	server->_internal->sender = netemu_sender_udp_new(netemu_util_copy_addr((netlib_sockaddr*)&addr,sizeof(addr)), sizeof(addr));
 
 	ping = netemu_communication_create_ping_message();
 	/* Store current time, so we can calculate roundtrip time when we receive the pong. */
@@ -204,7 +204,7 @@ char* netemu_communication_http_get(char* host, char* path) {
  * @param servercount the number of servers. It will be filled with the appropriate number.
  * @return 0 if everything went OK, -1 on failure.
  */
-int netemu_communication_parse_http(NETEMU_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount) {
+int netemu_communication_parse_http(NETLIB_SOCKET socket, struct existing_game ***games, int *gamecount, struct server ***servers, int *servercount) {
 	struct netemu_stringbuilder *builder;
 	struct netemu_list *game_list, *server_list;
 	char *response_body, *serverlist;
@@ -409,7 +409,7 @@ char *_netemu_parse_server_list(char *response_body, struct netemu_list *servers
 	return response_body;
 }
 
-int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder *builder) {
+int _netemu_get_http_response(NETLIB_SOCKET socket, struct netemu_stringbuilder *builder) {
 	char *receive_buffer;
 	int received, error;
 	
@@ -419,7 +419,7 @@ int _netemu_get_http_response(NETEMU_SOCKET socket, struct netemu_stringbuilder 
 		return -1;
 	}
 	do{
-		received = netemu_recv(socket, receive_buffer, HTTP_BUFFER_SIZE, 0);
+		received = netlib_recv(socket, receive_buffer, HTTP_BUFFER_SIZE, 0);
 		if(received < 0) {
 			error = netlib_get_last_platform_error();
 			free(receive_buffer);

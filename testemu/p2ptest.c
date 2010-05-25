@@ -15,7 +15,7 @@
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "constants.h"
@@ -44,7 +44,7 @@ void host_p2p() {
 	scanf("%d",&port);
 	printf("\n");
 	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, 1);
-	netemu_p2p_host(p2p, BIND_ADDR,netemu_htons(port),CLOUD_NAME);
+	netemu_p2p_host(p2p, BIND_ADDR,netlib_htons(port),CLOUD_NAME);
 	p2p_menu(p2p);
 }
 
@@ -61,30 +61,30 @@ void connect_p2p() {
 	scanf("%d",&join_port);
 	printf("\n");
 	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, 1);
-	netemu_p2p_connect(p2p,BIND_ADDR,netemu_htons(host_port),ADDR,netemu_htons(join_port));
+	netemu_p2p_connect(p2p,BIND_ADDR,netlib_htons(host_port),ADDR,netlib_htons(join_port));
 	p2p_menu(p2p);
 }
 
 void connect_p2p_async() {
 	int port;
-	netemu_sockaddr_in in_addr;
-	netemu_sockaddr_in out_addr;
+	netlib_sockaddr_in in_addr;
+	netlib_sockaddr_in out_addr;
 	struct netemu_p2p *p2p;
 
 	in_addr.sin_addr.s_addr = ADDR;
-	in_addr.sin_family = NETEMU_AF_INET;
+	in_addr.sin_family = NETLIB_AF_INET;
 
 	out_addr.sin_addr.s_addr = ADDR;
-	out_addr.sin_family = NETEMU_AF_INET;
+	out_addr.sin_family = NETLIB_AF_INET;
 
 	printf("Enter Port Number for you:\n");
 	scanf("%d",&port);
-	in_addr.sin_port = netemu_htons(port);
+	in_addr.sin_port = netlib_htons(port);
 	printf("\n");
 
 	printf("Enter Port Number to the host:\n");
 	scanf("%d",&port);
-	out_addr.sin_port = netemu_htons(port);
+	out_addr.sin_port = netlib_htons(port);
 	printf("\n");
 
 	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, 1);
@@ -143,11 +143,11 @@ void p2p_send_play_values(struct netemu_p2p *connection) {
 }
 
 void p2p_player_ready(struct netemu_p2p *connection) {
-	netemu_sockaddr_in addr;
-	addr.sin_family = NETEMU_AF_INET;
+	netlib_sockaddr_in addr;
+	addr.sin_family = NETLIB_AF_INET;
 	addr.sin_addr.s_addr = ADDR;
-	addr.sin_port = netemu_htons(40001);
-	netemu_p2p_player_ready(connection,(netemu_sockaddr*)&addr,sizeof(addr));
+	addr.sin_port = netlib_htons(40001);
+	netemu_p2p_player_ready(connection,(netlib_sockaddr*)&addr,sizeof(addr));
 }
 
 void join_p2p_game(struct netemu_p2p *connection) {

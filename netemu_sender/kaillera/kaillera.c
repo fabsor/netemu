@@ -50,7 +50,7 @@ int _netemu_kaillera_buffered_values_cmp_all(char *playerval, char *cachedval, i
 void _netemu_kaillera_update(void *param);
 
 int netemu_kaillera_initialize() {
-	return netemu_init_network();
+	return netlib_init_network();
 }
 
 int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {

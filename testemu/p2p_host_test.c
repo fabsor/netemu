@@ -22,7 +22,7 @@
 #include "netemu_p2p.h"
 #include "constants.h"
 #include "p2ptest.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -94,7 +94,7 @@ void p2p_host_game_created_callback(struct netemu_p2p *connection, struct p2p_ga
 
 void p2p_host_game_started_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	printf("OK!\nThe game has started, trying to send player ready status...\n");
-	netemu_p2p_player_ready(connection,ADDR,netemu_htons(40511));
+	netemu_p2p_player_ready(connection,ADDR,netlib_htons(40511));
 	printf("OK!\nWaiting for all players to be ready...");
 }
 

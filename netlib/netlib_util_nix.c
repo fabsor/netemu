@@ -20,7 +20,7 @@
 #include "sys/time.h"
 #include "headers/netlib_util.h"
 
-void netemu_snprintf(char* dest,size_t size, char* format, void* data) {
+void netlib_snprintf(char* dest,size_t size, char* format, void* data) {
 	snprintf(dest,size,format,data);
 }
 

@@ -21,7 +21,7 @@
 #include "transport.h"
 #include "netlib_util.h"
 #include "application.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include <time.h>
 /* Size of the application_instruction struct excluding the body. */
 #define APPLICATION_INSTRUCTION_SIZE	33;

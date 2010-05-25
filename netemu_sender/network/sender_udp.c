@@ -22,19 +22,19 @@
 
 int netemu_sender_udp_send(struct netemu_sender_udp* sender, char* data, int size) {
 	int success;
-	success = netemu_sendto(sender->socket, data, size, 0, sender->addr, sender->addr_len);
+	success = netlib_sendto(sender->socket, data, size, 0, sender->addr, sender->addr_len);
 	if(success == -1){
 		//sender->error = netemu_get_last_error();
 	}
 	return success;
 }
 
-struct netemu_sender_udp* netemu_sender_udp_new(netemu_sockaddr* addr, int addr_len) {
-	NETEMU_SOCKET socket;
+struct netemu_sender_udp* netemu_sender_udp_new(netlib_sockaddr* addr, int addr_len) {
+	NETLIB_SOCKET socket;
 	struct netemu_sender_udp* sender;
 	sender = malloc(sizeof(struct netemu_sender_udp));
-	socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
-	if (socket == NETEMU_INVALID_SOCKET) {
+	socket = netlib_socket(NETLIB_AF_INET,NETLIB_SOCK_DGRAM);
+	if (socket == NETLIB_INVALID_SOCKET) {
 		sender->error = netlib_get_last_platform_error();
 	}
 	sender->addr_len = addr_len;
@@ -44,13 +44,13 @@ struct netemu_sender_udp* netemu_sender_udp_new(netemu_sockaddr* addr, int addr_
 	return sender;
 }
 
-struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netemu_sockaddr* addr, NETEMU_SOCKET socket, int addr_len) {
+struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netlib_sockaddr* addr, NETLIB_SOCKET socket, int addr_len) {
 	struct netemu_sender_udp* sender;
 	if((sender = malloc(sizeof(struct netemu_sender_udp))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return NULL;
 	}
-	if (socket == NETEMU_INVALID_SOCKET) {
+	if (socket == NETLIB_INVALID_SOCKET) {
 		return NULL;
 	}
 	sender->addr_len = addr_len;
@@ -61,7 +61,7 @@ struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netemu_sockaddr* addr,
 }
 
 void netemu_sender_udp_free(struct netemu_sender_udp* sender) {
-	netemu_closesocket(sender->socket);
+	netlib_closesocket(sender->socket);
 	free(sender->addr);
 	free(sender);
 }

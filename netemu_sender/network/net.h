@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "sender_collection.h"
 
 /**
@@ -67,7 +67,7 @@ typedef enum {
  * @param connection union containing the actual connection module instance
  * @param arg a user defined argument.
  */
-typedef int (*parseReceivedDataFn)(NETEMU_SOCKET, netemu_connection_types, union netemu_connection_type, void*);
+typedef int (*parseReceivedDataFn)(NETLIB_SOCKET, netemu_connection_types, union netemu_connection_type, void*);
 
 #ifdef	__cplusplus
 }

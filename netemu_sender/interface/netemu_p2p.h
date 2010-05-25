@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 #include "../protocol/application_p2p.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "netemu_kaillera.h"
 
 /**
@@ -140,7 +140,7 @@ int netemu_p2p_connect(struct netemu_p2p* p2p, NETEMU_DWORD in_addr, unsigned sh
  * netemu_htonl on the desired address.
  * @param connect_port the port you want to connect to. Please make sure that this port is in network byte orde
  */
-int netemu_p2p_connect_async(struct netemu_p2p* p2p, netemu_sockaddr_in *in_addr, int in_addr_size,  netemu_sockaddr_in *connect_addr, int connect_addr_size, connectedFn callback);
+int netemu_p2p_connect_async(struct netemu_p2p* p2p, netlib_sockaddr_in *in_addr, int in_addr_size,  netlib_sockaddr_in *connect_addr, int connect_addr_size, connectedFn callback);
 
 /**
  * Host a new P2P cloud.

@@ -35,7 +35,7 @@ extern "C" {
 
 #include "../protocol/application_kaillera.h"
 #include "../protocol/communication.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 
 /*! Error returned if you're in a game already. */
 #define NETEMU_EINKAILLERAGAME 50001
@@ -106,7 +106,7 @@ typedef struct existing_game kaillera_existing_game;
 int netemu_kaillera_initialize();
 struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, int conneciton_quality);
 
-void netemu_kaillera_network_init(netemu_sockaddr_in *addr, int addr_size);
+void netemu_kaillera_network_init(netlib_sockaddr_in *addr, int addr_size);
 
 int kaillera_communication_get_server_list(const char *address, struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount);
 

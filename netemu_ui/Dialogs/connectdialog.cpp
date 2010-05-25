@@ -65,7 +65,7 @@ bool ConnectDialog::Connect()
 	char* address;
 	short port;
 	bool portConversionSuccess;
-	netemu_sockaddr_in addr;
+	netlib_sockaddr_in addr;
 
 	QStringList stringList = this->address.split(':', QString::SkipEmptyParts);
 	if(stringList.length() > 2)
@@ -93,7 +93,7 @@ bool ConnectDialog::Connect()
 		/* TODO: Figure out why connect_async wont work. netemu_util_prepare_receiver errors on the first malloc for some reason */
 		/*kaillera_communication_connect_async(&addr, sizeof(addr), "W00t", this->userName.toLatin1().data(), ConnectResponse, this);*/
 		this->connectionInfo = netemu_kaillera_create(usernameBytes.data(),"W00t", this->connectionQuality);
-		this->connectionInfo = netemu_kaillera_connect(this->connectionInfo, netemu_inet_addr("127.0.0.1"),0,netemu_inet_addr(address), netemu_htons(port));
+		this->connectionInfo = netemu_kaillera_connect(this->connectionInfo, netlib_inet_addr("127.0.0.1"),0,netlib_inet_addr(address), netlib_htons(port));
 
 		if(this->connectionInfo == NULL) {
 			qDebug("Connection error");

@@ -36,7 +36,7 @@ typedef unsigned short NETEMU_WORD;
 
 typedef char NETEMU_BOOL;
 
-void netemu_snprintf(char* dest,size_t size, char* format, void* data);
+void netlib_snprintf(char* dest,size_t size, char* format, void* data);
 
 long netlib_get_time_millis();
 #endif /* NETLIB_UTIL_H_ */

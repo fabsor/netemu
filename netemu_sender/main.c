@@ -15,7 +15,7 @@
  *   along with netemu.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "tests/application_test.h"
 #include <stdio.h>
 #include <stdlib.h>

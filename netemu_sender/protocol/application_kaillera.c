@@ -19,7 +19,7 @@
 #include <string.h>
 #include <time.h>
 #include "../util.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "netlib_util.h"
 #include "application_kaillera.h"
 #include "application_p2p_internal.h"

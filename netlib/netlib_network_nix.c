@@ -15,7 +15,7 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "headers/netemu_socket.h"
+#include "headers/netlib_network.h"
 #include "headers/netlib_error.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -30,17 +30,17 @@
 #include <netdb.h>
 
 int initialized;
-void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *netemuinfo);
+void _fill_netlib_addrinfo(struct addrinfo* addrinfo, struct netlib_addrinfo *netemuinfo);
 
 /* Initializes the socket usage for the application on the platform. */
-int netemu_init_network() {
+int netlib_init_network() {
     initialized = 1;
     return 0;
     
 }
 
 /* Creates a new NETEMU_SOCKET. */
-NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
+NETLIB_SOCKET netlib_socket(int address_family, int socket_type) {
 	int error;
 
     error = socket(address_family,socket_type,0);
@@ -51,7 +51,7 @@ NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
 }
 
 /* Binds a given NETEMU_SOCKET to an address. */
-int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
+int netlib_bind(NETLIB_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
 	int error;
 
     error = bind(socket,address,address_len);
@@ -62,7 +62,7 @@ int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t 
 }
 
 /* Places a socket in a state where it listens for incoming connection attempts. */
-int netemu_listen(NETEMU_SOCKET socket, int backlog) {
+int netlib_listen(NETLIB_SOCKET socket, int backlog) {
 	int error;
 
     error = listen(socket,backlog);
@@ -73,7 +73,7 @@ int netemu_listen(NETEMU_SOCKET socket, int backlog) {
 }
 
 /* Accepts a connection attempt made on the listening socket. */
-NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, socklen_t *address_len) {
+NETLIB_SOCKET netlib_accept(NETLIB_SOCKET socket, netlib_sockaddr *address, socklen_t *address_len) {
 	int error;
 
     error = accept(socket,address,address_len);
@@ -84,7 +84,7 @@ NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, sock
 }
 
 /* We have to use this ugly function until we can decide to remove netemu_prepare_addr.*/
-NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address, socklen_t *address_len) {
+NETLIB_SOCKET netlib_accept_inet(NETLIB_SOCKET socket,netlib_sockaddr** address, socklen_t *address_len) {
     struct sockaddr_in addr;
     socklen_t size;
     int error;
@@ -103,7 +103,7 @@ NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address,
 }
 
 /* Sends data through a connected socket. */
-int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
+int netlib_send(NETLIB_SOCKET socket, const char *buffer, int len, int flags) {
     int error;
 	error = send(socket,buffer,len,flags);
 	if(error == -1) {
@@ -113,7 +113,7 @@ int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
 }
 
 /* Sends data to a specific destination. */
-int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len){
+int netlib_sendto(NETLIB_SOCKET socket, const char *buffer, int len, int flags, const netlib_sockaddr *dest_address, socklen_t address_len){
     int error;
 	error = sendto(socket,buffer,len,flags,dest_address,address_len);
 	if(error == -1) {
@@ -123,12 +123,12 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
 }
 
 /*! Sets the blocking status of the socket */
-int netemu_set_blocking(NETEMU_SOCKET socket, int blocking) {
+int netlib_set_blocking(NETLIB_SOCKET socket, int blocking) {
 	return ioctl(socket, FIONBIO, &blocking);
 }
 
 /* Receives data on a connected socket. */
-int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
+int netlib_recv(NETLIB_SOCKET socket, char *buffer, int len, int flags) {
 	int error;
 
     error = recv(socket,buffer,len,flags);
@@ -139,7 +139,7 @@ int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
 }
 
 /* Received a datagram and stores the sender address */
-int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len) {
+int netlib_recvfrom(NETLIB_SOCKET socket, char *buffer, int len, int flags, netlib_sockaddr *address, socklen_t *address_len) {
 	int error;
 
     error = recvfrom(socket,buffer,len,flags,address,address_len);
@@ -150,7 +150,7 @@ int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, nete
 }
 
 /* Disables send or receive on a socket. */
-int netemu_shutdown(NETEMU_SOCKET socket, int how) {
+int netlib_shutdown(NETLIB_SOCKET socket, int how) {
 	int error;
 
     error = shutdown(socket,how);
@@ -160,7 +160,7 @@ int netemu_shutdown(NETEMU_SOCKET socket, int how) {
     return error;
 }
 
-int netemu_closesocket(NETEMU_SOCKET socket) {
+int netlib_closesocket(NETLIB_SOCKET socket) {
 	int error;
 
 	error = close(socket);
@@ -170,11 +170,11 @@ int netemu_closesocket(NETEMU_SOCKET socket) {
 	return error;
 }
 
-int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
+int netlib_get_addr_info(char* nodename, char* servicetype, const struct netlib_addrinfo* hints, struct netlib_addrinfo** result) {
 	struct addrinfo* info;
 	struct addrinfo info_hints;
 	struct addrinfo* info_hints_ptr;
-	struct netemu_addrinfo *addr_result, *iter;
+	struct netlib_addrinfo *addr_result, *iter;
 	int error;
 	if(hints == NULL) {
 		info_hints_ptr = NULL;
@@ -191,21 +191,21 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		return -1;
 	}
 
-	if((addr_result = malloc(sizeof(struct netemu_addrinfo))) == NULL) {
+	if((addr_result = malloc(sizeof(struct netlib_addrinfo))) == NULL) {
 		netlib_set_last_error(0);
 		return -1;
 	}
-	_fill_netemu_addrinfo(info,addr_result);
+	_fill_netlib_addrinfo(info,addr_result);
 	info = info->ai_next;
 	iter = addr_result->next;
 	while(info != NULL) {
 		/* TODO: Check for out-of-memory errors here */
-		iter = malloc(sizeof(struct netemu_addrinfo));
+		iter = malloc(sizeof(struct netlib_addrinfo));
 		if(iter == NULL) {
 			netlib_set_last_error(errno);
 			return -1;
 		}
-		_fill_netemu_addrinfo(info, iter);
+		_fill_netlib_addrinfo(info, iter);
 		iter = iter->next;
 		info = info->ai_next;
 	}
@@ -214,11 +214,11 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	return 0;
 }
 
-void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *netemuinfo) {
+void _fill_netlib_addrinfo(struct addrinfo* addrinfo, struct netlib_addrinfo *netemuinfo) {
 	netemuinfo->addrlen = addrinfo->ai_addrlen;
 	if(addrinfo->ai_canonname != NULL)
 		netemuinfo->hostname = addrinfo->ai_canonname;
-	netemuinfo->addr = (netemu_sockaddr*)addrinfo->ai_addr;
+	netemuinfo->addr = (netlib_sockaddr*)addrinfo->ai_addr;
 }
 
 /**
@@ -226,12 +226,12 @@ void _fill_netemu_addrinfo(struct addrinfo* addrinfo, struct netemu_addrinfo *ne
  * @param addr the address to convert.
  * @return the address in network byte order.
  */
-unsigned long netemu_inet_addr(char* addr) {
+unsigned long netlib_inet_addr(char* addr) {
 	return inet_addr(addr);
 }
 
 
-int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
+int netlib_connect(NETLIB_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
 	int error;
 
 	error = connect(socket,address,address_len);
@@ -247,7 +247,7 @@ int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen
  * @param value the value to convert
  * @return the value in network byte order.
  */
-unsigned long netemu_htonl(unsigned long value) {
+unsigned long netlib_htonl(unsigned long value) {
 	return htonl(value);
 }
 
@@ -256,11 +256,11 @@ unsigned long netemu_htonl(unsigned long value) {
  * @param value the value to convert.
  * @return the value in host order.
  */
-unsigned long netemu_ntohl(unsigned long value) {
+unsigned long netlib_ntohl(unsigned long value) {
 	return ntohl(value);
 }
 
 /* Converts an unsigned long from network order to host order. */
-unsigned short netemu_htons(unsigned short value) {
+unsigned short netlib_htons(unsigned short value) {
 	return htons(value);
 }

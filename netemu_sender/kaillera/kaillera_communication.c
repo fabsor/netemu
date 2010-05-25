@@ -34,7 +34,7 @@
 #include "../network/receiver_udp.h"
 #include "../util.h"
 #include "netlib_error.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "../interface/netemu_kaillera.h"
 #include "../network/net.h"
 #include "../protocol/application.h"
@@ -56,24 +56,24 @@ struct communication_callback {
 	NETEMU_BOOL async; /**< Wheter or not this callback is handled asynchronously. */
 	NETEMU_BOOL response_received;
 	int port; /**< the server port */
-	netemu_sockaddr_in *addr; /**< The address to the server. */
+	netlib_sockaddr_in *addr; /**< The address to the server. */
 	connectionAcquiredFn fn;
 	struct netemu_kaillera *connection;
 	netemu_event instruction_received_event;
 	void *arg;
 };
 
-int netemu_kaillera_communication_listener(NETEMU_SOCKET socket, netemu_connection_types type, union netemu_connection_type connection, void* args);
+int netemu_kaillera_communication_listener(NETLIB_SOCKET socket, netemu_connection_types type, union netemu_connection_type connection, void* args);
 void kaillera_communication_listener_async(char* data, size_t size, struct netemu_receiver_udp* receiver, void* args);
 void _netemu_kaillera_communication_login(void *param);
 
 int kaillera_communication_get_server_list(const char *address, struct server ***servers, int *servercount, struct existing_game ***games, int *gamecount) {
 	struct netemu_tcp_connection *sender;
-	struct netemu_addrinfo *info;
+	struct netlib_addrinfo *info;
 	char* request;
 	int errcode;
 	/* TODO: We need to write a function for destroying and freeing netemu_tcp_connections. */
-	errcode = netemu_get_addr_info(address,"80",NULL,&info);
+	errcode = netlib_get_addr_info(address,"80",NULL,&info);
 	if(errcode != 0)
 		return -1;
 
@@ -121,7 +121,7 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	char* hello;
 	struct communication_callback callback;
 	int connection_attempts;
-	netemu_sockaddr_in in_addr;
+	netlib_sockaddr_in in_addr;
 
 	/* We set the port to -1, indicating that we don't know the port number yet. */
 	callback.port = -1;
@@ -132,19 +132,19 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	client = netemu_resources_get_client();
 	in_addr.sin_addr.s_addr = local_address;
 	in_addr.sin_port = local_port;
-	in_addr.sin_family = NETEMU_AF_INET;
+	in_addr.sin_family = NETLIB_AF_INET;
 
 	if(client == NULL)
 		return NULL;
 
-	client->receiver = netemu_receiver_udp_create((netemu_sockaddr*)&in_addr, sizeof(in_addr));
+	client->receiver = netemu_receiver_udp_create((netlib_sockaddr*)&in_addr, sizeof(in_addr));
 	if(client->receiver == NULL)
 		return NULL;
 	netemu_receiver_udp_start_receiving(client->receiver, netemu_kaillera_communication_listener, &callback);
 
 	in_addr.sin_addr.s_addr = server_address;
 	in_addr.sin_port = server_port;
-	in_addr.sin_family = NETEMU_AF_INET;
+	in_addr.sin_family = NETLIB_AF_INET;
 
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, &in_addr, sizeof(in_addr));
 	if(client->sender == NULL) {
@@ -169,8 +169,8 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	}
 	free(hello);
 	netemu_receiver_udp_stop_receiving(client->receiver);
-	in_addr.sin_port = netemu_htons(callback.port);
-	client->sender->addr = netemu_util_copy_addr((netemu_sockaddr*)&in_addr,sizeof(in_addr));
+	in_addr.sin_port = netlib_htons(callback.port);
+	client->sender->addr = netemu_util_copy_addr((netlib_sockaddr*)&in_addr,sizeof(in_addr));
 	netemu_receiver_udp_start_receiving(client->receiver, netemu_application_parse_udp, connection->_internal->receive_buffer);
 	netemu_kaillera_login(connection);
 	return connection;
@@ -180,7 +180,7 @@ int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWO
 		NETEMU_DWORD server_address, unsigned short server_port, connectionAcquiredFn connectionFn, void* user_data) {
 	struct netemu_client *client;
 	struct communication_callback *callback;
-	netemu_sockaddr_in in_addr;
+	netlib_sockaddr_in in_addr;
 
 	callback = malloc(sizeof(struct communication_callback));
 	/* We set the port to -1, indicating that we don't know the port number yet. */
@@ -195,18 +195,18 @@ int netemu_kaillera_connect_async(struct netemu_kaillera *connection, NETEMU_DWO
 	client = netemu_resources_get_client();
 	in_addr.sin_addr.s_addr = local_address;
 	in_addr.sin_port = local_port;
-	in_addr.sin_family = NETEMU_AF_INET;
+	in_addr.sin_family = NETLIB_AF_INET;
 
 	if(client == NULL)
 		return -1;
 
-	client->receiver = netemu_receiver_udp_create((netemu_sockaddr*)&in_addr, sizeof(in_addr));
+	client->receiver = netemu_receiver_udp_create((netlib_sockaddr*)&in_addr, sizeof(in_addr));
 	if(client->receiver == NULL)
 		return -1;
 
 	in_addr.sin_addr.s_addr = server_address;
 	in_addr.sin_port = server_port;
-	in_addr.sin_family = NETEMU_AF_INET;
+	in_addr.sin_family = NETLIB_AF_INET;
 
 	client->sender = netemu_util_prepare_sender_on_socket_at_addr(client->receiver->socket, &in_addr, sizeof(in_addr));
 
@@ -249,13 +249,13 @@ void _netemu_kaillera_communication_login(void *param) {
 	}
 	free(hello);
 	netemu_receiver_udp_stop_receiving(client->receiver);
-	((netemu_sockaddr_in*)client->sender->addr)->sin_port = netemu_htons(callback->port);
+	((netlib_sockaddr_in*)client->sender->addr)->sin_port = netlib_htons(callback->port);
 	netemu_receiver_udp_start_receiving(client->receiver, netemu_application_parse_udp, connection->_internal->receive_buffer);
 	netemu_kaillera_login(connection);
 	callback->fn(callback->connection, 1, callback->arg);
 }
 
-int netemu_kaillera_communication_listener(NETEMU_SOCKET socket, netemu_connection_types type, union netemu_connection_type connection, void* args) {
+int netemu_kaillera_communication_listener(NETLIB_SOCKET socket, netemu_connection_types type, union netemu_connection_type connection, void* args) {
 	struct communication_callback *callback;
 	int result;
 	int error;
@@ -265,7 +265,7 @@ int netemu_kaillera_communication_listener(NETEMU_SOCKET socket, netemu_connecti
 	ret = 1;
 	callback = (struct communication_callback*)args;
 	buffer = malloc(128);
-	error = netemu_recvfrom(socket, buffer, 128, 0, NULL, 0);
+	error = netlib_recvfrom(socket, buffer, 128, 0, NULL, 0);
 	if(error == -1) {
 		error = netlib_get_last_error();
 		return -1;

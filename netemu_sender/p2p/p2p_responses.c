@@ -104,7 +104,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 	struct p2p_start_game *game;
 	struct netemu_p2p* connection;
 	struct netemu_sender_udp *sender;
-	netemu_sockaddr *addr;
+	netlib_sockaddr *addr;
 	int i, size;
 	NETEMU_BOOL user_joined;
 	user_joined = 0;
@@ -117,7 +117,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 			connection->current_game->user_count)*connection->current_game->connection_quality);
 
 	game = (struct p2p_start_game*)item->instruction->body;
-	addr = (netemu_sockaddr*) netemu_util_create_addr(game->addr,game->port,&size);
+	addr = (netlib_sockaddr*) netemu_util_create_addr(game->addr,game->port,&size);
 	sender = netemu_sender_udp_new(addr, size);
 	netemu_sender_collection_add_udp_sender(connection->current_game->_internal->udp_collection, sender);
 	connection->current_game->_internal->ready_count++;
@@ -183,7 +183,7 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 	struct netemu_tcp_connection *player_con;
 	int index, i, size;
 	union netemu_connection_type type;
-	netemu_sockaddr* addr;
+	netlib_sockaddr* addr;
 	connection = (struct netemu_p2p*)arg;
 	if(connection->current_game != NULL) {
 		user = (struct p2p_user*)item->instruction->body;
@@ -201,7 +201,7 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 		}
 		/* If that's not the case, it's time to correct that. */
 		if(user->_internal == NULL || (user->_internal->connection == NULL )) {
-			addr = (netemu_sockaddr*)netemu_util_create_addr(user->addr, user->port, &size);
+			addr = (netlib_sockaddr*)netemu_util_create_addr(user->addr, user->port, &size);
 			player_con = _netemu_p2p_connect_to(connection,addr,  size);
 			user->_internal = netemu_application_p2p_create_user_internal();
 			user->_internal->connection = player_con;

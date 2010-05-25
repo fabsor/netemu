@@ -18,21 +18,21 @@
 #ifndef NETEMU_SENDER_UDP_H_
 #define NETEMU_SENDER_UDP_H_
 
-#include "netemu_socket.h"
+#include "netlib_network.h"
 
 /*! This struct describes a sender. */
 struct netemu_sender_udp{
-	NETEMU_SOCKET socket;
-	netemu_sockaddr* addr;
+	NETLIB_SOCKET socket;
+	netlib_sockaddr* addr;
 	int addr_len;
 	int error;
 };
 
 int netemu_sender_udp_send(struct netemu_sender_udp* sender, char* data, int size);
 
-struct netemu_sender_udp* netemu_sender_udp_new(netemu_sockaddr* addr, int addr_len);
+struct netemu_sender_udp* netemu_sender_udp_new(netlib_sockaddr* addr, int addr_len);
 
-struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netemu_sockaddr* addr, NETEMU_SOCKET socket, int addr_len);
+struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netlib_sockaddr* addr, NETLIB_SOCKET socket, int addr_len);
 
 void netemu_sender_free(struct netemu_sender_udp* sender);
 

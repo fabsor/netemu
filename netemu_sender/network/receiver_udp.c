@@ -42,7 +42,7 @@ void free_receiver(struct netemu_receiver_udp*);
  * - NETEMU_INVALID_SOCKET
  * - All errors that can occur with netemu_bind @see netemu_bind
  */
-struct netemu_receiver_udp* netemu_receiver_udp_create(netemu_sockaddr* addr, int addr_len) {
+struct netemu_receiver_udp* netemu_receiver_udp_create(netlib_sockaddr* addr, int addr_len) {
 	struct netemu_receiver_udp* receiver;
 	int bind_error;
 	if((receiver = malloc(sizeof(struct netemu_receiver_udp))) == NULL) {
@@ -52,17 +52,17 @@ struct netemu_receiver_udp* netemu_receiver_udp_create(netemu_sockaddr* addr, in
 	receiver->addr = netemu_util_copy_addr(addr,addr_len);
 
 	receiver->addr_len = addr_len;
-	receiver->socket = netemu_socket(NETEMU_AF_INET,NETEMU_SOCK_DGRAM);
+	receiver->socket = netlib_socket(NETLIB_AF_INET,NETLIB_SOCK_DGRAM);
 	receiver->fn = NULL;
 	receiver->listening = FALSE;
-	if(receiver->socket == NETEMU_INVALID_SOCKET) {
+	if(receiver->socket == NETLIB_INVALID_SOCKET) {
 		free(receiver);
 		return NULL;
 	}
-	bind_error = netemu_bind(receiver->socket,receiver->addr,receiver->addr_len);
+	bind_error = netlib_bind(receiver->socket,receiver->addr,receiver->addr_len);
 	if(bind_error == -1) {
 		bind_error = netlib_get_last_platform_error();
-		netemu_closesocket(receiver->socket);
+		netlib_closesocket(receiver->socket);
 		free(receiver);
 		return NULL;
 	}
@@ -132,6 +132,6 @@ void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver) {
  */
 void netemu_receiver_udp_destroy(struct netemu_receiver_udp* receiver) {
 	netemu_receiver_udp_stop_receiving(receiver);
-	netemu_closesocket(receiver->socket);
+	netlib_closesocket(receiver->socket);
 	free(receiver->addr);
 }

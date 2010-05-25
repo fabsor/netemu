@@ -72,9 +72,9 @@
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
 
-int netemu_application_parse_tcp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
+int netemu_application_parse_tcp(NETLIB_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
 
-int netemu_application_parse_udp(NETEMU_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
+int netemu_application_parse_udp(NETLIB_SOCKET socket, netemu_connection_types type,  union netemu_connection_type connection, void* param);
 
 struct application_instruction* netemu_application_instruction_create();
 

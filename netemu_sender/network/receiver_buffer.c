@@ -93,11 +93,11 @@ struct netemu_receiver_buffer *netemu_receiver_buffer_create(hash_size size) {
  * - Any error related to mutex locks can also occur.
  */
 int netemu_receiver_buffer_add(struct netemu_receiver_buffer *buffer, struct application_instruction *instruction,
-		netemu_connection_types type,  union netemu_connection_type connection, netemu_sockaddr* addr, int addr_len) {
+		netemu_connection_types type,  union netemu_connection_type connection, netlib_sockaddr* addr, int addr_len) {
 	struct netemu_receiver_buffer_item *item;
 	/* If there are any nullpointers, we might as well stop right here. */
 	if(buffer == NULL || instruction == NULL) {
-		netlib_set_last_error(NETEMU_EINVAL);
+		netlib_set_last_error(NETLIB_EINVAL);
 		return -1;
 	}
 	item = malloc(sizeof(struct netemu_receiver_buffer_item));

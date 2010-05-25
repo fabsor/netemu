@@ -30,7 +30,7 @@
 #define NETEMU_TRANSPORT_H_
 
 #include "netlib_util.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "protocol.h"
 
 /**

@@ -28,7 +28,7 @@
 #pragma once
 #ifndef NETEMU_RECEIVER_UDP_H_
 #define NETEMU_RECEIVER_UDP_H_
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "../structures/netemu_list.h"
 #include "net.h"
 #include "netemu_thread.h"
@@ -36,8 +36,8 @@
 
 /*! This struct describes a receiver. */
 struct netemu_receiver_udp{
-	NETEMU_SOCKET socket;
-	netemu_sockaddr* addr;
+	NETLIB_SOCKET socket;
+	netlib_sockaddr* addr;
 	netemu_mutex lock;
 	parseReceivedDataFn fn;
 	NETEMU_BOOL listening;
@@ -64,7 +64,7 @@ struct netemu_receiver_udp_fn{
  * - NETEMU_INVALID_SOCKET
  * - All errors that can occur with netemu_bind @see netemu_bind
  */
-struct netemu_receiver_udp* netemu_receiver_udp_create(netemu_sockaddr* addr, int addr_len);
+struct netemu_receiver_udp* netemu_receiver_udp_create(netlib_sockaddr* addr, int addr_len);
 
 /**
  * Start receiving data with this instance of netemu_receiver.

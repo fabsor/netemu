@@ -17,7 +17,7 @@
 
 #ifndef P2PTEST_H_
 #define P2PTEST_H_
-#include "netemu_socket.h"
+#include "netlib_network.h"
 void host_p2p();
 
 void connect_p2p();

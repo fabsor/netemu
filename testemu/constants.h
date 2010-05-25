@@ -22,21 +22,21 @@
 #define PLAYERNAME	"fabsor"
 
 
-#define BIND_ADDR	netemu_inet_addr("127.0.0.1")
+#define BIND_ADDR	netlib_inet_addr("127.0.0.1")
 
-#define ADDR	netemu_inet_addr("192.168.0.179")
-#define PORT	netemu_htons(27888)
+#define ADDR	netlib_inet_addr("192.168.0.179")
+#define PORT	netlib_htons(27888)
 
 #define VALUE	"0x0x0xff"
 #define JOIN_VALUE "1x1x1xff"
 
-#define P2P_HOST_TEST_BIND_ADDR	netemu_inet_addr("127.0.0.1")
-#define P2P_HOST_TEST_PORT	netemu_htons(3535)
+#define P2P_HOST_TEST_BIND_ADDR	netlib_inet_addr("127.0.0.1")
+#define P2P_HOST_TEST_PORT	netlib_htons(3535)
 
-#define P2P_JOIN_TEST_BIND_ADDR	netemu_inet_addr("127.0.0.1")
-#define P2P_JOIN_TEST_CONNECT_ADDR	netemu_inet_addr("127.0.0.1")
-#define P2P_JOIN_TEST_PORT	netemu_htons(3536)
-#define P2P_JOIN_TEST_CONNECT_PORT	netemu_htons(3535)
+#define P2P_JOIN_TEST_BIND_ADDR	netlib_inet_addr("127.0.0.1")
+#define P2P_JOIN_TEST_CONNECT_ADDR	netlib_inet_addr("127.0.0.1")
+#define P2P_JOIN_TEST_PORT	netlib_htons(3536)
+#define P2P_JOIN_TEST_CONNECT_PORT	netlib_htons(3535)
 
 #define CLOUD_NAME	"the_cloud"
 

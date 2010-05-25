@@ -29,7 +29,7 @@ struct netemu_stringbuilder *netemu_stringbuilder_new(NETEMU_DWORD capacity) {
 	struct netemu_stringbuilder *builder;
 
 	if(capacity < 0) {
-		netlib_set_last_error(NETEMU_EINVAL);
+		netlib_set_last_error(NETLIB_EINVAL);
 		return NULL;
 	}
 	else if(capacity == 0)

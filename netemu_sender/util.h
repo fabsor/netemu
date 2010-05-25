@@ -20,7 +20,7 @@
 
 #include "network/receiver_udp.h"
 #include "network/sender_udp.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 
 #define INTERNAL_PORT	27999
 #define SERVER_PORT		27888
@@ -29,10 +29,10 @@ int netemu_util_copy_string(char** dest, char* src);
 char* netemu_util_parse_string(char* data);
 struct netemu_receiver_udp* netemu_util_prepare_receiver(int port,void (* listenerFn)(char*, size_t, struct netemu_receiver_udp*, void*), void* args);
 struct netemu_sender_udp* netemu_util_prepare_sender(int port);
-struct netemu_sender_udp* netemu_util_prepare_sender_on_socket(NETEMU_SOCKET socket, int port);
-struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETEMU_SOCKET socket, netemu_sockaddr_in *addr_in, int size);
-netemu_sockaddr* netemu_util_copy_addr(netemu_sockaddr *addr, int addr_size);
-netemu_sockaddr_in* netemu_util_create_addr(NETEMU_DWORD addr, unsigned short port, int *size);
+struct netemu_sender_udp* netemu_util_prepare_sender_on_socket(NETLIB_SOCKET socket, int port);
+struct netemu_sender_udp* netemu_util_prepare_sender_on_socket_at_addr(NETLIB_SOCKET socket, netlib_sockaddr_in *addr_in, int size);
+netlib_sockaddr* netemu_util_copy_addr(netlib_sockaddr *addr, int addr_size);
+netlib_sockaddr_in* netemu_util_create_addr(NETEMU_DWORD addr, unsigned short port, int *size);
 void netemu_util_send_data(struct netemu_sender_udp* sender, char* data);
 void* netemu_util_alloc_or_die(size_t size);
 int netemu_util_pack_str(char* buffer, char* str);

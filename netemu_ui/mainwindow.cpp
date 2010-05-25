@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui.labelServerRefreshStatus->setText("");
 	ui.textUsername->setText(this->settings->value("Username", "").toString());
 	this->setWindowTitle("NetEmu");
-	netemu_init_network();
+	netlib_init_network();
 	createActions();
 	this->serverDialog = NULL;
 }

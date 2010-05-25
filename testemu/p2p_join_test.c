@@ -22,7 +22,7 @@
 #include "netemu_p2p.h"
 #include "constants.h"
 #include "p2ptest.h"
-#include "netemu_socket.h"
+#include "netlib_network.h"
 #include "netemu_thread.h"
 #include <stdlib.h>
 #include <stdio.h>

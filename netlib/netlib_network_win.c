@@ -15,10 +15,10 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "headers/netemu_socket.h"
+#include "headers/netlib_network.h"
 #include "headers/netlib_error.h"
 
-int netemu_init_network() {
+int netlib_init_network() {
     static int initialized;
 	int errcode;
     WSADATA wsaData;
@@ -39,7 +39,7 @@ int netemu_init_network() {
     return 0;
 }
 
-int netemu_cleanup() {
+int netlib_cleanup() {
     int errcode;
 	int retval;
 
@@ -53,8 +53,8 @@ int netemu_cleanup() {
 	return retval;
 }
 
-NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
-	NETEMU_SOCKET return_socket;
+netlib_SOCKET netlib_socket(int address_family, int socket_type) {
+	netlib_SOCKET return_socket;
     return_socket = socket(address_family, socket_type, 0);
 	if(return_socket == INVALID_SOCKET)
 		netlib_set_last_error(WSAGetLastError());
@@ -62,7 +62,7 @@ NETEMU_SOCKET netemu_socket(int address_family, int socket_type) {
 	return return_socket;
 }
 
-int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
+int netlib_bind(netlib_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
 	int errcode;
     
 	errcode = bind(socket, address, address_len);
@@ -72,7 +72,7 @@ int netemu_bind(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t 
 	return errcode;
 }
 
-int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen_t address_len) {
+int netlib_connect(netlib_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
 	int errcode;
 
 	errcode = connect(socket, address, address_len);
@@ -83,11 +83,11 @@ int netemu_connect(NETEMU_SOCKET socket, const netemu_sockaddr *address, socklen
 }
 
 /*! Sets the blocking status of the socket */
-int netemu_set_blocking(NETEMU_SOCKET socket, int blocking) {
+int netlib_set_blocking(netlib_SOCKET socket, int blocking) {
 	return ioctlsocket(socket, FIONBIO, &blocking);
 }
 
-int netemu_listen(NETEMU_SOCKET socket, int backlog) {
+int netlib_listen(netlib_SOCKET socket, int backlog) {
 	int errcode;
 
     errcode = listen(socket, backlog);
@@ -97,7 +97,7 @@ int netemu_listen(NETEMU_SOCKET socket, int backlog) {
 	return errcode;
 }
 
-NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, socklen_t *address_len) {
+netlib_SOCKET netlib_accept(netlib_SOCKET socket, netlib_sockaddr *address, socklen_t *address_len) {
 	int errcode;
 
     errcode = accept(socket, address, address_len);
@@ -107,13 +107,13 @@ NETEMU_SOCKET netemu_accept(NETEMU_SOCKET socket, netemu_sockaddr *address, sock
 	return errcode;
 }
 
-/* We have to use this ugly function until we can decide to remove netemu_prepare_addr.*/
-NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address, socklen_t *address_len) {
+/* We have to use this ugly function until we can decide to remove netlib_prepare_addr.*/
+netlib_SOCKET netlib_accept_inet(netlib_SOCKET socket,netlib_sockaddr** address, socklen_t *address_len) {
     struct sockaddr_in addr;
     socklen_t size;
     int error;
     size = sizeof(addr);
-    error = accept(socket,(netemu_sockaddr*)&addr,&size);
+    error = accept(socket,(netlib_sockaddr*)&addr,&size);
 
     if(error == -1) {
     	return error;
@@ -125,7 +125,7 @@ NETEMU_SOCKET netemu_accept_inet(NETEMU_SOCKET socket,netemu_sockaddr** address,
     return error;
 }
 
-int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
+int netlib_send(netlib_SOCKET socket, const char *buffer, int len, int flags) {
 	int errcode;
     
 	errcode = send(socket, buffer, len, flags);
@@ -135,7 +135,7 @@ int netemu_send(NETEMU_SOCKET socket, const char *buffer, int len, int flags) {
 	return errcode;
 }
 
-int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, const netemu_sockaddr *dest_address, socklen_t address_len) {
+int netlib_sendto(netlib_SOCKET socket, const char *buffer, int len, int flags, const netlib_sockaddr *dest_address, socklen_t address_len) {
     int errcode;
 	
 	errcode = sendto(socket, buffer, len, flags, dest_address, address_len);
@@ -145,7 +145,7 @@ int netemu_sendto(NETEMU_SOCKET socket, const char *buffer, int len, int flags, 
 	return errcode;
 }
 
-int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
+int netlib_recv(netlib_SOCKET socket, char *buffer, int len, int flags) {
 	int errcode;
 
 	errcode = recv(socket, buffer, len, flags);
@@ -155,7 +155,7 @@ int netemu_recv(NETEMU_SOCKET socket, char *buffer, int len, int flags) {
 	return errcode;
 }
 
-int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, netemu_sockaddr *address, socklen_t *address_len) {
+int netlib_recvfrom(netlib_SOCKET socket, char *buffer, int len, int flags, netlib_sockaddr *address, socklen_t *address_len) {
 	int errcode;
 
     errcode = recvfrom(socket, buffer, len, flags, address, address_len);
@@ -165,7 +165,7 @@ int netemu_recvfrom(NETEMU_SOCKET socket, char *buffer, int len, int flags, nete
 	return errcode;
 }
 
-int netemu_shutdown(NETEMU_SOCKET socket, int how) {
+int netlib_shutdown(netlib_SOCKET socket, int how) {
 	int errcode;
 
     errcode = shutdown(socket, how);
@@ -175,7 +175,7 @@ int netemu_shutdown(NETEMU_SOCKET socket, int how) {
 	return errcode;
 }
 
-int netemu_closesocket(NETEMU_SOCKET socket) {
+int netlib_closesocket(netlib_SOCKET socket) {
 	int errcode;
 
 	errcode = closesocket(socket);
@@ -185,10 +185,10 @@ int netemu_closesocket(NETEMU_SOCKET socket) {
 	return errcode;
 }
 
-int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_addrinfo* hints, struct netemu_addrinfo** result) {
+int netlib_get_addr_info(char* nodename, char* servicetype, const struct netlib_addrinfo* hints, struct netlib_addrinfo** result) {
 	PADDRINFOA addrinfo = NULL;
 	int errcode;
-	struct netemu_addrinfo *result_addrinfo;
+	struct netlib_addrinfo *result_addrinfo;
 	struct addrinfo info_hints;
 
 	if(hints == NULL) {
@@ -206,7 +206,7 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		/* If a memory error occured, we map it to our general out-of-memory error code for consistency, 
 		 * otherwise, we just use the WSA error code directly */
 		if(errcode == WSA_NOT_ENOUGH_MEMORY) 
-			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
 		else
 			netlib_set_last_error(errcode);
 		
@@ -214,8 +214,8 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	}
 	
 
-	if((*result = malloc(sizeof(struct netemu_addrinfo))) == NULL) {
-		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+	if((*result = malloc(sizeof(struct netlib_addrinfo))) == NULL) {
+		netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
 		return -1;
 	}
 
@@ -230,8 +230,8 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 		result_addrinfo->ai_socktype = addrinfo->ai_socktype;
 		addrinfo = addrinfo->ai_next;
 		if(addrinfo != NULL) {
-			if((result_addrinfo->next = malloc(sizeof(struct netemu_addrinfo))) == NULL) {
-				netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+			if((result_addrinfo->next = malloc(sizeof(struct netlib_addrinfo))) == NULL) {
+				netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
 				errcode = -1;
 				break;
 			}
@@ -246,19 +246,19 @@ int netemu_get_addr_info(char* nodename, char* servicetype, const struct netemu_
 	return errcode;
 }
 
-unsigned long netemu_inet_addr(char* addr) {
+unsigned long netlib_inet_addr(char* addr) {
 	return inet_addr(addr);
 }
 
-unsigned long netemu_htonl(unsigned long value) {
+unsigned long netlib_htonl(unsigned long value) {
 	return htonl(value);
 }
 
-unsigned long netemu_ntohl(unsigned long value) {
+unsigned long netlib_ntohl(unsigned long value) {
 	return ntohl(value);
 }
 
 /* Converts an unsigned long from network order to host order. */
-unsigned short netemu_htons(unsigned short value) {
+unsigned short netlib_htons(unsigned short value) {
 	return htons(value);
 }
