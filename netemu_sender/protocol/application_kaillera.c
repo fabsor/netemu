@@ -719,6 +719,7 @@ void netemu_application_client_timeout_request_add(struct application_instructio
 	instruction->body_size = 0;
 	instruction->id = CLIENT_TIMEOUT;
 	instruction->packBodyFn = NULL;
+	instruction->body = NULL;
 }
 
 void netemu_application_start_game_parse(struct application_instruction* instruction, char* buffer) {
