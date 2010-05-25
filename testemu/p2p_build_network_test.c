@@ -16,7 +16,7 @@
  */
 
 void p2p_build_network_test(int n) {
-	struct netemu_p2p_connection *p2p_host;
+	struct netemu_p2p *p2p_host;
 	struct netemu_list *list;
 	int i;
 

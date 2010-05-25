@@ -41,7 +41,7 @@ extern "C" {
  * @ingroup netemu_p2p_responses
  * @param p2p the netemu_p2p instance.
  */
-void _netemu_p2p_register_responders(struct netemu_p2p_connection *p2p);
+void _netemu_p2p_register_responders(struct netemu_p2p *p2p);
 
 /**
  * This function responds to all "User Join" instructions.

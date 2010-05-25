@@ -49,7 +49,7 @@ struct netemu_p2p_internal {
 	struct netemu_receiver_buffer *receive_buffer;
 	struct buffered_play_values *buffered_values;
 	struct netemu_sender_buffer *send_buffer;
-	void (*continueFn)(struct netemu_p2p_connection *connection); /**< Function for continuing work after a ready instruction has been added */
+	void (*continueFn)(struct netemu_p2p *connection); /**< Function for continuing work after a ready instruction has been added */
 };
 
 

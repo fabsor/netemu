@@ -27,20 +27,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void p2p_host_register_callbacks(struct netemu_p2p_connection *connection);
-void p2p_host_game_started_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
-void p2p_host_game_created_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
-void p2p_game_created_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
-void p2p_host_user_joined_callback(struct netemu_p2p_connection *connection, struct p2p_user *user);
-void p2p_host_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
-void p2p_host_play_values_received_callback(struct netemu_p2p_connection *, char* values, int size);
+void p2p_host_register_callbacks(struct netemu_p2p *connection);
+void p2p_host_game_started_callback(struct netemu_p2p *connection, struct p2p_game *game);
+void p2p_host_game_created_callback(struct netemu_p2p *connection, struct p2p_game *game);
+void p2p_game_created_callback(struct netemu_p2p *connection, struct p2p_game *game);
+void p2p_host_user_joined_callback(struct netemu_p2p *connection, struct p2p_user *user);
+void p2p_host_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game);
+void p2p_host_play_values_received_callback(struct netemu_p2p *, char* values, int size);
 netemu_event p2p_host_event;
 netemu_event p2p_host_join_event;
 int p2p_host_test_ready = 0;
 int p2p_host_ready_to_send = 0;
 struct p2p_game *host_created_game;
 void run_p2p_host_test(int no_instructions, char connection) {
-	struct netemu_p2p_connection *p2p;
+	struct netemu_p2p *p2p;
 	struct p2p_game** games;
 	int n;
 	char* data;
@@ -78,32 +78,32 @@ void run_p2p_host_test(int no_instructions, char connection) {
 	}
 }
 
-void p2p_host_register_callbacks(struct netemu_p2p_connection *connection) {
+void p2p_host_register_callbacks(struct netemu_p2p *connection) {
 	netemu_p2p_register_user_joined_callback(connection, p2p_host_user_joined_callback, NULL);
 	netemu_p2p_register_game_created_callback(connection, p2p_host_game_created_callback, NULL);
 	netemu_p2p_register_game_started_callback(connection, p2p_host_game_started_callback, NULL);
 	netemu_p2p_register_all_players_ready_callback(connection, p2p_host_all_ready_callback, NULL);
 }
 
-void p2p_host_game_created_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {
+void p2p_host_game_created_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	printf("A game has been created!\nTrying to join the game...");
 	/* Join the game that was just created. */
 	host_created_game = game;
 	netemu_thread_event_signal(p2p_host_join_event);
 }
 
-void p2p_host_game_started_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {
+void p2p_host_game_started_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	printf("OK!\nThe game has started, trying to send player ready status...\n");
 	netemu_p2p_player_ready(connection,ADDR,netemu_htons(40511));
 	printf("OK!\nWaiting for all players to be ready...");
 }
 
-void p2p_host_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {
+void p2p_host_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	printf("OK!\nNow let's have some fun shall we? Let's send some data to the other player...");
 	p2p_host_ready_to_send = 1;
 	netemu_thread_event_signal(p2p_host_event);
 }
 
-void p2p_host_user_joined_callback(struct netemu_p2p_connection *connection, struct p2p_user *user) {
+void p2p_host_user_joined_callback(struct netemu_p2p *connection, struct p2p_user *user) {
 	printf("A new user has joined! Hosting Seems OK!\n Listening for more players or new games...\n");
 }
