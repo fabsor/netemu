@@ -61,6 +61,11 @@ struct p2p_callback {
 	void *user_data;
 };
 
+/**
+ * Call this function to initialize the network.
+ * You only need to call this once.
+ */
+int netemu_p2p_initialize();
 
 struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname, char connection_quality);
 

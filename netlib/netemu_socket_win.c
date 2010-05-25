@@ -15,25 +15,28 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netemu_socket.h"
-#include "netlib_error.h"
+#include "headers/netemu_socket.h"
+#include "headers/netlib_error.h"
 
 int netemu_init_network() {
-    int errcode;
+    static int initialized;
+	int errcode;
     WSADATA wsaData;
     int retval;
+	if(initialized == 0) {
+		retval = 0;
+		errcode = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    retval = 0;
-    errcode = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-    /* WSAStartup returns the errorcode directly if something went wrong.
-     * For consistency, we'll set that to be the last error code and return -1. */
-    if(errcode != 0) {
-		netlib_set_last_error(errcode);
-        retval = -1;
-    }
-
-    return retval;
+		/* WSAStartup returns the errorcode directly if something went wrong.
+		 * For consistency, we'll set that to be the last error code and return -1. */
+		if(errcode != 0) {
+			netlib_set_last_error(errcode);
+			retval = -1;
+		}
+		initialized = 1;
+		return retval;
+	}
+    return 0;
 }
 
 int netemu_cleanup() {

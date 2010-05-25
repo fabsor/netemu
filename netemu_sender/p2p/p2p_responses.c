@@ -66,7 +66,7 @@ void netemu_p2p_respond_to_user_join(struct netemu_receiver_buffer* buffer, stru
 		type.collection = connection->_internal->peers;
 		netemu_list_add(connection->_internal->users,user);
 		netemu_sender_buffer_add(connection->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
-		for(i = 0; i < connection->_internal->join_callbacks->count; i++) {
+		for (i = 0; i < connection->_internal->join_callbacks->count; i++) {
 			((struct p2p_callback*)connection->_internal->join_callbacks->elements[i])->fn.userJoinedFn(connection, user);
 		}
 	}
@@ -128,15 +128,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
 			((struct p2p_callback*)connection->_internal->all_ready_callbacks->elements[i])->fn.allReadyFn(connection, connection->current_game);
 		}
 	}
-
-	for(i = 0; i < connection->current_game->user_count-1; i++) {
-		if(connection->current_game->players[i].addr == game->addr && connection->current_game->creator->port == game->port) {
-				user_joined = 1;
-				break;
-		}
-
-	}
-	if(user_joined) {
+	if(item->instruction->id == P2P_PLAYER_READY) {
 		for(i = 0; i < connection->_internal->player_ready_callbacks->count; i++) {
 			((struct p2p_callback*)connection->_internal->player_ready_callbacks->elements[i])->fn.gameStartedFn(connection, connection->current_game);
 		}
@@ -262,7 +254,9 @@ void _netemu_p2p_respond_to_game_created(struct netemu_receiver_buffer* buffer, 
 		if((index = netemu_list_contains(connection->_internal->users,game->creator)) != -1) {
 			game->creator->_internal = ((struct p2p_user*)connection->_internal->users->elements[index])->_internal;
 		}
-		game->creator->_internal->player_no = 1;
+		if(game->creator->_internal != NULL) {
+			game->creator->_internal->player_no = 1;
+		}
 		/* Add the game to our game list. */
 		netemu_list_add(connection->_internal->games,game);
 		/* Create a copy of the game, to preserve the instruction integrity. */
@@ -324,22 +318,24 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 	struct netemu_p2p_connection* connection;
 	int i;
 	NETEMU_BOOL all_values_received;
+	struct p2p_cached_buffered_play_values *values;
 	all_values_received = TRUE;
 	connection = (struct netemu_p2p_connection*)arg;
+	values = item->instruction->body;
 	netemu_thread_mutex_lock(connection->current_game->_internal->game_lock, NETEMU_INFINITE);
-	if(connection->current_game->creator->_internal->receiver == item->connection.udp_receiver) {
+	if(values->player_no == 1) {
 		netemu_list_add(connection->current_game->creator->_internal->play_values, item->instruction);
 		connection->current_game->creator->_internal->values_received = TRUE;
 	}
-	else if(connection->current_game->creator->_internal->values_received == FALSE) {
+	else if(connection->current_game->creator->addr != connection->user->connection && connection->current_game->creator->port != connection->user->port && connection->current_game->creator->_internal->values_received == FALSE) {
 		all_values_received = FALSE;
 	}
 	for(i = 0; i < connection->current_game->user_count-1; i++) {
-		if(connection->current_game->players[i]._internal->receiver == item->connection.udp_receiver) {
+		if(connection->current_game->players[i]._internal->player_no == values->player_no && connection->current_game->players[i]._internal->player_no != connection->user->_internal->player_no) {
 			netemu_list_add(connection->current_game->players[i]._internal->play_values, item->instruction);
 			connection->current_game->players[i]._internal->values_received = TRUE;
 		}
-		if(connection->current_game->players[i]._internal->values_received == FALSE) {
+		else if(connection->current_game->players[i]._internal->player_no != connection->user->_internal->player_no && connection->current_game->players[i]._internal->values_received == FALSE) {
 			all_values_received = FALSE;
 		}
 	}
@@ -349,8 +345,6 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 		connection->current_game->_internal->all_values_received = TRUE;
 		netemu_thread_event_signal(connection->_internal->play_values_event);
 	}
-	/* Signal anyone that waits for an event. */
-	netemu_thread_event_signal(connection->_internal->play_values_event);
 }
 
 /**

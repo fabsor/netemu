@@ -69,6 +69,10 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 void _netemu_p2p_register_responders(struct netemu_p2p_connection *p2p);
 /* End of function declarations */
 
+int netemu_p2p_initialize() {
+	return netemu_init_network();
+}
+
 /**
  * Create a new netemu_p2p instance.
  * This function creates a new p2p instance.
@@ -111,7 +115,7 @@ struct netemu_p2p_connection* netemu_p2p_new(char* username, char* emulatorname,
 	p2p->_internal->game_started_callbacks = netemu_list_create(2,0);
 	p2p->_internal->all_ready_callbacks = netemu_list_create(2,0);
 	p2p->_internal->player_joined_callbacks = netemu_list_create(2,0);
-
+	p2p->_internal->player_ready_callbacks = netemu_list_create(2,0);
 
 	p2p->_internal->values_to_send = NULL;
 	p2p->_internal->values_buffered = 0;
@@ -539,6 +543,7 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWO
 	struct netemu_receiver_udp *receiver;
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
+	int i;
 	netemu_sockaddr_in addr;
 	/* We can't join a game if a game is not created and started first, and you are not the owner of the game. */
 	if(connection->current_game == NULL || (_netemu_p2p_user_compare(connection->current_game->creator, connection->user)) == -1)
@@ -559,6 +564,9 @@ int netemu_p2p_player_ready(struct netemu_p2p_connection *connection, NETEMU_DWO
 	connection->current_game->_internal->ready_count++;
 	if(connection->current_game->_internal->ready_count >= connection->current_game->user_count) {
 		connection->current_game->started = 1;
+		for(i = 0; i < connection->_internal->all_ready_callbacks->count; i++) {
+			((struct p2p_callback*)connection->_internal->all_ready_callbacks->elements[i])->fn.allReadyFn(connection, connection->current_game);
+		}
 	}
 	/* This instruction will be broadcasted to all game members */
 	type.collection = connection->current_game->_internal->tcp_collection;
@@ -698,7 +706,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p_connection* info, void* data) 
 
 	/* Copy data from the current frame index. */
 	if(info->current_game->_internal->sent_first_values) {
-		memcpy(data, info->_internal->values_received + (size*info->_internal->frame_index), size * info->current_game->user_count);
+		memcpy(data, info->_internal->values_received + (size * info->current_game->user_count*info->_internal->frame_index), size * info->current_game->user_count * info->current_game->connection_quality);
 	}
 
 	info->_internal->frame_index++;
@@ -770,7 +778,7 @@ void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_us
 	instruction = player->_internal->play_values->elements[0];
 	netemu_list_remove_at(player->_internal->play_values, 0);
 	if(instruction->id == P2P_CACHED_BUFFERED_PLAY_VALUES) {
-		index = ((struct intelligently_cached_buffered_play_values*)instruction->body)->index;
+		index = ((struct p2p_cached_buffered_play_values*)instruction->body)->index;
 	}
 	else if(instruction->id == P2P_BUFFERED_PLAY_VALUES) {
 		values = instruction->body;
@@ -783,7 +791,7 @@ void netemu_process_user_value(struct netemu_p2p_connection *info, struct p2p_us
 		}
 		else {
 			netemu_application_p2p_buffered_play_values_copy(&player->_internal->cache[player->_internal->cache_index], values);
-			player->_internal->current_index = player->_internal->cache_index;
+			index = player->_internal->cache_index;
 			player->_internal->cache_index++;
 
 		}

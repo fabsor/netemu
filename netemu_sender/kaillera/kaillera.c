@@ -49,6 +49,10 @@ int _netemu_kaillera_buffered_values_cmp(char *playerval, char *cachedval, int s
 int _netemu_kaillera_buffered_values_cmp_all(char *playerval, char *cachedval, int size);
 void _netemu_kaillera_update(void *param);
 
+int netemu_kaillera_initialize() {
+	return netemu_init_network();
+}
+
 int netemu_send_chat_message(struct netemu_kaillera *info, char *message) {
 	struct application_instruction *instruction;
 	union netemu_connection_type type;
@@ -257,7 +261,6 @@ struct netemu_kaillera *netemu_kaillera_create(char* user, char* emulator_name, 
 	netemu_receiver_buffer_add_instruction_received_fn(info->_internal->receive_buffer,GAME_STATUS_UPDATE,_netemu_respond_to_game_status_update, info);
 	netemu_receiver_buffer_add_instruction_received_fn(info->_internal->receive_buffer,PLAYER_READY ,_netemu_respond_to_player_ready, info);
 	netemu_receiver_buffer_add_instruction_received_fn(info->_internal->receive_buffer,START_GAME ,_netemu_respond_to_game_started, info);
-	netemu_thread_new(_netemu_kaillera_update, info);
 	return info;
 }
 
@@ -284,6 +287,7 @@ int netemu_kaillera_login(struct netemu_kaillera* info) {
 		netemu_application_free_login_request((struct login_request*)message->body);
 	}
 	netemu_receiver_buffer_wait_for_instruction(info->_internal->receive_buffer, LOGIN_SUCCESS, timestamp);
+	netemu_thread_new(_netemu_kaillera_update, info);
 	return 0;
 }
 

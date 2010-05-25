@@ -40,6 +40,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	int n;
 	char* data;
 	data = malloc(512);
+	netemu_p2p_initialize();
 	memcpy(data, JOIN_VALUE, strlen(JOIN_VALUE)+1);
 	p2p_join_event = netemu_thread_event_create();
 	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
@@ -74,7 +75,6 @@ void p2p_join_register_callbacks(struct netemu_p2p_connection *connection) {
 }
 
 void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user) {
-	netemu_p2p_player_ready(connection, P2P_JOIN_TEST_BIND_ADDR, netemu_htons(40000));
 	netemu_thread_event_signal(p2p_join_event);
 }
 

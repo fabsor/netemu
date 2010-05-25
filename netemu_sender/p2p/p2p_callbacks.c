@@ -83,7 +83,7 @@ int netemu_p2p_register_player_ready_callback(struct netemu_p2p_connection *conn
 
 int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p_connection *connection, p2pAllReadyFn callback, void *user_data) {
 	union p2p_callback_fn fn;
-	fn.gameStartedFn = callback;
-	netemu_p2p_register_callback(connection->_internal->game_started_callbacks, fn, 0, user_data);
+	fn.allReadyFn = callback;
+	netemu_p2p_register_callback(connection->_internal->all_ready_callbacks, fn, 0, user_data);
 	return 0;
 }

@@ -15,8 +15,8 @@
  *   along with netlib.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include "netlib_error.h"
-#include "netemu_thread.h"
+#include "headers/netlib_error.h"
+#include "headers/netemu_thread.h"
 
 struct netemu_mutex_internal {
 	HANDLE mutex;
@@ -92,7 +92,9 @@ int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
 		return 0;
 	else if(errcode == WAIT_FAILED)
 		netlib_set_last_mapped_error(GetLastError());
-
+	else if(errcode == WAIT_TIMEOUT) {
+		return NETEMU_WAIT_TIMEOUT;
+	}
 	/* TODO: Det �r inte s� bra att bara returnera -1 h�r, eftersom det antyder att n�got gick fel i WaitForSingleObject,
 	 * vilket det n�dv�ndigtvis inte gjorde.*/
 	return -1;

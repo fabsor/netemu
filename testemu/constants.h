@@ -24,8 +24,9 @@
 
 #define BIND_ADDR	netemu_inet_addr("127.0.0.1")
 
-#define ADDR	netemu_inet_addr("127.0.0.1")
+#define ADDR	netemu_inet_addr("192.168.0.179")
 #define PORT	netemu_htons(27888)
+
 #define VALUE	"0x0x0xff"
 #define JOIN_VALUE "1x1x1xff"
 

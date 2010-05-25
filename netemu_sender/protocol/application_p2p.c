@@ -161,7 +161,6 @@ int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	pos += sizeof(NETEMU_WORD);
 	memcpy(buffer+pos, &game->connection_quality, sizeof(char));
 	pos += sizeof(char);
-
 	pos += _netemu_application_p2p_pack_user(buffer+pos,game->creator);
 
 	if(game->players != NULL) {
@@ -316,6 +315,9 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 		target->_internal->ready_count = game->_internal->ready_count;
 		target->_internal->game_lock = game->_internal->game_lock;
 		target->_internal->all_values_received = game->_internal->all_values_received;
+	}
+	else {
+		target->_internal = NULL;	
 	}
 	target->creator = malloc(sizeof(struct p2p_user));
 	size += netemu_application_p2p_copy_user(target->creator,game->creator);
@@ -655,7 +657,7 @@ void netemu_application_p2p_player_join_success_add(struct application_instructi
 	copy = malloc(sizeof(struct p2p_game));
 	size = netemu_application_p2p_copy_game(copy, game);
 	instruction->id = P2P_PLAYER_JOIN_SUCCESS;
-	instruction->body = game;
+	instruction->body = copy;
 	instruction->body_size = size;
 	instruction->packBodyFn = netemu_application_p2p_player_join_success_pack;
 
@@ -721,11 +723,10 @@ void netemu_application_p2p_cached_play_values_add(struct application_instructio
 
 void netemu_application_p2p_cached_play_values_pack(struct application_instruction *instruction, char *data) {
 	struct p2p_cached_buffered_play_values *cache;
-	cache = malloc(sizeof(struct p2p_cached_buffered_play_values));
+	cache = instruction->body;
 	memcpy(data, &cache->player_no, 1);
 	data++;
-	*data = cache->index;
-	instruction->body = cache;
+	memcpy(data, &cache->index, 1);
 }
 
 void netemu_application_p2p_cached_play_values_parse(struct application_instruction *instruction, char *data) {
@@ -733,6 +734,7 @@ void netemu_application_p2p_cached_play_values_parse(struct application_instruct
 	cache = malloc(sizeof(struct p2p_cached_buffered_play_values));
 	memcpy(&cache->player_no,data, 1);
 	data++;
-	cache->index = *data;
+	memcpy(&cache->index, data, 1);
 	instruction->body = cache;
+	instruction->packBodyFn = netemu_application_p2p_cached_play_values_pack;
 }
