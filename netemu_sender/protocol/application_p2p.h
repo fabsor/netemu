@@ -19,6 +19,11 @@
  * @file
  * This file contains structs used when handling p2p instructions.
  */
+
+/**
+ * @defgroup application_p2p Netemu p2p instructions
+ * Functions that handle p2p instructions.
+ */
 #pragma once
 #ifndef NETEMU_APPLICATION_P2P_H_
 #define NETEMU_APPLICATION_P2P_H_
@@ -31,6 +36,7 @@ extern "C" {
 /**
  * This struct represents a player. It also contains everything that
  * is included in a player instruction.
+ * @ingroup application_p2p
  */
 struct p2p_user {
 	char *name; /**< The name of the player. This is included in the instructions all sends users. */
@@ -43,6 +49,7 @@ struct p2p_user {
 };
 /**
  * This struct represents a game. It also contains everything that is included in a game instruction.
+ * @ingroup application_p2p
  */
 struct p2p_game {
 	char* name; /**< The name of game */
@@ -59,6 +66,7 @@ struct p2p_game {
 
 /**
  * This struct represents a p2p start game and a player_join instruction.
+ * @ingroup application_p2p
  */
 struct p2p_start_game {
 	NETEMU_DWORD addr; /**< The address in network byte order. This is the address a player is supposed to send values to.  */
@@ -66,6 +74,7 @@ struct p2p_start_game {
 };
 /**
  * This struct represents a p2p login success instruction.
+ * @ingroup application_p2p
  */
 struct p2p_login_success {
 	NETEMU_WORD users_count; /**< The number of users that exist in the cloud. */
@@ -75,7 +84,8 @@ struct p2p_login_success {
 };
 
 /**
- * This struct represents a buffered_play_values
+ * This struct represents buffered_play_values
+ * @ingroup application_p2p
  */
 struct p2p_buffered_play_values {
 	char player_no; /**< The player number.  */
@@ -83,6 +93,10 @@ struct p2p_buffered_play_values {
 	char *values; /**< The data in the instruction. */
 };
 
+/**
+ * This truct represents p2p cached buffered values.
+ * @ingroup application_p2p
+ */
 struct p2p_cached_buffered_play_values {
 	char player_no; /**< The number of the plaeyr */
 	char index; /**< The index in the players cache */
@@ -90,6 +104,7 @@ struct p2p_cached_buffered_play_values {
 
 /**
  * This struct represents a player leave instruction.
+ * @ingroup application_p2p
  */
 struct p2p_leave_player {
 	char player_no; /**< The player number. */

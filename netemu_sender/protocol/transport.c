@@ -21,6 +21,14 @@
 #include "application_kaillera.h"
 #include "netlib_error.h"
 
+/**
+ * Pack application instruction into something that's ready to be sent over
+ * the network.
+ * @ingroup netemu_transport
+ * @param messages an array of instructions that should be included in the packet.
+ * @param count the number of instructions in the array.
+ * @return a buffer containing the size and the packets.
+ */
 struct transport_packet_buffer netemu_transport_pack(struct application_instruction **messages, char count) {
 	static int current_index;
 	struct transport_packet_buffer packet_buffer;
@@ -81,6 +89,11 @@ void netemu_transport_free_packet(struct transport_packet* packet) {
 	free(packet);
 }
 
+/**
+ * Free a packet buffer
+ * @ingroup netemu_transport
+ * @param buffer the buffer to free.
+ */
 void netemu_transport_free_packet_buffer(struct transport_packet_buffer* buffer) {
 	free(buffer->data);
 }

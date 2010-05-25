@@ -32,7 +32,7 @@ void _netemu_receiver_listen(void* params);
 void free_receiver(struct netemu_receiver_udp*);
 
 /**
- * Creates a new instance of hte netemu_receiver_udp module
+ * Creates a new instance of the netemu_receiver_udp module
  * @ingroup netemu_receiver_udp
  * @param addr The address to bind to.
  * @param addr_len the size of the address.

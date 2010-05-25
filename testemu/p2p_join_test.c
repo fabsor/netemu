@@ -28,14 +28,14 @@
 #include <stdio.h>
 
 int p2p_join_test_ready = 0;
-void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user);
-void p2p_join_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game);
-void p2p_join_register_callbacks(struct netemu_p2p_connection *connection);
-void p2p_join_play_values_received_callback(struct netemu_p2p_connection *, char* values, int size);
+void p2p_join_player_join_callback(struct netemu_p2p *connection, struct p2p_game *game, struct p2p_user *user);
+void p2p_join_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game);
+void p2p_join_register_callbacks(struct netemu_p2p *connection);
+void p2p_join_play_values_received_callback(struct netemu_p2p *, char* values, int size);
 netemu_event p2p_join_event;
 int p2p_join_ready_to_send = 0;
 void run_p2p_join_test(int no_instructions, char connection) {
-	struct netemu_p2p_connection *p2p;
+	struct netemu_p2p *p2p;
 	struct p2p_game *game;
 	int n;
 	char* data;
@@ -43,7 +43,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	netemu_p2p_initialize();
 	memcpy(data, JOIN_VALUE, strlen(JOIN_VALUE)+1);
 	p2p_join_event = netemu_thread_event_create();
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
+	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");
 	p2p_join_register_callbacks(p2p);
 	printf("OK!\Hosting on %d and connecting to %d...", P2P_JOIN_TEST_PORT, P2P_JOIN_TEST_CONNECT_PORT);
@@ -68,17 +68,17 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	}
 }
 
-void p2p_join_register_callbacks(struct netemu_p2p_connection *connection) {
+void p2p_join_register_callbacks(struct netemu_p2p *connection) {
 	netemu_p2p_register_player_joined_callback(connection, p2p_join_player_join_callback, NULL);
 	netemu_p2p_register_all_players_ready_callback(connection, p2p_join_all_ready_callback, NULL);
 
 }
 
-void p2p_join_player_join_callback(struct netemu_p2p_connection *connection, struct p2p_game *game, struct p2p_user *user) {
+void p2p_join_player_join_callback(struct netemu_p2p *connection, struct p2p_game *game, struct p2p_user *user) {
 	netemu_thread_event_signal(p2p_join_event);
 }
 
-void p2p_join_all_ready_callback(struct netemu_p2p_connection *connection, struct p2p_game *game) {
+void p2p_join_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game) {
 	p2p_join_ready_to_send = 1;
 	netemu_thread_event_signal(p2p_join_event);
 }

@@ -54,21 +54,36 @@ struct netemu_receiver_udp_fn{
 };
 
 /**
- * Create a new receiver. This will create a new socket and bind to the provided host and
- * port.
+ * Creates a new instance of the netemu_receiver_udp module
+ * @ingroup netemu_receiver_udp
+ * @param addr The address to bind to.
+ * @param addr_len the size of the address.
+ * @return NULL if something went wrong, 0 otherwise. Call netlib_get_last_error to get information
+ * about the occurred error. Errors that can occur includes:
+ * - NETEMU_ENOTENOUGHMEMORY
+ * - NETEMU_INVALID_SOCKET
+ * - All errors that can occur with netemu_bind @see netemu_bind
  */
 struct netemu_receiver_udp* netemu_receiver_udp_create(netemu_sockaddr* addr, int addr_len);
 
 /**
- * This function creates a new thread and starts listening for incoming
- * datagrams on the specified address and port.
+ * Start receiving data with this instance of netemu_receiver.
+ * @param receiver the instance of netemu_receiver_udp
+ * @param fn the function which should handle and parse data recieved.
+ * @param param any value you want to pass on to the responder function. Set it to NULL if you're not interested.
  */
 void netemu_receiver_udp_start_receiving(struct netemu_receiver_udp* receiver, parseReceivedDataFn fn, void* param);
 
+/**
+ * Stop receiving data on this receiver. This function will block for a short time in order to let the receiving thread finish.
+ * @param receiver the instance of netemu_receiver_udp
+ */
 void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver);
 
 /**
- * Free the memory that this receiver is using.
+ * Free resources used by this receiver and destroy it. You cannot use this
+ * receiver after destroying it!!
+ * @param receiver the instance of netemu_receiver_udp
  */
 void netemu_receiver_udp_destroy(struct netemu_receiver_udp* receiver);
 
