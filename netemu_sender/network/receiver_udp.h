@@ -29,7 +29,7 @@
 #ifndef NETEMU_RECEIVER_UDP_H_
 #define NETEMU_RECEIVER_UDP_H_
 #include "netemu_socket.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "net.h"
 #include "netemu_thread.h"
 

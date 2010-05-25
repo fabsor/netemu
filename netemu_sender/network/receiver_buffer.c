@@ -16,7 +16,7 @@
  */
 
 #include "receiver_buffer.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "netlib_error.h"
 #include "../protocol/application.h"
 

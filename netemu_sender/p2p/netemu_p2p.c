@@ -29,7 +29,7 @@
 #include "netemu_p2p_internal.h"
 #include "../protocol/application_p2p.h"
 #include "../network/tcp.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "../protocol/application.h"
 #include "../protocol/application_p2p_internal.h"
 

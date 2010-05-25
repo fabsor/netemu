@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 #include "net.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "sender_udp.h"
 #include "tcp.h"
 #include "sender_collection.h"

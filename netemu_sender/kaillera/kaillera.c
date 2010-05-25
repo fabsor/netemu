@@ -30,7 +30,7 @@
 #include "../network/sender_udp.h"
 #include "../network/receiver_udp.h"
 #include "../structures/netemu_hashtbl.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "kaillera_responses.h"
 #include "../protocol/application_p2p.h"
 #include "netemu_thread.h"

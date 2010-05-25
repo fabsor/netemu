@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "headers/netemu_thread.h"
-#include "headers/netemu_list.h"
 #include <pthread.h>
 #include <time.h>
 #include <errno.h>

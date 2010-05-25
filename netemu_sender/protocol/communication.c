@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "netemu_socket.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "netlib_error.h"
 #include "../structures/netemu_stringbuilder.h"
 #include <time.h>

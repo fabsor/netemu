@@ -23,7 +23,7 @@
  */
 #include "../interface/netemu_kaillera.h"
 #include "kaillera_internal.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "netlib_error.h"
 
 int netemu_kaillera_register_callback(struct netemu_list *list, union callback_fn *fn, int disposable, void *user_data);

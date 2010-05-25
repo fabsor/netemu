@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #include "sender_udp.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 
 typedef enum {
 	SENDER_UDP,

@@ -23,7 +23,7 @@
 #include "kaillera_internal.h"
 #include "kaillera_responses.h"
 #include "../network/sender_buffer.h"
-#include "netemu_list.h"
+#include "../structures/netemu_list.h"
 #include "../interface/netemu_kaillera.h"
 
 void _netemu_respond_to_login_success(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
