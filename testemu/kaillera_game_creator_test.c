@@ -60,7 +60,7 @@ void run_kaillera_game_creator_test(int no_instructions) {
 	data = malloc(512);
 
 	for (i = 0; i < no_instructions; i++) {
-		data = VALUE;
+		memcpy(data, VALUE, strlen(VALUE)+1);
 		netemu_kaillera_send_play_values(info, strlen(VALUE)+1, data);
 	}
 }

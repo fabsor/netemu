@@ -136,7 +136,6 @@ void _netemu_respond_to_game_started(struct netemu_receiver_buffer* buffer, stru
 	connection->_internal->player_no = start->player_no;
 	for(i = 0; i < connection->_internal->game_started_callbacks->count; i++)
 	{
-
 		call = connection->_internal->game_started_callbacks->elements[i];
 		call->fn->game_started_fn(connection, connection->current_game, start, call->user_data);
 		if(call->disposable)
@@ -241,6 +240,7 @@ void _netemu_respond_to_game_status_update(struct netemu_receiver_buffer* buffer
 	}
 	if(game != NULL) {
 		game->users_count = update->num_players;
+		game->player_count = update->num_players;
 		game->status = update->status;
 	}
 	for(i = 0; i< connection->_internal->game_status_updated_callbacks->count; i++) {

@@ -57,7 +57,7 @@ void run_kaillera_game_joiner_test(no_instructions) {
 	printf("OK!\n We're ready for action!");
 	data = malloc(512);
 	for (i = 0; i < no_instructions; i++) {
-		data = VALUE;
+		memcpy(data, VALUE, strlen(VALUE)+1);
 		netemu_kaillera_send_play_values(info, strlen(VALUE)+1, data);
 	}
 
