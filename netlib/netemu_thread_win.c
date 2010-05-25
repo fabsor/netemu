@@ -92,7 +92,9 @@ int netemu_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
 		return 0;
 	else if(errcode == WAIT_FAILED)
 		netlib_set_last_mapped_error(GetLastError());
-
+	else if(errcode == WAIT_TIMEOUT) {
+		return NETEMU_WAIT_TIMEOUT;
+	}
 	/* TODO: Det �r inte s� bra att bara returnera -1 h�r, eftersom det antyder att n�got gick fel i WaitForSingleObject,
 	 * vilket det n�dv�ndigtvis inte gjorde.*/
 	return -1;
