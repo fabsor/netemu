@@ -584,7 +584,7 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 	buffer += netemu_util_copy_string(&game->appName,buffer);
 	memcpy(&game->id,buffer,sizeof(NETEMU_DWORD));
 	buffer += sizeof(NETEMU_DWORD);
-	//memcpy(&game->wtf,buffer,sizeof(NETEMU_WORD)); Maybe it isn't included?
+	memcpy(&game->wtf,buffer,sizeof(NETEMU_DWORD));// Maybe it isn't included?
 	instruction->body = game;
 }
 
@@ -612,7 +612,7 @@ void netemu_application_user_joined_parse(struct application_instruction *instru
 	pos += sizeof(NETEMU_DWORD);
 	memcpy(&status->connection,buffer+pos,sizeof(char));
 	instruction->body = status;
-	instruction->body_size = instruction->body_size;
+
 }
 
 void netemu_application_player_left_add(struct application_instruction* instruction) {
@@ -631,10 +631,16 @@ void netemu_application_player_left_pack(struct application_instruction* instruc
 	memcpy(buffer,&left->user_id,sizeof(NETEMU_WORD));
 }
 
-void netemu_application_player_left_parse(struct application_instruction* instruction, char* buffer) {
+int netemu_application_player_left_parse(struct application_instruction *instruction, char* buffer) {
 	struct player_left *left;
-	left = malloc(sizeof(struct player_left));
-	memcpy(&left->user_id,buffer,sizeof(char));
+	if((left = malloc(sizeof(struct player_left))) == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+	memcpy(&left->user_id, buffer, sizeof(NETEMU_WORD));
+	instruction->body = left;
+
+	return 0;
 }
 
 void netemu_application_player_joined_parse(struct application_instruction* instruction, char* data) {

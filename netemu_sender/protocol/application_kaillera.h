@@ -36,14 +36,15 @@
 #define GAME_CHAT										0x08
 #define CLIENT_TIMEOUT									0x09
 #define CREATE_GAME										0x0a
+#define PLAYER_LEFT										0x0b
 #define PLAYER_JOINED									0x0c
 #define EXISTING_PLAYERS_LIST							0x0d
 #define GAME_STATUS_UPDATE								0x0e
 #define PLAYER_KICK										0x0f
+/* TODO: Add GAME_CLOSED define and implement the instruction! */
 #define START_GAME										0x11
 #define BUFFERED_PLAY_VALUES							0x12
 #define INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES		0x13
-#define PLAYER_LEFT										0x14
 #define PLAYER_READY									0x15
 #define MOTD_CHAT										0x17
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
@@ -70,8 +71,8 @@ struct player {
 };
 
 struct login_success {
-	unsigned int users_count;
-	unsigned int games_count;
+	NETEMU_DWORD users_count;
+	NETEMU_DWORD games_count;
 	struct user **users;
 	struct game **games;
 };
@@ -80,11 +81,11 @@ struct login_status {
 	NETEMU_WORD id;
 	char message[128];
 };
-
+/*
 struct ping {
 	int pbody[3];
 };
-
+*/
 struct pong {
 	char pbody[16];
 };
@@ -148,7 +149,7 @@ struct player_left {
 };
 
 struct existing_player_list {
-	unsigned int players_count;
+	NETEMU_DWORD players_count;
 	struct player *players;
 };
 
@@ -234,6 +235,8 @@ void netemu_application_player_dropped_parse(struct application_instruction *ins
 void netemu_application_player_left_add(struct application_instruction* instruction);
 
 void netemu_application_player_left_pack(struct application_instruction* instruction, char* buffer);
+
+int netemu_application_player_left_parse(struct application_instruction *instruction, char* buffer);
 
 void netemu_application_player_joined_parse(struct application_instruction* instruction, char* buffer);
 
