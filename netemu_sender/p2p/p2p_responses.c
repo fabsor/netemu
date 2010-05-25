@@ -27,7 +27,7 @@
 /**
  * Register responders that will be used by this module.
  * @ingroup netemu_p2p
- * @ingroup netemu_p2p_responces
+ * @ingroup netemu_p2p_responses
  * @param p2p the netemu_p2p instance.
  */
 void _netemu_p2p_register_responders(struct netemu_p2p *p2p) {

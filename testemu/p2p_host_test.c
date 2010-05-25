@@ -48,7 +48,7 @@ void run_p2p_host_test(int no_instructions, char connection) {
 	data = malloc(512);
 	host_created_game = NULL;
 	memcpy(data, VALUE, strlen(VALUE)+1);
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
+	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");
 	p2p_host_register_callbacks(p2p);
 

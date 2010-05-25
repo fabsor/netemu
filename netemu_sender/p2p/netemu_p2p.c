@@ -57,12 +57,17 @@ void netemu_p2p_respond_to_ready(struct netemu_receiver_buffer* buffer, struct n
 void netemu_p2p_respond_to_play_values(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
 struct netemu_tcp_connection *_netemu_p2p_connect_to_async(struct netemu_p2p *p2p, netemu_sockaddr *connect_addr, int connect_addr_size);
 NETEMU_BOOL _netemu_p2p_player_exists(struct p2p_game *game, struct p2p_user *player);
-void netemu_process_user_value(struct netemu_p2p *info, struct p2p_user *player);
-int netemu_p2p_receive_play_values(struct netemu_p2p *info);
+void _netemu_process_user_value(struct netemu_p2p *info, struct p2p_user *player);
+int _netemu_p2p_receive_play_values(struct netemu_p2p *info);
 void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
 void _netemu_p2p_register_responders(struct netemu_p2p *p2p);
 /* End of function declarations */
 
+/**
+ * Call this function to initialize the network.
+ * You only need to call this once.
+ * @ingroup netemu_p2p
+ */
 int netemu_p2p_initialize() {
 	return netemu_init_network();
 }
@@ -79,7 +84,7 @@ int netemu_p2p_initialize() {
  * If you have a connection quality of 2, then you will send two play values, then wait for all others.\n
  * etc.
  */
-struct netemu_p2p* netemu_p2p_new(char* username, char* emulatorname, char connection_quality) {
+struct netemu_p2p* netemu_p2p_create(char* username, char* emulatorname, char connection_quality) {
 	struct netemu_p2p *p2p;
 	union netemu_connection_type *type;
 
@@ -174,6 +179,7 @@ int netemu_p2p_host(struct netemu_p2p* p2p, NETEMU_DWORD address, unsigned short
 	netemu_tcp_listener_start_listening(p2p->_internal->host);
 	return 0;
 }
+
 /**
  * Connect to a host. This function let's you connect to an existing cloud by specifying an address to which users can
  * connect to you and the address to one of the computers in the cloud.
@@ -335,6 +341,7 @@ void _netemu_p2p_send_login_request(struct netemu_p2p *p2p) {
 	timestamp = time(NULL);
 	netemu_sender_buffer_add(p2p->_internal->send_buffer,message,CONNECTION_COLLECTION,type);
 }
+
 /**
  * Send a login success instruction.
  * @ingroup netemu_p2p
@@ -390,6 +397,7 @@ int netemu_p2p_create_game(struct netemu_p2p *connection, char *gamename, char c
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
 	return 0;
 }
+
 /**
  * Join an existing game. This is a blocking call that will connect to the creator of the
  * game if there isn't a connection already, and then send a "Join game" instruction.
@@ -515,6 +523,7 @@ int netemu_p2p_start_game(struct netemu_p2p *connection, NETEMU_DWORD listen_add
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
 	return 0;
 }
+
 /**
  * Indicate that you are ready to play. In order for the game to start, you must call this function.
  * This function will send a player ready instruction to all players, and this will
@@ -567,6 +576,7 @@ int netemu_p2p_player_ready(struct netemu_p2p *connection, NETEMU_DWORD listen_a
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
 	return 0;
 }
+
 /**
  * Get a list of games in the netemu p2p cloud.
  * @ingroup netemu_p2p
@@ -582,6 +592,7 @@ struct p2p_game** netemu_p2p_get_game_list(struct netemu_p2p* info, int *count) 
 	*count = info->_internal->games->count;
 	return games;
 }
+
 /**
  * Get a list of games in the netemu p2p cloud.
  * @ingroup netemu_p2p
@@ -651,6 +662,7 @@ NETEMU_BOOL _netemu_p2p_player_exists(struct p2p_game *game, struct p2p_user *pl
  * @ingroup p2p_player
  * @param game the game to which the player should be added.
  * @param player the player that should be added to the game.
+ * @todo Better memory handling for the array containing the players.
  */
 void _netemu_p2p_add_player(struct p2p_game *game, struct p2p_user *player) {
 	struct p2p_user* new_player_list;
@@ -682,7 +694,12 @@ void _netemu_p2p_add_player(struct p2p_game *game, struct p2p_user *player) {
  * Send play values to all clients.
  * This function will block if you haven't received play values from your co-players, and
  * will handle all the synchronization for you.
- * @ingroup p2p_responses
+ * @ingroup netemu_p2p
+ * @param info an instance of the netemu_p2p module.
+ * @param data the data to send. The block must contain data with the size of emulator_value_size, and be big enough to contain
+ * data from all players.
+ * @return 0 if everything went alright.
+ * @todo Error handling here.
  */
 int netemu_p2p_send_play_values(struct netemu_p2p* info, void* data) {
 	time_t timestamp;
@@ -709,7 +726,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p* info, void* data) {
 	/* We have used up all our frames, we need new ones. Let's send the data we collected and then receive data from other players. */
 	if(info->_internal->values_buffered == info->current_game->connection_quality) {
 		message = netemu_application_instruction_create();
-		cache_index = netemu_p2p_value_in_cache(info->user, info->_internal->values_to_send, info->current_game->emulator_value_size);
+		cache_index = _netemu_p2p_value_in_cache(info->user, info->_internal->values_to_send, info->current_game->emulator_value_size);
 		if(cache_index == -1) {
 			netemu_application_p2p_buffered_play_values_add(message,info->user->_internal->player_no, size,data);
 			netemu_list_add(info->user->_internal->play_values, message);
@@ -721,7 +738,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p* info, void* data) {
 		timestamp = time(NULL);
 		netemu_sender_buffer_add(info->_internal->send_buffer,message, CONNECTION_COLLECTION, type);
 		info->_internal->values_buffered = 0;
-		netemu_p2p_receive_play_values(info);
+		_netemu_p2p_receive_play_values(info);
 		info->_internal->frame_index = 0;
 		info->current_game->_internal->sent_first_values = TRUE;
 	}
@@ -735,7 +752,7 @@ int netemu_p2p_send_play_values(struct netemu_p2p* info, void* data) {
  * @param size the size fo the data.
  * @return the index of the value if it was found, -1 otherwise.
  */
-int netemu_p2p_value_in_cache(struct p2p_user *user, char* data, int size) {
+int _netemu_p2p_value_in_cache(struct p2p_user *user, char* data, int size) {
 	int i;
 	for(i = 0; i < user->_internal->cache_index; i++) {
 		if(memcmp(user->_internal->cache[i].values, data, size) == 0) {
@@ -745,7 +762,7 @@ int netemu_p2p_value_in_cache(struct p2p_user *user, char* data, int size) {
 	return -1;
 }
 
-int netemu_p2p_receive_play_values(struct netemu_p2p *info) {
+int _netemu_p2p_receive_play_values(struct netemu_p2p *info) {
 	int i;
 	struct p2p_user *player;
 
@@ -754,17 +771,17 @@ int netemu_p2p_receive_play_values(struct netemu_p2p *info) {
 		netemu_thread_event_wait(info->_internal->play_values_event, NETEMU_INFINITE);
 	}
 	netemu_thread_mutex_lock(info->current_game->_internal->game_lock, NETEMU_INFINITE);
-	netemu_process_user_value(info, info->current_game->creator);
+	_netemu_process_user_value(info, info->current_game->creator);
 	for(i = 0; i < info->current_game->user_count-1; i++) {
 		player = &info->current_game->players[i];
-		netemu_process_user_value(info, player);
+		_netemu_process_user_value(info, player);
 	}
 	info->current_game->_internal->all_values_received = FALSE;
 	netemu_thread_mutex_release(info->current_game->_internal->game_lock);
 	return 0;
 }
 
-void netemu_process_user_value(struct netemu_p2p *info, struct p2p_user *player) {
+void _netemu_process_user_value(struct netemu_p2p *info, struct p2p_user *player) {
 	struct p2p_buffered_play_values *values;
 	struct application_instruction *instruction;
 	int index, i;

@@ -43,7 +43,7 @@ void run_p2p_join_test(int no_instructions, char connection) {
 	netemu_p2p_initialize();
 	memcpy(data, JOIN_VALUE, strlen(JOIN_VALUE)+1);
 	p2p_join_event = netemu_thread_event_create();
-	p2p = netemu_p2p_new(EMUNAME,PLAYERNAME, connection);
+	p2p = netemu_p2p_create(EMUNAME,PLAYERNAME, connection);
 	printf("Registering callbacks...");
 	p2p_join_register_callbacks(p2p);
 	printf("OK!\Hosting on %d and connecting to %d...", P2P_JOIN_TEST_PORT, P2P_JOIN_TEST_CONNECT_PORT);
