@@ -63,14 +63,14 @@ void run_p2p_host_test(int no_instructions, char connection) {
 		return;
 	}
 	while(host_created_game == NULL) {
-		netemu_thread_event_wait(p2p_host_join_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(p2p_host_join_event, NETLIB_INFINITE);
 	}
 
 	netemu_p2p_join_game(p2p, host_created_game);
 	printf("OK!\n Waiting for game start...");
 
 	while(!p2p_host_ready_to_send) {
-		netemu_thread_event_wait(p2p_host_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(p2p_host_event, NETLIB_INFINITE);
 	}
 	for(n = 0; n < no_instructions; n++) {
 		memcpy(data, VALUE, strlen(VALUE)+1);

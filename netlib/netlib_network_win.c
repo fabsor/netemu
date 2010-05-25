@@ -53,8 +53,8 @@ int netlib_cleanup() {
 	return retval;
 }
 
-netlib_SOCKET netlib_socket(int address_family, int socket_type) {
-	netlib_SOCKET return_socket;
+NETLIB_SOCKET netlib_socket(int address_family, int socket_type) {
+	NETLIB_SOCKET return_socket;
     return_socket = socket(address_family, socket_type, 0);
 	if(return_socket == INVALID_SOCKET)
 		netlib_set_last_error(WSAGetLastError());
@@ -62,7 +62,7 @@ netlib_SOCKET netlib_socket(int address_family, int socket_type) {
 	return return_socket;
 }
 
-int netlib_bind(netlib_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
+int netlib_bind(NETLIB_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
 	int errcode;
     
 	errcode = bind(socket, address, address_len);
@@ -72,7 +72,7 @@ int netlib_bind(netlib_SOCKET socket, const netlib_sockaddr *address, socklen_t 
 	return errcode;
 }
 
-int netlib_connect(netlib_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
+int netlib_connect(NETLIB_SOCKET socket, const netlib_sockaddr *address, socklen_t address_len) {
 	int errcode;
 
 	errcode = connect(socket, address, address_len);
@@ -83,11 +83,11 @@ int netlib_connect(netlib_SOCKET socket, const netlib_sockaddr *address, socklen
 }
 
 /*! Sets the blocking status of the socket */
-int netlib_set_blocking(netlib_SOCKET socket, int blocking) {
+int netlib_set_blocking(NETLIB_SOCKET socket, int blocking) {
 	return ioctlsocket(socket, FIONBIO, &blocking);
 }
 
-int netlib_listen(netlib_SOCKET socket, int backlog) {
+int netlib_listen(NETLIB_SOCKET socket, int backlog) {
 	int errcode;
 
     errcode = listen(socket, backlog);
@@ -97,7 +97,7 @@ int netlib_listen(netlib_SOCKET socket, int backlog) {
 	return errcode;
 }
 
-netlib_SOCKET netlib_accept(netlib_SOCKET socket, netlib_sockaddr *address, socklen_t *address_len) {
+NETLIB_SOCKET netlib_accept(NETLIB_SOCKET socket, netlib_sockaddr *address, socklen_t *address_len) {
 	int errcode;
 
     errcode = accept(socket, address, address_len);
@@ -108,7 +108,7 @@ netlib_SOCKET netlib_accept(netlib_SOCKET socket, netlib_sockaddr *address, sock
 }
 
 /* We have to use this ugly function until we can decide to remove netlib_prepare_addr.*/
-netlib_SOCKET netlib_accept_inet(netlib_SOCKET socket,netlib_sockaddr** address, socklen_t *address_len) {
+NETLIB_SOCKET netlib_accept_inet(NETLIB_SOCKET socket,netlib_sockaddr** address, socklen_t *address_len) {
     struct sockaddr_in addr;
     socklen_t size;
     int error;
@@ -125,7 +125,7 @@ netlib_SOCKET netlib_accept_inet(netlib_SOCKET socket,netlib_sockaddr** address,
     return error;
 }
 
-int netlib_send(netlib_SOCKET socket, const char *buffer, int len, int flags) {
+int netlib_send(NETLIB_SOCKET socket, const char *buffer, int len, int flags) {
 	int errcode;
     
 	errcode = send(socket, buffer, len, flags);
@@ -135,7 +135,7 @@ int netlib_send(netlib_SOCKET socket, const char *buffer, int len, int flags) {
 	return errcode;
 }
 
-int netlib_sendto(netlib_SOCKET socket, const char *buffer, int len, int flags, const netlib_sockaddr *dest_address, socklen_t address_len) {
+int netlib_sendto(NETLIB_SOCKET socket, const char *buffer, int len, int flags, const netlib_sockaddr *dest_address, socklen_t address_len) {
     int errcode;
 	
 	errcode = sendto(socket, buffer, len, flags, dest_address, address_len);
@@ -145,7 +145,7 @@ int netlib_sendto(netlib_SOCKET socket, const char *buffer, int len, int flags, 
 	return errcode;
 }
 
-int netlib_recv(netlib_SOCKET socket, char *buffer, int len, int flags) {
+int netlib_recv(NETLIB_SOCKET socket, char *buffer, int len, int flags) {
 	int errcode;
 
 	errcode = recv(socket, buffer, len, flags);
@@ -155,7 +155,7 @@ int netlib_recv(netlib_SOCKET socket, char *buffer, int len, int flags) {
 	return errcode;
 }
 
-int netlib_recvfrom(netlib_SOCKET socket, char *buffer, int len, int flags, netlib_sockaddr *address, socklen_t *address_len) {
+int netlib_recvfrom(NETLIB_SOCKET socket, char *buffer, int len, int flags, netlib_sockaddr *address, socklen_t *address_len) {
 	int errcode;
 
     errcode = recvfrom(socket, buffer, len, flags, address, address_len);
@@ -165,7 +165,7 @@ int netlib_recvfrom(netlib_SOCKET socket, char *buffer, int len, int flags, netl
 	return errcode;
 }
 
-int netlib_shutdown(netlib_SOCKET socket, int how) {
+int netlib_shutdown(NETLIB_SOCKET socket, int how) {
 	int errcode;
 
     errcode = shutdown(socket, how);
@@ -175,7 +175,7 @@ int netlib_shutdown(netlib_SOCKET socket, int how) {
 	return errcode;
 }
 
-int netlib_closesocket(netlib_SOCKET socket) {
+int netlib_closesocket(NETLIB_SOCKET socket) {
 	int errcode;
 
 	errcode = closesocket(socket);
@@ -206,7 +206,7 @@ int netlib_get_addr_info(char* nodename, char* servicetype, const struct netlib_
 		/* If a memory error occured, we map it to our general out-of-memory error code for consistency, 
 		 * otherwise, we just use the WSA error code directly */
 		if(errcode == WSA_NOT_ENOUGH_MEMORY) 
-			netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
+			netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		else
 			netlib_set_last_error(errcode);
 		
@@ -215,7 +215,7 @@ int netlib_get_addr_info(char* nodename, char* servicetype, const struct netlib_
 	
 
 	if((*result = malloc(sizeof(struct netlib_addrinfo))) == NULL) {
-		netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
 	}
 
@@ -231,7 +231,7 @@ int netlib_get_addr_info(char* nodename, char* servicetype, const struct netlib_
 		addrinfo = addrinfo->ai_next;
 		if(addrinfo != NULL) {
 			if((result_addrinfo->next = malloc(sizeof(struct netlib_addrinfo))) == NULL) {
-				netlib_set_last_error(netlib_ENOTENOUGHMEMORY);
+				netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 				errcode = -1;
 				break;
 			}

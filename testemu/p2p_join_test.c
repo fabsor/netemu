@@ -56,11 +56,11 @@ void run_p2p_join_test(int no_instructions, char connection) {
 		return;
 	}
 	netemu_p2p_create_game(p2p, "TheGame",connection,strlen(VALUE)+1,&game);
-	netemu_thread_event_wait(p2p_join_event, NETLIB_INFINITE);
+	netlib_thread_event_wait(p2p_join_event, NETLIB_INFINITE);
 	printf("A new player has joined the game! OK!\n Starting the game...\n");
 	netemu_p2p_start_game(p2p,ADDR,45400);
 	while(!p2p_join_ready_to_send) {
-		netemu_thread_event_wait(p2p_join_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(p2p_join_event, NETLIB_INFINITE);
 	}
 	for(n = 0; n < no_instructions; n++) {
 		memcpy(data, VALUE, strlen(VALUE)+1);

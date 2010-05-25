@@ -152,19 +152,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\netemu_list.c"
-				>
-			</File>
-			<File
-				RelativePath=".\netemu_socket_win.c"
-				>
-			</File>
-			<File
 				RelativePath=".\netemu_thread_win.c"
 				>
 			</File>
 			<File
 				RelativePath=".\netlib_error_win.c"
+				>
+			</File>
+			<File
+				RelativePath=".\netlib_network_win.c"
 				>
 			</File>
 			<File
@@ -178,19 +174,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\headers\netemu_list.h"
-				>
-			</File>
-			<File
-				RelativePath=".\headers\netemu_socket.h"
-				>
-			</File>
-			<File
-				RelativePath=".\headers\netemu_thread.h"
-				>
-			</File>
-			<File
 				RelativePath=".\headers\netlib_error.h"
+				>
+			</File>
+			<File
+				RelativePath=".\headers\netlib_network.h"
+				>
+			</File>
+			<File
+				RelativePath=".\headers\netlib_thread.h"
 				>
 			</File>
 			<File

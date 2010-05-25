@@ -163,7 +163,7 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	/* TODO: Fix better constants here. */
 	while(connection_attempts < 5 && !callback.response_received) {
 		netemu_util_send_data(client->sender,hello);
-		if(netemu_thread_event_wait(callback.instruction_received_event, 3000) == NETLIB_WAIT_TIMEOUT) {
+		if(netlib_thread_event_wait(callback.instruction_received_event, 3000) == NETLIB_WAIT_TIMEOUT) {
 			connection_attempts++;
 		}
 	}
@@ -243,7 +243,7 @@ void _netemu_kaillera_communication_login(void *param) {
 	/* TODO: Fix better constants here. */
 	while(connection_attempts < 5 && !callback->response_received) {
 		netemu_util_send_data(client->sender,hello);
-		if(netemu_thread_event_wait(callback->instruction_received_event, 3000) == NETLIB_WAIT_TIMEOUT) {
+		if(netlib_thread_event_wait(callback->instruction_received_event, 3000) == NETLIB_WAIT_TIMEOUT) {
 			connection_attempts++;
 		}
 	}

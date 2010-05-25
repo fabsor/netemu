@@ -121,7 +121,7 @@ void _netemu_kaillera_update(void *param) {
 	instruction = netemu_application_instruction_create();
 	netemu_application_client_timeout_request_add(instruction);
 	while(TRUE) {
-		netemu_thread_event_wait(info->_internal->send_timeout, 60000);
+		netlib_thread_event_wait(info->_internal->send_timeout, 60000);
 		netemu_sender_buffer_add(info->_internal->send_buffer, instruction, UDP_SENDER, type);
 	}
 }
@@ -490,7 +490,7 @@ int netemu_kaillera_receive_play_values(struct netemu_kaillera *info) {
 	struct buffered_play_values *values;
 	int i;
 	while(info->_internal->received_play_values->count == 0) {
-		netemu_thread_event_wait(info->_internal->play_values_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(info->_internal->play_values_event, NETLIB_INFINITE);
 	}
 
 	instruction = info->_internal->received_play_values->elements[0];

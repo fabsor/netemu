@@ -70,7 +70,7 @@ void _netemu_sender_buffer_update(void* arg) {
 	itemsToSend = buffer->instructions;
 	while (buffer->running) {
 		if(buffer->instructions->count == 0) {
-			netemu_thread_event_wait(buffer->event, NETLIB_INFINITE);
+			netlib_thread_event_wait(buffer->event, NETLIB_INFINITE);
 		}
 
 		current_time = time(NULL);

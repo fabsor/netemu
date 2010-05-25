@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\structures\netemu_list.c"
+				>
+			</File>
+			<File
 				RelativePath=".\p2p\netemu_p2p.c"
 				>
 			</File>
@@ -318,6 +322,10 @@
 			</File>
 			<File
 				RelativePath=".\interface\netemu_kaillera.h"
+				>
+			</File>
+			<File
+				RelativePath=".\structures\netemu_list.h"
 				>
 			</File>
 			<File

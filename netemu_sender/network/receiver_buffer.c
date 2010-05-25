@@ -178,7 +178,7 @@ void _netemu_receiver_buffer_update(void* args) {
 
 	while(1) {
 		if(itemsToAdd->count == 0) {
-			netemu_thread_event_wait(buffer->_internal->event, NETLIB_INFINITE);
+			netlib_thread_event_wait(buffer->_internal->event, NETLIB_INFINITE);
 		}
 		if(itemsToAdd->count > 0) {
 			netlib_thread_mutex_lock(lock,NETLIB_INFINITE);
@@ -221,7 +221,7 @@ struct netemu_receiver_buffer_item* netemu_receiver_buffer_wait_for_instruction(
 
 	eventhandle = netlib_thread_event_create();
 	info = _netemu_receiver_buffer_register_wakeup_on_instruction(buffer, instruction_id, timestamp, eventhandle);
-	netemu_thread_event_wait(eventhandle, NETLIB_INFINITE);
+	netlib_thread_event_wait(eventhandle, NETLIB_INFINITE);
 	netlib_thread_event_destroy(eventhandle);
 	item = info->item;
 	free(info);

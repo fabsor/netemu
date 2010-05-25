@@ -43,14 +43,14 @@ void run_kaillera_game_joiner_test(no_instructions) {
 	netemu_kaillera_connect(info,BIND_ADDR, 0, ADDR, PORT);
 	printf("OK!\nLooking for a game to join...");
 	while(info->game_count == 0) {
-		netemu_thread_event_wait(game_join_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(game_join_event, NETLIB_INFINITE);
 	}
 	printf("OK!\nJoining game...");
 	games = netemu_kaillera_get_game_list(info,&count);
 	netemu_kaillera_join_game(info, games[0]->id);
 	printf("OK!\nWaiting for game start...");
 	while(join_game_started == 0) {
-		netemu_thread_event_wait(game_join_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(game_join_event, NETLIB_INFINITE);
 	}
 	printf("OK!\n Sending player ready...");
 	netemu_kaillera_send_player_ready(info);

@@ -43,13 +43,13 @@ void run_kaillera_game_creator_test(int no_instructions) {
 	netemu_kaillera_connect(info,BIND_ADDR, 0, ADDR, PORT);
 	printf("OK!\n Waiting for other users to join.");
 	while(user_joined == 0) {
-		netemu_thread_event_wait(game_creator_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(game_creator_event, NETLIB_INFINITE);
 	}
 	printf("Other users have joined! Let's start a game...");
 	netemu_kaillera_create_game(info, "gamename", &game);
 	printf("OK!\n Now we wait for other players...");
 	while(player_joined == 0) {
-		netemu_thread_event_wait(game_creator_event, NETLIB_INFINITE);
+		netlib_thread_event_wait(game_creator_event, NETLIB_INFINITE);
 	}
 	printf("OK!\n Let's start the game...");
 	/* We have liftoff! Let's start the game. */
