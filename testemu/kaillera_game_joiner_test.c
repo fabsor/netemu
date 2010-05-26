@@ -29,7 +29,7 @@ void kaillera_game_joiner_game_start(struct netemu_kaillera *info, struct game* 
 int game_exists = 0;
 int join_game_created = 0;
 int join_game_started = 0;
-netemu_event game_join_event;
+netlib_event game_join_event;
 void run_kaillera_game_joiner_test(no_instructions) {
 	struct netemu_kaillera *info;
 	struct game** games;

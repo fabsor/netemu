@@ -34,8 +34,8 @@ void p2p_game_created_callback(struct netemu_p2p *connection, struct p2p_game *g
 void p2p_host_user_joined_callback(struct netemu_p2p *connection, struct p2p_user *user);
 void p2p_host_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game);
 void p2p_host_play_values_received_callback(struct netemu_p2p *, char* values, int size);
-netemu_event p2p_host_event;
-netemu_event p2p_host_join_event;
+netlib_event p2p_host_event;
+netlib_event p2p_host_join_event;
 int p2p_host_test_ready = 0;
 int p2p_host_ready_to_send = 0;
 struct p2p_game *host_created_game;

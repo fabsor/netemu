@@ -25,7 +25,7 @@ struct _netemu_list_internal {
 	int (* comparator)(const void *, const void *);
 	int size;
 	int FOO;
-	netemu_mutex list_mutex;
+	netlib_mutex list_mutex;
 };
 
 int _netemu_enlarge_list(struct netemu_list* list, int size);

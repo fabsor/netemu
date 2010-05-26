@@ -38,7 +38,7 @@
 struct netemu_receiver_udp{
 	NETLIB_SOCKET socket;
 	netlib_sockaddr* addr;
-	netemu_mutex lock;
+	netlib_mutex lock;
 	parseReceivedDataFn fn;
 	NETEMU_BOOL listening;
 	void* received_data_param;

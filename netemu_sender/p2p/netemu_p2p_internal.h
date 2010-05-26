@@ -45,7 +45,7 @@ struct netemu_p2p_internal {
 	int sent_values; /**< values sent since last value was received. */
 	char *values_received; /**< Contains values that have been received. */
 	int frame_index; /**< The index of the frame to return to the user. */
-	netemu_event play_values_event;
+	netlib_event play_values_event;
 	struct netemu_receiver_buffer *receive_buffer;
 	struct buffered_play_values *buffered_values;
 	struct netemu_sender_buffer *send_buffer;

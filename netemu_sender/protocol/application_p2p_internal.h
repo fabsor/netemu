@@ -55,7 +55,7 @@ struct p2p_game_internal {
 	NETEMU_WORD ready_count;
 	NETEMU_BOOL sent_first_values; /**< We need to know that we haven't sent any values, and that we can't have any data to fetch from */
 	NETEMU_BOOL all_values_received;
-	netemu_mutex game_lock;
+	netlib_mutex game_lock;
 };
 
 /**

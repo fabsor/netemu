@@ -59,7 +59,7 @@ struct communication_callback {
 	netlib_sockaddr_in *addr; /**< The address to the server. */
 	connectionAcquiredFn fn;
 	struct netemu_kaillera *connection;
-	netemu_event instruction_received_event;
+	netlib_event instruction_received_event;
 	void *arg;
 };
 

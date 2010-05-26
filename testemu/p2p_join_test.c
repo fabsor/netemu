@@ -32,7 +32,7 @@ void p2p_join_player_join_callback(struct netemu_p2p *connection, struct p2p_gam
 void p2p_join_all_ready_callback(struct netemu_p2p *connection, struct p2p_game *game);
 void p2p_join_register_callbacks(struct netemu_p2p *connection);
 void p2p_join_play_values_received_callback(struct netemu_p2p *, char* values, int size);
-netemu_event p2p_join_event;
+netlib_event p2p_join_event;
 int p2p_join_ready_to_send = 0;
 void run_p2p_join_test(int no_instructions, char connection) {
 	struct netemu_p2p *p2p;

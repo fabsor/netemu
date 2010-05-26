@@ -22,9 +22,9 @@
 #define PLAYERNAME	"fabsor"
 
 
-#define BIND_ADDR	netlib_inet_addr("127.0.0.1")
+#define BIND_ADDR	netlib_inet_addr("192.168.106.222")
 
-#define ADDR	netlib_inet_addr("192.168.0.179")
+#define ADDR	netlib_inet_addr("192.168.106.217")
 #define PORT	netlib_htons(27888)
 
 #define VALUE	"0x0x0xff"

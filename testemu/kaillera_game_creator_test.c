@@ -28,7 +28,7 @@ int kaillera_creator_test = 0;
 int user_joined = 0;
 int player_joined = 0;
 int n = 0;
-netemu_event game_creator_event;
+netlib_event game_creator_event;
 void run_kaillera_game_creator_test(int no_instructions) {
 	struct netemu_kaillera *info;
 	struct game* game;

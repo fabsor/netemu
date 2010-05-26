@@ -90,7 +90,7 @@ int netlib_thread_exit() {
  * Create a new mutex lock.
  * @return an identifier for the mutex lock.
  */
-netemu_mutex netlib_thread_mutex_create() {
+netlib_mutex netlib_thread_mutex_create() {
 	struct netlib_mutex_internal* mutex_struct;
 	/* We need a pointer to this mutex, so we can save it off in our list and send the index back to the user. Let's allocate it on the heap.*/
 	mutex_struct = malloc(sizeof(struct netlib_mutex_internal));
@@ -103,7 +103,7 @@ netemu_mutex netlib_thread_mutex_create() {
  * Lock a mutex lock.
  * @param NETEMU_MUTEX identifier the identifier of the mutex lock.
  */
-int netlib_thread_mutex_lock(netemu_mutex mutex_identifier, NETEMU_DWORD timeout) {
+int netlib_thread_mutex_lock(netlib_mutex mutex_identifier, NETEMU_DWORD timeout) {
 	int error;
 	if(timeout == NETLIB_INFINITE) {
 		error = pthread_mutex_lock(mutex_identifier->mutex);
@@ -121,7 +121,7 @@ int netlib_thread_mutex_lock(netemu_mutex mutex_identifier, NETEMU_DWORD timeout
  * Release a lock.
  * @param NETEMU_MUTEX identifier the identifier for this lock.
  */
-int netlib_thread_mutex_release(netemu_mutex mutex_identifier) {
+int netlib_thread_mutex_release(netlib_mutex mutex_identifier) {
 	int error;
 	error = pthread_mutex_unlock(mutex_identifier->mutex);
 	if(error != 0) {
@@ -134,7 +134,7 @@ int netlib_thread_mutex_release(netemu_mutex mutex_identifier) {
  * Destroy a mutex lock.
  * @param NETEMU_MUTEX the identifier of the lock.
  */
-int netlib_thread_mutex_destroy(netemu_mutex mutex_identifier) {
+int netlib_thread_mutex_destroy(netlib_mutex mutex_identifier) {
 	int error;
 	error = pthread_mutex_destroy(mutex_identifier->mutex);
 	free(mutex_identifier);
@@ -148,7 +148,7 @@ int netlib_thread_mutex_destroy(netemu_mutex mutex_identifier) {
  * Creates an event.
  * @return an identifier for the event, or NULL if something went wrong.
  */
-netemu_event netlib_thread_event_create() {
+netlib_event netlib_thread_event_create() {
 	struct netlib_event_internal *event;
 
 	event = (struct netlib_event_internal*)malloc(sizeof(struct netlib_event_internal));
@@ -165,7 +165,7 @@ netemu_event netlib_thread_event_create() {
  * Signals an event.
  * @param event_identifier the identifier of the event.
  */
-int netlib_thread_event_signal(netemu_event event_identifier) {
+int netlib_thread_event_signal(netlib_event event_identifier) {
 	pthread_mutex_lock(event_identifier->mutex);
 	pthread_cond_signal(event_identifier->cond);
 	pthread_mutex_unlock(event_identifier->mutex);
@@ -177,7 +177,7 @@ int netlib_thread_event_signal(netemu_event event_identifier) {
  * Waits for an event to be signaled.
  * @param event_identifier the identifier of the event.
  */
-int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds) {
+int netlib_thread_event_wait(netlib_event event_identifier, NETEMU_DWORD seconds) {
 	struct timespec spec;
 	int retval;
 
@@ -205,7 +205,7 @@ int netemu_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds
 	return retval;
 }
 
-int netlib_thread_event_destroy(netemu_event event_identifier) {
+int netlib_thread_event_destroy(netlib_event event_identifier) {
 	pthread_mutex_destroy(event_identifier->mutex);
 	pthread_cond_destroy(event_identifier->cond);
 	return 0;

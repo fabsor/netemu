@@ -21,7 +21,7 @@
 #include "../protocol/application.h"
 
 struct _netemu_receiver_buffer_wakeup_info {
-	netemu_event eventhandle;
+	netlib_event eventhandle;
 	time_t age;
 	struct netemu_receiver_buffer_item* item;
 	struct _netemu_receiver_buffer_wakeup_info *next;
@@ -40,12 +40,12 @@ struct _netemu_receiver_buffer_notify_info {
  */
 struct _netemu_receiver_buffer_internal {
 	struct netemu_list* instructions_to_add;
-	netemu_mutex add_mutex;
-	netemu_mutex wakeup_mutex;
-	netemu_mutex fn_mutex;
+	netlib_mutex add_mutex;
+	netlib_mutex wakeup_mutex;
+	netlib_mutex fn_mutex;
 	NETEMU_HASHTBL *registered_wakeups;
 	NETEMU_HASHTBL *registered_fns;
-	netemu_event event;
+	netlib_event event;
 };
 
 
@@ -53,7 +53,7 @@ void _netemu_receiver_buffer_internal_add(struct netemu_receiver_buffer *buffer,
 void _netemu_receiver_buffer_perform_notify(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item);
 void _netemu_receiver_buffer_perform_wakeup(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item);
 void _netemu_receiver_buffer_update(void* args);
-struct _netemu_receiver_buffer_wakeup_info* _netemu_receiver_buffer_register_wakeup_on_instruction(struct netemu_receiver_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle);
+struct _netemu_receiver_buffer_wakeup_info* _netemu_receiver_buffer_register_wakeup_on_instruction(struct netemu_receiver_buffer *buffer, int instruction_id, time_t age, netlib_event eventhandle);
 
 /**
  * Create a new instance of the receiver buffer module
@@ -169,7 +169,7 @@ void _netemu_receiver_buffer_update(void* args) {
 	struct netemu_receiver_buffer *buffer;
 	struct netemu_list* itemsToAdd;
 	struct netemu_list* itemsToNotify;
-	netemu_mutex lock;
+	netlib_mutex lock;
 	int i;
 	buffer = (struct netemu_receiver_buffer*)args;
 	itemsToAdd = buffer->_internal->instructions_to_add;
@@ -215,7 +215,7 @@ void _netemu_receiver_buffer_update(void* args) {
  * @return a receiver_buffer_item containing the instruction, and where it came from if everything went all right, or NULL if something went wrong.
  */
 struct netemu_receiver_buffer_item* netemu_receiver_buffer_wait_for_instruction(struct netemu_receiver_buffer* buffer, int instruction_id, time_t timestamp) {
-	netemu_event eventhandle;
+	netlib_event eventhandle;
 	struct _netemu_receiver_buffer_wakeup_info* info;
 	struct netemu_receiver_buffer_item* item;
 
@@ -230,7 +230,7 @@ struct netemu_receiver_buffer_item* netemu_receiver_buffer_wait_for_instruction(
 /**
  * Banana, banana, banana
  */
-struct _netemu_receiver_buffer_wakeup_info* _netemu_receiver_buffer_register_wakeup_on_instruction(struct netemu_receiver_buffer *buffer, int instruction_id, time_t age, netemu_event eventhandle) {
+struct _netemu_receiver_buffer_wakeup_info* _netemu_receiver_buffer_register_wakeup_on_instruction(struct netemu_receiver_buffer *buffer, int instruction_id, time_t age, netlib_event eventhandle) {
 	struct _netemu_receiver_buffer_wakeup_info *wakeup, *existing_wakeup;
 	wakeup = malloc(sizeof(struct _netemu_receiver_buffer_wakeup_info));
 	wakeup->age = age;

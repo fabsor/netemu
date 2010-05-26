@@ -40,8 +40,8 @@ struct netemu_sender_buffer {
 	char running;
 	union netemu_connection_type *sender;
 	netemu_connection_types type;
-	netemu_mutex send_lock;
-	netemu_event event;
+	netlib_mutex send_lock;
+	netlib_event event;
 	time_t last_send;
 };
 

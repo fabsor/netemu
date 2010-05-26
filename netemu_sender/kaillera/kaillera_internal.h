@@ -25,7 +25,7 @@ extern "C" {
 #include "netlib_thread.h"
 
 struct _netemu_info_internal {
-	netemu_event connected_event;
+	netlib_event connected_event;
 	struct netemu_list *chat_callback;
 	struct netemu_list *join_callback;
 	struct netemu_list *leave_callback;
@@ -51,11 +51,11 @@ struct _netemu_info_internal {
 	short cached_count; /**< The current number of cached values.  */
 	int cache_index; /**< The index in the cache buffer. */
 	int frame_index; /**< The index of the frame to return to the user. */
-	netemu_event play_values_event;
+	netlib_event play_values_event;
 	int player_no;
 	struct netemu_receiver_buffer *receive_buffer;
 	struct netemu_sender_buffer *send_buffer;
-	netemu_event send_timeout;
+	netlib_event send_timeout;
 };
 
 #ifdef	__cplusplus

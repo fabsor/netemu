@@ -29,7 +29,7 @@ extern "C" {
 struct netemu_tcp_connection {
 	NETLIB_SOCKET socket;
 	netlib_sockaddr* addr;
-	netemu_mutex lock;
+	netlib_mutex lock;
 	void* data_param;
 	int addr_len;
 	parseReceivedDataFn fn;
