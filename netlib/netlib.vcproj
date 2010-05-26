@@ -152,15 +152,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\netemu_thread_win.c"
-				>
-			</File>
-			<File
 				RelativePath=".\netlib_error_win.c"
 				>
 			</File>
 			<File
 				RelativePath=".\netlib_network_win.c"
+				>
+			</File>
+			<File
+				RelativePath=".\netlib_thread_win.c"
 				>
 			</File>
 			<File

@@ -66,9 +66,9 @@ DWORD WINAPI _netlib_thread_callback(void *arg) {
 	return 0;
 }
 
-netemu_mutex netlib_thread_mutex_create() {
+netlib_mutex netlib_thread_mutex_create() {
 	int errcode;
-	netemu_mutex mutex_struct;
+	netlib_mutex mutex_struct;
 
 	if((mutex_struct = malloc(sizeof(struct netlib_mutex_internal))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
@@ -84,7 +84,7 @@ netemu_mutex netlib_thread_mutex_create() {
 	return mutex_struct;
 }
 
-int netlib_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
+int netlib_thread_mutex_lock(netlib_mutex mutex_identifier, DWORD timeout) {
 	int errcode;
 
 	errcode = WaitForSingleObject(mutex_identifier->mutex, timeout);
@@ -100,7 +100,7 @@ int netlib_thread_mutex_lock(netemu_mutex mutex_identifier, DWORD timeout) {
 	return -1;
 }
 
-int netlib_thread_mutex_release(netemu_mutex mutex_identifier) {
+int netlib_thread_mutex_release(netlib_mutex mutex_identifier) {
 	int errcode;
 	
 	errcode = ReleaseMutex(mutex_identifier->mutex);
@@ -111,7 +111,7 @@ int netlib_thread_mutex_release(netemu_mutex mutex_identifier) {
 	return 0;
 }
 
-int netlib_thread_mutex_destroy(netemu_mutex mutex_identifier) {
+int netlib_thread_mutex_destroy(netlib_mutex mutex_identifier) {
 	int errcode;
 
 	/* TODO: Mutex-objektet blir f�rst�rt f�rst n�r ALLA handles till objektet
@@ -124,8 +124,8 @@ int netlib_thread_mutex_destroy(netemu_mutex mutex_identifier) {
 	return 0;
 }
 
-netemu_event netlib_thread_event_create() {
-	netemu_event event_struct;
+netlib_event netlib_thread_event_create() {
+	netlib_event event_struct;
 	HANDLE handle;
 
 	if((event_struct = malloc(sizeof(struct netlib_event_internal))) == NULL) {
@@ -146,7 +146,7 @@ netemu_event netlib_thread_event_create() {
 	return event_struct;
 }
 
-int netlib_thread_event_signal(netemu_event event_identifier) {
+int netlib_thread_event_signal(netlib_event event_identifier) {
 	int errcode;
 	
 	errcode = SetEvent(event_identifier->eventhandle);
@@ -157,7 +157,7 @@ int netlib_thread_event_signal(netemu_event event_identifier) {
 	return 0;
 }
 
-int netlib_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds) {
+int netlib_thread_event_wait(netlib_event event_identifier, NETEMU_DWORD seconds) {
 	int errcode;
 	
 	errcode = WaitForSingleObject(event_identifier->eventhandle, seconds);
@@ -170,7 +170,7 @@ int netlib_thread_event_wait(netemu_event event_identifier, NETEMU_DWORD seconds
 	return -1;
 }
 
-int netlib_thread_event_destroy(netemu_event event_identifier) {
+int netlib_thread_event_destroy(netlib_event event_identifier) {
 	int errcode;
 
 	errcode = CloseHandle(event_identifier->eventhandle);
