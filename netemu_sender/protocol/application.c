@@ -180,6 +180,9 @@ struct application_instruction* netemu_application_instruction_parse(struct tran
 		case EXISTING_PLAYERS_LIST:
 			netemu_application_existing_players_list_parse(app_instruction, data);
 			break;
+		case GAME_CLOSED:
+			netemu_application_game_closed_parse(app_instruction, data);
+			break;
 		case GAME_STATUS_UPDATE:
 			netemu_application_game_status_parse(app_instruction,data);
 			break;

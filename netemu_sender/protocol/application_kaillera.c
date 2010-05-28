@@ -588,6 +588,20 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 	instruction->body = game;
 }
 
+int netemu_application_game_closed_parse(struct application_instruction *instruction, char *buffer) {
+	struct game_closed *game;
+	
+	game = malloc(sizeof(struct game_closed));
+	if(game == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	game->id = *((NETEMU_WORD*)buffer);
+
+	instruction->body = game;
+}
+
 void netemu_application_game_status_parse(struct application_instruction *instruction, char* buffer) {
 	struct game_status_update* status;
 	status = malloc(sizeof(struct login_status));

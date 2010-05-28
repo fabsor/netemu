@@ -41,11 +41,20 @@
 #define EXISTING_PLAYERS_LIST							0x0d
 #define GAME_STATUS_UPDATE								0x0e
 #define PLAYER_KICK										0x0f
-/* TODO: Add GAME_CLOSED define and implement the instruction! */
+#define GAME_CLOSED										0x10
+/**
+ * @todo Add GAME_CLOSED define and implement the instruction!
+ */
 #define START_GAME										0x11
 #define BUFFERED_PLAY_VALUES							0x12
 #define INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES		0x13
+/**
+ * @todo: Add PLAYER_DROPPED define and implement the instruction!
+ */
 #define PLAYER_READY									0x15
+/**
+ * @todo: Add CONNECTION_REJECTED (SERVER_LOGIN_STATUS) define and implement the instruction
+ */
 #define MOTD_CHAT										0x17
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
@@ -81,11 +90,7 @@ struct login_status {
 	NETEMU_WORD id;
 	char message[128];
 };
-/*
-struct ping {
-	int pbody[3];
-};
-*/
+
 struct pong {
 	char pbody[16];
 };
@@ -122,7 +127,7 @@ struct game_created {
 };
 
 struct game_closed {
-	unsigned int id;
+	NETEMU_DWORD id;
 };
 
 struct game_status_update {
@@ -198,7 +203,9 @@ void netemu_application_create_game_parse(struct application_instruction *instru
 
 void netemu_application_existing_players_list_parse(struct application_instruction *instruction, char *data);
 
-void netemu_application_game_status_parse(struct application_instruction *instruction, char* buffer);
+int netemu_application_game_closed_parse(struct application_instruction *instruction, char *buffer);
+
+void netemu_application_game_status_parse(struct application_instruction *instruction, char *buffer);
 
 void netemu_application_intelligently_cached_play_values_add(struct application_instruction *instruction, char index);
 
