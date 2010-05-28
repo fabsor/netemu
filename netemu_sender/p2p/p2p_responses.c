@@ -236,12 +236,13 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 
 void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct netemu_p2p *connection;
+	struct p2p_game *game;
 	int i;
 	connection = arg;
-
+	game = item->instruction->body;
 	for(i = 0; i < connection->_internal->player_join_success_callbacks->count; i++) {
 		((struct p2p_callback*)connection->_internal->player_join_success_callbacks->elements[i])->fn.playerJoinedSuccessFn(connection,
-				connection->current_game);
+				game);
 	}
 }
 

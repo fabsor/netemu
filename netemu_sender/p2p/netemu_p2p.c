@@ -56,7 +56,7 @@ void _netemu_p2p_join_host_continue(struct netemu_p2p *connection);
 void _netemu_p2p_create_callbacks(struct netemu_p2p *p2p);
 void _netemu_p2p_create_user(struct netemu_p2p *p2p, char* username, char* emulatorname, char connection_quality);
 void _netemu_p2p_create_callbacks(struct netemu_p2p *p2p);
-void _netemu_p2p_send_join_game(struct netemu_p2p *connection);
+void _netemu_p2p_send_join_game(struct netemu_p2p *connection, struct p2p_game *game);
 /* End of function declarations */
 
 /**
@@ -447,7 +447,6 @@ int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
 
 	timestamp = time(NULL);
 	connection->user->_internal->values_received = TRUE;
-
 	/* Create a connection to the creator of this game if we don't have one already. */
 	if(game->creator->_internal == NULL || (game->creator->_internal->connection == NULL)) {
 		game->creator->_internal = netemu_application_p2p_create_user_internal();
@@ -457,7 +456,7 @@ int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
 		netemu_receiver_buffer_wait_for_instruction(connection->_internal->receive_buffer, P2P_READY, timestamp);
 	}
 
-	_netemu_p2p_send_join_game(connection);
+	_netemu_p2p_send_join_game(connection, game);
 	item = netemu_receiver_buffer_wait_for_instruction(connection->_internal->receive_buffer, P2P_PLAYER_JOIN_SUCCESS, timestamp);
 
 	connection->current_game = item->instruction->body;
@@ -489,7 +488,7 @@ int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
 	return 0;
 }
 
-int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *game, joinFn fn, void* user_data) {
+int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *game, p2pPlayerJoinedFn fn, void* user_data) {
 	time_t timestamp;
 	int size;
 	union p2p_callback_fn callback;
@@ -510,6 +509,9 @@ int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *g
 	callback.playerJoinedSuccessFn = _netemu_p2p_join_game_continue;
 	_netemu_p2p_register_callback(connection->_internal->player_join_success_callbacks, callback, 1, NULL);
 
+	callback.playerJoinedFn = fn;
+	_netemu_p2p_register_callback(connection->_internal->player_joined_callbacks, callback, 1, user_data);
+	connection->current_game = game;
 	/* Create a connection to the creator of this game if we don't have one already. */
 	if(game->creator->_internal == NULL || (game->creator->_internal->connection == NULL)) {
 		game->creator->_internal = netemu_application_p2p_create_user_internal();
@@ -519,15 +521,15 @@ int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *g
 		netemu_p2p_join_host(connection,game->creator, game->creator->_internal->connection);
 	}
 	else {
-		_netemu_p2p_send_join_game(connection);
+		_netemu_p2p_send_join_game(connection, game);
 	}
 	return 0;
 }
 
-void _netemu_p2p_send_join_game(struct netemu_p2p *connection) {
+void _netemu_p2p_send_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
 	union netemu_connection_type type;
 	struct application_instruction *instruction;
-	type.connection = connection->current_game->creator->_internal->connection;
+	type.connection = game->creator->_internal->connection;
 	instruction = netemu_application_instruction_create();
 	netemu_application_p2p_player_join_add(instruction, connection->user);
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, TCP_CONNECTION, type);
@@ -538,7 +540,7 @@ void _netemu_p2p_send_join_game(struct netemu_p2p *connection) {
  */
 void _netemu_p2p_join_host_continue(struct netemu_p2p *connection) {
 	connection->_internal->continueFn = NULL;
-	_netemu_p2p_send_join_game(connection);
+	_netemu_p2p_send_join_game(connection, connection->current_game);
 }
 
 /**
@@ -548,8 +550,10 @@ void _netemu_p2p_join_game_continue(struct netemu_p2p *connection, struct p2p_ga
 	int i;
 	netlib_sockaddr *addr;
 	int size;
+
 	/* The creator from the old game has an active connection */
-	connection->current_game->creator = game->creator;
+	game->creator = connection->current_game->creator;
+	connection->current_game = game;
 
 	/*Create internal stuff*/
 	connection->current_game->_internal = netemu_application_p2p_create_game_internal();

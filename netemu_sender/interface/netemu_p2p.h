@@ -188,7 +188,7 @@ int netemu_p2p_player_ready(struct netemu_p2p *connection, NETEMU_DWORD listen_a
  * @param connection an instance of the netemu_p2p module.
  * @param game the game you want to join. Use netemu_get_game_list to get a game to join.
  * @return the return value can be:
- * - 0 if everything went alright.
+ * - 0 if everything went all right.
  * - -1 if you're already in a game.
  * - -2 if you try to join a game which you have created.
  * @todo we need more errors here for:
@@ -197,7 +197,7 @@ int netemu_p2p_player_ready(struct netemu_p2p *connection, NETEMU_DWORD listen_a
  */
 int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game);
 
-int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *game, joinFn fn, void* user_data);
+int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *game, p2pPlayerJoinedFn fn, void* user_data);
 
 /**
  * Start a game. In order for the game to start, you must call this function.
