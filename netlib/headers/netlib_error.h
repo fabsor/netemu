@@ -128,6 +128,13 @@ extern "C" {
 #define NETEMU_EINVALIDHANDLE		40003
 #define NETEMU_EINVALIDSERVERLIST 	40004
 
+/**
+ * @todo
+ * We need to be able to register a callback function
+ * that get's called every time an error occurs. This way,
+ * we will be able to notify the developer about errors
+ * even when they occur internally.
+ */
 int netlib_get_last_error();
 int netlib_get_last_platform_error();
 const char *netlib_get_last_error_string();
