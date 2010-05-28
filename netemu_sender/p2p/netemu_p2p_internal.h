@@ -25,6 +25,33 @@ extern "C" {
 #include "netlib_util.h"
 #include "netlib_thread.h"
 
+typedef void (*p2pPlayerJoinSuccess)(struct netemu_p2p *, struct p2p_game *game);
+
+/**
+ * This union contains the different callback functions.
+ */
+union p2p_callback_fn {
+	connectedFn connectFn;
+	p2pValuesReceivedFn valuesFn;
+	p2pGameCreatedFn gameCreatedFn;
+	p2pUserJoinedFn userJoinedFn;
+	p2pGameStartedFn gameStartedFn;
+	p2pPlayerReadyFn playerReadyFn;
+	p2pAllReadyFn allReadyFn;
+	p2pPlayerJoinedFn playerJoinedFn;
+	p2pPlayerJoinSuccess playerJoinedSuccessFn;
+};
+
+/**
+ * This struct is used to contain a callback function.
+ */
+struct p2p_callback {
+	short disposable;
+	union p2p_callback_fn fn;
+	void *user_data;
+};
+
+
 struct netemu_p2p_internal {
 	struct netemu_tcp_listener *host;
 	struct netemu_tcp_connection *login_connection;
@@ -37,6 +64,7 @@ struct netemu_p2p_internal {
 	struct netemu_list *player_ready_callbacks;
 	struct netemu_list *game_started_callbacks;
 	struct netemu_list *all_ready_callbacks;
+	struct netemu_list *player_join_success_callbacks;
 	struct netemu_list *users;
 	struct netemu_list *game_status_updated_callbacks;
 	struct netemu_list *games;

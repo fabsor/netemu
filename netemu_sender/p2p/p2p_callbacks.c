@@ -24,7 +24,6 @@
 #include "netemu_p2p_internal.h"
 
 int _netemu_p2p_register_callback(struct netemu_list *list, union p2p_callback_fn fn, int disposable, void *user_data);
-
 /**
  * Register a callback in the right place. This is a helper function.
  * @ingroup netemu_p2p
