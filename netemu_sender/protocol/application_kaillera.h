@@ -42,12 +42,10 @@
 #define GAME_STATUS_UPDATE								0x0e
 #define PLAYER_KICK										0x0f
 #define GAME_CLOSED										0x10
-/**
- * @todo Add GAME_CLOSED define and implement the instruction!
- */
 #define START_GAME										0x11
 #define BUFFERED_PLAY_VALUES							0x12
 #define INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES		0x13
+#define PLAYER_DROPPED									0x14
 /**
  * @todo: Add PLAYER_DROPPED define and implement the instruction!
  */
@@ -145,10 +143,6 @@ struct player_joined {
 	char connection;
 };
 
-struct player_dropped {
-	char player_number;
-};
-
 struct player_left {
 	NETEMU_WORD user_id;
 };
@@ -175,6 +169,10 @@ struct buffered_play_values {
 
 struct intelligently_cached_buffered_play_values {
 	char index;
+};
+
+struct player_dropped {
+	char player_number;
 };
 
 struct chat {
