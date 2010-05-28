@@ -43,7 +43,6 @@ extern "C" {
 #include "../protocol/application_p2p.h"
 #include "netlib_network.h"
 #include "netemu_kaillera.h"
-
 /**
  * This struct is the base of the netemu_p2p module.
  */
@@ -54,6 +53,11 @@ struct netemu_p2p {
 	char* cloud_name; /**< The name of the cloud. */
 };
 
+/**
+ * @todo
+ * We really need functions indicating when something go wrong too.
+ */
+
 typedef void (*connectedFn)(struct netemu_p2p *, int);
 typedef void (*joinHostFn)(struct netemu_p2p *, int);
 typedef void (*p2pValuesReceivedFn)(struct netemu_p2p *, char* values, int size);
@@ -63,29 +67,6 @@ typedef void (*p2pUserJoinedFn)(struct netemu_p2p *, struct p2p_user *user);
 typedef void (*p2pPlayerReadyFn)(struct netemu_p2p *, struct p2p_game *game);
 typedef void (*p2pAllReadyFn)(struct netemu_p2p *, struct p2p_game *game);
 typedef void (*p2pPlayerJoinedFn)(struct netemu_p2p *, struct p2p_game *game, struct p2p_user*);
-
-/**
- * This union contains the different callback functions.
- */
-union p2p_callback_fn {
-	connectedFn connectFn;
-	p2pValuesReceivedFn valuesFn;
-	p2pGameCreatedFn gameCreatedFn;
-	p2pUserJoinedFn userJoinedFn;
-	p2pGameStartedFn gameStartedFn;
-	p2pPlayerReadyFn playerReadyFn;
-	p2pAllReadyFn allReadyFn;
-	p2pPlayerJoinedFn playerJoinedFn;
-};
-
-/**
- * This struct is used to contain a callback function.
- */
-struct p2p_callback {
-	short disposable;
-	union p2p_callback_fn fn;
-	void *user_data;
-};
 
 /**
  * Call this function to initialize the network.
@@ -105,6 +86,8 @@ int netemu_p2p_initialize();
  * If you have a connection_quality of 1, then you will send one play value, then wait for all others.\n
  * If you have a connection quality of 2, then you will send two play values, then wait for all others.\n
  * etc.
+ * @return An instance of the netemu_p2p module if everything went fine, NULL otherwise.
+ * @todo This function needs error handling
  */
 struct netemu_p2p* netemu_p2p_create(char* username, char* emulatorname, char connection_quality);
 
@@ -213,6 +196,8 @@ int netemu_p2p_player_ready(struct netemu_p2p *connection, NETEMU_DWORD listen_a
  * - if the host refuses you.
  */
 int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game);
+
+int netemu_p2p_join_game_async(struct netemu_p2p *connection, struct p2p_game *game, joinFn fn, void* user_data);
 
 /**
  * Start a game. In order for the game to start, you must call this function.

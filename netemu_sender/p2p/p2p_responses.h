@@ -105,7 +105,17 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
  * adding this function as a listener.
  */
 void _netemu_p2p_respond_to_game_created(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
+
+/**
+ * @todo
+ * This function might not need to exist, but if it does, it needs to be implemented properly.
+ */
 void netemu_p2p_respond_to_play_values(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
+
+/**
+ * @todo
+ * This function might not need to exist, but if it does, it needs to be implemented properly.
+ */
 void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
 
 /**

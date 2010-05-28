@@ -52,6 +52,7 @@ void _netemu_p2p_register_responders(struct netemu_p2p *p2p) {
  * @param buffer the packet buffer which contained the instruction
  * @param item the item in the instruction that triggered the event.
  * @param arg if not null, this is the argument that was passed by the player when
+ * @todo support disposable functions.
  * adding this function as a listener.
  */
 void netemu_p2p_respond_to_user_join(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
@@ -79,6 +80,7 @@ void netemu_p2p_respond_to_user_join(struct netemu_receiver_buffer* buffer, stru
  * @param buffer the packet buffer which contained the instruction
  * @param item the item in the instruction that triggered the event.
  * @param arg if not null, this is the argument that was passed by the player when
+ * @todo support disposable functions.
  * adding this function as a listener.
  */
 void netemu_p2p_respond_to_ready(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
@@ -99,6 +101,7 @@ void netemu_p2p_respond_to_ready(struct netemu_receiver_buffer* buffer, struct n
  * @param item the item in the instruction that triggered the event.
  * @param arg if not null, this is the argument that was passed by the player when
  * adding this function as a listener.
+ * @todo support disposable functions.
  */
 void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct p2p_start_game *game;
@@ -149,6 +152,7 @@ void netemu_p2p_respond_to_game_started(struct netemu_receiver_buffer* buffer, s
  * @param item the item in the instruction that triggered the event.
  * @param arg if not null, this is the argument that was passed by the player when
  * adding this function as a listener.
+ * @todo support disposable functions.
  */
 void _netemu_p2p_respond_to_join_host(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct p2p_user *user;
@@ -166,6 +170,10 @@ void _netemu_p2p_respond_to_join_host(struct netemu_receiver_buffer* buffer, str
 		registered_user->_internal = netemu_application_p2p_create_user_internal();
 	}
 	registered_user->_internal->connection = item->connection.connection;
+
+	if(connection->_internal->continueFn != NULL) {
+		connection->_internal->continueFn(connection);
+	}
 }
 
 /**
@@ -175,6 +183,7 @@ void _netemu_p2p_respond_to_join_host(struct netemu_receiver_buffer* buffer, str
  * @param item the item in the instruction that triggered the event.
  * @param arg if not null, this is the argument that was passed by the player when
  * adding this function as a listener.
+ * @todo support disposable functions.
  */
 void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct p2p_user *user;
@@ -227,8 +236,13 @@ void _netemu_p2p_respond_to_player_join(struct netemu_receiver_buffer* buffer, s
 
 void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct netemu_p2p *connection;
+	int i;
 	connection = arg;
-	/* TODO: Fix some stuff here. */
+
+	for(i = 0; i < connection->_internal->player_join_success_callbacks->count; i++) {
+		((struct p2p_callback*)connection->_internal->player_join_success_callbacks->elements[i])->fn.playerJoinedSuccessFn(connection,
+				connection->current_game);
+	}
 }
 
 /**
@@ -238,6 +252,7 @@ void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* b
  * @param item the item in the instruction that triggered the event.
  * @param arg if not null, this is the argument that was passed by the player when
  * adding this function as a listener.
+ * @todo support disposable functions.
  */
 void _netemu_p2p_respond_to_game_created(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct p2p_game *game, *copy;
