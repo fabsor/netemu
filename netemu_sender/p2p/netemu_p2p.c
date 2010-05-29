@@ -450,10 +450,10 @@ int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player) {
 		}
 		_netemu_p2p_remove_connection(game->_internal->tcp_collection,
 									game->players[removeIndex].addr,
-									players[removeIndex].port);
+									game->players[removeIndex].port);
 		_netemu_p2p_remove_connection(game->_internal->udp_collection,
 											game->players[removeIndex].addr,
-											players[removeIndex].port);
+											game->players[removeIndex].port);
 		free(game->players);
 		game->user_count--;
 
@@ -472,10 +472,10 @@ void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, 
 	removeIndex = -1;
 	for(i = 0; i < collection->senders->count; i++) {
 		item = (struct netemu_sender_collection_item*)collection->senders->elements[i];
-		if(item->type == TCP_CONNECTION) {
+		if(item->type == SENDER_TCP) {
 			addr = (netlib_sockaddr_in*)item->sender->tcp_sender->addr;
 		}
-		else if(item->type == UDP_SENDER){
+		else if(item->type == SENDER_UDP){
 			addr = (netlib_sockaddr_in*)item->sender->udp_sender->addr;
 		}
 

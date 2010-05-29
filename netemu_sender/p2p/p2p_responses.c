@@ -23,7 +23,7 @@
 #include "netemu_p2p_internal.h"
 #include "../protocol/application_p2p_internal.h"
 #include "../network/sender_collection.h"
-
+#include "../network/sender_buffer.h"
 /**
  * Register responders that will be used by this module.
  * @ingroup netemu_p2p
@@ -43,6 +43,7 @@ void _netemu_p2p_register_responders(struct netemu_p2p *p2p) {
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_BUFFERED_PLAY_VALUES, netemu_p2p_respond_to_play_values, p2p);
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_CACHED_BUFFERED_PLAY_VALUES, netemu_p2p_respond_to_cached_play_values, p2p);
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_PLAYER_JOIN_SUCCESS, _netemu_p2p_respond_to_player_join_success, p2p);
+	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_LEAVE_GAME, netemu_p2p_respond_to_player_leave, p2p);
 }
 
 /**

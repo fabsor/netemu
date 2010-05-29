@@ -271,7 +271,6 @@ void netemu_application_p2p_player_leave_add(struct application_instruction* ins
 	instruction->body_size = netemu_application_p2p_copy_user(player, user);
 	instruction->body = player;
 	instruction->id = P2P_LEAVE_GAME;
-	instruction->body_size = 0;
 	instruction->packBodyFn = netemu_application_p2p_player_leave_pack;
 }
 
