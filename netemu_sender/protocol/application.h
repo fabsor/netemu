@@ -46,6 +46,7 @@
 #define P2P_CACHED_BUFFERED_PLAY_VALUES	42
 #define P2P_PLAYER_JOIN_SUCCESS			43
 #define P2P_LOGIN_DENIED				44
+#define P2P_LEAVE_CLOUD					45
 
 
 /*! Kaillera defines */

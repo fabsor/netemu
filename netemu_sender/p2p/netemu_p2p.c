@@ -62,6 +62,20 @@ void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, 
 int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player);
 /* End of function declarations */
 
+
+/**
+ * Disconnect from a cloud.
+ */
+void netemu_p2p_disconnect(struct netemu_p2p *p2p) {
+	struct application_instruction *instruction;
+	union netemu_connection_type type;
+	type.collection = p2p->_internal->peers;
+	instruction = netemu_application_instruction_create();
+	netemu_application_p2p_user_leave_add(instruction, p2p->user);
+	netemu_sender_buffer_add(p2p->_internal->send_buffer, instruction,TCP_CONNECTION, type);
+
+}
+
 /**
  * Call this function to initialize the network.
  * You only need to call this once.

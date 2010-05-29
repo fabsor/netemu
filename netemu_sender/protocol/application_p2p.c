@@ -47,6 +47,7 @@ void netemu_application_p2p_buffered_play_values_pack(struct application_instruc
 void netemu_application_p2p_cached_play_values_pack(struct application_instruction *instruction, char *data);
 void netemu_application_p2p_player_join_success_pack(struct application_instruction *instruction, char *buffer);
 void netemu_application_p2p_player_leave_pack(struct application_instruction *instruction, char *buffer);
+void netemu_application_p2p_user_leave_pack(struct application_instruction *instruction, char *buffer);
 
 /**
  * Add a "Create game" body to an instruction.
@@ -264,6 +265,30 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	}
 	return pos;
 }
+
+void netemu_application_p2p_user_leave_add(struct application_instruction* instruction, struct p2p_user *user) {
+	struct p2p_user *copy;
+	copy = malloc(sizeof(struct p2p_user));
+	instruction->body_size = netemu_application_p2p_copy_user(copy, user);
+	instruction->body = copy;
+	instruction->id = P2P_LEAVE_CLOUD;
+	instruction->packBodyFn = netemu_application_p2p_user_leave_pack;
+}
+
+void netemu_application_p2p_user_leave_pack(struct application_instruction *instruction, char *buffer) {
+	struct p2p_user *user;
+	user = instruction->body;
+	_netemu_application_p2p_pack_user(buffer, user);
+}
+
+void netemu_application_p2p_user_leave_parse(struct application_instruction *instruction, char *buffer) {
+	struct p2p_user *user;
+	user = malloc(sizeof(struct p2p_user));
+	_netemu_application_p2p_parse_user(buffer, user, 1);
+	instruction->body = user;
+	instruction->packBodyFn = netemu_application_p2p_user_leave_pack;
+}
+
 
 void netemu_application_p2p_player_leave_add(struct application_instruction* instruction, struct p2p_user *user) {
 	struct p2p_user *player;

@@ -44,6 +44,7 @@ void _netemu_p2p_register_responders(struct netemu_p2p *p2p) {
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_CACHED_BUFFERED_PLAY_VALUES, netemu_p2p_respond_to_cached_play_values, p2p);
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_PLAYER_JOIN_SUCCESS, _netemu_p2p_respond_to_player_join_success, p2p);
 	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_LEAVE_GAME, netemu_p2p_respond_to_player_leave, p2p);
+	netemu_receiver_buffer_add_instruction_received_fn(p2p->_internal->receive_buffer, P2P_LEAVE_CLOUD, netemu_p2p_respond_to_user_leave, p2p);
 }
 
 /**
@@ -371,6 +372,22 @@ void netemu_p2p_respond_to_player_leave(struct netemu_receiver_buffer* buffer, s
 	user = item->instruction->body;
 	if(info->current_game != NULL && _netemu_p2p_player_exists(info->current_game, user)) {
 		_netemu_p2p_remove_player(info->current_game, user);
+	}
+}
+
+void netemu_p2p_respond_to_user_leave(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
+	struct netemu_p2p *info;
+	struct p2p_user *user;
+	union netemu_connection_type type;
+	type.collection = info->_internal->peers;
+	info = arg;
+	user = item->instruction->body;
+	if(netemu_list_contains(info->_internal->users, user) != -1) {
+		netemu_list_remove(info->_internal->users, user);
+		_netemu_p2p_remove_connection(info->_internal->peers,
+										user->addr, user->port);
+		netemu_sender_buffer_add(info->_internal->send_buffer, item->instruction, CONNECTION_COLLECTION, type);
+
 	}
 }
 

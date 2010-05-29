@@ -344,6 +344,8 @@ int netemu_p2p_register_player_ready_callback(struct netemu_p2p *connection, p2p
  */
 int netemu_p2p_register_all_players_ready_callback(struct netemu_p2p *connection, p2pAllReadyFn callback, void *user_data);
 
+void netemu_p2p_disconnect(struct netemu_p2p *p2p);
+
 /**
  * @todo
  * Add unregister_callback functions for all callbacks.

@@ -333,4 +333,8 @@ struct p2p_game_internal *netemu_application_p2p_create_game_internal();
  */
 struct p2p_user_internal* netemu_application_p2p_create_user_internal();
 
+void netemu_application_p2p_user_leave_add(struct application_instruction* instruction, struct p2p_user *user);
+
+void netemu_application_p2p_user_leave_parse(struct application_instruction *instruction, char *buffer);
+
 #endif /* APPLICATION_P2P_INTERNAL_H_ */

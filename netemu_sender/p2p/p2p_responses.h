@@ -144,6 +144,8 @@ void _netemu_p2p_respond_to_player_join_success(struct netemu_receiver_buffer* b
 
 void netemu_p2p_respond_to_player_leave(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
 
+void netemu_p2p_respond_to_user_leave(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg);
+
 #ifdef	__cplusplus
 }
 #endif
