@@ -3,6 +3,7 @@
 	<name>netemu</name>
 	<comment></comment>
 	<projects>
+		<project>netlib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

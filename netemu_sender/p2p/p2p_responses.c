@@ -363,6 +363,16 @@ void netemu_p2p_respond_to_cached_play_values(struct netemu_receiver_buffer* buf
 	}
 }
 
+void netemu_p2p_respond_to_player_leave(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
+	struct netemu_p2p *info;
+	struct p2p_user *user;
+	info = arg;
+	user = item->instruction->body;
+	if(info->current_game != NULL && _netemu_p2p_player_exists(info->current_game, user)) {
+		_netemu_p2p_remove_player(info->current_game, user);
+	}
+}
+
 /**
  * This function responds to all "Login success" instructions.
  * @ingroup netemu_p2p

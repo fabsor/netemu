@@ -28,7 +28,7 @@
 #include "protocol.h"
 #include "../network/net.h"
 
-/* Below are the IDs for each instruction as they appear in the original Kaillera protocol and our modified P2P protocoll */
+/* Below are the IDs for each instruction as they appear in the original Kaillera protocol and our modified P2P protocol */
 
 /*! P2P defines */
 #define CREATE_P2P_GAME					30

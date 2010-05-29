@@ -27,7 +27,7 @@ extern "C" {
 #include "tcp.h"
 #include "sender_collection.h"
 #include "netlib_thread.h"
-
+#include "../protocol/application.h"
 #define LIST_START_SIZE	10
 #define PACKET_SEND_INTERVAL 30
 

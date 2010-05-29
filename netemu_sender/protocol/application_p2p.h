@@ -107,7 +107,7 @@ struct p2p_cached_buffered_play_values {
  * @ingroup application_p2p
  */
 struct p2p_leave_player {
-	char player_no; /**< The player number. */
+	struct p2p_user *player; /**< The player number. */
 };
 
 #ifdef	__cplusplus

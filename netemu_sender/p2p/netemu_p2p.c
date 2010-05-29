@@ -27,6 +27,7 @@
 #include "../network/sender_collection.h"
 #include "../interface/netemu_p2p.h"
 #include "netemu_p2p_internal.h"
+#include "netlib_error.h"
 #include "../protocol/application_p2p.h"
 #include "../network/tcp.h"
 #include "../structures/netemu_list.h"
@@ -57,6 +58,8 @@ void _netemu_p2p_create_callbacks(struct netemu_p2p *p2p);
 void _netemu_p2p_create_user(struct netemu_p2p *p2p, char* username, char* emulatorname, char connection_quality);
 void _netemu_p2p_create_callbacks(struct netemu_p2p *p2p);
 void _netemu_p2p_send_join_game(struct netemu_p2p *connection, struct p2p_game *game);
+void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, NETEMU_DWORD address, unsigned short port);
+int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player);
 /* End of function declarations */
 
 /**
@@ -414,6 +417,77 @@ int netemu_p2p_create_game(struct netemu_p2p *connection, char *gamename, char c
 	return 0;
 }
 
+int netemu_p2p_leave_game(struct netemu_p2p *connection) {
+	struct application_instruction *instruction;
+	union netemu_connection_type type;
+	type.collection = connection->current_game->_internal->tcp_collection;
+	if(connection->current_game == NULL) {
+		netlib_set_last_error(NETEMU_P2P_ENOTINGAME);
+		return -1;
+	}
+	instruction = netemu_application_instruction_create();
+	netemu_application_p2p_player_leave_add(instruction, connection->user);
+	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
+	connection->current_game = NULL;
+	return 0;
+}
+
+int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player) {
+	int i, removeIndex;
+	struct p2p_user *players;
+	removeIndex = -1;
+	for(i = 0; i < game->user_count-1; i++) {
+		if(_netemu_p2p_user_compare(&game->players[i],player) == 0) {
+			removeIndex = i;
+		}
+	}
+	if(removeIndex != -1) {
+		players = malloc(sizeof(struct p2p_user)*game->user_count-2);
+		for(i = 0; i< game->user_count-1; i++) {
+			if(removeIndex != i) {
+				players[i] = game->players[i];
+			}
+		}
+		_netemu_p2p_remove_connection(game->_internal->tcp_collection,
+									game->players[removeIndex].addr,
+									players[removeIndex].port);
+		_netemu_p2p_remove_connection(game->_internal->udp_collection,
+											game->players[removeIndex].addr,
+											players[removeIndex].port);
+		free(game->players);
+		game->user_count--;
+
+		game->players = players;
+		return 0;
+	}
+	return -1;
+}
+
+void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, NETEMU_DWORD address, unsigned short port) {
+	struct netemu_sender_collection_item *item;
+	int i;
+	int removeIndex;
+	netlib_sockaddr_in *addr;
+
+	removeIndex = -1;
+	for(i = 0; i < collection->senders->count; i++) {
+		item = (struct netemu_sender_collection_item*)collection->senders->elements[i];
+		if(item->type == TCP_CONNECTION) {
+			addr = (netlib_sockaddr_in*)item->sender->tcp_sender->addr;
+		}
+		else if(item->type == UDP_SENDER){
+			addr = (netlib_sockaddr_in*)item->sender->udp_sender->addr;
+		}
+
+		if(addr->sin_addr.s_addr == address && addr->sin_port == port) {
+			removeIndex = i;
+			break;
+		}
+	}
+	if(removeIndex != -1)
+		netemu_list_remove_at(collection->senders, removeIndex);
+}
+
 /**
  * Join an existing game. This is a blocking call that will connect to the creator of the
  * game if there isn't a connection already, and then send a "Join game" instruction.
@@ -428,9 +502,7 @@ int netemu_p2p_create_game(struct netemu_p2p *connection, char *gamename, char c
  * - if the host refuses you.
  */
 int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
-	struct application_instruction *instruction;
 	struct netemu_receiver_buffer_item *item;
-	union netemu_connection_type type;
 	time_t timestamp;
 	netlib_sockaddr* addr;
 	int size, i;

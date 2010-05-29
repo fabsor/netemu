@@ -46,6 +46,7 @@ void netemu_application_p2p_start_game_pack(struct application_instruction *inst
 void netemu_application_p2p_buffered_play_values_pack(struct application_instruction *instruction, char *data);
 void netemu_application_p2p_cached_play_values_pack(struct application_instruction *instruction, char *data);
 void netemu_application_p2p_player_join_success_pack(struct application_instruction *instruction, char *buffer);
+void netemu_application_p2p_player_leave_pack(struct application_instruction *instruction, char *buffer);
 
 /**
  * Add a "Create game" body to an instruction.
@@ -264,28 +265,28 @@ int _netemu_application_p2p_parse_game(char *buffer, struct p2p_game *game) {
 	return pos;
 }
 
-void netemu_application_p2p_player_leave_add(struct application_instruction* instruction, char player_no) {
-	struct p2p_leave_player *player;
-	player = malloc(sizeof(struct p2p_leave_player));
-	player->player_no = player_no;
+void netemu_application_p2p_player_leave_add(struct application_instruction* instruction, struct p2p_user *user) {
+	struct p2p_user *player;
+	player = malloc(sizeof(struct p2p_user));
+	instruction->body_size = netemu_application_p2p_copy_user(player, user);
 	instruction->body = player;
-	instruction->body_size = 1;
 	instruction->id = P2P_LEAVE_GAME;
-	instruction->body = NULL;
 	instruction->body_size = 0;
-	instruction->packBodyFn = NULL;
+	instruction->packBodyFn = netemu_application_p2p_player_leave_pack;
 }
 
 void netemu_application_p2p_player_leave_pack(struct application_instruction *instruction, char *buffer) {
-	struct p2p_leave_player *player;
+	struct p2p_user *player;
 	player = instruction->body;
-	memcpy(buffer, &player->player_no, 1);
+	_netemu_application_p2p_pack_user(buffer, player);
 }
 
 void netemu_application_p2p_player_leave_parse(struct application_instruction *instruction, char *buffer) {
-	struct p2p_leave_player *player;
-	player = malloc(sizeof(struct p2p_leave_player));
-	memcpy(&player->player_no,buffer,1);
+	struct p2p_user *player;
+	player = malloc(sizeof(struct p2p_user));
+	_netemu_application_p2p_parse_user(buffer, player, 1);
+	instruction->body = player;
+	instruction->packBodyFn = netemu_application_p2p_player_leave_pack;
 }
 
 /**

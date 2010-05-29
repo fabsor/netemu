@@ -239,6 +239,14 @@ void netemu_application_add_start_game(struct application_instruction *instructi
 void netemu_application_p2p_start_game_parse(struct application_instruction *instruction, char *buffer);
 
 /**
+ * Add a "Player leave" body to an instruction.
+ * @ingroup application_p2p
+ * @param instruction the instruction to add the body to.
+ * @param player_no the number of the player.
+ */
+void netemu_application_p2p_player_leave_add(struct application_instruction* instruction, struct p2p_user *user);
+
+/**
  * Add a "Player ready" body to an instruction.
  * @ingroup application_p2p
  * @param instruction the instruction to add the body to.

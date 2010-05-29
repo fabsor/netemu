@@ -43,6 +43,12 @@ extern "C" {
 #include "../protocol/application_p2p.h"
 #include "netlib_network.h"
 #include "netemu_kaillera.h"
+
+#define NETEMU_P2P_ENOTINGAME		60001
+#define NETEMU_P2P_EALREADYINGAME	60002
+#define NETEMU_P2P_EGAMECREATOR		60003
+#define NETEMU_P2P_ENOTGAMECREATOR	60003
+
 /**
  * This struct is the base of the netemu_p2p module.
  */
@@ -156,6 +162,13 @@ int netemu_p2p_host(struct netemu_p2p* p2p, NETEMU_DWORD address, unsigned short
  */
 int netemu_p2p_create_game(struct netemu_p2p *connection, char *gamename, char connection_quality, int emulator_value_size, struct p2p_game** result);
 
+/**
+ * Leave your current game.
+ * @ingroup netemu_p2p
+ * @param connection an instance of the netemu_p2p module.
+ * @return 0 if everything went fine -1 if something went wrong.
+ */
+int netemu_p2p_leave_game(struct netemu_p2p *connection);
 /**
  * @todo
  * Should netemu_p2p_login be in the public interface??
