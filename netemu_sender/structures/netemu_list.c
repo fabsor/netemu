@@ -290,6 +290,7 @@ struct netemu_list_iterator* netemu_list_iterator_create(struct netemu_list *lis
 	struct netemu_list_iterator *iterator;
 	iterator = malloc(sizeof(struct netemu_list_iterator*));
 	iterator->index = -1;
+	iterator->list = list;
 	if(list->thread_safe) {
 		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
 	}
