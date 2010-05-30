@@ -379,8 +379,8 @@ void netemu_p2p_respond_to_user_leave(struct netemu_receiver_buffer* buffer, str
 	struct netemu_p2p *info;
 	struct p2p_user *user;
 	union netemu_connection_type type;
-	type.collection = info->_internal->peers;
 	info = arg;
+	type.collection = info->_internal->peers;
 	user = item->instruction->body;
 	if(netemu_list_contains(info->_internal->users, user) != -1) {
 		netemu_list_remove(info->_internal->users, user);

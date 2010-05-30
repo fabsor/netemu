@@ -36,6 +36,6 @@ struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netlib_sockaddr* addr,
 
 void netemu_sender_free(struct netemu_sender_udp* sender);
 
-void netemu_sender_udp_free(struct netemu_sender_udp* sender);
+void netemu_sender_udp_destroy(struct netemu_sender_udp* sender);
 
 #endif /* SENDER_UDP_H_ */

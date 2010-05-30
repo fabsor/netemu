@@ -153,7 +153,7 @@ struct netemu_kaillera* netemu_kaillera_connect(struct netemu_kaillera *connecti
 	}
 
 	if((hello = netemu_communication_create_hello_message(VERSION)) == NULL) {
-		netemu_sender_udp_free(client->sender);
+		netemu_sender_udp_destroy(client->sender);
 		netemu_receiver_udp_destroy(client->receiver);
 		return NULL;
 	}
@@ -234,7 +234,7 @@ void _netemu_kaillera_communication_login(void *param) {
 		return;
 
 	if((hello = netemu_communication_create_hello_message(VERSION)) == NULL) {
-		netemu_sender_udp_free(client->sender);
+		netemu_sender_udp_destroy(client->sender);
 		netemu_receiver_udp_destroy(client->receiver);
 		return;
 	}

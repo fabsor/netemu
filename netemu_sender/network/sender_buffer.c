@@ -86,12 +86,11 @@ void _netemu_sender_buffer_update(void* arg) {
 					for(j = 0; j < items->count; j++) {
 						item = (struct netemu_sender_buffer_item*)items->elements[j];
 						instructions[j] = item->instruction;
-						if(instructions[j]->id == 31)
-							printf("hej");
 					}
 					packet_buffer = netemu_transport_pack(instructions, items->count);
 					netemu_sender_buffer_send(type,connection, packet_buffer.data,
 							packet_buffer.size);
+					free(packet_buffer.data);
 				}
 			}
 			netemu_hashtbl_clear(itemsToSend);
@@ -103,7 +102,7 @@ void _netemu_sender_buffer_update(void* arg) {
 }
 
 int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
-		struct application_instruction* instruction, netemu_connection_types type, union netemu_connection_type recipient) {
+	struct application_instruction* instruction, netemu_connection_types type, union netemu_connection_type recipient) {
 	struct netemu_sender_buffer_item *item;
 	struct netemu_list *list;
 	void* key;
@@ -129,6 +128,8 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 			break;
 		case CONNECTION_COLLECTION:
 			key = recipient.collection;
+			break;
+		default:
 			break;
 	}
 
@@ -184,6 +185,8 @@ void netemu_sender_buffer_send(netemu_connection_types type, union netemu_connec
 			break;
 		case CONNECTION_COLLECTION:
 			netemu_sender_collection_send_data(recipient.collection, data, size);
+			break;
+		default:
 			break;
 	}
 }

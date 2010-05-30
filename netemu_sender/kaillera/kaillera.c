@@ -359,9 +359,6 @@ void netemu_kaillera_add_game(struct netemu_kaillera *info, char* app_name, char
 	game->name = game_name;
 	game->id = id;
 	game->status = status;
-	/*TODO: ??? */
-	game->users_count = users_count;
-	game->creator = creator;
 	_netemu_kaillera_add_game_struct(info, game);
 }
 

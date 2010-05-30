@@ -60,6 +60,8 @@ void _netemu_p2p_create_callbacks(struct netemu_p2p *p2p);
 void _netemu_p2p_send_join_game(struct netemu_p2p *connection, struct p2p_game *game);
 void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, NETEMU_DWORD address, unsigned short port);
 int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player);
+void _netemu_p2p_clear_users(struct netemu_list *users);
+void _netemu_p2p_clear_games(struct netemu_list *games);
 /* End of function declarations */
 
 
@@ -68,13 +70,45 @@ int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player);
  */
 void netemu_p2p_disconnect(struct netemu_p2p *p2p) {
 	struct application_instruction *instruction;
-	union netemu_connection_type type;
-	type.collection = p2p->_internal->peers;
+	struct transport_packet_buffer buffer;
 	instruction = netemu_application_instruction_create();
 	netemu_application_p2p_user_leave_add(instruction, p2p->user);
-	netemu_sender_buffer_add(p2p->_internal->send_buffer, instruction,TCP_CONNECTION, type);
-	p2p->cloud_name = NULL;
+	/* It's time to lock down the sender buffer, no more packets will come in or out. */
+	netemu_sender_buffer_lock(p2p->_internal->send_buffer);
 
+	/* We can't rely on the sender buffer, since it will try to send thee data on a different thread.
+	 * We will send this data directly to all peers in this thread,
+	 * that way we know we can free the resources afterwards. */
+	buffer = netemu_transport_pack(&instruction, 1);
+
+	netemu_sender_collection_send_data(p2p->_internal->peers, buffer.data, buffer.size);
+	netemu_sender_collection_clear(p2p->_internal->peers, TRUE);
+	if(p2p->current_game != NULL) {
+		netemu_sender_collection_clear(p2p->current_game->_internal->tcp_collection, TRUE);
+		netemu_sender_collection_clear(p2p->current_game->_internal->udp_collection, TRUE);
+	}
+	p2p->cloud_name = NULL;
+	_netemu_p2p_clear_games(p2p->_internal->games);
+	_netemu_p2p_clear_users(p2p->_internal->users);
+}
+
+void _netemu_p2p_clear_games(struct netemu_list *games) {
+	int i;
+	for(i = 0; i < games->count; i++) {
+		netemu_application_p2p_destroy_game(games->elements[i], TRUE, TRUE, FALSE);
+	}
+	netemu_list_clear(games);
+}
+
+void _netemu_p2p_clear_users(struct netemu_list *users) {
+	/*
+	 * TODO: Figure out how to handle the memory, then make sure this happens.
+	int i;
+	for(i = 0; i < users->count; i++) {
+		netemu_application_p2p_destroy_game(games->elements[i], TRUE, TRUE, FALSE);
+	}
+	*/
+	netemu_list_clear(users);
 
 }
 
@@ -481,33 +515,28 @@ int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player) {
 
 void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, NETEMU_DWORD address, unsigned short port) {
 	struct netemu_sender_collection_item *item;
-	struct netemu_tcp_connection *connection;
-	struct netemu_sender_udp *udp;
-	int i;
+	struct netemu_list_iterator *iterator;
 	int removeIndex;
 	netlib_sockaddr_in *addr;
-
 	removeIndex = -1;
-	for(i = 0; i < collection->senders->count; i++) {
-		item = (struct netemu_sender_collection_item*)collection->senders->elements[i];
+	iterator = netemu_list_iterator_create(collection->senders);
+
+	while((item = (struct netemu_sender_collection_item*)netemu_list_iterator_next(iterator)) != NULL) {
 		if(item->type == SENDER_TCP) {
 			addr = (netlib_sockaddr_in*)item->sender->tcp_sender->addr;
-			connection = item->sender->tcp_sender;
-			netemu_tcp_connection_destroy(connection);
 		}
 		else if(item->type == SENDER_UDP){
 			addr = (netlib_sockaddr_in*)item->sender->udp_sender->addr;
-			udp = item->sender->udp_sender;
-			netemu_receiver_udp_destroy(udp);
 		}
 
 		if(addr->sin_addr.s_addr == address && addr->sin_port == port) {
-			removeIndex = i;
+			removeIndex = iterator->index;
 			break;
 		}
 	}
+	netemu_list_iterator_destroy(iterator);
 	if(removeIndex != -1) {
-		netemu_list_remove_at(collection->senders, removeIndex);
+		netemu_sender_collection_remove_sender(collection, removeIndex);
 	}
 }
 

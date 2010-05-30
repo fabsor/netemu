@@ -33,7 +33,7 @@ void test_network(){
 	send_network_data(sender);
 	while(!net_ping && !net_hello);
 	netemu_receiver_udp_destroy(receiver);
-	netemu_sender_udp_free(sender);
+	netemu_sender_udp_destroy(sender);
 	printf("network test finished\n");
 }
 

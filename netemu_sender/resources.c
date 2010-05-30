@@ -52,6 +52,6 @@ struct netemu_sender_udp* netemu_resources_get_sender() {
 
 void netemu_resources_free_client() {
 netemu_receiver_udp_destroy(_netemu_resources_client->receiver);
-	netemu_sender_udp_free(_netemu_resources_client->sender);
+	netemu_sender_udp_destroy(_netemu_resources_client->sender);
 	free(_netemu_resources_client);
 }

@@ -140,11 +140,11 @@ int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender) {
 
 void netemu_tcp_connection_destroy(struct netemu_tcp_connection *connection) {
 	connection->receiving = -1;
+	netlib_closesocket(connection->socket);
 	netlib_thread_mutex_lock(connection->lock, NETLIB_INFINITE);
 	netlib_thread_mutex_release(connection->lock);
 	free(connection->addr);
 	netlib_thread_mutex_destroy(connection->lock);
-	netlib_closesocket(connection->socket);
 	free(connection);
 }
 

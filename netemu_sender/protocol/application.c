@@ -29,6 +29,9 @@ int netemu_application_parse_tcp(NETLIB_SOCKET socket, netemu_connection_types t
 	if(error == -1) {
 		return -1;
 	}
+	else if(error == 0) {
+		return 1;
+	}
 	if((packet->instructions = malloc(sizeof(struct transport_instruction*)*packet->count)) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		free(packet);
@@ -86,8 +89,12 @@ int netemu_application_parse_udp(NETLIB_SOCKET socket, netemu_connection_types t
 	//addr = malloc(sizeof(netemu_sockaddr_in));
 	buffer = (struct netemu_receiver_buffer *)param;
 	error = netlib_recvfrom(socket, bytebuffer, 512, 0, (netlib_sockaddr*)&addr, &addr_size);
+
 	if(error == -1) {
 		return -1;
+	}
+	if(error == 0) {
+		return 1;
 	}
 
 	if((packet = malloc(sizeof(struct transport_packet))) == NULL) {
@@ -155,7 +162,7 @@ struct application_instruction* netemu_application_instruction_parse(struct tran
 
 	app_instruction->body_size = instruction->length - (sizeof(char) + strlen(app_instruction->user)+1);
 	app_instruction->body = NULL;
-
+	/* TODO: We need a smarter way to deal with this. */
 	switch(app_instruction->id) {
 		case PING:
 			app_instruction->body_size = 0;
@@ -230,6 +237,9 @@ struct application_instruction* netemu_application_instruction_parse(struct tran
 			break;
 		case P2P_LEAVE_GAME:
 			netemu_application_p2p_player_leave_parse(app_instruction, data);
+			break;
+		case P2P_LEAVE_CLOUD:
+			netemu_application_p2p_user_leave_parse(app_instruction, data);
 			break;
 
 	}

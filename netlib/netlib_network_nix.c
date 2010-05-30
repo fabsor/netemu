@@ -28,6 +28,7 @@
 #include <arpa/inet.h>
 #include <sys/un.h>
 #include <netdb.h>
+#include <unistd.h>
 
 int initialized;
 void _fill_netlib_addrinfo(struct addrinfo* addrinfo, struct netlib_addrinfo *netemuinfo);
@@ -162,7 +163,10 @@ int netlib_shutdown(NETLIB_SOCKET socket, int how) {
 
 int netlib_closesocket(NETLIB_SOCKET socket) {
 	int error;
-
+	error = shutdown(socket, SHUT_RDWR);
+	if(error == -1) {
+		netlib_set_last_error(errno);
+	}
 	error = close(socket);
 	if(error == -1) {
 		netlib_set_last_error(errno);

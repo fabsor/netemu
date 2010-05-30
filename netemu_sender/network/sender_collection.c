@@ -21,7 +21,6 @@ struct netemu_sender_collection* netemu_sender_collection_new() {
 	struct netemu_sender_collection *collection;
 	collection = malloc(sizeof(struct netemu_collection*));
 	collection->senders = netemu_list_create(10,1);
-
 	return collection;
 }
 
@@ -49,10 +48,10 @@ void netemu_sender_collection_remove_sender(struct netemu_sender_collection *col
 }
 
 void netemu_sender_collection_send_data(struct netemu_sender_collection* collection, char* data, size_t size) {
-	int i;
 	struct netemu_sender_collection_item *sender;
-	for(i = 0; i < collection->senders->count; i++) {
-		sender = (struct netemu_sender_collection_item*)collection->senders->elements[i];
+	struct netemu_list_iterator *iterator;
+	iterator = netemu_list_iterator_create(collection->senders);
+	while((sender = netemu_list_iterator_next(iterator)) != NULL) {
 		switch(sender->type) {
 			case SENDER_TCP:
 				netemu_tcp_connection_send(sender->sender->tcp_sender,data,size);
@@ -62,13 +61,44 @@ void netemu_sender_collection_send_data(struct netemu_sender_collection* collect
 				break;
 		}
 	}
+	netemu_list_iterator_destroy(iterator);
+}
+/**
+ * Clear out the collection.
+ */
+void netemu_sender_collection_clear(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections) {
+	int i;
+	for(i = 0; i < collection->senders->count; i++) {
+		netemu_sender_collection_item_destroy(collection->senders->elements[i], destroy_connections);
+	}
+	netemu_list_clear(collection->senders);
 }
 
-void netemu_sender_collection_clear() {
-
+/**
+ * Disconnect a sender collection item.
+ *
+ * @ingroup netemu_sender_collection
+ * @param item the item to be destroyed.
+ * @param destroy_connection Set this to true if you want to destroy the connection this item holds.
+ */
+void netemu_sender_collection_item_destroy(struct netemu_sender_collection_item *item, NETEMU_BOOL destroy_connection) {
+	struct netemu_tcp_connection *connection;
+	struct netemu_sender_udp *udp;
+	if(destroy_connection) {
+		if(item->type == SENDER_TCP) {
+			connection = item->sender->tcp_sender;
+			netemu_tcp_connection_destroy(connection);
+		}
+		else if(item->type == SENDER_UDP){
+			udp = item->sender->udp_sender;
+			netemu_receiver_udp_destroy(udp);
+		}
+	}
+	free(item);
 }
 
-void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection) {
+void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections) {
+	netemu_sender_collection_clear(collection, destroy_connections);
 	netemu_list_destroy(collection->senders);
 	free(collection);
 }

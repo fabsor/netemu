@@ -150,32 +150,9 @@ void* netemu_application_p2p_create_game_copy(struct application_instruction *in
 }
 
 void netemu_application_p2p_create_game_free(struct application_instruction *instruction) {
-	netemu_application_p2p_free_game(instruction->body, 0);
+	netemu_application_p2p_destroy_game(instruction->body, TRUE, FALSE, FALSE);
 }
 
-
-void netemu_application_p2p_free_game(struct p2p_game *game, NETEMU_BOOL free_pointer) {
-	int i;
-	free(game->app_name);
-	free(game->name);
-	netemu_application_p2p_free_user(game->creator, 1);
-	for(i = 0; i < game->user_count; i++)  {
-		netemu_application_p2p_free_user(&game->players[i],0);
-	}
-	free(game->players);
-	if(free_pointer)
-		free(game);
-}
-
-void netemu_application_p2p_free_user(struct p2p_user *user, NETEMU_BOOL free_pointer) {
-	free(user->app_name);
-	if (user->name != NULL) {
-		free(user->name);
-	}
-	free(user->addr);
-	if(free_pointer)
-		free(user);
-}
 
 int _netemu_application_p2p_pack_game(char *buffer, struct p2p_game *game) {
 	int i, pos;
@@ -406,6 +383,43 @@ int netemu_application_p2p_copy_game(struct p2p_game *target, struct p2p_game *g
 	return size;
 }
 
+void netemu_application_p2p_buffered_play_values_free(struct p2p_buffered_play_values *values) {
+	free(values->values);
+	free(values);
+}
+
+void netemu_application_p2p_destroy_user(struct p2p_user *user, NETEMU_BOOL free_ptr, NETEMU_BOOL free_internal) {
+	free(user->app_name);
+	free(user->name);
+	if(user->_internal != NULL && free_internal) {
+		netemu_tcp_connection_destroy(user->_internal->connection);
+		netemu_sender_udp_destroy(user->_internal->sender);
+		/* TODO: We need to free all stored play values instructions here. */
+		netemu_receiver_udp_destroy(user->_internal->receiver);
+	}
+	if(free_ptr) {
+		free(user);
+	}
+}
+
+void netemu_application_p2p_destroy_game(struct p2p_game *game, NETEMU_BOOL free_ptr, NETEMU_BOOL free_internal, NETEMU_BOOL free_connections) {
+	int i;
+	free(game->app_name);
+	free(game->creator);
+	free(game->name);
+	for(i = 0; i < game->user_count; i++) {
+		netemu_application_p2p_destroy_user(game->players, FALSE, free_internal);
+	}
+	free(game->players);
+	if(game->_internal != NULL && free_internal) {
+		netlib_thread_mutex_destroy(game->_internal->game_lock);
+		netemu_sender_collection_free_collection(game->_internal->tcp_collection, free_connections);
+		netemu_sender_collection_free_collection(game->_internal->udp_collection, free_connections);
+		free(game->_internal);
+	}
+	free(game);
+}
+
 /**
  * Add a "Login Success" body to an instruction.
  * @ingroup application_p2p
@@ -489,11 +503,11 @@ void netemu_application_p2p_login_success_free(struct application_instruction *i
 	int i;
 	body = instruction->body;
 	for(i = 0; i < body->users_count; i++) {
-		netemu_application_p2p_free_user(&body->users[i],0);
+		netemu_application_p2p_destroy_user(&body->users[i], FALSE, FALSE);
 	}
 	free(body->users);
 	for(i = 0; i < body->games_count; i++) {
-		netemu_application_p2p_free_game(&body->games[i],0);
+		netemu_application_p2p_destroy_game(&body->games[i], FALSE, FALSE, FALSE);
 	}
 	free(body->games);
 }
@@ -651,7 +665,7 @@ void* netemu_application_p2p_login_request_copy(struct application_instruction *
 void netemu_application_p2p_login_request_free(struct application_instruction *instruction) {
 	struct p2p_user *user;
 	user = instruction->body;
-	netemu_application_p2p_free_user(user,1);
+	netemu_application_p2p_destroy_user(user,TRUE, FALSE);
 }
 
 /**

@@ -53,9 +53,20 @@ void netemu_sender_collection_add_tcp_sender(struct netemu_sender_collection *co
 
 void netemu_sender_collection_remove_sender(struct netemu_sender_collection *collection, int index);
 
-void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection);
+void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections);
 
 void netemu_sender_collection_send_data(struct netemu_sender_collection* collection, char* data, size_t size);
+
+
+void netemu_sender_collection_clear(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections);
+/**
+ * Disconnect a sender collection item.
+ *
+ * @ingroup netemu_sender_collection
+ * @param item the item to be destroyed.
+ * @param destroy_item Set this to true if you want to destroy the connection this item holds.
+ */
+void netemu_sender_collection_item_destroy(struct netemu_sender_collection_item *item, NETEMU_BOOL destroy_item);
 
 #ifdef	__cplusplus
 }

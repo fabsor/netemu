@@ -337,4 +337,8 @@ void netemu_application_p2p_user_leave_add(struct application_instruction* instr
 
 void netemu_application_p2p_user_leave_parse(struct application_instruction *instruction, char *buffer);
 
+void netemu_application_p2p_destroy_game(struct p2p_game *game, NETEMU_BOOL free_ptr, NETEMU_BOOL free_internal, NETEMU_BOOL free_connections);
+
+void netemu_application_p2p_destroy_user(struct p2p_user *user, NETEMU_BOOL free_ptr, NETEMU_BOOL free_internal);
+
 #endif /* APPLICATION_P2P_INTERNAL_H_ */

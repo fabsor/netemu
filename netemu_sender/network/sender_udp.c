@@ -60,7 +60,7 @@ struct netemu_sender_udp* netemu_sender_udp_new_on_socket(netlib_sockaddr* addr,
 	return sender;
 }
 
-void netemu_sender_udp_free(struct netemu_sender_udp* sender) {
+void netemu_sender_udp_destroy(struct netemu_sender_udp* sender) {
 	netlib_closesocket(sender->socket);
 	free(sender->addr);
 	free(sender);
