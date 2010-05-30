@@ -80,6 +80,8 @@ int netemu_kaillera_disconnect(struct netemu_kaillera *info, char *message) {
 	instruction = netemu_application_instruction_create();
 	netemu_application_user_leave_add(instruction, message);
 	netemu_sender_buffer_add(info->_internal->send_buffer, instruction, UDP_SENDER, type);
+	netemu_list_clear(info->_internal->games);
+	netemu_list_clear(info->_internal->users);
 	return 0;
 }
 
