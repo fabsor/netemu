@@ -284,3 +284,35 @@ int netemu_list_clear(struct netemu_list* list) {
 
 	return error;
 }
+
+
+struct netemu_list_iterator* netemu_list_iterator_create(struct netemu_list *list) {
+	struct netemu_list_iterator *iterator;
+	iterator = malloc(sizeof(struct netemu_list_iterator*));
+	iterator->index = -1;
+	if(list->thread_safe) {
+		netlib_thread_mutex_lock(list->_intern->list_mutex, NETLIB_INFINITE);
+	}
+	return iterator;
+}
+
+void netemu_list_iterator_destroy(struct netemu_list_iterator *iterator) {
+	if(iterator->list->thread_safe) {
+		netlib_thread_mutex_release(iterator->list->_intern->list_mutex);
+	}
+	free(iterator);
+}
+
+void* netemu_list_iterator_next(struct netemu_list_iterator *iterator) {
+	if(iterator->index == -1) {
+		iterator->index = 0;
+	}
+	else if(iterator->index > iterator->list->count) {
+		return NULL;
+	}
+	else {
+		iterator->index++;
+	}
+	iterator->item = iterator->list->elements[iterator->index];
+	return iterator->item;
+}

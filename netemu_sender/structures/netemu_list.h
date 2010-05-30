@@ -34,8 +34,6 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-	typedef struct _netemu_list_internal* netemu_list_internal;
 	/**
 	 * This struct is the base for the netemu_list module.
 	 * @ingroup netemu_list
@@ -45,8 +43,14 @@ extern "C" {
         int count; /**< The number of elements in the list */
         NETEMU_BOOL sorted; /**< Indiciates if the list is sorted or not. */
 		NETEMU_BOOL thread_safe; /**< Indicates if the list is thread safe or not. */
-        netemu_list_internal _intern; /**< Internal data used by the module. Do not touch this! */
+        struct _netemu_list_internal *_intern; /**< Internal data used by the module. Do not touch this! */
     };
+
+	struct netemu_list_iterator {
+		int index;
+		struct netemu_list *list;
+		void* item;
+	};
 
 	/**
 	 * Create a new instance of netemu_list.
@@ -136,6 +140,13 @@ extern "C" {
      * @param list a list instance.
      */
     int netemu_list_clear(struct netemu_list* list);
+
+    struct netemu_list_iterator* netemu_list_iterator_create(struct netemu_list *list);
+
+    void netemu_list_iterator_destroy(struct netemu_list_iterator *iterator);
+
+    void* netemu_list_iterator_next(struct netemu_list_iterator *iterator);
+
 #ifdef	__cplusplus
 }
 #endif
