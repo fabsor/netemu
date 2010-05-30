@@ -388,6 +388,9 @@ void netemu_p2p_respond_to_user_leave(struct netemu_receiver_buffer* buffer, str
 										user->addr, user->port);
 		netemu_sender_buffer_add(info->_internal->send_buffer, item->instruction, CONNECTION_COLLECTION, type);
 
+		if(info->current_game != NULL) {
+			_netemu_p2p_remove_player(info->current_game,user);
+		}
 	}
 }
 

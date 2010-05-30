@@ -43,14 +43,13 @@ struct netemu_tcp_connection* netemu_tcp_connection_new(netlib_sockaddr* addr, s
 	socket = netlib_socket(NETLIB_AF_INET, NETLIB_SOCK_STREAM);
 	if (socket == NETLIB_INVALID_SOCKET) {
 		/* TODO: Need to retrieve the platforms last error here and set it as our last error. Will use NETEMU_UNKNOWNERROR in the meantime. */
-		//netlib_set_last_error(NETEMU_EUNKNOWNERROR);
 		/* sender->error = netlib_get_last_error(); */
 		return NULL;
 	}
 	sender->addr_len = addr_len;
 	sender->addr = addr;
 	sender->socket = socket;
-	sender->listening = 0;
+	sender->receiving = 0;
 	sender->fn = NULL;
 	return sender;
 }
@@ -61,7 +60,7 @@ struct netemu_tcp_connection* netemu_tcp_connection_new_on_socket(NETLIB_SOCKET 
 	sender->addr_len = addr_len;
 	sender->addr = addr;
 	sender->socket = socket;
-	sender->listening = 0;
+	sender->receiving = 0;
 	sender->fn = NULL;
 	sender->socket = socket;
 	return sender;
@@ -98,20 +97,18 @@ void netemu_tcp_listener_register_new_connection_fn(struct netemu_tcp_listener* 
 void netemu_tcp_connection_start_receiving(struct netemu_tcp_connection* con, parseReceivedDataFn fn, void *param) {
 	con->fn = fn;
 	con->data_param = param;
+	con->receiving = 1;
 	netlib_thread_new(_netemu_tcp_connection_recv, (void*)con);
 }
 
 void _netemu_tcp_connection_recv(void* params) {
 	struct netemu_tcp_connection *receiver;
 	union netemu_connection_type type;
-	struct application_instruction *instruction;
-	int error, i;
-	NETEMU_DWORD temp;
-
+	int error;
 	receiver = (struct netemu_tcp_connection*)params;
 	type.connection = receiver;
 	receiver->lock = netlib_thread_mutex_create();
-	while (1) {
+	while (receiver->receiving) {
 		/* We have to make sure that no one else is fiddling with our struct while we're receiving. */
 		netlib_thread_mutex_lock(receiver->lock, NETLIB_INFINITE);
 		error = receiver->fn(receiver->socket, TCP_CONNECTION, type, receiver->data_param);
@@ -122,6 +119,10 @@ void _netemu_tcp_connection_recv(void* params) {
 		}
 		netlib_thread_mutex_release(receiver->lock);
 	}
+}
+
+void netemu_tcp_connection_stop_receiving(struct netemu_tcp_connection *receiver) {
+	receiver->receiving = -1;
 }
 
 int netemu_tcp_connection_send(struct netemu_tcp_connection* sender, char* data, int size) {
@@ -135,6 +136,16 @@ int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender) {
 	int success;
 	success = netlib_connect(sender->socket,sender->addr,sender->addr_len);
 	return success;
+}
+
+void netemu_tcp_connection_destroy(struct netemu_tcp_connection *connection) {
+	connection->receiving = -1;
+	netlib_thread_mutex_lock(connection->lock, NETLIB_INFINITE);
+	netlib_thread_mutex_release(connection->lock);
+	free(connection->addr);
+	netlib_thread_mutex_destroy(connection->lock);
+	netlib_closesocket(connection->socket);
+	free(connection);
 }
 
 struct netemu_tcp_listener* netemu_tcp_listener_new(netlib_sockaddr* bind_addr, size_t addr_len) {
@@ -178,7 +189,6 @@ void _netemu_tcp_listener_listen(void* params) {
 		socket = netlib_accept_inet(receiver->socket,&addr,&addr_len);
 		if (socket == NETLIB_INVALID_SOCKET) {
 			free(addr);
-			//receiver->error = netemu_get_last_error();
 			/*Do something interesting here.*/
 			error = netlib_get_last_error();
 		}

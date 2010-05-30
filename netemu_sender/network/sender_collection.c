@@ -64,6 +64,10 @@ void netemu_sender_collection_send_data(struct netemu_sender_collection* collect
 	}
 }
 
+void netemu_sender_collection_clear() {
+
+}
+
 void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection) {
 	netemu_list_destroy(collection->senders);
 	free(collection);

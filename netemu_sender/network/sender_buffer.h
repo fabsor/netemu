@@ -31,6 +31,13 @@ extern "C" {
 #define LIST_START_SIZE	10
 #define PACKET_SEND_INTERVAL 30
 
+#define NETEMU_SENDER_BUFFER_EBUFFERLOCKED	70023
+
+/**
+ * This struct represents the netemu_sender_buffer module.
+ * @todo Some parts of this struct should not be public.
+ * Put appropriate parts of this struct into an internal struct.
+ */
 struct netemu_sender_buffer {
 	struct netemu_hashtbl* instructions;
 	struct netemu_list* itemsToAdd;
@@ -38,6 +45,7 @@ struct netemu_sender_buffer {
 	char preferred_delay_time;
 	char send;
 	char running;
+	NETEMU_BOOL locked;
 	union netemu_connection_type *sender;
 	netemu_connection_types type;
 	netlib_mutex send_lock;
@@ -53,6 +61,19 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 
 void netemu_sender_buffer_add_with_blacklist(struct netemu_sender_buffer* buffer,
 		struct application_instruction* instruction, struct netemu_sender_collection *recipients, netemu_connection_types blacklist_type, union netemu_connection_type blacklist);
+
+/**
+ * Lock the sender buffer so that it can't handle any incoming
+ * packets to send. This function is useful when you don't want any
+ * thread to send any data.
+ */
+void netemu_sender_buffer_lock(struct netemu_sender_buffer *buffer);
+
+/**
+ * unlock the sender buffer so that it can handle any incoming
+ * packets to send.
+ */
+void netemu_sender_buffer_unlock(struct netemu_sender_buffer *buffer);
 
 #ifdef	__cplusplus
 }

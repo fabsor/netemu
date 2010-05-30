@@ -132,6 +132,8 @@ void netemu_receiver_udp_stop_receiving(struct netemu_receiver_udp *receiver) {
  */
 void netemu_receiver_udp_destroy(struct netemu_receiver_udp* receiver) {
 	netemu_receiver_udp_stop_receiving(receiver);
+
 	netlib_closesocket(receiver->socket);
 	free(receiver->addr);
+	free(receiver);
 }

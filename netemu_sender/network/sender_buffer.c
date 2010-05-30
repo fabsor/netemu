@@ -107,7 +107,11 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 	struct netemu_sender_buffer_item *item;
 	struct netemu_list *list;
 	void* key;
-
+	/* Don't accept any new items when we're in lockdown. */
+	if(buffer->locked) {
+		netlib_set_last_error(NETEMU_SENDER_BUFFER_EBUFFERLOCKED);
+		return -1;
+	}
 	if((item = malloc(sizeof(struct netemu_sender_buffer_item))) == NULL) {
 		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
 		return -1;
@@ -152,6 +156,22 @@ int netemu_sender_buffer_add(struct netemu_sender_buffer* buffer,
 	netlib_thread_event_signal(buffer->event);
 	netlib_thread_mutex_release(buffer->send_lock);
 	return 0;
+}
+
+void netemu_sender_buffer_lock(struct netemu_sender_buffer *buffer) {
+	/* Make sure we don't interfere with anything. */
+	netlib_thread_mutex_lock(buffer->send_lock, NETLIB_INFINITE);
+	/* Flush all instructions that have been queued. */
+	netemu_list_clear(buffer->itemsToAdd);
+	buffer->locked = TRUE;
+	netlib_thread_mutex_release(buffer->send_lock);
+}
+
+void netemu_sender_buffer_unlock(struct netemu_sender_buffer *buffer) {
+	/* Make sure we don't interfere with anything. */
+	netlib_thread_mutex_lock(buffer->send_lock, NETLIB_INFINITE);
+	buffer->locked = FALSE;
+	netlib_thread_mutex_release(buffer->send_lock);
 }
 
 void netemu_sender_buffer_send(netemu_connection_types type, union netemu_connection_type recipient, char* data, int size) {

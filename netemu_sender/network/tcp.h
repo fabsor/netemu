@@ -33,7 +33,7 @@ struct netemu_tcp_connection {
 	void* data_param;
 	int addr_len;
 	parseReceivedDataFn fn;
-	int listening;
+	int receiving;
 	int error;
 };
 
@@ -68,6 +68,7 @@ void netemu_tcp_listener_register_new_connection_fn(struct netemu_tcp_listener* 
 
 int netemu_tcp_connection_connect(struct netemu_tcp_connection *sender);
 
+void netemu_tcp_connection_destroy(struct netemu_tcp_connection *connection);
 #ifdef	__cplusplus
 }
 #endif

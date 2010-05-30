@@ -103,7 +103,7 @@ void p2p_menu(struct netemu_p2p *connection) {
 	char val;
 	val = 10;
 	while(val != '0') {
-		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAYER_READY\n7. SEND PLAY VALUES\n8. JOIN GAME ASYNC\n 9. LEAVE GAME");
+		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAYER_READY\n7. SEND PLAY VALUES\n8. JOIN GAME ASYNC\n 9. LEAVE GAME\n A. DISCONNECT\n");
 		val = getchar();
 
 		switch(val) {
@@ -131,6 +131,9 @@ void p2p_menu(struct netemu_p2p *connection) {
 				join_p2p_game_async(connection);
 			case '9':
 				netemu_p2p_leave_game(connection);
+			case 'A':
+				netemu_p2p_disconnect(connection);
+				break;
 
 		}
 

@@ -73,6 +73,8 @@ void netemu_p2p_disconnect(struct netemu_p2p *p2p) {
 	instruction = netemu_application_instruction_create();
 	netemu_application_p2p_user_leave_add(instruction, p2p->user);
 	netemu_sender_buffer_add(p2p->_internal->send_buffer, instruction,TCP_CONNECTION, type);
+	p2p->cloud_name = NULL;
+
 
 }
 
@@ -479,6 +481,8 @@ int _netemu_p2p_remove_player(struct p2p_game *game, struct p2p_user *player) {
 
 void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, NETEMU_DWORD address, unsigned short port) {
 	struct netemu_sender_collection_item *item;
+	struct netemu_tcp_connection *connection;
+	struct netemu_sender_udp *udp;
 	int i;
 	int removeIndex;
 	netlib_sockaddr_in *addr;
@@ -488,9 +492,13 @@ void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, 
 		item = (struct netemu_sender_collection_item*)collection->senders->elements[i];
 		if(item->type == SENDER_TCP) {
 			addr = (netlib_sockaddr_in*)item->sender->tcp_sender->addr;
+			connection = item->sender->tcp_sender;
+			netemu_tcp_connection_destroy(connection);
 		}
 		else if(item->type == SENDER_UDP){
 			addr = (netlib_sockaddr_in*)item->sender->udp_sender->addr;
+			udp = item->sender->udp_sender;
+			netemu_receiver_udp_destroy(udp);
 		}
 
 		if(addr->sin_addr.s_addr == address && addr->sin_port == port) {
@@ -498,8 +506,9 @@ void _netemu_p2p_remove_connection(struct netemu_sender_collection *collection, 
 			break;
 		}
 	}
-	if(removeIndex != -1)
+	if(removeIndex != -1) {
 		netemu_list_remove_at(collection->senders, removeIndex);
+	}
 }
 
 /**
