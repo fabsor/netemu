@@ -60,8 +60,9 @@ void _netemu_p2p_register_responders(struct netemu_p2p *p2p) {
 void netemu_p2p_respond_to_user_join(struct netemu_receiver_buffer* buffer, struct netemu_receiver_buffer_item *item, void* arg) {
 	struct p2p_user *user;
 	struct netemu_p2p* connection;
+	struct netemu_list_iterator *iterator;
+	struct p2p_callback *callback;
 	union netemu_connection_type type;
-	int i;
 
 	connection = (struct netemu_p2p*)arg;
 	user = (struct p2p_user*)item->instruction->body;
@@ -69,9 +70,11 @@ void netemu_p2p_respond_to_user_join(struct netemu_receiver_buffer* buffer, stru
 		type.collection = connection->_internal->peers;
 		netemu_list_add(connection->_internal->users,user);
 		netemu_sender_buffer_add(connection->_internal->send_buffer,item->instruction,CONNECTION_COLLECTION,type);
-		for (i = 0; i < connection->_internal->join_callbacks->count; i++) {
-			((struct p2p_callback*)connection->_internal->join_callbacks->elements[i])->fn.userJoinedFn(connection, user);
+		iterator = netemu_list_iterator_create(connection->_internal->join_callbacks);
+		while((callback = netemu_list_iterator_next(iterator)) != NULL) {
+			callback->fn.userJoinedFn(connection, user);
 		}
+		netemu_list_iterator_destroy(iterator);
 	}
 }
 
