@@ -45,7 +45,7 @@ union netemu_sender_type {
 	struct netemu_tcp_connection *tcp_sender;
 };
 
-struct netemu_sender_collection* netemu_sender_collection_new();
+struct netemu_sender_collection* netemu_sender_collection_create();
 
 void netemu_sender_collection_add_udp_sender(struct netemu_sender_collection *collection, struct netemu_sender_udp *connection);
 
@@ -53,7 +53,7 @@ void netemu_sender_collection_add_tcp_sender(struct netemu_sender_collection *co
 
 void netemu_sender_collection_remove_sender(struct netemu_sender_collection *collection, int index);
 
-void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections);
+void netemu_sender_collection_destroy(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections);
 
 void netemu_sender_collection_send_data(struct netemu_sender_collection* collection, char* data, size_t size);
 

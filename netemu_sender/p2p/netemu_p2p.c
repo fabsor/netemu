@@ -140,7 +140,7 @@ struct netemu_p2p* netemu_p2p_create(char* username, char* emulatorname, char co
 	union netemu_connection_type *type;
 
 	type = malloc(sizeof(union netemu_connection_type));
-	type->collection = netemu_sender_collection_new();
+	type->collection = netemu_sender_collection_create();
 	p2p = malloc(sizeof(struct netemu_p2p));
 
 	_netemu_p2p_create_user(p2p,username, emulatorname, connection_quality);
@@ -460,8 +460,8 @@ int netemu_p2p_create_game(struct netemu_p2p *connection, char *gamename, char c
 	connection->_internal->play_values_event = netlib_thread_event_create();
 	netemu_list_add(connection->_internal->games, game);
 	game->_internal = netemu_application_p2p_create_game_internal();
-	game->_internal->tcp_collection = netemu_sender_collection_new();
-	game->_internal->udp_collection = netemu_sender_collection_new();
+	game->_internal->tcp_collection = netemu_sender_collection_create();
+	game->_internal->udp_collection = netemu_sender_collection_create();
 	game->creator->_internal->values_received = TRUE;
 	netemu_sender_buffer_add(connection->_internal->send_buffer, instruction, CONNECTION_COLLECTION, type);
 	return 0;
@@ -589,8 +589,8 @@ int netemu_p2p_join_game(struct netemu_p2p *connection, struct p2p_game *game) {
 
 	/*Create internal stuff*/
 	connection->current_game->_internal = netemu_application_p2p_create_game_internal();
-	connection->current_game->_internal->tcp_collection = netemu_sender_collection_new();
-	connection->current_game->_internal->udp_collection = netemu_sender_collection_new();
+	connection->current_game->_internal->tcp_collection = netemu_sender_collection_create();
+	connection->current_game->_internal->udp_collection = netemu_sender_collection_create();
 
 	/* We need to go through the array of players and establish a link to them. */
 	for(i = 0; i < connection->current_game->user_count-1; i++) {
@@ -681,8 +681,8 @@ void _netemu_p2p_join_game_continue(struct netemu_p2p *connection, struct p2p_ga
 
 	/*Create internal stuff*/
 	connection->current_game->_internal = netemu_application_p2p_create_game_internal();
-	connection->current_game->_internal->tcp_collection = netemu_sender_collection_new();
-	connection->current_game->_internal->udp_collection = netemu_sender_collection_new();
+	connection->current_game->_internal->tcp_collection = netemu_sender_collection_create();
+	connection->current_game->_internal->udp_collection = netemu_sender_collection_create();
 
 	/* We need to go through the array of players and establish a link to them. */
 	for(i = 0; i < connection->current_game->user_count-1; i++) {

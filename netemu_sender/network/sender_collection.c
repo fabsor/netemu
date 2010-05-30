@@ -17,7 +17,7 @@
 
 #include "sender_collection.h"
 
-struct netemu_sender_collection* netemu_sender_collection_new() {
+struct netemu_sender_collection* netemu_sender_collection_create() {
 	struct netemu_sender_collection *collection;
 	collection = malloc(sizeof(struct netemu_collection*));
 	collection->senders = netemu_list_create(10,1);
@@ -97,7 +97,7 @@ void netemu_sender_collection_item_destroy(struct netemu_sender_collection_item 
 	free(item);
 }
 
-void netemu_sender_collection_free_collection(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections) {
+void netemu_sender_collection_destroy(struct netemu_sender_collection *collection, NETEMU_BOOL destroy_connections) {
 	netemu_sender_collection_clear(collection, destroy_connections);
 	netemu_list_destroy(collection->senders);
 	free(collection);

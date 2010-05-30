@@ -413,8 +413,8 @@ void netemu_application_p2p_destroy_game(struct p2p_game *game, NETEMU_BOOL free
 	free(game->players);
 	if(game->_internal != NULL && free_internal) {
 		netlib_thread_mutex_destroy(game->_internal->game_lock);
-		netemu_sender_collection_free_collection(game->_internal->tcp_collection, free_connections);
-		netemu_sender_collection_free_collection(game->_internal->udp_collection, free_connections);
+		netemu_sender_collection_destroy(game->_internal->tcp_collection, free_connections);
+		netemu_sender_collection_destroy(game->_internal->udp_collection, free_connections);
 		free(game->_internal);
 	}
 	free(game);
