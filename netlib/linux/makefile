@@ -1,9 +1,10 @@
 # This makefile creates a static library out of netlib.
 
 RM := rm -rf
-NETLIB_PATH := ./netlib.a
+NETLIB_PATH := ./libnetlib.a
 SUBDIRS := \
 . \
+NETLIB_SRC := ../
 
 -include netlib.mk
 

@@ -3,28 +3,31 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-C_SRCS += \
-../host_test.c \
-../join_test.c \
+TESTEMU_C_SRCS += \
 ../kaillera_game_creator_test.c \
 ../kaillera_game_joiner_test.c \
 ../main.c \
+../p2p_build_network_test.c \
+../p2p_host_test.c \
+../p2p_join_test.c \
 ../p2ptest.c 
 
-OBJS += \
-./host_test.o \
-./join_test.o \
+TESTEMU_OBJS += \
 ./kaillera_game_creator_test.o \
 ./kaillera_game_joiner_test.o \
 ./main.o \
+./p2p_build_network_test.o \
+./p2p_host_test.o \
+./p2p_join_test.o \
 ./p2ptest.o 
 
-C_DEPS += \
-./host_test.d \
-./join_test.d \
+TESTEMU_C_DEPS += \
 ./kaillera_game_creator_test.d \
 ./kaillera_game_joiner_test.d \
 ./main.d \
+./p2p_build_network_test.d \
+./p2p_host_test.d \
+./p2p_join_test.d \
 ./p2ptest.d 
 
 
@@ -32,7 +35,7 @@ C_DEPS += \
 %.o: ../%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -D_NIX -I"/home/emil/workspace/netemu/netemu_sender/interface" -I"/home/emil/workspace/netemu/netlib/headers" -O0 -g3 -pg -p -pedantic -Wall -c -fmessage-length=0 -m32 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	gcc -D_NIX -I$(NETEMU_DIR) -I$(NETLIB_DIR) -O3 -pg -p -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

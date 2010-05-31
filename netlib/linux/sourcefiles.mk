@@ -1,9 +1,9 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 NETLIB_C_SRCS += \
-../netlib_error_nix.c \
-../netlib_network_nix.c \
-../netlib_thread_nix.c \
-../netlib_util_nix.c 
+$(NETLIB_SRC)netlib_error_nix.c \
+$(NETLIB_SRC)netlib_network_nix.c \
+$(NETLIB_SRC)netlib_thread_nix.c \
+$(NETLIB_SRC)netlib_util_nix.c 
 
 NETLIB_OBJS += \
 ./netlib_error_nix.o \

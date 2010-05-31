@@ -3,17 +3,17 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-NETEMU_C_SRCS += \
+C_SRCS += \
 ../p2p/netemu_p2p.c \
 ../p2p/p2p_callbacks.c \
 ../p2p/p2p_responses.c 
 
-NETEMU_OBJS += \
+OBJS += \
 ./p2p/netemu_p2p.o \
 ./p2p/p2p_callbacks.o \
 ./p2p/p2p_responses.o 
 
-NETEMU_C_DEPS += \
+C_DEPS += \
 ./p2p/netemu_p2p.d \
 ./p2p/p2p_callbacks.d \
 ./p2p/p2p_responses.d 
@@ -23,7 +23,7 @@ NETEMU_C_DEPS += \
 p2p/%.o: ../p2p/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -D_NIX -I$(NETLIB_DIR) -O3 -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	gcc -D_NIX -I"/home/fabian/workspace/netemu/netlib/headers" -O3 -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

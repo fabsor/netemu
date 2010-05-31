@@ -1,16 +1,15 @@
-RM := rm -rf
-NETLIB_DIR := ../../netlib/headers
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
 
-SUBDIRS := \
-. \
-structures \
-protocol \
-p2p \
-network \
-kaillera \
+-include ../makefile.init
+
+RM := rm -rf
 
 # All of the sources participating in the build are defined here
+-include sources.mk
 -include subdir.mk
+-include tests/subdir.mk
 -include structures/subdir.mk
 -include protocol/subdir.mk
 -include p2p/subdir.mk
@@ -19,10 +18,12 @@ kaillera \
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(strip $(NETEMU_C_DEPS)),)
--include $(NETEMU_C_DEPS)
+ifneq ($(strip $(C_DEPS)),)
+-include $(C_DEPS)
 endif
 endif
+
+-include ../makefile.defs
 
 # Add inputs and outputs from these tool invocations to the build variables 
 
@@ -30,15 +31,19 @@ endif
 all: libnetemu.a
 
 # Tool invocations
-libnetemu.a: $(NETEMU_OBJS)
+libnetemu.a: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC Archiver'
-	ar -r "libnetemu.a" $(NETEMU_OBJS) $(LIBS)
+	ar -r "libnetemu.a" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
-	-$(RM) $(NETEMU_OBJS)$(NETEMU_C_DEPS)
 
 # Other Targets
 clean:
-	-$(RM) $(NETEMU_OBJS)$(NETEMU_C_DEPS)$(ARCHIVES) libnetemu.a
+	-$(RM) $(OBJS)$(C_DEPS)$(ARCHIVES) libnetemu.a
 	-@echo ' '
+
+.PHONY: all clean dependents
+.SECONDARY:
+
+-include ../makefile.targets

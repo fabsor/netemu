@@ -1,13 +1,17 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
 # Add inputs and outputs from these tool invocations to the build variables 
-NETEMU_C_SRCS += \
+C_SRCS += \
 ../resources.c \
 ../util.c 
 
-NETEMU_C_OBJS += \
+OBJS += \
 ./resources.o \
 ./util.o 
 
-NETEMU_C_DEPS += \
+C_DEPS += \
 ./resources.d \
 ./util.d 
 
@@ -16,7 +20,7 @@ NETEMU_C_DEPS += \
 %.o: ../%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -D_NIX -I$(NETLIB_DIR) -O3 -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	gcc -D_NIX -I"/home/fabian/workspace/netemu/netlib/headers" -O3 -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
