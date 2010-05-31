@@ -3,7 +3,7 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-C_SRCS += \
+NETEMU_C_SRCS += \
 ../network/receiver_buffer.c \
 ../network/receiver_udp.c \
 ../network/sender_buffer.c \
@@ -11,7 +11,7 @@ C_SRCS += \
 ../network/sender_udp.c \
 ../network/tcp.c 
 
-OBJS += \
+NETEMU_OBJS += \
 ./network/receiver_buffer.o \
 ./network/receiver_udp.o \
 ./network/sender_buffer.o \
@@ -19,7 +19,7 @@ OBJS += \
 ./network/sender_udp.o \
 ./network/tcp.o 
 
-C_DEPS += \
+NETEMU_C_DEPS += \
 ./network/receiver_buffer.d \
 ./network/receiver_udp.d \
 ./network/sender_buffer.d \
@@ -32,7 +32,7 @@ C_DEPS += \
 network/%.o: ../network/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -D_NIX -I"/home/fabbe/workspace/netemu/netlib/headers" -O3 -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	gcc -D_NIX -I$(NETLIB_DIR) -O3 -pedantic -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
