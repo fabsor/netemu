@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="netemu_ui"
 	ProjectGUID="{6BE836B5-644A-30EF-8924-9C5CC359FB50}"
+	RootNamespace="netemu_ui"
 	Keyword="Qt4VSv1.0"
 	TargetFrameworkVersion="0"
 	>
@@ -45,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200 -w34100 -w34189 -w34100 -w34189"
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;c:\Qt\4.6.2\include\QtCore&quot;,&quot;c:\Qt\4.6.2\include\QtGui&quot;,&quot;c:\Qt\4.6.2\include&quot;,&quot;..\netemu_sender\interface&quot;,&quot;..\netlib\headers&quot;,&quot;c:\Qt\4.6.2\include\ActiveQt&quot;,&quot;debug&quot;,&quot;.&quot;,c:\Qt\4.6.2\mkspecs\default"
+				AdditionalIncludeDirectories="c:\Qt\4.6.2\include\QtCore;c:\Qt\4.6.2\include\QtGui;c:\Qt\4.6.2\include;..\netemu\interface;..\netlib\headers;c:\Qt\4.6.2\include\ActiveQt;debug;.;c:\Qt\4.6.2\mkspecs\default"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,QT_LARGEFILE_SUPPORT,QT_DLL,QT_GUI_LIB,QT_CORE_LIB,QT_THREAD_SUPPORT"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"

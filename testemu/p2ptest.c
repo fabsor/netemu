@@ -34,6 +34,8 @@ void join_p2p_game(struct netemu_p2p *connection);
 void show_p2p_game_list(struct netemu_p2p* connection);
 void show_p2p_user_list(struct netemu_p2p* connection);
 void p2p_player_joined_callback(struct netemu_p2p *connection, struct p2p_game *game, struct p2p_user *user);
+void p2p_player_joined(struct netemu_p2p *p2p, struct p2p_game *game, void* arg);
+void join_p2p_game_async(struct netemu_p2p *connection);
 
 int logged_in = 0;
 
@@ -101,7 +103,7 @@ void p2p_menu(struct netemu_p2p *connection) {
 	char val;
 	val = 10;
 	while(val != '0') {
-		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAYER_READY\n7. SEND PLAY VALUES");
+		printf("1. CREATE GAME\n2. SHOW GAME LIST\n3. SHOW USER LIST\n4. JOIN GAME\n5. START GAME\n6. SEND PLAYER_READY\n7. SEND PLAY VALUES\n8. JOIN GAME ASYNC\n 9. LEAVE GAME\n A. DISCONNECT\n");
 		val = getchar();
 
 		switch(val) {
@@ -125,6 +127,13 @@ void p2p_menu(struct netemu_p2p *connection) {
 				break;
 			case '7':
 				p2p_send_play_values(connection);
+			case '8':
+				join_p2p_game_async(connection);
+			case '9':
+				netemu_p2p_leave_game(connection);
+			case 'A':
+				netemu_p2p_disconnect(connection);
+				break;
 
 		}
 
@@ -162,6 +171,22 @@ void join_p2p_game(struct netemu_p2p *connection) {
 	}
 }
 
+void join_p2p_game_async(struct netemu_p2p *connection) {
+	struct p2p_game **p2p_games;
+	int no_games;
+	p2p_games = netemu_p2p_get_game_list(connection, &no_games);
+	if(no_games > 0) {
+		netemu_p2p_join_game_async(connection, p2p_games[0], p2p_player_joined, NULL);
+	}
+	else {
+		printf("No games to Join!");
+	}
+}
+
+void p2p_player_joined(struct netemu_p2p *p2p, struct p2p_game *game, void* arg) {
+	printf("yey");
+}
+
 void create_p2p_game(struct netemu_p2p* connection) {
 	struct p2p_game *result;
 	printf("Creating game\n");
@@ -184,7 +209,6 @@ void show_p2p_game_list(struct netemu_p2p* connection) {
 		}
 	}
 }
-
 
 void show_p2p_user_list(struct netemu_p2p* connection) {
 	int no_users, i;
