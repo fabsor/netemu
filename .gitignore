@@ -29,4 +29,8 @@ libnetlib.a
 netemu.org/*
 docs
 docs/*
-
+*.vcproj.*
+*.pdb
+*.idb
+.cproject
+.project
