@@ -128,6 +128,27 @@ int netemu_application_chat_parse(struct application_instruction *instruction, c
 	return 0;
 }
 
+int netemu_application_connection_rejected_parse(struct application_instruction *instruction, char *data) {
+	struct connection_rejected *rejected;
+
+	rejected = malloc(sizeof(struct connection_rejected));
+	if(rejected == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		return -1;
+	}
+
+	rejected->id = *((NETEMU_WORD*)*data);
+	data += sizeof(NETEMU_WORD);
+	rejected->message = netemu_util_parse_string(data);
+	if(rejected->message == NULL) {
+		netlib_set_last_error(NETEMU_ENOTENOUGHMEMORY);
+		free(rejected);
+		return -1;
+	}
+
+	return 0;
+}
+
 int netemu_application_login_success_parse(struct application_instruction *instruction, char *data) {
 	struct login_success *success;
 

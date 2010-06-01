@@ -46,13 +46,8 @@
 #define BUFFERED_PLAY_VALUES							0x12
 #define INTELLIGENTLY_CACHED_N_BUFFERED_PLAY_VALUES		0x13
 #define PLAYER_DROPPED									0x14
-/**
- * @todo: Add PLAYER_DROPPED define and implement the instruction!
- */
 #define PLAYER_READY									0x15
-/**
- * @todo: Add CONNECTION_REJECTED (SERVER_LOGIN_STATUS) define and implement the instruction
- */
+#define CONNECTION_REJECTED								0x16
 #define MOTD_CHAT										0x17
 #define PLAYER_DROPPED									20 /* Jag har ingen internetanslutning = Jag kan inte komma �t hex-decimal konverteraren. */
 
@@ -179,6 +174,11 @@ struct chat {
 	char *message;
 };
 
+struct connection_rejected {
+	NETEMU_WORD id;
+	char *message;
+};
+
 void netemu_application_buffered_play_values_add(struct application_instruction *instruction, NETEMU_WORD size, char *data);
 
 void netemu_application_buffered_play_values_pack(struct application_instruction *instruction, char *buffer);
@@ -192,6 +192,8 @@ int netemu_application_chat_partyline_add(struct application_instruction *instru
 void netemu_application_chat_pack(struct application_instruction *instruction, char *buffer);
 
 int netemu_application_chat_parse(struct application_instruction *instruction, char *data);
+
+int netemu_application_connection_rejected_parse(struct application_instruction *instruction, char *data);
 
 void netemu_application_create_game_add(struct application_instruction *instruction, char* gamename);
 
